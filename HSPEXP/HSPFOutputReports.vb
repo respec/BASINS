@@ -411,7 +411,8 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
-
+                    Dim QUALProperties As List(Of PQUALProperties)
+                    Dim QUALDataList As List(Of QUALData)
                     For Each lConstituent As String In pConstituents
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
@@ -428,12 +429,14 @@ Module HSPFOutputReports
                                 lConstituentName = "P"
                             Case "TotalN"
                                 lConstituentName = "TN"
+                                QUALProperties = Utility.LocatePQUALNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("NO3")
                                 AcceptableQUALNames.Add("NH3+NH4")
                                 AcceptableQUALNames.Add("BOD")
                             Case "TotalP"
                                 lConstituentName = "TP"
+                                QUALProperties = Utility.LocatePQUALNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("ORTHO P")
                                 AcceptableQUALNames.Add("BOD")
@@ -518,18 +521,18 @@ Module HSPFOutputReports
                                     Next
                                     For Each lTs As atcTimeseries In lOpenHspfBinDataSource.DataSets
                                         Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
-                                        If lConstituentNames.Contains(ConstituentFromTS) Then
-                                            'If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
-                                            lTs = SubsetByDate(lTs, SDateJ, EDateJ, Nothing)
-                                            lScenarioResults.DataSets.Add(lTs)
-                                            'Else
-                                            'Should be able to aggregate here, but need a better definition of TS that needs to be
-                                            'summed, averaged, or for the ones that need last.
-                                            'lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-                                            'lScenarioResults.DataSets.Add(lTs)
-                                            'End If
+                                        'If lConstituentNames.Contains(ConstituentFromTS) Then
+                                        'If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
+                                        'lTs = SubsetByDate(lTs, SDateJ, EDateJ, Nothing)
+                                        'lScenarioResults.DataSets.Add(lTs)
+                                        'Else
+                                        'Should be able to aggregate here, but need a better definition of TS that needs to be
+                                        'summed, averaged, or for the ones that need last.
+                                        'lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                                        lScenarioResults.DataSets.Add(lTs)
+                                        'End If
 
-                                        End If
+                                        'End If
                                     Next lTs
                                 End If
 
@@ -539,9 +542,21 @@ Module HSPFOutputReports
                         Next i
 
                         If lScenarioResults.DataSets.Count > 0 Then
-                            Dim lReportCons As New atcReport.ReportText
 
+
+                            Dim lReportCons As New atcReport.ReportText
+                            lReportCons = Nothing
                             Dim lOutFileName As String = ""
+                            For lcount As Integer = 0 To QUALProperties.Count - 1
+
+                                QUALDataList = HspfSupport.QUALReports(aHspfUci, lScenarioResults, QUALProperties(lcount))
+                                lReportCons = PrintQUALReports(QUALDataList, pBaseName, lRunMade)
+                                SaveFileString(loutfoldername & QUALProperties(lcount).ConstNameForEXPPlus & "_TestQUALReport.txt", lReportCons.ToString)
+                            Next lcount
+
+
+
+                            'Print test data for QUALData
 
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing

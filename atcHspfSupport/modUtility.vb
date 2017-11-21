@@ -4,6 +4,74 @@ Imports atcData
 Imports atcUCI
 
 Public Module Utility
+    Public Class PQUALProperties
+        ''' <summary>
+        ''' Kind of constituent report, like TN, TP, NO3-N, NH4-N etc. 
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReportType As String = ""
+        ''' <summary>
+        ''' Use a specific name in EXP+ to differentiate between constituents
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ConstNameForEXPPlus As String = ""
+        ''' <summary>
+        ''' UCI may have a different name for the Quality Constituent
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PQUALNameInUCI As String = ""
+        ''' <summary>
+        ''' Unit of the QUALID specifiied in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PQUALUnit As String = ""
+
+    End Class
+
+    Public Class QUALData
+        ''' <summary>
+        ''' PERLND or IMPLND
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property LandType As String = ""
+        ''' <summary>
+        ''' Operation Number
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OperationNumber As Integer = 0
+        ''' <summary>
+        ''' Name of operation specified in the GEN-INFO block
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OperationName As String = ""
+        ''' <summary>
+        ''' Name of the Quality Constituent in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property QUALNameInUCI As String = ""
+        ''' <summary>
+        ''' Units specified in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Units As String = "" 'QTYID from QUAL-PROPS
+        ''' <summary>
+        ''' Number of years of simulation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property NumberOfYears As Integer = 0
+        ''' <summary>
+        ''' Outflow data from each operation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutflowData As Dictionary(Of String, atcCollection) 'Collection will be like (year, value) and list will include for WASHQS, SCRQS etc.
+        ''' <summary>
+        ''' Monthly Average Outflow data from each operation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MonthlyOutFlowData As Dictionary(Of String, atcCollection) 'Collection will be like (month, value) and list will include for WASHQS, SCRQS etc.
+
+    End Class
+
 
     Public Function ConstituentsThatUseLast() As Generic.List(Of String)
         Static pConstituentsThatUseLast As Generic.List(Of String) = Nothing
@@ -1309,4 +1377,160 @@ Public Module Utility
 
     End Function
 
+    Public Function LocatePQUALNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String) As List(Of PQUALProperties)
+        Dim QUALs As New List(Of PQUALProperties)
+        Dim QUALNames As PQUALProperties
+        Dim QUALName As String = ""
+        Dim QUALUnit As String = ""
+        Dim lPERLNDOperations As HspfOperations = aUCI.OpnBlks("PERLND").Ids
+        Dim lIMPNDOperations As HspfOperations = aUCI.OpnBlks("IMPLND").Ids
+        Dim lRCHRESOperations As HspfOperations = aUCI.OpnBlks("RCHRES").Ids
+        Dim NQUALS As Integer = lPERLNDOperations(0).Tables("NQUALS").Parms("NQUAL").Value
+        Dim QUALID As Int16
+        Dim lTableName As String = ""
+        Dim ListContains As Boolean = False
+        For Each lML As HspfMassLink In aUCI.MassLinks
+            If lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL" Then
+                Select Case aBalanceType
+                    Case "TotalN"
+                        If lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+
+                            QUALNames.ConstNameForEXPPlus = "NO3N"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "NH4N"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "Ref-OrgN"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "lab-OrgN"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+
+                        End If
+
+                    Case "TotalP"
+
+                        If lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "PO4P"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 4 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "Ref-OrgP"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "lab-OrgP"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        End If
+
+                End Select
+
+
+
+
+            End If
+
+        Next
+
+
+
+        Return QUALs
+    End Function
+    Private Function CheckQUALList(item1 As PQUALProperties, item2 As List(Of PQUALProperties)) As Boolean
+        Dim itemsEqual As Boolean = False
+        For Each item As PQUALProperties In item2
+            If item.ConstNameForEXPPlus = item1.ConstNameForEXPPlus AndAlso
+                                    item.PQUALNameInUCI = item1.PQUALNameInUCI AndAlso
+                                    item.PQUALUnit = item1.PQUALUnit AndAlso
+                                    item.ReportType = item1.ReportType Then
+                itemsEqual = True
+                Exit For
+            End If
+        Next
+
+        Return itemsEqual
+    End Function
 End Module
