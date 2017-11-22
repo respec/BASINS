@@ -1252,6 +1252,10 @@ Public Module modBaseflowUtil
                 .Add("RateDaily", lTsFlowDailyBnd)
                 lTsFlowDailyDepth = lTsFlowDailyBnd * lConversionFactor
                 .Add("DepthDaily", lTsFlowDailyDepth)
+                If lTsFlowDaily.Dates.Value(1) <> lTsFlowDailyBnd.Dates.Value(1) Then
+                    .Add("RateDailyOriginal", lTsFlowDaily)
+                    .Add("DepthDailyOriginal", lTsFlowDaily * lConversionFactor)
+                End If
             Else
                 .Add("RateDaily", lTsFlowDaily)
                 .Add("DepthDaily", lTsFlowDailyDepth)
@@ -1994,8 +1998,20 @@ Public Module modBaseflowUtil
         Dim lBFTser As atcTimeseries = Nothing
         Dim lBFDepthTser As atcTimeseries = Nothing
 
-        Dim lTsFlow As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
-        Dim lTsFlowDepth As atcTimeseries = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep)
+        Dim lTsFlow As atcTimeseries = Nothing
+        Dim lTsFlowDepth As atcTimeseries = Nothing
+        If ATStep = "Daily" Then
+            If aTsGroupStreamFlow.Keys.Contains("Rate" & ATStep & "Original") Then
+                lTsFlow = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep & "Original")
+                lTsFlowDepth = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep & "Original")
+            Else
+                lTsFlow = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
+                lTsFlowDepth = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep)
+            End If
+        Else
+            lTsFlow = aTsGroupStreamFlow.ItemByKey("Rate" & ATStep)
+            lTsFlowDepth = aTsGroupStreamFlow.ItemByKey("Depth" & ATStep)
+        End If
         Dim lFlowStartDate As Double = -99
         Dim lFlowEndDate As Double = -99
         If lTsFlow IsNot Nothing Then
@@ -2066,8 +2082,8 @@ Public Module modBaseflowUtil
                     .Value(3) = "NA"
                     .Value(4) = "NA"
                 Else
-                    .Value(3) = DoubleToString(lFlowVal, , "0.0")
-                    .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00")
+                    .Value(3) = DoubleToString(lFlowVal, , "0.00", "0.00E00")
+                    .Value(4) = DoubleToString(lTsFlowDepth.Value(I), , "0.00", "0.00E00")
                 End If
                 Dim lLastColumn As Integer = 4
                 If aTsGroupPart.Count > 0 Then
@@ -2303,10 +2319,10 @@ Public Module modBaseflowUtil
                     .Value(aLastColumn + 5) = lValueNA
                     .Value(aLastColumn + 6) = lValueNA
                 Else
-                    .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00")
-                    .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00")
-                    .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00")
-                    .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00")
+                    .Value(aLastColumn + 1) = DoubleToString(aBF, , "0.00", "0.00E00")
+                    .Value(aLastColumn + 2) = DoubleToString(aBFDepth, , "0.00", "0.00E00")
+                    .Value(aLastColumn + 3) = DoubleToString(lRO, , "0.00", "0.00E00")
+                    .Value(aLastColumn + 4) = DoubleToString(lRODepth, , "0.00", "0.00E00")
                     .Value(aLastColumn + 5) = DoubleToString(lBFPct, , "0.0")
                     .Value(aLastColumn + 6) = DoubleToString(lBFPct / 100, , "0.0000")
                 End If
@@ -2462,11 +2478,11 @@ Public Module modBaseflowUtil
                 'lTsBFToReportPartYearly.Attributes.SetValue(lReportColumnAttributeName, "RateYearly")
                 'lTsBFToReportPartYearlyDepth.Attributes.SetValue(lReportColumnAttributeName, "DepthYearly")
                 With lTsGroupToReport
-                    If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" AndAlso lNumOfDays > JulianYear Then
-                        .Add("RateDaily", lTsBFToReportPartDailyBnd)
-                    Else
-                        .Add("RateDaily", lTsBFToReportPartDaily)
-                    End If
+                    'If Not String.IsNullOrEmpty(aReportBy) AndAlso aReportBy.ToLower() = "water" AndAlso lNumOfDays > JulianYear Then
+                    '    .Add("RateDaily", lTsBFToReportPartDailyBnd)
+                    'Else
+                    .Add("RateDaily", lTsBFToReportPartDaily)
+                    'End If
                     .Add("DepthDaily", lTsBFToReportPartDailyDepth)
                     .Add("RateMonthly", lTsBFToReportPartMonthly)
                     .Add("DepthMonthly", lTsBFToReportPartMonthlyDepth)
@@ -2485,6 +2501,16 @@ Public Module modBaseflowUtil
                 'Dim lTsYear As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                 'Dim lTsYearSum As atcTimeseries = Aggregate(lTsDaily, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
                 'Dim lTsYearDepth As atcTimeseries = lTsYearSum * lConversionFactor
+
+                If aMethod = BFMethods.BFIStandard OrElse aMethod = BFMethods.BFIModified Then
+                    Dim lStartOrig As Double = lTsDaily.Attributes.GetValue("OriginalStart", -1)
+                    Dim lEndOrig As Double = lTsDaily.Attributes.GetValue("OriginalEnd", -1)
+                    If lStartOrig > 0 AndAlso lEndOrig > 0 Then
+                        If lStartOrig <> lTsDaily.Dates.Value(0) AndAlso lStartOrig > lTsDaily.Dates.Value(0) Then
+                            lTsDaily = SubsetByDate(lTsDaily, lStartOrig, lEndOrig, Nothing)
+                        End If
+                    End If
+                End If
 
                 Dim lTsDailyDepth As atcTimeseries = Nothing
                 Dim lTsMon As atcTimeseries = Nothing
@@ -2641,7 +2667,11 @@ Public Module modBaseflowUtil
                 End If
                 With lTsGroupToReport
                     .Add("RateDaily", lTsDaily)
-                    .Add("DepthDaily", lTsDailyDepth)
+                    If lTsDaily.numValues = lTsDailyDepth.numValues Then
+                        .Add("DepthDaily", lTsDailyDepth)
+                    Else
+                        .Add("DepthDaily", lTsDaily * lConversionFactor)
+                    End If
                     .Add("RateMonthly", lTsMon)
                     .Add("DepthMonthly", lTsMonDepth)
                     .Add("RateYearly", lTsYear)
