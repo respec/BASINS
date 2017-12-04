@@ -1108,7 +1108,7 @@ Public Module Utility
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
 
             If lMassLink.MassLinkId = aMassLink Then
-
+                'If aMassLink = 1 Then Stop
                 Select Case aBalanceType
                     Case "Sediment"
                         Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
@@ -1128,13 +1128,12 @@ Public Module Utility
 
                     Case "TotalN"
 
-                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
-                            "_" & lMassLink.Target.MemSub1
-                            Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1", _
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
+                            Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1",
                                 "NO3-N - TOTAL OUTFLOW_NUIF1_1"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
-                            Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2", _
+                            Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2",
                                 "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW_NUIF1_2"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
@@ -1151,15 +1150,21 @@ Public Module Utility
                                     lMassLinkFactor += lMassLink.MFact
                                 End If
 
-                            Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2", "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2",
+                                 "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2",
+                                 "SOQO-NH3+NH4_NUIF1_2"
+
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     'Return lMassLinkFactor
                                 End If
 
-                            Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2", _
-                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3", _
-                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1"
+                            Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2",
+                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3",
+                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1",
+                                 "WASHQS-NH3+NH4_NUIF2_1", "WASHQS-NH3+NH4_NUIF2_2", "WASHQS-NH3+NH4_NUIF2_3",
+                                 "SCRQS-NH3+NH4_NUIF2_1", "SCRQS-NH3+NH4_NUIF2_2", "SCRQS-NH3+NH4_NUIF2_3"
                                 If lMassLink.Target.MemSub2 = 1 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                         lMassLinkFactor += lMassLink.MFact
@@ -1169,13 +1174,15 @@ Public Module Utility
                                 End If
 
 
-                            Case "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "SOQO-NO3_NUIF1_1", "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     Return lMassLinkFactor
                                 End If
-                            Case "WASHQS-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "WASHQS-BOD_PKIF_3", "SCRQS-BOD_PKIF_3", "SOQO-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     If aMultipleIndex = 1 Then
                                         lMassLinkFactor = lMassLink.MFact
                                     ElseIf aMultipleIndex = 2 Then
@@ -1186,7 +1193,7 @@ Public Module Utility
                                     Return lMassLinkFactor
 
                                 End If
-                            
+
                             Case "ORGN - TOTAL OUTFLOW_PKIF_3"
                                 If aMultipleIndex = 2 Then
                                     lMassLinkFactor = lMassLink.MFact
@@ -1224,14 +1231,18 @@ Public Module Utility
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString &
                             "_" & lMassLink.Target.MemSub1
 
-                            Case "POQUAL-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4", "AOQUAL-ORTHO P_NUIF1_4"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "POQUAL-ORTHO P_NUIF1_4", "SOQO-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4",
+                                 "AOQUAL-ORTHO P_NUIF1_4", "SCRQS-ORTHO P_NUIF1_4", "WASHQS-ORTHO P_NUIF1_4"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     'Return lMassLinkFactor
                                 End If
                             Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2",
                                 "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3",
-                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1"
+                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1",
+                                 "WASHQS-ORTHO P_NUIF2_1", "WASHQS-ORTHO P_NUIF2_2", "WASHQS-ORTHO P_NUIF2_3",
+                                 "SCRQS-ORTHO P_NUIF2_1", "SCRQS-ORTHO P_NUIF2_2", "SCRQS-ORTHO P_NUIF2_3"
 
                                 If lMassLink.Target.MemSub2 = 2 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
@@ -1402,7 +1413,7 @@ Public Module Utility
                                 lTableName = "QUAL-PROPS"
                             End If
 
-                            QUALNames.ConstNameForEXPPlus = "NO3N"
+                            QUALNames.ConstNameForEXPPlus = "NO3"
                             QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
                             QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
                             QUALNames.ReportType = aBalanceType
@@ -1417,7 +1428,7 @@ Public Module Utility
                             Else
                                 lTableName = "QUAL-PROPS"
                             End If
-                            QUALNames.ConstNameForEXPPlus = "NH4N"
+                            QUALNames.ConstNameForEXPPlus = "NH3+NH4"
                             QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
                             QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
                             QUALNames.ReportType = aBalanceType

@@ -29,8 +29,15 @@ Public Module atcQUALReports
         pPERLND = New atcCollection
         pIMPLND = New atcCollection
 
-        For Each loperation As HspfOperation In aUCI.OpnSeqBlock.Opns
+        Dim lMultipleIndex As Integer = 0
+        If QUALDetails.ConstNameForEXPPlus.ToLower.Contains("ref") Then
+            lMultipleIndex = 1
+        ElseIf QUALDetails.ConstNameForEXPPlus.Contains("lab") Then
+            lMultipleIndex = 2
+        End If
 
+        For Each loperation As HspfOperation In aUCI.OpnSeqBlock.Opns
+            If loperation.Name = "RCHRES" Then Continue For
             'Collecting the names of the land uses
             If loperation.Name = "PERLND" AndAlso Not pPERLND.Keys.Contains(loperation.Description) Then
                 pPERLND.Add(loperation.Description)
@@ -46,14 +53,35 @@ Public Module atcQUALReports
             QUALIndividualData.QUALNameInUCI = QUALDetails.PQUALNameInUCI
             Dim LocationName As String = loperation.Name.Substring(0, 1) & ":" & loperation.Id
             For Each OutflowData As String In lOutflowDataType
+                Dim lMassLinkFactor As Double = 1.0
+
 
                 Dim lTS As atcTimeseries = aScenariosResults.DataSets.FindData("Constituent", OutflowData & "-" & QUALNameInUCI).FindData("Location", LocationName)(0)
+
                 If Not lTS Is Nothing Then
+                    For Each lConnection As HspfConnection In loperation.Targets
+                        If lConnection.Target.VolName = "RCHRES" Then
+                            Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                            Dim aConversionFactor As Double = 0.0
+                            aConversionFactor = ConversionFactorfromOxygen(aUCI, QUALDetails.ReportType, aReach)
+                            Dim lMassLinkID As Integer = lConnection.MassLink
+                            If Not lMassLinkID = 0 Then
+
+                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, OutflowData & "-" & QUALNameInUCI,
+                                                                     QUALDetails.ReportType, aConversionFactor, lMultipleIndex)
+
+                                Exit For
+                            End If
+
+                        End If
+                    Next
+
+
                     lSeasons.SetSeasonalAttributes(lTS, lSeasonalAttributes, lYearlyAttributes)
                     Dim lYearlyData As New atcCollection
-                    lYearlyData.Increment("SumAnnual", lTS.Attributes.GetDefinedValue("SumAnnual").Value)
+                    lYearlyData.Increment("SumAnnual", lTS.Attributes.GetDefinedValue("SumAnnual").Value * lMassLinkFactor)
                     For i As Integer = 0 To lYearlyAttributes.Count - 1
-                        lYearlyData.Increment(lYearlyAttributes.Item(i).Arguments(1).Value.ToString, lYearlyAttributes.Item(i).Value)
+                        lYearlyData.Increment(lYearlyAttributes.Item(i).Arguments(1).Value.ToString, lYearlyAttributes.Item(i).Value * lMassLinkFactor)
                     Next
                     lTempOutflowData.Add(OutflowData, lYearlyData) 'So for WASHQS, SCRQS etc., this list has annual sum and yearwise data.
                 End If
@@ -104,6 +132,7 @@ Public Module atcQUALReports
                         Exit For
                     End If
                 Next
+                'If lTest Is Nothing Then Stop
 
                 For Each YearName As String In lTest.Keys
                     .CurrentRecord += 1
