@@ -88,6 +88,8 @@ Public Class clsBaseflowBFI
         If Not lTsDaily.Attributes.GetValue("Tu") = atcTimeUnit.TUDay Then
             lTsDaily = Aggregate(lTsDaily, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
         End If
+        Dim lStartDateOriginal As Double = StartDate
+        Dim lEndDateOriginal As Double = EndDate
 
         Dim lDate(5) As Integer
         Dim fillInStartIsNeeded As Boolean = False
@@ -162,6 +164,8 @@ Public Class clsBaseflowBFI
                 .SetValue("Constituent", lCons)
                 .SetValue("AnalysisStart", StartDate)
                 .SetValue("AnalysisEnd", EndDate)
+                .SetValue("OriginalStart", lStartDateOriginal)
+                .SetValue("OriginalEnd", lEndDateOriginal)
             End With
         End If
 
