@@ -4,6 +4,74 @@ Imports atcData
 Imports atcUCI
 
 Public Module Utility
+    Public Class PQUALProperties
+        ''' <summary>
+        ''' Kind of constituent report, like TN, TP, NO3-N, NH4-N etc. 
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReportType As String = ""
+        ''' <summary>
+        ''' Use a specific name in EXP+ to differentiate between constituents
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ConstNameForEXPPlus As String = ""
+        ''' <summary>
+        ''' UCI may have a different name for the Quality Constituent
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PQUALNameInUCI As String = ""
+        ''' <summary>
+        ''' Unit of the QUALID specifiied in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PQUALUnit As String = ""
+
+    End Class
+
+    Public Class QUALData
+        ''' <summary>
+        ''' PERLND or IMPLND
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property LandType As String = ""
+        ''' <summary>
+        ''' Operation Number
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OperationNumber As Integer = 0
+        ''' <summary>
+        ''' Name of operation specified in the GEN-INFO block
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OperationName As String = ""
+        ''' <summary>
+        ''' Name of the Quality Constituent in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property QUALNameInUCI As String = ""
+        ''' <summary>
+        ''' Units specified in the UCI file
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Units As String = "" 'QTYID from QUAL-PROPS
+        ''' <summary>
+        ''' Number of years of simulation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property NumberOfYears As Integer = 0
+        ''' <summary>
+        ''' Outflow data from each operation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutflowData As Dictionary(Of String, atcCollection) 'Collection will be like (year, value) and list will include for WASHQS, SCRQS etc.
+        ''' <summary>
+        ''' Monthly Average Outflow data from each operation
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MonthlyOutFlowData As Dictionary(Of String, atcCollection) 'Collection will be like (month, value) and list will include for WASHQS, SCRQS etc.
+
+    End Class
+
 
     Public Function ConstituentsThatUseLast() As Generic.List(Of String)
         Static pConstituentsThatUseLast As Generic.List(Of String) = Nothing
@@ -1040,7 +1108,7 @@ Public Module Utility
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
 
             If lMassLink.MassLinkId = aMassLink Then
-
+                'If aMassLink = 1 Then Stop
                 Select Case aBalanceType
                     Case "Sediment"
                         Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
@@ -1060,13 +1128,12 @@ Public Module Utility
 
                     Case "TotalN"
 
-                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & _
-                            "_" & lMassLink.Target.MemSub1
-                            Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1", _
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
+                            Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1",
                                 "NO3-N - TOTAL OUTFLOW_NUIF1_1"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
-                            Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2", _
+                            Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2",
                                 "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW_NUIF1_2"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
@@ -1083,15 +1150,21 @@ Public Module Utility
                                     lMassLinkFactor += lMassLink.MFact
                                 End If
 
-                            Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2", "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2",
+                                 "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2",
+                                 "SOQO-NH3+NH4_NUIF1_2"
+
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     'Return lMassLinkFactor
                                 End If
 
-                            Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2", _
-                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3", _
-                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1"
+                            Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2",
+                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3",
+                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1",
+                                 "WASHQS-NH3+NH4_NUIF2_1", "WASHQS-NH3+NH4_NUIF2_2", "WASHQS-NH3+NH4_NUIF2_3",
+                                 "SCRQS-NH3+NH4_NUIF2_1", "SCRQS-NH3+NH4_NUIF2_2", "SCRQS-NH3+NH4_NUIF2_3"
                                 If lMassLink.Target.MemSub2 = 1 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
                                         lMassLinkFactor += lMassLink.MFact
@@ -1101,13 +1174,15 @@ Public Module Utility
                                 End If
 
 
-                            Case "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "SOQO-NO3_NUIF1_1", "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     Return lMassLinkFactor
                                 End If
-                            Case "WASHQS-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "WASHQS-BOD_PKIF_3", "SCRQS-BOD_PKIF_3", "SOQO-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     If aMultipleIndex = 1 Then
                                         lMassLinkFactor = lMassLink.MFact
                                     ElseIf aMultipleIndex = 2 Then
@@ -1118,7 +1193,7 @@ Public Module Utility
                                     Return lMassLinkFactor
 
                                 End If
-                            
+
                             Case "ORGN - TOTAL OUTFLOW_PKIF_3"
                                 If aMultipleIndex = 2 Then
                                     lMassLinkFactor = lMassLink.MFact
@@ -1156,14 +1231,18 @@ Public Module Utility
                         Select Case aConstituent & "_" & lMassLink.Target.Member.ToString &
                             "_" & lMassLink.Target.MemSub1
 
-                            Case "POQUAL-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4", "AOQUAL-ORTHO P_NUIF1_4"
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                            Case "POQUAL-ORTHO P_NUIF1_4", "SOQO-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4",
+                                 "AOQUAL-ORTHO P_NUIF1_4", "SCRQS-ORTHO P_NUIF1_4", "WASHQS-ORTHO P_NUIF1_4"
+                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
                                     lMassLinkFactor = lMassLink.MFact
                                     'Return lMassLinkFactor
                                 End If
                             Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2",
                                 "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3",
-                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1"
+                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1",
+                                 "WASHQS-ORTHO P_NUIF2_1", "WASHQS-ORTHO P_NUIF2_2", "WASHQS-ORTHO P_NUIF2_3",
+                                 "SCRQS-ORTHO P_NUIF2_1", "SCRQS-ORTHO P_NUIF2_2", "SCRQS-ORTHO P_NUIF2_3"
 
                                 If lMassLink.Target.MemSub2 = 2 Then
                                     If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
@@ -1309,4 +1388,160 @@ Public Module Utility
 
     End Function
 
+    Public Function LocatePQUALNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String) As List(Of PQUALProperties)
+        Dim QUALs As New List(Of PQUALProperties)
+        Dim QUALNames As PQUALProperties
+        Dim QUALName As String = ""
+        Dim QUALUnit As String = ""
+        Dim lPERLNDOperations As HspfOperations = aUCI.OpnBlks("PERLND").Ids
+        Dim lIMPNDOperations As HspfOperations = aUCI.OpnBlks("IMPLND").Ids
+        Dim lRCHRESOperations As HspfOperations = aUCI.OpnBlks("RCHRES").Ids
+        Dim NQUALS As Integer = lPERLNDOperations(0).Tables("NQUALS").Parms("NQUAL").Value
+        Dim QUALID As Int16
+        Dim lTableName As String = ""
+        Dim ListContains As Boolean = False
+        For Each lML As HspfMassLink In aUCI.MassLinks
+            If lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL" Then
+                Select Case aBalanceType
+                    Case "TotalN"
+                        If lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+
+                            QUALNames.ConstNameForEXPPlus = "NO3"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "NH3+NH4"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "Ref-OrgN"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "lab-OrgN"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+
+                        End If
+
+                    Case "TotalP"
+
+                        If lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "PO4P"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 4 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "Ref-OrgP"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        ElseIf lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                            QUALNames = New PQUALProperties
+                            QUALID = lML.Source.MemSub1
+                            If QUALID <> 1 Then
+                                lTableName = "QUAL-PROPS" & ":" & QUALID
+                            Else
+                                lTableName = "QUAL-PROPS"
+                            End If
+                            QUALNames.ConstNameForEXPPlus = "lab-OrgP"
+                            QUALNames.PQUALNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
+                            QUALNames.PQUALUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                            QUALNames.ReportType = aBalanceType
+                            ListContains = CheckQUALList(QUALNames, QUALs)
+                            If ListContains = False Then QUALs.Add(QUALNames)
+
+                        End If
+
+                End Select
+
+
+
+
+            End If
+
+        Next
+
+
+
+        Return QUALs
+    End Function
+    Private Function CheckQUALList(item1 As PQUALProperties, item2 As List(Of PQUALProperties)) As Boolean
+        Dim itemsEqual As Boolean = False
+        For Each item As PQUALProperties In item2
+            If item.ConstNameForEXPPlus = item1.ConstNameForEXPPlus AndAlso
+                                    item.PQUALNameInUCI = item1.PQUALNameInUCI AndAlso
+                                    item.PQUALUnit = item1.PQUALUnit AndAlso
+                                    item.ReportType = item1.ReportType Then
+                itemsEqual = True
+                Exit For
+            End If
+        Next
+
+        Return itemsEqual
+    End Function
 End Module

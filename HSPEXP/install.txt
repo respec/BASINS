@@ -1,3 +1,10 @@
+Dated 11/10/2017
+HSPEXP+1.40beta4
+Features:
+1. Improved sensitivity/uncertainty analysis.
+2. This is a pre release version. The text will be polished in proper release.
+
+
 Dated 7/24/2017
 HSPEXP+1.40beta3
 Features:
