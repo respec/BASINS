@@ -411,9 +411,10 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
-                    Dim QUALProperties As List(Of PQUALProperties)
-                    Dim QUALDataList As List(Of QUALData)
+                    Dim ConstProperties As List(Of ConstituentProperties)
+
                     For Each lConstituent As String In pConstituents
+                        Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
                         Dim lConstituentName As String = ""
@@ -421,22 +422,26 @@ Module HSPFOutputReports
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "Sediment"
                                 lConstituentName = "SED"
-                            Case "N-PQUAL"
-                                lConstituentName = "N"
-                            Case "P-PQUAL"
-                                lConstituentName = "P"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                            'Case "N-PQUAL"
+                            '    lConstituentName = "N"
+
+                            'Case "P-PQUAL"
+                            '    lConstituentName = "P"
+
                             Case "TotalN"
                                 lConstituentName = "TN"
-                                QUALProperties = Utility.LocatePQUALNames(aHspfUci, lConstituent)
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("NO3")
                                 AcceptableQUALNames.Add("NH3+NH4")
                                 AcceptableQUALNames.Add("BOD")
                             Case "TotalP"
                                 lConstituentName = "TP"
-                                QUALProperties = Utility.LocatePQUALNames(aHspfUci, lConstituent)
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("ORTHO P")
                                 AcceptableQUALNames.Add("BOD")
@@ -547,13 +552,49 @@ Module HSPFOutputReports
                             Dim lReportCons As New atcReport.ReportText
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
-                            For lcount As Integer = 0 To QUALProperties.Count - 1
+                            For lcount As Integer = 0 To ConstProperties.Count - 1
 
-                                QUALDataList = HspfSupport.QUALReports(aHspfUci, lScenarioResults, QUALProperties(lcount))
-                                lReportCons = PrintQUALReports(QUALDataList, pBaseName, lRunMade)
-                                SaveFileString(loutfoldername & QUALProperties(lcount).ConstNameForEXPPlus & "_TestQUALReport.txt", lReportCons.ToString)
+                                ConstituentDataList.Add(QUALReports(aHspfUci, lScenarioResults, ConstProperties(lcount)))
+
                             Next lcount
+                            If lConstituentName = "TN" Or lConstituentName = "TP" Then
 
+                                For i As Integer = 0 To ConstituentDataList.Count - 1
+
+                                    For Each ConstOutflowData As ConstOutflowDatafromLand In ConstituentDataList(i)
+                                        Dim TotalConstituent As New ConstOutflowDatafromLand
+                                        TotalConstituent.LandConstituentNameForHSPEXP = lConstituentName
+                                        TotalConstituent.LandConstituentNameInUCI = lConstituentName
+                                        TotalConstituent.LandType = ConstOutflowData.LandType
+                                        TotalConstituent.OperationName = ConstOutflowData.OperationName
+                                        TotalConstituent.OperationNumber = ConstOutflowData.OperationNumber
+                                        TotalConstituent.Units = ConstOutflowData.Units
+                                        Dim Test2 As New Dictionary(Of String, atcCollection)
+                                        For Each key In ConstOutflowData.OutflowData.Keys
+
+                                            Dim Test As New atcCollection
+                                            For Each YearKey In ConstOutflowData.OutflowData(key).Keys
+                                                Test.Increment(YearKey, ConstOutflowData.OutflowData(key).ItemByKey(YearKey))
+
+                                            Next YearKey
+                                            Test2.Add(key, Test)
+
+
+
+                                        Next key
+                                        TotalConstituent.OutflowData = Test2
+                                        'Stop
+
+                                    Next ConstOutflowData
+
+
+                                Next i
+
+
+                            End If
+
+                            lReportCons = PrintQUALReports(ConstituentDataList, pBaseName, lRunMade, lConstituent)
+                            SaveFileString(loutfoldername & lConstituentName & "_TestQUALReport.txt", lReportCons.ToString)
 
 
                             'Print test data for QUALData
