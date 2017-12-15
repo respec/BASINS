@@ -90,9 +90,19 @@ Public Class atcDataSourceTimeseriesHSF5
                     Dim lCons(lConsStorageSize - 1) As Byte
                     H5D.read(Of Byte)(lConsId, lConsTypeId, New H5Array(Of Byte)(lCons))
                     Dim lConsNames(lConsArraySize - 1) As String
+                    Dim lConsDateDatasetIndex As Integer = Me.DataSets.Count
                     For lConInd As Integer = 0 To lConsArraySize - 1
                         lConsNames(lConInd) = System.Text.Encoding.ASCII.GetString(lCons, lConInd * 6, 6).Replace(vbNullChar, " ")
                         Debug.Print("  ConName " & lConsNames(lConInd))
+                        Dim lTimeSeries As New atcTimeseries(Me)
+                        lTimeSeries.Attributes.Add("Constituent", lConsNames(lConInd))
+                        lTimeSeries.Attributes.Add("Location", lOpnName)
+                        lTimeSeries.Attributes.Add("Scenario", "Simulated")
+                        If lConInd > 0 Then 'use dates from first dataset in this group
+                            lTimeSeries.Dates = Me.DataSets(lConsDateDatasetIndex).Dates.Clone
+                        End If
+                        ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
+                        Me.AddDataSet(lTimeSeries)
                     Next
                 Next
             Next
@@ -104,11 +114,11 @@ Public Class atcDataSourceTimeseriesHSF5
         Filter = pFilter
     End Sub
 
-    Private Function BuildTimeSeries(aGrpID As H5LocId, aTsNAme As String, aScenario As String) As atcTimeseries
-        Dim lTsGrpId As H5GroupId = H5G.open(aGrpID, aTsNAme)
+    Private Function BuildTimeSeries(aGrpID As H5LocId, aTsName As String, aScenario As String) As atcTimeseries
+        Dim lTsGrpId As H5GroupId = H5G.open(aGrpID, aTsName)
 
         Dim lTsAtCnt As Integer = H5A.getNumberOfAttributes(lTsGrpId)
-        Debug.Print("Attribute Count " & lTsAtCnt & " for " & aTsNAme)
+        Debug.Print("Attribute Count " & lTsAtCnt & " for " & aTsName)
 
         Dim lTimeSeries As New atcTimeseries(Me)
 
@@ -150,48 +160,64 @@ Public Class atcDataSourceTimeseriesHSF5
                     lTimeSeries.Attributes.Add(lAtName, "?")
             End Select
         Next
-        lTimeSeries.Attributes.Add("Name", aTsNAme)
+        lTimeSeries.Attributes.Add("Name", aTsName)
 
-        Dim lCnt As Integer = H5G.getNumObjects(lTsGrpId)
-
-        Dim lDateGrpId As H5DataSetId = H5D.open(lTsGrpId, "index")
-        Dim lDateStorageSize As Integer = H5D.getStorageSize(lDateGrpId)
-        Dim lDateArraySize As Integer = lDateStorageSize / 8
-        Dim lDates(lDateArraySize - 1) As Long
-        Dim lDateTypeId As H5DataTypeId = H5D.getType(lDateGrpId)
-        H5D.read(Of Int64)(lDateGrpId, lDateTypeId, New H5Array(Of Long)(lDates))
-        Debug.Print(lDateStorageSize.ToString & ":" & lDateArraySize.ToString & ":" & lDates(0).ToString)
-        Dim lDateBase As New System.DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)
-        Dim lDateNow As System.DateTime = lDateBase.AddMilliseconds(lDates(0) / (10 ^ 6))
-        Dim lDatesJ(lDateArraySize) As Double
-        For lIndex As Integer = 0 To lDateArraySize - 1
-            lDateNow = lDateBase.AddMilliseconds(lDates(lIndex) / (10 ^ 6))
-            With lDateNow
-                lDatesJ(lIndex) = Date2J(.Year, .Month, .Day, .Hour, .Minute, .Second)
-            End With
-            If lIndex < 3 Or lIndex > lDateArraySize - 2 Then
-                Debug.Print(lDateNow.ToString & ":" & DumpDate(lDatesJ(lIndex)))
-            End If
-        Next
-        lDatesJ(lDateArraySize) = (2 * (lDatesJ(lDateArraySize - 1))) - lDatesJ(lDateArraySize - 2)
-        Debug.Print(DumpDate(lDatesJ(lDateArraySize)))
-        lTimeSeries.Dates = New atcTimeseries(Me)
-        lTimeSeries.Dates.Values = lDatesJ
-
-        Dim lValueGrpId As H5DataSetId = H5D.open(lTsGrpId, "values")
-        Dim lValueStorageSize As Integer = H5D.getStorageSize(lValueGrpId)
-        Dim lValueArraySize As Integer = lDateArraySize
-        Dim lValues(lValueArraySize - 1) As Single
-        Dim lValueTypeId As H5DataTypeId = H5D.getType(lValueGrpId)
-        H5D.read(Of Single)(lValueGrpId, lValueTypeId, New H5Array(Of Single)(lValues))
-        Debug.Print(lValueStorageSize.ToString & ":" & lValueArraySize.ToString & ":" & lValues(0).ToString & ":" & lValues(1).ToString)
-        ReDim lTimeSeries.Values(lDateArraySize)
-        For lIndex As Integer = 1 To lDateArraySize
-            lTimeSeries.Values(lIndex) = lValues(lIndex - 1)
-        Next lIndex
-        lTimeSeries.SetInterval()
-        lTimeSeries.Attributes.CalculateAll()
+        ReadDatesAndData(lTimeSeries, lTsGrpId, "index", "values")
 
         Return lTimeSeries
     End Function
+
+    Private Sub ReadDatesAndData(aTimeseries As atcTimeseries, aTsGrpId As H5GroupId, aDateTableName As String, aDataTableName As String, Optional aColumn As Integer = -1)
+
+        Dim lNumValues As Integer
+        Dim lColumn As Integer = aColumn
+        If lColumn < 0 Then lColumn = 0
+
+        If aColumn <= 0 Then
+            Dim lDateGrpId As H5DataSetId = H5D.open(aTsGrpId, aDateTableName)
+            Dim lDateStorageSize As Integer = H5D.getStorageSize(lDateGrpId)
+            lNumValues = lDateStorageSize / 8
+            Dim lDates(lNumValues - 1) As Long
+            Dim lDateTypeId As H5DataTypeId = H5D.getType(lDateGrpId)
+            H5D.read(Of Int64)(lDateGrpId, lDateTypeId, New H5Array(Of Long)(lDates))
+            Debug.Print(lDateStorageSize.ToString & ":" & lNumValues.ToString & ":" & lDates(0).ToString)
+            Dim lDateBase As New System.DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)
+            Dim lDateNow As System.DateTime = lDateBase.AddMilliseconds(lDates(0) / (10 ^ 6))
+            Dim lDatesJ(lNumValues) As Double
+            For lIndex As Integer = 0 To lNumValues - 1
+                lDateNow = lDateBase.AddMilliseconds(lDates(lIndex) / (10 ^ 6))
+                With lDateNow
+                    lDatesJ(lIndex) = Date2J(.Year, .Month, .Day, .Hour, .Minute, .Second)
+                End With
+                If lIndex < 3 Or lIndex > lNumValues - 2 Then
+                    Debug.Print(lDateNow.ToString & ":" & DumpDate(lDatesJ(lIndex)))
+                End If
+            Next
+            lDatesJ(lNumValues) = (2 * (lDatesJ(lNumValues - 1))) - lDatesJ(lNumValues - 2)
+            Debug.Print(DumpDate(lDatesJ(lNumValues)))
+            aTimeseries.Dates = New atcTimeseries(Me)
+            aTimeseries.Dates.Values = lDatesJ
+        Else
+            lNumValues = aTimeseries.Dates.numValues
+        End If
+
+        Dim lValueGrpId As H5DataSetId = H5D.open(aTsGrpId, aDataTableName)
+        Dim lValuesArraySize As Integer = H5D.getStorageSize(lValueGrpId) / 4
+        Dim lValueArraySize As Integer = aTimeseries.Dates.numValues
+        Dim lValueColumns As Integer = lValuesArraySize / lValueArraySize
+        Dim lValues(lValuesArraySize - 1) As Single
+        Dim lValueTypeId As H5DataTypeId = H5D.getType(lValueGrpId)
+        'read all data (may be multiple ts)
+        H5D.read(Of Single)(lValueGrpId, lValueTypeId, New H5Array(Of Single)(lValues))
+        Debug.Print(lValuesArraySize.ToString & ":" & lValueArraySize.ToString & ":" & lValues(0).ToString & ":" & lValues(1).ToString)
+        ReDim aTimeseries.Values(lNumValues)
+        For lIndex As Integer = 1 To lNumValues
+            Dim lArrayIndex As Integer = (lValueColumns * (lIndex - 1)) + lColumn
+            aTimeseries.Values(lIndex) = lValues(lArrayIndex)
+        Next lIndex
+
+        aTimeseries.SetInterval()
+        aTimeseries.Attributes.CalculateAll()
+
+    End Sub
 End Class
