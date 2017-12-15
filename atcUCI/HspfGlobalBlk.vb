@@ -6,12 +6,34 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Class HspfGlobalBlk
-    Private pRunInf As HSPFParm ' run information
+    ''' <summary>
+    ''' Run Information 
+    ''' </summary>
+
+    Private pRunInf As HspfParm ' run information
+    ''' <summary>
+    ''' Starting date of the simulation.
+    ''' </summary>
     Private pSDate(5) As Integer 'starting date
+    ''' <summary>
+    ''' Ending date of the simulation.
+    ''' </summary>
     Private pEDate(5) As Integer 'ending date
-    Private pOutLev As HSPFParm 'run interp output level
+    ''' <summary>
+    ''' Run Interpreter Output Level
+    ''' </summary>
+    Private pOutLev As HspfParm 'run interp output level
+    ''' <summary>
+    ''' Special Action Output Level
+    ''' </summary>
     Private pSpOut As Integer 'special action output level
+    ''' <summary>
+    ''' Interpret only (0) or Interpret and Run (1).
+    ''' </summary>
     Private pRunFg As Integer 'interp only(0) or interp and run(1)
+    ''' <summary>
+    ''' English(1) or Metric(2) units for model simulation
+    ''' </summary>
     Private pEmFg As Integer 'english(1), metric(2) flag
     Private pIhmFg As Integer 'ihm flag (normal-0,IHM control-1)
     Public Comment As String = ""
