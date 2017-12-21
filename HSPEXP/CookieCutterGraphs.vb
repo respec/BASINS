@@ -7,6 +7,7 @@ Imports atcGraph
 Imports System.Collections.Specialized
 
 Public Module CookieCutterGraphs
+    'This can probably go under atcGraph.
     Sub ReganGraphs(ByVal aHSPFUCI As HspfUci, ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal lOutputFolder As String)
         Dim lConstituentsToGraph As New atcCollection
         lOutputFolder &= "ReganPlots\"

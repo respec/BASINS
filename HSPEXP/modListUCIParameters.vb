@@ -27,13 +27,13 @@ Public Module modListUCIParameters
         Next
 
         ParameterList.WriteLine("Number Of Reaches in the UCI File = " & NumberOfReaches)
-        ParameterList.WriteLine("OperationType, OperationID, OperationCaption, TableName, TableOccurrence, PrameterName, ParameterValue")
+        ParameterList.WriteLine("OperationType, OperationID, TableName, TableOccurrence, PrameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "RCHRES" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption & ", " & lTable.Name & ", " &
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lTable.Name & ", " &
                                                 lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
@@ -63,15 +63,16 @@ Public Module modListUCIParameters
         Next
 
         ParameterList.WriteLine("Number Of PERLND Operations in the UCI File = " & NumberOfPERLNDOperations)
-        ParameterList.WriteLine("OperationType, OperationID, Operationcaption, TableName, Table Occurrence Index, ParameterName, ParameterValue")
+        ParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "PERLND" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
+                        'If lparm.Value.Contains("ORTHO") Then Stop
                         'If lTable.OccurIndex > 1 Then Stop
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption & ", " &
-                                                lTable.Name & "," & lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
+                                                lTable.Name & "," & lTable.OccurNum & ", " & lTable.OccurCount & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
             End If
@@ -100,14 +101,14 @@ Public Module modListUCIParameters
         Next
 
         ParameterList.WriteLine("Number Of IMPLND Operations in the UCI File = " & NumberOfReaches)
-        ParameterList.WriteLine("OperationType, OperationID, Operationcaption, TableName, Table Occurrence Index, ParameterName, ParameterValue")
+        ParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "IMPLND" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lOperation.Caption &
-                                                ", " & lTable.Name & "," & lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
+                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
+                                                lTable.Name & "," & lTable.OccurNum & ", " & lTable.OccurCount & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
             End If

@@ -1621,11 +1621,17 @@ StartOver:
                     If lLayerProjection4 IsNot Nothing AndAlso lLayerProjection4.Trim().Length > 0 AndAlso lLayerProjection4 <> g_Project.ProjectProjection Then
                         g.Close()
                         Logger.Status("Reprojecting Grid, this may take several minutes: " & aFilename)
-                        Dim lOutputFileName As String = GetTemporaryFileName(IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)), IO.Path.GetExtension(aFilename))
+                        'the problem with GetTemporaryFileName is that we want this file to be permanent, so don't use this
+                        'Dim lOutputFileName As String = GetTemporaryFileName(IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)), IO.Path.GetExtension(aFilename))
+                        Dim lOutputFileName As String = IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)) & "_reproj" & IO.Path.GetExtension(aFilename)
                         MapWinGeoProc.SpatialReference.ProjectGrid(lLayerProjection4, g_Project.ProjectProjection, aFilename, lOutputFileName, True)
                         g = New MapWinGIS.Grid
                         Logger.Status("Opening " & aFilename)
-                        g.Open(lOutputFileName)
+                        If IO.File.Exists(lOutputFileName) Then
+                            g.Open(lOutputFileName)
+                        Else
+                            g.Open(aFilename)
+                        End If
                         Logger.Status("")
                     End If
                 End If
@@ -2111,9 +2117,11 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
 
     Public Function CheckAddress(ByVal URL As String) As Boolean
         Try
+            Logger.Dbg("CheckAddress " & URL)
             Dim request As WebRequest = WebRequest.Create(URL)
             Dim response As WebResponse = request.GetResponse()
         Catch ex As Exception
+            Logger.Dbg("CheckAddress Failed " & ex.ToString)
             Return False
         End Try
         Return True

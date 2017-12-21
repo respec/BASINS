@@ -111,6 +111,8 @@ Public Class frmUSGSBaseflowBatch
         Dim lDates(5) As Integer
 
         If Not pSetGlobal Then
+            btnExamineData.Visible = True
+            btnPlotDur.Visible = True
             Dim lStations As ArrayList = pBasicAttributes.GetValue("StationInfo", Nothing)
             For Each lDataset As atcData.atcTimeseries In pDataGroup
                 If lDataset.Dates.numValues > 0 Then
@@ -150,6 +152,8 @@ Public Class frmUSGSBaseflowBatch
             grdStations.Visible = True
             btnWriteASCIIOutput.Text = "Set Parameters: " & pBasicAttributes.GetValue("Group", "")
         Else
+            btnExamineData.Visible = False
+            btnPlotDur.Visible = False
             grdStations.Visible = False
             btnWriteASCIIOutput.Text = "Set Parameters: Global Defaults"
             pCommonStart = pBasicAttributes.GetValue("SJDATECommon", 0)
@@ -254,6 +258,15 @@ Public Class frmUSGSBaseflowBatch
             End If
         End If
 
+        Dim lReportBy As String = pBasicAttributes.GetValue(BFInputNames.Reportby, "")
+        If lReportBy <> "" Then
+            If lReportBy = BFBatchInputNames.ReportByCY OrElse lReportBy = BFInputNames.BFIReportbyCY Then
+                rdoBFIReportbyCalendarYear.Checked = True
+            ElseIf lReportBy = BFBatchInputNames.ReportByWY OrElse lReportBy = BFInputNames.BFIReportbyWY Then
+                rdoBFIReportbyWaterYear.Checked = True
+            End If
+        End If
+
         If pMethods.Contains(BFMethods.BFLOW) Then
             Dim lFP1 As Double = pBasicAttributes.GetValue(BFInputNames.BFLOWFilter, 0.925)
             If Double.IsNaN(lFP1) OrElse lFP1 < 0 OrElse lFP1 > 1 Then
@@ -286,6 +299,11 @@ Public Class frmUSGSBaseflowBatch
         txtOutputDir.Text = pOutputDir
         OutputFilenameRoot = pBasicAttributes.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
         txtOutputRootName.Text = OutputFilenameRoot
+        If pBasicAttributes.GetValue(BFInputNames.FullSpanDuration, False) Then
+            rdoDurationYes.Checked = True
+        Else
+            rdoDurationNo.Checked = True
+        End If
     End Sub
 
     Public Function AskUser(ByVal aName As String, _
@@ -439,6 +457,11 @@ Public Class frmUSGSBaseflowBatch
             If pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFIRecessConst, lK1Day) '"BFIK1Day"
             End If
+            Dim lYearBasis As String = BFInputNames.ReportbyCY '"Calendar"
+            If rdoBFIReportbyWaterYear.Checked Then
+                lYearBasis = BFInputNames.ReportbyWY '"Water"
+            End If
+            Args.SetValue(BFInputNames.Reportby, lYearBasis) '"Reportby"
             If pMethods.Contains(BFMethods.BFIStandard) OrElse pMethods.Contains(BFMethods.BFIModified) Then
                 Args.SetValue(BFInputNames.BFINDayScreen, lNDay) '"BFINDay"
                 Dim lBFIYearBasis As String = BFInputNames.BFIReportbyCY '"Calendar"
@@ -456,6 +479,7 @@ Public Class frmUSGSBaseflowBatch
                 Args.SetValue(BFInputNames.TwoParamEstMethod, pTwoParamEstimationMethod)
             End If
             Args.SetValue(BFInputNames.BFMethods, pMethods)
+            Args.SetValue(BFInputNames.FullSpanDuration, rdoDurationYes.Checked)
         End If
         Return lErrMsg
     End Function
@@ -490,7 +514,7 @@ Public Class frmUSGSBaseflowBatch
             If pSetGlobal Then
                 Return -99
             End If
-            Dim lAskUser As String = _
+            Dim lAskUser As String =
             Logger.MsgCustomOwned("Invalid starting date. Use dataset start date?", "Start Date Correction", Me, New String() {"Yes", "No"})
             If lAskUser = "Yes" Then
                 lArr = txtDataStart.Text.Trim.Split("/")
@@ -507,6 +531,15 @@ Public Class frmUSGSBaseflowBatch
         If IsDateValid(lArr) Then
             If pAnalysisOverCommonDuration Then
                 pCommonStart = Date2J(lYear, lMonth, lDay)
+                If lMonth = 10 And lDay = 1 Then
+                    If Not rdoBFIReportbyWaterYear.Checked Then
+                        Dim lAskUser As String =
+            Logger.MsgCustomOwned("Report by water year?", "Start Date", Me, New String() {"Yes", "No"})
+                        If lAskUser = "Yes" Then
+                            rdoBFIReportbyWaterYear.Checked = True
+                        End If
+                    End If
+                End If
             End If
         Else
             Return -99.0

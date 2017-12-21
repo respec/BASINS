@@ -116,6 +116,16 @@ Public MustInherit Class clsBaseflow
         End Set
     End Property
 
+    Private pReportBy As String
+    Public Property ReportBy() As String
+        Get
+            Return pReportBy
+        End Get
+        Set(ByVal value As String)
+            pReportBy = value
+        End Set
+    End Property
+
     Public MustOverride Function DoBaseFlowSeparation() As atcData.atcTimeseriesGroup Implements IclsBaseflow.DoBaseFlowSeparation
     Public MustOverride Sub Clear() Implements IclsBaseflow.Clear
 End Class

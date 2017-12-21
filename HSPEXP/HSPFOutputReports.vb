@@ -118,13 +118,31 @@ Module HSPFOutputReports
                 SDateJ = StartUp.DateTimePicker1.Value.ToOADate()
                 EDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
 
+                Dim lEchoFileisinFilesBlock As Boolean = False
+                Dim lHspfEchoFileName As String = pTestPath & "hspfecho.out" 'Get the default name of echo file
+                Dim echoFileInfo As System.IO.FileInfo
+                For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                    If aHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
+                        lHspfEchoFileName = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Update echo file name if it is referenced in the Files block
+                        Exit For
+                    End If
+                Next
+
                 If pSensitivity Then
-                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ)
+                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ, lHspfEchoFileName)
                     Logger.Msg("Sensitivity/Uncertainty Analysis Complete", vbOKOnly)
                     OpenFile(pTestPath)
                     End
 
                 End If
+
+                pListModelParameters = True
+                If pListModelParameters Then
+                    ListReachParametersForAllUCIFiles(pTestPath)
+                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
+                End If
+
+
 
                 If pRunUci = True Then
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
@@ -149,36 +167,14 @@ Module HSPFOutputReports
                 Dim lStr As String = ""
                 Dim lRunMade As String = ""
 
-                Dim lEchoFileisinFilesBlock As Boolean = False
-                Dim lHspfEchoFileName As String = ""
-                Dim echoFileInfo As System.IO.FileInfo
-                For i As Integer = 0 To aHspfUci.FilesBlock.Count
-                    If aHspfUci.FilesBlock.Value(i).Typ = "MESSU" Then
-                        lHspfEchoFileName = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Should check if the echo file is present
-                        If IO.File.Exists(lHspfEchoFileName) Then
-                            echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                            lRunMade = echoFileInfo.LastWriteTime.ToString
-                            lEchoFileisinFilesBlock = True
-                        Else
-                            Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
-                            End
-                            Return
-                        End If
-                        Exit For
-                    End If
-                Next
-                If Not lEchoFileisinFilesBlock Then
-                    lHspfEchoFileName = pTestPath & "hspfecho.out"
-                    If IO.File.Exists(lHspfEchoFileName) Then
-                        echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
-                        lRunMade = echoFileInfo.LastWriteTime.ToString
-                        lEchoFileisinFilesBlock = True
-                    Else
-                        Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
-                        Return
-                    End If
+                If IO.File.Exists(lHspfEchoFileName) Then
+                    echoFileInfo = New System.IO.FileInfo(lHspfEchoFileName)
+                    lRunMade = echoFileInfo.LastWriteTime.ToString
+                Else
+                    Logger.Msg("The ECHO file is not available for this model. Please check if model ran successfully last time", vbCritical)
+                    End
+                    Return
                 End If
-
 
 
                 Dim HSPFRan As Boolean = False
@@ -210,11 +206,7 @@ Module HSPFOutputReports
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
-                pListModelParameters = True
-                If pListModelParameters Then
-                    ListReachParametersForAllUCIFiles(pTestPath)
-                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
-                End If
+
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try
@@ -419,8 +411,10 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
+                    Dim ConstProperties As List(Of ConstituentProperties)
 
                     For Each lConstituent As String In pConstituents
+                        Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
                         Dim lConstituentName As String = ""
@@ -428,20 +422,26 @@ Module HSPFOutputReports
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "Sediment"
                                 lConstituentName = "SED"
-                            Case "N-PQUAL"
-                                lConstituentName = "N"
-                            Case "P-PQUAL"
-                                lConstituentName = "P"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                            'Case "N-PQUAL"
+                            '    lConstituentName = "N"
+
+                            'Case "P-PQUAL"
+                            '    lConstituentName = "P"
+
                             Case "TotalN"
                                 lConstituentName = "TN"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("NO3")
                                 AcceptableQUALNames.Add("NH3+NH4")
                                 AcceptableQUALNames.Add("BOD")
                             Case "TotalP"
                                 lConstituentName = "TP"
+                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("ORTHO P")
                                 AcceptableQUALNames.Add("BOD")
@@ -526,18 +526,18 @@ Module HSPFOutputReports
                                     Next
                                     For Each lTs As atcTimeseries In lOpenHspfBinDataSource.DataSets
                                         Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
-                                        If lConstituentNames.Contains(ConstituentFromTS) Then
-                                            'If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
-                                            lTs = SubsetByDate(lTs, SDateJ, EDateJ, Nothing)
-                                            lScenarioResults.DataSets.Add(lTs)
-                                            'Else
-                                            'Should be able to aggregate here, but need a better definition of TS that needs to be
-                                            'summed, averaged, or for the ones that need last.
-                                            'lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
-                                            'lScenarioResults.DataSets.Add(lTs)
-                                            'End If
+                                        'If lConstituentNames.Contains(ConstituentFromTS) Then
+                                        'If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
+                                        'lTs = SubsetByDate(lTs, SDateJ, EDateJ, Nothing)
+                                        'lScenarioResults.DataSets.Add(lTs)
+                                        'Else
+                                        'Should be able to aggregate here, but need a better definition of TS that needs to be
+                                        'summed, averaged, or for the ones that need last.
+                                        'lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
+                                        lScenarioResults.DataSets.Add(lTs)
+                                        'End If
 
-                                        End If
+                                        'End If
                                     Next lTs
                                 End If
 
@@ -547,9 +547,57 @@ Module HSPFOutputReports
                         Next i
 
                         If lScenarioResults.DataSets.Count > 0 Then
-                            Dim lReportCons As New atcReport.ReportText
 
+
+                            Dim lReportCons As New atcReport.ReportText
+                            lReportCons = Nothing
                             Dim lOutFileName As String = ""
+                            For lcount As Integer = 0 To ConstProperties.Count - 1
+
+                                ConstituentDataList.Add(QUALReports(aHspfUci, lScenarioResults, ConstProperties(lcount)))
+
+                            Next lcount
+                            If lConstituentName = "TN" Or lConstituentName = "TP" Then
+
+                                For i As Integer = 0 To ConstituentDataList.Count - 1
+
+                                    For Each ConstOutflowData As ConstOutflowDatafromLand In ConstituentDataList(i)
+                                        Dim TotalConstituent As New ConstOutflowDatafromLand
+                                        TotalConstituent.LandConstituentNameForHSPEXP = lConstituentName
+                                        TotalConstituent.LandConstituentNameInUCI = lConstituentName
+                                        TotalConstituent.LandType = ConstOutflowData.LandType
+                                        TotalConstituent.OperationName = ConstOutflowData.OperationName
+                                        TotalConstituent.OperationNumber = ConstOutflowData.OperationNumber
+                                        TotalConstituent.Units = ConstOutflowData.Units
+                                        Dim Test2 As New Dictionary(Of String, atcCollection)
+                                        For Each key In ConstOutflowData.OutflowData.Keys
+
+                                            Dim Test As New atcCollection
+                                            For Each YearKey In ConstOutflowData.OutflowData(key).Keys
+                                                Test.Increment(YearKey, ConstOutflowData.OutflowData(key).ItemByKey(YearKey))
+
+                                            Next YearKey
+                                            Test2.Add(key, Test)
+
+
+
+                                        Next key
+                                        TotalConstituent.OutflowData = Test2
+                                        'Stop
+
+                                    Next ConstOutflowData
+
+
+                                Next i
+
+
+                            End If
+
+                            lReportCons = PrintQUALReports(ConstituentDataList, pBaseName, lRunMade, lConstituent)
+                            SaveFileString(loutfoldername & lConstituentName & "_TestQUALReport.txt", lReportCons.ToString)
+
+
+                            'Print test data for QUALData
 
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing

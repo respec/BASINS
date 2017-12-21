@@ -31,6 +31,7 @@ Partial Class frmAddConnection
         Me.cboDownstream = New System.Windows.Forms.ComboBox()
         Me.lblDownstream = New System.Windows.Forms.Label()
         Me.lblDownstreamReach = New System.Windows.Forms.Label()
+        Me.txtDisclaimer = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'cboUpstream
@@ -39,7 +40,7 @@ Partial Class frmAddConnection
         Me.cboUpstream.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.cboUpstream.Location = New System.Drawing.Point(115, 38)
         Me.cboUpstream.Name = "cboUpstream"
-        Me.cboUpstream.Size = New System.Drawing.Size(122, 21)
+        Me.cboUpstream.Size = New System.Drawing.Size(143, 21)
         Me.cboUpstream.TabIndex = 2
         '
         'lblUpstreamReach
@@ -64,7 +65,7 @@ Partial Class frmAddConnection
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnOk.AutoSize = True
-        Me.btnOk.Location = New System.Drawing.Point(15, 148)
+        Me.btnOk.Location = New System.Drawing.Point(53, 201)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(84, 23)
         Me.btnOk.TabIndex = 9
@@ -75,7 +76,7 @@ Partial Class frmAddConnection
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.AutoSize = True
-        Me.btnCancel.Location = New System.Drawing.Point(105, 148)
+        Me.btnCancel.Location = New System.Drawing.Point(143, 201)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(84, 23)
         Me.btnCancel.TabIndex = 10
@@ -88,7 +89,7 @@ Partial Class frmAddConnection
         Me.cboDownstream.FormattingEnabled = True
         Me.cboDownstream.Location = New System.Drawing.Point(115, 99)
         Me.cboDownstream.Name = "cboDownstream"
-        Me.cboDownstream.Size = New System.Drawing.Size(122, 21)
+        Me.cboDownstream.Size = New System.Drawing.Size(143, 21)
         Me.cboDownstream.TabIndex = 30
         '
         'lblDownstream
@@ -109,12 +110,28 @@ Partial Class frmAddConnection
         Me.lblDownstreamReach.TabIndex = 31
         Me.lblDownstreamReach.Text = "Downstream Reach:"
         '
+        'txtDisclaimer
+        '
+        Me.txtDisclaimer.BackColor = System.Drawing.SystemColors.Menu
+        Me.txtDisclaimer.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.txtDisclaimer.CausesValidation = False
+        Me.txtDisclaimer.Enabled = False
+        Me.txtDisclaimer.Location = New System.Drawing.Point(15, 136)
+        Me.txtDisclaimer.Multiline = True
+        Me.txtDisclaimer.Name = "txtDisclaimer"
+        Me.txtDisclaimer.Size = New System.Drawing.Size(243, 56)
+        Me.txtDisclaimer.TabIndex = 34
+        Me.txtDisclaimer.Text = "Warning: When connecting Upstream/Downstream UCIs, this feature assumes the simul" &
+    "ation units are the same for both UCIs and that the UCIs have a common period of" &
+    " record."
+        '
         'frmAddConnection
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(254, 183)
+        Me.ClientSize = New System.Drawing.Size(270, 236)
+        Me.Controls.Add(Me.txtDisclaimer)
         Me.Controls.Add(Me.cboDownstream)
         Me.Controls.Add(Me.lblDownstream)
         Me.Controls.Add(Me.lblDownstreamReach)
@@ -138,4 +155,5 @@ Partial Class frmAddConnection
     Friend WithEvents lblDownstream As Label
     Friend WithEvents lblDownstreamReach As Label
     Friend WithEvents cboUpstream As ComboBox
+    Friend WithEvents txtDisclaimer As TextBox
 End Class
