@@ -661,25 +661,18 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine()
 
                             If pHigh Then
-                                If lNumZero > 0 Then
-                                    lRept.AppendLine("                            Adjusted    Variance    95-Pct Confidence")
-                                Else
-                                    lRept.AppendLine("                                        Variance    95-Pct Confidence")
-                                End If
+                                lRept.AppendLine("                                        Variance    95-Pct Confidence")
                                 lRept.AppendLine(" Exceedence     Recurrence  Parameter      of          Intervals")
                             Else
-                                If lNumZero > 0 Then
-                                    lRept.AppendLine("   Non-                     Adjusted    Variance    95-Pct Confidence")
-                                Else
-                                    lRept.AppendLine("   Non-                                 Variance    95-Pct Confidence")
-                                End If
+                                lRept.AppendLine("   Non-                                 Variance    95-Pct Confidence")
                                 lRept.AppendLine(" exceedance     Recurrence  Parameter      of          Intervals")
                             End If
-                            'If just aligns code
-                            If True Then
+                            If lNumZero > 0 Then
+                                lRept.AppendLine(" Probability     Interval   Value (*)   Estimate    Lower      Upper")
+                            Else
                                 lRept.AppendLine(" Probability     Interval     Value     Estimate    Lower      Upper")
-                                lRept.AppendLine(" -----------    ----------  ---------   --------  ---------  ---------")
                             End If
+                            lRept.AppendLine(" -----------    ----------  ---------   --------  ---------  ---------")
                         End If
 
                         Dim lReverseString As String = ""
@@ -756,9 +749,9 @@ Public Class atcFrequencyGridSource
 
                             lRept.AppendLine()
                             If lNumZero > 0 Then
-                                lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
-                                lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
-                                lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                                lRept.AppendLine(" (*) Note - Conditional Probability Adjustment (CPA) applied because of zero flow(s).")
+                                lRept.AppendLine("            Parameter values (column 3), adjusted using CPA, correspond with")
+                                lRept.AppendLine("            non-exceedence probabilities (column 1) and recurrence intervals (column 2).")
                                 'Or, could Add Message Here, like another Note entry
                             End If
                             lRept.AppendLine()

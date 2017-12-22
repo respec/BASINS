@@ -403,6 +403,9 @@ Public Class ATCoSelectListSortByProp
             cmdMoveAllRight.Left = lButtonLeft
             cmdMoveAllLeft.Left = lButtonLeft
             lstRight.Left = lButtonLeft + cmdMoveRight.Width + lMargin
+            lblRight.Left = lstRight.Left
+            lblRight.Width = lstRight.Width
+            lblLeft.Width = lstLeft.Width
         End If
     End Sub
 End Class
