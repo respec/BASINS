@@ -9,13 +9,31 @@ Imports System.Collections
 
 Public Class BoxWhiskerItem
 
+    ''' <summary>
+    ''' Location (may be Watershed Name?)
+    ''' </summary>
     Public Location As String
+    ''' <summary>
+    ''' Generally UCI file name
+    ''' </summary>
     Public Scenario As String
+    ''' <summary>
+    ''' Start and end date of the simulation
+    ''' </summary>
     Public TimeSpan As String
+    ''' <summary>
+    ''' Name of the constituent 
+    ''' </summary>
     Public Constituent As String
+    ''' <summary>
+    ''' Unit used in the model
+    ''' </summary>
     Public Units As String
     'Public Labels As New List(Of String)
     'Public Values As New List(Of Double)
+    ''' <summary>
+    ''' A collection where Land Use Name is key and list of values for each land use.
+    ''' </summary>
     Public LabelValueCollection As New atcCollection
 
     'Public SortedList As New List(Of Double)

@@ -3,315 +3,593 @@ Imports atcData
 Imports MapWinUtility
 Imports atcUCI
 Imports System.Data.DataTable
+Imports System.Data
 Public Module atcQUALReports
     Private pPERLND As atcCollection
     Private pIMPLND As atcCollection
-    Public QUALDataCollecion As List(Of QUALData)
+    Public QUALDataCollecion As List(Of ConstOutflowDatafromLand)
+    'This function reads a UCI file, Binary files and the list of constituents
+    'The output result is a list of a class ConstOutflowDatafromLand
+    'ConstOutflowDataFromLand is a class where each individual land operation's outflow data is stored.
+
     Public Function QUALReports(ByVal aUCI As HspfUci,
                                 ByRef aScenariosResults As atcDataSource,
-                                ByRef QUALDetails As ConstituentProperties) As List(Of ConstOutflowDatafromLand)
+                                ByRef QUALDetails As List(Of ConstituentProperties)) As List(Of ConstOutflowDatafromLand)
 
-        Dim QualityConstituent As Boolean = False
-        Dim lOutflowDataTypes As String() = ConstituentList(QUALDetails.ReportType, QualityConstituent)
-
-        Dim ConstituentIndividualData As ConstOutflowDatafromLand
-        Dim QUALNameInUCI As String = QUALDetails.ConstituentNameInUCI
-
-        Dim lSeasonalAttributes As New atcDataAttributes
-        lSeasonalAttributes.SetValue("Sum", 0)
-
-        Dim lYearlyAttributes As New atcDataAttributes
-        Dim lSeasons As atcSeasonBase
         Dim lOutputQUALData As New List(Of ConstOutflowDatafromLand)
-        If aUCI.GlobalBlock.SDate(1) = 10 Then 'month Oct
-            lSeasons = New atcSeasonsWaterYear
-        Else
-            lSeasons = New atcSeasonsCalendarYear
-        End If
-
-        pPERLND = New atcCollection
-        pIMPLND = New atcCollection
-
-        Dim lMultipleIndex As Integer = 0
-        If QUALDetails.ConstNameForEXPPlus.ToLower.Contains("ref") Then
-            lMultipleIndex = 1
-        ElseIf QUALDetails.ConstNameForEXPPlus.Contains("lab") Then
-            lMultipleIndex = 2
-        End If
-
         For Each loperation As HspfOperation In aUCI.OpnSeqBlock.Opns
+            'Starting through each opertaion
+            'If loperation.Name = "IMPLND" Then Stop
             If loperation.Name = "RCHRES" Then Continue For
-            'Collecting the names of the land uses
-            If loperation.Name = "PERLND" AndAlso Not pPERLND.Keys.Contains(loperation.Description) Then
-                pPERLND.Add(loperation.Description)
-            ElseIf loperation.Name = "IMPLND" AndAlso Not pIMPLND.Keys.Contains(loperation.Description) Then
-                pIMPLND.Add(loperation.Description)
-            Else Continue For
-            End If
-            Dim lTempOutflowData As New Dictionary(Of String, atcCollection)
-            ConstituentIndividualData = New ConstOutflowDatafromLand
-            ConstituentIndividualData.LandType = loperation.Name
-            ConstituentIndividualData.OperationNumber = loperation.Id
-            ConstituentIndividualData.OperationName = loperation.Description
-            ConstituentIndividualData.LandConstituentNameInUCI = QUALDetails.ConstituentNameInUCI
-            ConstituentIndividualData.LandConstituentNameForHSPEXP = QUALDetails.ConstNameForEXPPlus
-            ConstituentIndividualData.Units = QUALDetails.ConstituentUnit
             Dim LocationName As String = loperation.Name.Substring(0, 1) & ":" & loperation.Id
-            For Each OutflowData As String In lOutflowDataTypes
-                If OutflowData.ToLower.Contains("total") Then
-                    Dim TestCollection As New atcCollection
-                    For Each key As String In lTempOutflowData.Keys
-                        For Each YearKey As String In lTempOutflowData(key).Keys
-                            TestCollection.Increment(YearKey, lTempOutflowData(key).ItemByKey(YearKey))
-                        Next
-                    Next
-                    lTempOutflowData.Add(OutflowData, TestCollection)
+            For Each constituent As ConstituentProperties In QUALDetails
+                'QUALDetails is a list of constituent like NO3, NH4, Ref-OrgN, lab-OrgN
+                'Going through each constituent
+
+                Dim ConstituentIndividualData As New ConstOutflowDatafromLand
+                ConstituentIndividualData.LandType = loperation.Name
+                ConstituentIndividualData.OperationNumber = loperation.Id
+                ConstituentIndividualData.OperationName = loperation.Description
+                Dim lOutflowDataTypes As String() = ConstituentList(constituent.ReportType, constituent.ConstituentNameInUCI)
+                Dim QUALNameInUCI As String = constituent.ConstituentNameInUCI
+
+                Dim lMultipleIndex As Integer = 0
+                If constituent.ConstNameForEXPPlus.ToLower.Contains("ref") Then
+                    lMultipleIndex = 1
+                ElseIf constituent.ConstNameForEXPPlus.Contains("lab") Then
+                    lMultipleIndex = 2
                 End If
 
-                Dim lMassLinkFactor As Double = 1.0
-                Dim lTS As atcTimeseries
-                Dim BinaryFileConstituentName As String = ""
-                If QualityConstituent Then
-                    BinaryFileConstituentName = OutflowData & "-" & QUALNameInUCI
-                Else
-                    BinaryFileConstituentName = OutflowData
-                End If
+                ConstituentIndividualData.LandConstituentNameInUCI = constituent.ConstituentNameInUCI
+                ConstituentIndividualData.LandConstituentNameForHSPEXP = constituent.ConstNameForEXPPlus
+                ConstituentIndividualData.Units = constituent.ConstituentUnit
+                Dim lTSGroup As New atcTimeseriesGroup
+                Dim lTotalTS As New atcTimeseries(Nothing)
+                For Each OutflowData As String In lOutflowDataTypes
 
-                lTS = aScenariosResults.DataSets.FindData("Constituent", BinaryFileConstituentName).FindData("Location", LocationName)(0)
+                    Dim lMassLinkFactor As Double = 1.0
+                    Dim lTS As atcTimeseries = aScenariosResults.DataSets.FindData("Constituent", OutflowData).FindData("Location", LocationName)(0)
 
+                    'Getting the time series of constituent and the location from the binary file data.
 
-                'Getting the time series of constituent and the location from the binary file data.
+                    If Not lTS Is Nothing Then
+                        For Each lConnection As HspfConnection In loperation.Targets
+                            If lConnection.Target.VolName = "RCHRES" Then
+                                Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                Dim aConversionFactor As Double = 0.0
+                                aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
+                                Dim lMassLinkID As Integer = lConnection.MassLink
+                                If Not lMassLinkID = 0 Then
+                                    lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, OutflowData,
+                                                                             constituent.ReportType, aConversionFactor, lMultipleIndex)
+                                    Exit For
+                                End If
 
+                            End If
+                        Next lconnection
 
-                If Not lTS Is Nothing Then
-                    For Each lConnection As HspfConnection In loperation.Targets
-                        If lConnection.Target.VolName = "RCHRES" Then
-                            Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-                            Dim aConversionFactor As Double = 0.0
-                            aConversionFactor = ConversionFactorfromOxygen(aUCI, QUALDetails.ReportType, aReach)
-                            Dim lMassLinkID As Integer = lConnection.MassLink
-                            If Not lMassLinkID = 0 Then
+                        lTS = lTS * lMassLinkFactor
+                        lTSGroup.Add(lTS)
 
-                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, BinaryFileConstituentName,
-                                                                     QUALDetails.ReportType, aConversionFactor, lMultipleIndex)
-
-                                Exit For
+                    ElseIf OutflowData.ToLower.Contains("total outflow") Then
+                        'lTotalTS = lTSGroup(0) * 0
+                        For Each AddTS As atcTimeseries In lTSGroup
+                            If lTotalTS.Dates Is Nothing Then
+                                lTotalTS = AddTS + 0
+                            Else
+                                lTotalTS += AddTS
                             End If
 
+                        Next
+
+                        lTotalTS.Attributes.SetValue("Constituent", "total")
+                        lTSGroup.Add(lTotalTS)
+                    End If
+
+                    If OutflowData.Contains("-") AndAlso OutflowData.Split("-")(1).ToLower.Contains("total") AndAlso Not OutflowData.Split("-")(0).ToLower.Contains("total") Then
+
+                        Dim lTotalTS2 As New atcTimeseries(Nothing)
+                        For i As Integer = 0 To lOutputQUALData.Count - 1
+                            Dim ConstituentName As String = OutflowData.Split("-")(0) & "-" & lOutputQUALData(i).LandConstituentNameInUCI
+
+                            For Each AddTS As atcTimeseries In lOutputQUALData(i).MonthlyTimeSeriesOutflowData.FindData("constituent", ConstituentName).FindData("Location", LocationName)
+                                If lTotalTS2.Dates Is Nothing Then
+                                    lTotalTS2 = AddTS + 0
+                                Else
+                                    lTotalTS2 += AddTS
+                                End If
+
+                            Next AddTS
+
+                        Next i
+                        If lTotalTS2.Dates IsNot Nothing Then
+                            lTotalTS2.Attributes.SetValue("Constituent", OutflowData)
+                            lTSGroup.Add(lTotalTS2)
                         End If
-                    Next
 
+                    End If
+                    'The group of time series for each constituent and each operation get added here.
+                Next OutflowData
+                ConstituentIndividualData.MonthlyTimeSeriesOutflowData = lTSGroup
+                'The individudal object ConstOutflowDatafromLand gets added to the list lOutputQUALData.
+                lOutputQUALData.Add(ConstituentIndividualData)
 
-                    lSeasons.SetSeasonalAttributes(lTS, lSeasonalAttributes, lYearlyAttributes)
-                    Dim lYearlyData As New atcCollection
-                    lYearlyData.Increment("SumAnnual", lTS.Attributes.GetDefinedValue("SumAnnual").Value * lMassLinkFactor)
-                    For i As Integer = 0 To lYearlyAttributes.Count - 1
-                        lYearlyData.Increment(lYearlyAttributes.Item(i).Arguments(1).Value.ToString, lYearlyAttributes.Item(i).Value * lMassLinkFactor)
-                    Next
-                    lTempOutflowData.Add(OutflowData, lYearlyData) 'So for WASHQS, SCRQS etc., this list has annual sum and yearwise data.
-                End If
-
-
-            Next
-            ConstituentIndividualData.OutflowData = lTempOutflowData
-
-            lOutputQUALData.Add(ConstituentIndividualData)
-        Next
+            Next constituent
+        Next loperation
 
         Return lOutputQUALData
 
     End Function
 
-    Public Function PrintQUALReports(ByVal OutputQUALData As List(Of List(Of ConstOutflowDatafromLand)),
+    Public Function PrintQUALReports(ByVal OutputQUALData As List(Of ConstOutflowDatafromLand),
                                      ByVal aScenario As String,
                                      ByVal aRunMade As String,
                                      ByVal aBalanceType As String) As atcReport.IReport
+        'A list of ConstOutflowData contains inromation about individual constituents (like NO3, or NH4)
+        'A list of list ConstOutflowData will contain information about TN, TP etc.
+        'This function prepares a text report for constituents like TN and TP.
         Dim lReport As New atcReport.ReportText
-        lReport.AppendLine("   Run Made " & aRunMade)
+
         Dim QualityConstituent As Boolean = False
         Dim lOutflowDataTypes As String() = ConstituentList(aBalanceType, QualityConstituent)
 
-        Dim lOutputTable As New atcTableDelimited
         Select Case aBalanceType
             Case "Water", "DO", "Heat"
-                With lOutputTable
-                    .NumFields = 10
-                    .Delimiter = vbTab
 
-                    Dim lField As Integer = 0
-                    lField += 1 : .FieldLength(lField) = 6 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Type"
-                    lField += 1 : .FieldLength(lField) = 3 : .FieldType(lField) = "N" : .FieldName(lField) = "Operation Number"
-                    lField += 1 : .FieldLength(lField) = 20 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Description"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Constituent Name"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Year"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Unit"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Surface Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Interflow Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Active Groundwater Outflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Total Outflow"
+                Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
+
+                Dim Water_Do_Heat As New DataTable("ConstituentTable")
+                Dim column As DataColumn
+                Dim row As DataRow
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpType"
+                column.Caption = "Operation Type"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Int32")
+                column.ColumnName = "OpNum"
+                column.Caption = "Operation Number"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpDesc"
+                column.Caption = "Operation Description"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "ConstName"
+                column.Caption = "Constituent Name"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Year"
+                column.Caption = "Year"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Unit"
+                column.Caption = "Unit"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "SurfOutflow"
+                column.Caption = "Surface Outflow"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "InterOutflow"
+                column.Caption = "Interflow Outflow"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "GroundOutflow"
+                column.Caption = "Groundwater Outflow"
+                Water_Do_Heat.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "TotalOutflow"
+                column.Caption = "Total Outflow"
+                Water_Do_Heat.Columns.Add(column)
+                Dim RowNumber As Integer = 0
+                Dim listLanduses As New List(Of String)
+                For Each lOperation As ConstOutflowDatafromLand In OutputQUALData
+                    listLanduses.Add(SafeSubstring(lOperation.LandType, 0, 1) & ":" & lOperation.OperationName)
+                    Dim NumberOfFields As Integer = 0
+                    Dim lTSNumber As Integer = 0
+                    For Each lTS As atcTimeseries In lOperation.MonthlyTimeSeriesOutflowData
+
+                        Dim lTsYearly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                        Dim lSumAnnual As Double = lTsYearly.Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lTSAttributes As String = lTsYearly.Attributes.GetDefinedValue("Constituent").Value
+                        If lTSNumber > 0 Then RowNumber -= (lTsYearly.numValues + 1)
+
+                        For i As Integer = 1 To lTsYearly.numValues + 1
+
+                            row = Water_Do_Heat.NewRow
+                            Dim lDate(5) As Integer
+                            Dim Year As String = ""
+                            Dim lValue As Double = 0
+                            If i > lTsYearly.numValues Then
+                                Year = "SumAnnual"
+                                lValue = HspfTable.NumFmtRE(lSumAnnual, 10)
 
 
-                    For Each ConstituentList As List(Of ConstOutflowDatafromLand) In OutputQUALData
-                        For i As Integer = 0 To ConstituentList.Count - 1
-                            Dim lTest As New atcCollection
-                            For Each lOutflowDataType As String In lOutflowDataTypes
-                                If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
-
-                                    Exit For
-                                End If
-                            Next lOutflowDataType
-                            'If lTest Is Nothing Then Stop
-
-                            For Each YearName As String In lTest.Keys
-                                .CurrentRecord += 1
-                                lField = 0
-                                lField += 1 : .Value(lField) = ConstituentList(i).LandType
-                                lField += 1 : .Value(lField) = ConstituentList(i).OperationNumber
-                                lField += 1 : .Value(lField) = ConstituentList(i).OperationName
-                                lField += 1 : .Value(lField) = ConstituentList(i).LandConstituentNameInUCI
-                                lField += 1 : .Value(lField) = YearName
-                                lField += 1 : .Value(lField) = ConstituentList(i).Units
-
-                                For Each lOutflowDataType As String In lOutflowDataTypes
-                                    lTest = New atcCollection
-                                    If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
-
-                                        lField += 1 : .Value(lField) = HspfTable.NumFmtRE(lTest.ItemByKey(YearName), 10)
-                                    Else
-                                        lField += 1 : .Value(lField) = "NA"
-                                    End If
-                                Next lOutflowDataType
-                            Next YearName
-                        Next i
-
-                    Next ConstituentList
-                    lReport.Append(.ToString)
-                End With
-
-            Case "Sediment"
-                With lOutputTable
-                    .NumFields = 9
-                    .Delimiter = vbTab
-
-                    Dim lField As Integer = 0
-                    lField += 1 : .FieldLength(lField) = 6 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Type"
-                    lField += 1 : .FieldLength(lField) = 3 : .FieldType(lField) = "N" : .FieldName(lField) = "Operation Number"
-                    lField += 1 : .FieldLength(lField) = 20 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Description"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Constituent Name"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Year"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Unit"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Washoff of Detached Sediment"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Scour of Matrix Soil"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Total Outflow"
-
-                    For Each ConstituentList As List(Of ConstOutflowDatafromLand) In OutputQUALData
-                        For i As Integer = 0 To ConstituentList.Count - 1
-
-
-                            Dim lTest As New atcCollection
-                            For Each lOutflowDataType As String In lOutflowDataTypes
-                                If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
-
-                                    Exit For
-                                End If
-                            Next lOutflowDataType
-                            If lTest IsNot Nothing Then
-                                For Each YearName As String In lTest.Keys
-                                    .CurrentRecord += 1
-                                    lField = 0
-                                    lField += 1 : .Value(lField) = ConstituentList(i).LandType
-                                    lField += 1 : .Value(lField) = ConstituentList(i).OperationNumber
-                                    lField += 1 : .Value(lField) = ConstituentList(i).OperationName
-                                    lField += 1 : .Value(lField) = ConstituentList(i).LandConstituentNameInUCI
-                                    lField += 1 : .Value(lField) = YearName
-                                    lField += 1 : .Value(lField) = ConstituentList(i).Units
-
-                                    For Each lOutflowDataType As String In lOutflowDataTypes
-                                        lTest = New atcCollection
-                                        If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
-                                            If (ConstituentList(i).LandType = "IMPLND" AndAlso lOutflowDataType = "SOSLD") Then lField -= 2
-                                            lField += 1 : .Value(lField) = HspfTable.NumFmtRE(lTest.ItemByKey(YearName), 10)
-                                        Else
-                                            If Not (ConstituentList(i).LandType = "PERLND" AndAlso lOutflowDataType = "SOSLD") Then
-                                                lField += 1 : .Value(lField) = "NA"
-                                            End If
-                                        End If
-                                    Next lOutflowDataType
-                                Next YearName
+                            Else
+                                J2Date(lTsYearly.Dates.Values(i), lDate)
+                                Year = CStr(lDate(0))
+                                lValue = HspfTable.NumFmtRE(lTsYearly.Value(i), 10)
+                            End If
+                            RowNumber += 1
+                            If lTSNumber = 0 Then
+                                row("OpType") = lOperation.LandType
+                                row("OpNum") = lOperation.OperationNumber
+                                row("OpDesc") = lOperation.OperationName
+                                row("ConstName") = lOperation.LandConstituentNameInUCI
+                                row("Year") = Year
+                                row("Unit") = lOperation.Units
+                                row("SurfOutflow") = lValue
+                                Water_Do_Heat.Rows.Add(row)
+                            ElseIf lTSAttributes.StartsWith("I") Then
+                                Water_Do_Heat.Rows(RowNumber - 1)("InterOutflow") = lValue
+                            ElseIf lTSAttributes.StartsWith("A") Then
+                                Water_Do_Heat.Rows(RowNumber - 1)("GroundOutflow") = lValue
+                            ElseIf lTSAttributes.Contains("total") Then
+                                Water_Do_Heat.Rows(RowNumber - 1)("TotalOutflow") = lValue
 
                             End If
 
                         Next i
+                        lTSNumber += 1
+                    Next lTS
 
-                    Next ConstituentList
-                    lReport.Append(.ToString)
-                End With
+                Next lOperation
 
-            Case Else
-                With lOutputTable
-                    .NumFields = 12
-                    .Delimiter = vbTab
+                Dim TextToWrite As String = ""
+                For Each TableColumn As DataColumn In Water_Do_Heat.Columns
+                    TextToWrite &= TableColumn.Caption & vbTab
+                Next
+                lReport.AppendLine(TextToWrite)
 
-                    Dim lField As Integer = 0
-                    lField += 1 : .FieldLength(lField) = 6 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Type"
-                    lField += 1 : .FieldLength(lField) = 3 : .FieldType(lField) = "N" : .FieldName(lField) = "Operation Number"
-                    lField += 1 : .FieldLength(lField) = 20 : .FieldType(lField) = "C" : .FieldName(lField) = "Operation Description"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "QUALID in UCI"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Constituent Name"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "C" : .FieldName(lField) = "Year"
+                Dim BoxWhiskerDataSet As New BoxWhiskerItem
 
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Removal of QUALSD by association with detached sediment Runoff "
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Removal of QUALSD with scour of matrix soil"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Washoff of QUALOF from surface"
-                    'lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Total Outflow of QUAL from surface"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Outflow of QUAL in interflow"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Outflow of QUAL in active groundwater"
-                    'lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Total flux of QUAL from land area"
-                    lField += 1 : .FieldLength(lField) = 10 : .FieldType(lField) = "N" : .FieldName(lField) = "Total Outflow"
+                For Each TableRow As DataRow In Water_Do_Heat.Rows
+                    TextToWrite = ""
+                    For Each TableColumn As DataColumn In Water_Do_Heat.Columns
+                        TextToWrite &= TableRow(TableColumn) & vbTab
 
-                    For Each ConstituentList As List(Of ConstOutflowDatafromLand) In OutputQUALData
-                        For i As Integer = 0 To ConstituentList.Count - 1
+                    Next TableColumn
 
-                            Dim lTest As New atcCollection
-                            For Each lOutflowDataType As String In lOutflowDataTypes
-                                If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
+                    lReport.AppendLine(TextToWrite)
+                Next TableRow
+                lReport.AppendLine("Run Made " & aRunMade)
 
-                                    Exit For
-                                End If
-                            Next lOutflowDataType
-                            'If lTest Is Nothing Then Stop
+                For Each item As String In listLanduses
+                    Dim OpType1 As String = ""
+                    If item.StartsWith("P") Then
+                        OpType1 = "PERLND"
+                    Else
+                        OpType1 = "IMPLND"
+                    End If
+                    Dim LU As String = SafeSubstring(item, 2)
+                    Dim Values As New List(Of Double)
+                    For Each TableRow As DataRow In Water_Do_Heat.Rows
+                        If TableRow("OpType") = OpType1 AndAlso
+                                TableRow("OpDesc") = LU AndAlso
+                                TableRow("Year") = "SumAnnual" Then
+                            Values.Add(TableRow("Total Outflow"))
 
-                            For Each YearName As String In lTest.Keys
-                                .CurrentRecord += 1
-                                lField = 0
-                                lField += 1 : .Value(lField) = ConstituentList(i).LandType
-                                lField += 1 : .Value(lField) = ConstituentList(i).OperationNumber
-                                lField += 1 : .Value(lField) = ConstituentList(i).OperationName
-                                lField += 1 : .Value(lField) = ConstituentList(i).LandConstituentNameInUCI
-                                lField += 1 : .Value(lField) = ConstituentList(i).LandConstituentNameForHSPEXP
-                                lField += 1 : .Value(lField) = YearName
+                        End If
+
+                        lReport.AppendLine(TextToWrite)
+                    Next TableRow
+
+                Next
 
 
-                                For Each lOutflowDataType As String In lOutflowDataTypes
-                                    lTest = New atcCollection
-                                    If ConstituentList(i).OutflowData.TryGetValue(lOutflowDataType, lTest) Then
-                                        lField += 1 : .Value(lField) = HspfTable.NumFmtRE(lTest.ItemByKey(YearName), 10)
 
-                                    Else
-                                        lField += 1 : .Value(lField) = "NA"
-                                    End If
-                                Next lOutflowDataType
-                            Next YearName
+
+            Case "Sediment"
+
+                Dim SedConstTable As New DataTable("ConstituentTable")
+                Dim column As DataColumn
+                Dim row As DataRow
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpType"
+                column.Caption = "Operation Type"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Int32")
+                column.ColumnName = "OpNum"
+                column.Caption = "Operation Number"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpDesc"
+                column.Caption = "Operation Description"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "ConstName"
+                column.Caption = "Constituent Name"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Year"
+                column.Caption = "Year"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Unit"
+                column.Caption = "Unit"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "WSSD"
+                column.Caption = "Wash Off of detached Sediment"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "SCRSD"
+                column.Caption = "Scour of Matrix Soil"
+                SedConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "TotalOutflow"
+                column.Caption = "Total Outflow"
+                SedConstTable.Columns.Add(column)
+                Dim RowNumber As Integer = 0
+                For Each lOperation As ConstOutflowDatafromLand In OutputQUALData
+                    Dim NumberOfFields As Integer = 0
+                    Dim lTSNumber As Integer = 0
+                    For Each lTS As atcTimeseries In lOperation.MonthlyTimeSeriesOutflowData
+
+                        Dim lTsYearly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                        Dim lSumAnnual As Double = lTsYearly.Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lTSAttributes As String = lTsYearly.Attributes.GetDefinedValue("Constituent").Value
+                        If lTSNumber > 0 Then RowNumber -= (lTsYearly.numValues + 1)
+
+                        For i As Integer = 1 To lTsYearly.numValues + 1
+
+                            row = SedConstTable.NewRow
+                            Dim lDate(5) As Integer
+                            Dim Year As String = ""
+                            Dim lValue As Double = 0
+                            If i > lTsYearly.numValues Then
+                                Year = "SumAnnual"
+                                lValue = HspfTable.NumFmtRE(lSumAnnual, 10)
+                            Else
+                                J2Date(lTsYearly.Dates.Values(i), lDate)
+                                Year = CStr(lDate(0))
+                                lValue = HspfTable.NumFmtRE(lTsYearly.Value(i), 10)
+                            End If
+                            RowNumber += 1
+                            If lTSNumber = 0 Then
+                                row("OpType") = lOperation.LandType
+                                row("OpNum") = lOperation.OperationNumber
+                                row("OpDesc") = lOperation.OperationName
+                                row("ConstName") = lOperation.LandConstituentNameInUCI
+                                row("Year") = Year
+                                row("Unit") = lOperation.Units
+                                row("WSSD") = lValue
+                                SedConstTable.Rows.Add(row)
+                            ElseIf lTSAttributes.StartsWith("SCRSD") Then
+                                SedConstTable.Rows(RowNumber - 1)("SCRSD") = lValue
+                            ElseIf lTSAttributes.Contains("total") Then
+                                SedConstTable.Rows(RowNumber - 1)("TotalOutflow") = lValue
+                            End If
+
                         Next i
 
-                    Next ConstituentList
-                    lReport.Append(.ToString)
-                End With
+                        lTSNumber += 1
+                    Next lTS
+
+                Next lOperation
+
+                Dim TextToWrite As String = ""
+                For Each TableColumn As DataColumn In SedConstTable.Columns
+                    TextToWrite &= TableColumn.Caption & vbTab
+                Next
+                lReport.AppendLine(TextToWrite)
+                For Each TableRow As DataRow In SedConstTable.Rows
+                    TextToWrite = ""
+                    For Each TableColumn As DataColumn In SedConstTable.Columns
+
+                        TextToWrite &= TableRow(TableColumn) & vbTab
+
+                    Next TableColumn
+
+                    lReport.AppendLine(TextToWrite)
+                Next TableRow
+                lReport.AppendLine("Run Made " & aRunMade)
+
+            Case Else
+                Dim QUALConstTable As New DataTable("QUALConstituentTable")
+                Dim column As DataColumn
+                Dim row As DataRow
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpType"
+                column.Caption = "Operation Type"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Int32")
+                column.ColumnName = "OpNum"
+                column.Caption = "Operation Number"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpDesc"
+                column.Caption = "Operation Description"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "ConstName"
+                column.Caption = "Constituent Name"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "ConstNameEXP"
+                column.Caption = "Constituent Name in EXP+"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Year"
+                column.Caption = "Year"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "Unit"
+                column.Caption = "Unit"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "WASHQS"
+                column.Caption = "Removal of QUALSD by association with detached sediment Runoff"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "SCRQS"
+                column.Caption = "Removal of QUALSD with scour of matrix soil"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "SOQO"
+                column.Caption = "Washoff of QUALOF from surface"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "IOQUAL"
+                column.Caption = "Outflow of QUAL in interflow"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "AOQUAL"
+                column.Caption = "Outflow of QUAL in Groundwater flow"
+                QUALConstTable.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "TotalOutflow"
+                column.Caption = "Total Outflow"
+                QUALConstTable.Columns.Add(column)
+                Dim RowNumber As Integer = 0
+                For Each lOperation As ConstOutflowDatafromLand In OutputQUALData
+                    Dim lOperationTotal As New ConstOutflowDatafromLand
+                    Dim lTSNumber As Integer = 0
+                    For Each lTS As atcTimeseries In lOperation.MonthlyTimeSeriesOutflowData
+                        Dim TotalMonthlyTimeSeries As New atcTimeseriesGroup
+
+
+
+                        Dim lTsYearly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv)
+                        Dim lSumAnnual As Double = lTsYearly.Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lTSAttributes As String = lTsYearly.Attributes.GetDefinedValue("Constituent").Value
+                        If lTSNumber > 0 Then RowNumber -= (lTsYearly.numValues + 1)
+
+                        For i As Integer = 1 To lTsYearly.numValues + 1
+
+                            row = QUALConstTable.NewRow
+                            Dim lDate(5) As Integer
+                            Dim Year As String = ""
+                            Dim lValue As Double = 0
+                            If i > lTsYearly.numValues Then
+                                Year = "SumAnnual"
+                                lValue = HspfTable.NumFmtRE(lSumAnnual, 10)
+                            Else
+                                J2Date(lTsYearly.Dates.Values(i), lDate)
+                                Year = CStr(lDate(0))
+                                lValue = HspfTable.NumFmtRE(lTsYearly.Value(i), 10)
+                            End If
+                            RowNumber += 1
+                            If lTSNumber = 0 Then
+                                row("OpType") = lOperation.LandType
+                                row("OpNum") = lOperation.OperationNumber
+                                row("OpDesc") = lOperation.OperationName
+                                row("ConstName") = lOperation.LandConstituentNameInUCI
+                                row("ConstNameEXP") = lOperation.LandConstituentNameForHSPEXP
+                                row("Year") = Year
+                                row("Unit") = lOperation.Units
+                                row("WASHQS") = lValue
+                                QUALConstTable.Rows.Add(row)
+                            ElseIf lTSAttributes.StartsWith("SCRQS") Then
+                                QUALConstTable.Rows(RowNumber - 1)("SCRQS") = lValue
+                            ElseIf lTSAttributes.StartsWith("SOQO") Then
+                                QUALConstTable.Rows(RowNumber - 1)("SOQO") = lValue
+                            ElseIf lTSAttributes.StartsWith("IOQUAL") Then
+                                QUALConstTable.Rows(RowNumber - 1)("IOQUAL") = lValue
+                            ElseIf lTSAttributes.StartsWith("AOQUAL") Then
+                                QUALConstTable.Rows(RowNumber - 1)("AOQUAL") = lValue
+                            ElseIf lTSAttributes.Contains("total") Then
+                                QUALConstTable.Rows(RowNumber - 1)("TotalOutflow") = lValue
+                            End If
+
+                        Next i
+
+                        lTSNumber += 1
+                    Next lTS
+
+                Next lOperation
+
+                For Each TableRow As DataRow In QUALConstTable.Rows
+                    Dim UniqueComboVariable As String = ""
+                    For Each TableColumn As DataColumn In QUALConstTable.Columns
+                        'UniqueComboVariable = TableRow("OpType") & "_" & TableRow("OpNum") & 
+
+
+                    Next
+
+
+                Next
+
+                'Dim QueryExpression As String = "Select OpType, OpNum, OPDesc, null as ConstName, 'TN' as ConstNameExp, Year, Unit, SUM(WASHQS), SUM(SCRQS), SUM(SOQO), SUM(IOQUAL), SUM(AOQUAL), SUM(TotalOutflow),
+                '        from QUALConstTable group by OPType, OPNum, OPDesc, null as ConstName, 'TN' as ConstNameInExp, Year, Unit UNION ALL Select * from QUALConstTable"
+                'Dim distinctDT As DataRow() = QUALConstTable.Select(QueryExpression)
+
+                Dim TextToWrite As String = ""
+                For Each TableColumn As DataColumn In QUALConstTable.Columns
+                    TextToWrite &= TableColumn.Caption & vbTab
+                Next
+                lReport.AppendLine(TextToWrite)
+                For Each TableRow As DataRow In QUALConstTable.Rows
+                    TextToWrite = ""
+                    For Each TableColumn As DataColumn In QUALConstTable.Columns
+                        TextToWrite &= TableRow(TableColumn) & vbTab
+                    Next TableColumn
+                    lReport.AppendLine(TextToWrite)
+                Next TableRow
+                lReport.AppendLine("Run Made " & aRunMade)
+
         End Select
-
-
-
-
 
         Return lReport
     End Function

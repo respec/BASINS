@@ -40,7 +40,7 @@ Public Module ConstituentBudget
         Dim lReport5 As New atcReport.ReportText
         Dim lReport6 As New atcReport.ReportText
         Dim lReportLoadingRate As New atcReport.ReportText
-        Dim lBoxWhiskerItems As New List(Of BoxWhiskerItem)
+
         Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
 
         Dim lDataForAllBarGraphs As New atcCollection
