@@ -126,7 +126,7 @@
     <Compile Include="atcHspfWatershedConstituentBalance.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
     <Compile Include="atcHspfWatershedSummaryOverland.vb" />
-    <Compile Include="atcQUALReports.vb" />
+    <Compile Include="atcConstituentTables.vb" />
     <Compile Include="frmErrorCriteria.Designer.vb">
       <DependentUpon>frmErrorCriteria.vb</DependentUpon>
     </Compile>

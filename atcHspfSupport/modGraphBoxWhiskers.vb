@@ -50,19 +50,22 @@ Public Module modGraphBoxWhiskers
         lZgc.Height = 768
 
         Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
-        Select Case items.Constituent
-            Case "Sediment"
-                lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses in " & items.Scenario & " model." &
-                    vbCrLf & items.TimeSpan
-            Case "TotalP"
-                lGrapher.Title = "Box-Whisker plot of total phoshphorus loading rate from all land uses in " & items.Scenario & " model." &
-                    vbCrLf & items.TimeSpan
-            Case "TotalN"
-                lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses in " & items.Scenario & " model." &
-                    vbCrLf & items.TimeSpan
-            Case Else
-                Exit Sub
-        End Select
+
+        lGrapher.Title = "Box-Whisker plot of " & items.Constituent & " loading rate from all land uses in " & items.Scenario & " model." &
+            vbCrLf & items.TimeSpan
+        'Select Case items.Constituent
+        '    Case "Sediment"
+        '        lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses in " & items.Scenario & " model." &
+        '            vbCrLf & items.TimeSpan
+        '    Case "TotalP"
+        '        lGrapher.Title = "Box-Whisker plot of total phosphorus loading rate from all land uses in " & items.Scenario & " model." &
+        '            vbCrLf & items.TimeSpan
+        '    Case "TotalN"
+        '        lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses in " & items.Scenario & " model." &
+        '            vbCrLf & items.TimeSpan
+        '    Case Else
+        '        Exit Sub
+        'End Select
         lGrapher.DatasetsCollection = items.LabelValueCollection
         lGrapher.ShowOutliers = False
 

@@ -1442,7 +1442,12 @@ Public Module Utility
 
                         QUALNames.ConstNameForEXPPlus = "NO3"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
+
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1450,7 +1455,6 @@ Public Module Utility
                     End If
 
                 Case "TotalN"
-
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                         lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
@@ -1464,7 +1468,11 @@ Public Module Utility
 
                         QUALNames.ConstNameForEXPPlus = "NO3"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1480,7 +1488,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "NH3+NH4"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1496,7 +1508,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "Ref-OrgN"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1512,7 +1528,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "lab-OrgN"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1532,7 +1552,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "PO4P"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1548,7 +1572,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "Ref-OrgP"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1564,7 +1592,11 @@ Public Module Utility
                         End If
                         QUALNames.ConstNameForEXPPlus = "lab-OrgP"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
-                        QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
                         QUALNames.ReportType = aBalanceType
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
@@ -1581,9 +1613,9 @@ Public Module Utility
                 QUALNames.ConstNameForEXPPlus = "Water"
                 QUALNames.ConstituentNameInUCI = "Water"
                 If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = "ac-ft"
+                    QUALNames.ConstituentUnit = "in"
                 Else
-                    QUALNames.ConstituentUnit = "Mm3"
+                    QUALNames.ConstituentUnit = "mm"
                 End If
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
@@ -1594,9 +1626,9 @@ Public Module Utility
                 QUALNames.ConstNameForEXPPlus = "Sediment"
                 QUALNames.ConstituentNameInUCI = "Sediment"
                 If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = "ton"
+                    QUALNames.ConstituentUnit = "ton/ac"
                 Else
-                    QUALNames.ConstituentUnit = "tonne"
+                    QUALNames.ConstituentUnit = "tonne/ha"
                 End If
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
@@ -1606,9 +1638,9 @@ Public Module Utility
                 QUALNames.ConstNameForEXPPlus = "DO"
                 QUALNames.ConstituentNameInUCI = "DO"
                 If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = "lb"
+                    QUALNames.ConstituentUnit = "lbs/ac"
                 Else
-                    QUALNames.ConstituentUnit = "kg"
+                    QUALNames.ConstituentUnit = "kg/ha"
                 End If
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
@@ -1619,27 +1651,38 @@ Public Module Utility
                 QUALNames.ConstNameForEXPPlus = "Heat"
                 QUALNames.ConstituentNameInUCI = "Heat"
                 If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = "BTU"
+                    QUALNames.ConstituentUnit = "BTU/ac"
                 Else
-                    QUALNames.ConstituentUnit = "kcal"
+                    QUALNames.ConstituentUnit = "kcal/ha"
                 End If
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
             Case "TotalN"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TN"
+                QUALNames.ConstNameForEXPPlus = "TotalN"
                 QUALNames.ConstituentNameInUCI = "TotalN"
-                QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+                Else
+                    QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+                End If
+
+
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
 
             Case "TotalP"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TP"
+                QUALNames.ConstNameForEXPPlus = "TotalP"
                 QUALNames.ConstituentNameInUCI = "TotalP"
-                QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+                Else
+                    QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
+                End If
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
@@ -1662,25 +1705,44 @@ Public Module Utility
 
         Return itemsEqual
     End Function
-    Public Function ConstituentList(ByVal aBalanceType As String, ByVal QualityConstituent As String) As String()
+    Public Function ConstituentList(ByVal aBalanceType As String, Optional ByVal QualityConstituent As String = "") As String()
         Dim lOutflowDataType As String()
         Select Case aBalanceType
             Case "Water"
-                lOutflowDataType = {"SURO", "IFWO", "AGWO", "Total Runoff"}
+                lOutflowDataType = {"SUPY", "IRRAPP6", "SURO", "IFWO", "AGWO", "TotalOutflow", "IGWI", "AGWI", "AGWLI", "PET",
+                                     "CEPE", "UZET", "LZET", "AGWET", "BASET", "TAET", "IMPEV"}
             Case "Sediment"
-                lOutflowDataType = {"WSSD", "SCRSD", "SOSLD", "Total Outflow"}
+                lOutflowDataType = {"WSSD", "SCRSD", "SOSLD", "TotalOutflow"}
             Case "DO"
-                lOutflowDataType = {"SODOXM", "IODOXM", "AODOXM", "Total Outflow"}
+                lOutflowDataType = {"SODOXM", "IODOXM", "AODOXM", "TotalOutflow"}
             Case "Heat"
-                lOutflowDataType = {"SOHT", "IOHT", "AOHT", "Total Outflow"}
+                lOutflowDataType = {"SOHT", "IOHT", "AOHT", "TotalOutflow"}
             Case Else
                 lOutflowDataType = {"WASHQS" & "-" & QualityConstituent, "SCRQS" & "-" & QualityConstituent,
                                     "SOQO" & "-" & QualityConstituent, "IOQUAL" & "-" & QualityConstituent,
-                                    "AOQUAL" & "-" & QualityConstituent, "Total Outflow" & "-" & QualityConstituent}
+                                    "AOQUAL" & "-" & QualityConstituent, "TotalOutflow" & "-" & QualityConstituent}
         End Select
 
         Return lOutflowDataType
     End Function
 
+    Public Function ConstituentListRCHRES(ByVal aBalanceType As String) As String()
+        Dim lOutflowDataType As String() = {}
+
+        Select Case aBalanceType
+            Case "Water"
+                lOutflowDataType = {}
+            Case "Sediment"
+                lOutflowDataType = {}
+            Case "DO"
+                lOutflowDataType = {"NPSLoad", "PSLoad", "Diversion", "MassBalance", "UpStreamIn", "DOXIN", "DOXFLUX-TOT", "DOXFLUX-REAER",
+                    "DOXFLUX-BODDEC", "DOXFLUX-BENTHAL", "DOXFLUX-NITR", "DOXFLUX-PHYTO", "DOXFLUX-ZOO", "DOXOUTTOT"}
+            Case "Heat"
+                lOutflowDataType = {}
+
+        End Select
+
+        Return lOutflowDataType
+    End Function
 
 End Module

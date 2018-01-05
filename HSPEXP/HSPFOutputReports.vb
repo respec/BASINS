@@ -431,23 +431,12 @@ Module HSPFOutputReports
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "Sediment"
                                 lConstituentName = "SED"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "DO"
                                 lConstituentName = "DO"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "Heat"
                                 lConstituentName = "Heat"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-
-                            'Case "N-PQUAL"
-                            '    lConstituentName = "N"
-
-                            'Case "P-PQUAL"
-                            '    lConstituentName = "P"
-
                             Case "TotalN"
                                 lConstituentName = "TN"
                                 ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
@@ -555,14 +544,8 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            ConstituentDataList = QUALReports(aHspfUci, lScenarioResults, ConstProperties)
-
-                            lReportCons = PrintQUALReports(ConstituentDataList, pBaseName, lRunMade, lConstituent)
-                            SaveFileString(loutfoldername & lConstituentName & "_TestQUALReport.txt", lReportCons.ToString)
-                            'Print test data for QUALData
-
-                            'Following lines should collect the values of loading report for each constituent to make Box-Whisker Plots
-
+                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, ConstProperties, SDateJ, EDateJ)
+                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, SDateJ, EDateJ)
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing
 
@@ -572,10 +555,10 @@ Module HSPFOutputReports
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
 
                                 SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
-                                lReportCons = .Item2
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                                SaveFileString(lOutFileName, lReportCons.ToString)
+                                'lReportCons = Nothing
+                                'lReportCons = .Item2
+                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                                'SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
                                 lReportCons = .Item3
 
@@ -589,18 +572,14 @@ Module HSPFOutputReports
                                     SaveFileString(lOutFileName, lReportCons.ToString)
                                 End If
                                 lReportCons = Nothing
-                                lReportCons = .Item5
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                                SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
+                                'lReportCons = .Item5
+                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                                'SaveFileString(lOutFileName, lReportCons.ToString)
+                                'lReportCons = Nothing
 
-                                If .Item6 IsNot Nothing AndAlso .Item6.LabelValueCollection.Count > 0 Then
-                                    CreateGraph_BoxAndWhisker(.Item6, loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.png")
-                                End If
-
-                                If .Item7 IsNot Nothing AndAlso .Item7.Keys.Count > 0 Then
-                                    For Each location As String In .Item7.Keys
-                                        CreateGraph_BarGraph(.Item7.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                                If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
+                                    For Each location As String In .Item6.Keys
+                                        CreateGraph_BarGraph(.Item6.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
                                     Next location
                                 End If
 
