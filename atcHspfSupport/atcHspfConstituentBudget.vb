@@ -295,10 +295,10 @@ Public Module ConstituentBudget
                                     End If
 
                                 Next EXTTarget
-                                If Not lGENEROperationisOutputtoWDM AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                    Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for." & aBalanceType)
-                                    lGENERInNetworkBlockMessageShown = True
+                                If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
+                                    Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
+                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
+                                    'lGENERInNetworkBlockMessageShown = True
 
                                 End If
 
@@ -718,11 +718,10 @@ This message box will not be shown again for." & aBalanceType)
                                         End If
 
                                     Next EXTTarget
-                                    If Not lGENEROperationisOutputtoWDM AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                        Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for." & aBalanceType)
-                                        lGENERInNetworkBlockMessageShown = True
-
+                                    If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
+                                        Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
+                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
+                                        'lGENERInNetworkBlockMessageShown = True
 
                                     End If
 
@@ -958,11 +957,10 @@ This message box will not be shown again for." & aBalanceType)
                                         End If
 
                                     Next EXTTarget
-                                    If Not lGENEROperationisOutputtoWDM AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                        Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for." & aBalanceType)
-                                        lGENERInNetworkBlockMessageShown = True
-
+                                    If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
+                                        Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
+                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
+                                        'lGENERInNetworkBlockMessageShown = True
 
                                     End If
 
