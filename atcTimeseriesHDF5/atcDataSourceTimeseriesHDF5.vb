@@ -12,6 +12,13 @@ Public Class atcDataSourceTimeseriesHSF5
     Private Shared pFilter As String = "HDF5 Files (*.h5)|*.h5"
     Private pColDefs As Hashtable
 
+    Public ReadOnly Property AvailableAttributes() As Collection
+        Get
+            'needed to edit attributes? that can't be done for this type!
+            Return New Collection 'empty!
+        End Get
+    End Property
+
     Public Overrides ReadOnly Property Description() As String
         Get
             Return "Timeseries HDF5"
@@ -42,6 +49,13 @@ Public Class atcDataSourceTimeseriesHSF5
         End Get
     End Property
 
+
+    Public ReadOnly Property Label() As String
+        Get
+            Return "HDF5"
+        End Get
+    End Property
+
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
             H5.Open()
@@ -50,21 +64,24 @@ Public Class atcDataSourceTimeseriesHSF5
             Dim lFileId As H5FileId = H5F.open(aFileName, H5F.OpenMode.ACC_RDONLY)
             Debug.Print("ID " & lFileId.Id & " for " & aFileName)
 
-            'input timeseries
             Dim lGrpName As String = "/TIMESERIES"
             Dim lGrpId As H5GroupId = H5G.open(lFileId, lGrpName)
             Dim lAtCnt As Integer = H5A.getNumberOfAttributes(lGrpId)
             Debug.Print("Attirbute Count for Input Timeseries" & lAtCnt & " for " & lGrpName)
             Dim lCnt As Integer = H5G.getNumObjects(lGrpId)
             Debug.Print("Potential Input Timeseries Count " & lCnt)
-
-            For lTsID As Integer = 0 To lCnt - 1
-                Dim lTsName As String = H5G.getObjectNameByIndex(lGrpId, lTsID)
-                If lTsName.StartsWith("TS") Then
-                    Me.AddDataSet(BuildTimeSeries(lGrpId, lTsName, "OBSERVED"))
-                End If
-            Next
-            Debug.Print("Actual Input Timeseries Count " & Me.DataSets.Count)
+            If aAttributes.GetValue("ProcessInputTS", True) Then
+                'input timeseries
+                For lTsID As Integer = 0 To lCnt - 1
+                    Dim lTsName As String = H5G.getObjectNameByIndex(lGrpId, lTsID)
+                    If lTsName.StartsWith("TS") Then
+                        Me.AddDataSet(BuildTimeSeries(lGrpId, lTsName, "OBSERVED"))
+                    End If
+                Next
+                Debug.Print("Actual Input Timeseries Count " & Me.DataSets.Count)
+            Else
+                Debug.Print("Input Timeseries Skipped" & Me.DataSets.Count)
+            End If
 
             'output timeseries
             lGrpName = "/RESULTS"
@@ -84,7 +101,10 @@ Public Class atcDataSourceTimeseriesHSF5
                     Dim lSecCnt As Integer = H5G.getNumObjects(lSecId)
                     Dim lConsId As H5DataSetId = H5D.open(lSecId, H5G.getObjectNameByIndex(lSecId, 2))
                     Dim lConsStorageSize As Integer = H5D.getStorageSize(lConsId)
-                    Dim lConsArraySize As Integer = lConsStorageSize / 6
+                    Dim lConsSpaceId As H5DataSpaceId = H5D.getSpace(lConsId)
+                    Dim lConsDims() As Long = H5S.getSimpleExtentDims(lConsSpaceId)
+                    Dim lConsArraySize As Integer = lConsDims(0)
+                    Dim lConsLength As Integer = lConsStorageSize / lConsArraySize
                     Debug.Print("  Number of Timser " & lConsArraySize)
                     Dim lConsTypeId As H5DataTypeId = H5D.getType(lConsId)
                     Dim lCons(lConsStorageSize - 1) As Byte
@@ -92,16 +112,18 @@ Public Class atcDataSourceTimeseriesHSF5
                     Dim lConsNames(lConsArraySize - 1) As String
                     Dim lConsDateDatasetIndex As Integer = Me.DataSets.Count
                     For lConInd As Integer = 0 To lConsArraySize - 1
-                        lConsNames(lConInd) = System.Text.Encoding.ASCII.GetString(lCons, lConInd * 6, 6).Replace(vbNullChar, " ")
+                        lConsNames(lConInd) = System.Text.Encoding.ASCII.GetString(lCons, lConInd * lConsLength, lConsLength).Replace(vbNullChar, " ")
                         Debug.Print("  ConName " & lConsNames(lConInd))
                         Dim lTimeSeries As New atcTimeseries(Me)
                         lTimeSeries.Attributes.Add("Constituent", lConsNames(lConInd))
                         lTimeSeries.Attributes.Add("Location", lOpnName)
                         lTimeSeries.Attributes.Add("Scenario", "Simulated")
-                        If lConInd > 0 Then 'use dates from first dataset in this group
-                            lTimeSeries.Dates = Me.DataSets(lConsDateDatasetIndex).Dates.Clone
+                        If lConsDateDatasetIndex < 50 Then 'too many datasets run out of memory, need to just build headers then read data as needed
+                            If lConInd > 0 Then 'use dates from first dataset in this group
+                                lTimeSeries.Dates = Me.DataSets(lConsDateDatasetIndex).Dates.Clone
+                            End If
+                            ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
                         End If
-                        ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
                         Me.AddDataSet(lTimeSeries)
                     Next
                 Next
@@ -173,7 +195,7 @@ Public Class atcDataSourceTimeseriesHSF5
         Dim lColumn As Integer = aColumn
         If lColumn < 0 Then lColumn = 0
 
-        If aColumn <= 0 Then
+        If aColumn <= 0 Then 'need dates
             Dim lDateGrpId As H5DataSetId = H5D.open(aTsGrpId, aDateTableName)
             Dim lDateStorageSize As Integer = H5D.getStorageSize(lDateGrpId)
             lNumValues = lDateStorageSize / 8
@@ -197,7 +219,7 @@ Public Class atcDataSourceTimeseriesHSF5
             Debug.Print(DumpDate(lDatesJ(lNumValues)))
             aTimeseries.Dates = New atcTimeseries(Me)
             aTimeseries.Dates.Values = lDatesJ
-        Else
+        Else 'using dates from first column
             lNumValues = aTimeseries.Dates.numValues
         End If
 
