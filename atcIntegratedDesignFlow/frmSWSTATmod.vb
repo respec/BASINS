@@ -3242,6 +3242,9 @@ Public Class frmSWSTATmod
                                                              aHigh:=radioHigh.Checked,
                                                              aNday:=ListToArray(lstNday),
                                                              aReturns:=ListToArray(lstRecurrence))
+
+        Calculate("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
+
         lFreqForm.Visible = False
 
         Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog

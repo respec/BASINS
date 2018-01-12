@@ -699,26 +699,20 @@ Public Class atcFrequencyGridSource
                             lRept.AppendLine("Frequency Curve - Parameter values at selected probabilities")
                             lRept.AppendLine()
 
+
                             If pHigh Then
-                                If lNumZero > 0 Then
-                                    lRept.AppendLine("                            Adjusted    Variance    95-Pct Confidence")
-                                Else
-                                    lRept.AppendLine("                                        Variance    95-Pct Confidence")
-                                End If
+                                lRept.AppendLine("                                        Variance    95-Pct Confidence")
                                 lRept.AppendLine(" Exceedence     Recurrence  Parameter      of          Intervals")
                             Else
-                                If lNumZero > 0 Then
-                                    lRept.AppendLine("   Non-                     Adjusted    Variance    95-Pct Confidence")
-                                Else
-                                    lRept.AppendLine("   Non-                                 Variance    95-Pct Confidence")
-                                End If
+                                lRept.AppendLine("   Non-                                 Variance    95-Pct Confidence")
                                 lRept.AppendLine(" exceedance     Recurrence  Parameter      of          Intervals")
                             End If
-                            'If just aligns code
-                            If True Then
+                            If lNumZero > 0 Then
+                                lRept.AppendLine(" Probability     Interval   Value (*)   Estimate    Lower      Upper")
+                            Else
                                 lRept.AppendLine(" Probability     Interval     Value     Estimate    Lower      Upper")
-                                lRept.AppendLine(" -----------    ----------  ---------   --------  ---------  ---------")
                             End If
+                            lRept.AppendLine(" -----------    ----------  ---------   --------  ---------  ---------")
                         End If
 
                         Dim lReverseString As String = ""
@@ -747,9 +741,9 @@ Public Class atcFrequencyGridSource
 
                                 'K Value (export only), variance of estimate and confidence intervals
                                 lExpTab.Value(lExpTabFldCtr + 3) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 4) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 5) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 6) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
+                                lExpTab.Value(lExpTabFldCtr + 4) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
+                                lExpTab.Value(lExpTabFldCtr + 5) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
+                                lExpTab.Value(lExpTabFldCtr + 6) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
                                 lExpTabFldCtr += lExpTabFieldNames7.Length
                             Next ' for each lRecurrenceKey As String In pRecurrence.Keys
                         Else
@@ -779,9 +773,9 @@ Public Class atcFrequencyGridSource
                                 End If
 
                                 'K Value (export only), variance of estimate and confidence intervals
-                                lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
-                                lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
-                                lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
+                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
+                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
+                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
                                 If pHigh Then
                                     lReverseString &= lThisRow & vbCrLf
                                 Else
@@ -795,9 +789,9 @@ Public Class atcFrequencyGridSource
 
                             lRept.AppendLine()
                             If lNumZero > 0 Then
-                                lRept.AppendLine(" Note -- Conditional Probability Adjustment applied because of zero flow(s),")
-                                lRept.AppendLine("         Adjusted parameter values (column 3) correspond with non-exceedence")
-                                lRept.AppendLine("         probabilities (column 1) and recurrence intervals (column 2).")
+                                lRept.AppendLine(" (*) Note - Conditional Probability Adjustment (CPA) applied because of zero flow(s).")
+                                lRept.AppendLine("            Parameter values (column 3), adjusted using CPA, correspond with")
+                                lRept.AppendLine("            non-exceedence probabilities (column 1) and recurrence intervals (column 2).")
                                 'Or, could Add Message Here, like another Note entry
                             End If
                             lRept.AppendLine()
