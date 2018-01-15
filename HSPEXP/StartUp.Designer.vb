@@ -54,6 +54,8 @@ Partial Class StartUp
         Me.ttHSPEXP = New System.Windows.Forms.ToolTip(Me.components)
         Me.chkExpertStats = New System.Windows.Forms.CheckBox()
         Me.chkHydrologySensitivity = New System.Windows.Forms.CheckBox()
+        Me.chkDO = New System.Windows.Forms.CheckBox()
+        Me.chkHeat = New System.Windows.Forms.CheckBox()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
@@ -197,7 +199,7 @@ Partial Class StartUp
         '
         Me.chkFecalColiform.AutoSize = True
         Me.chkFecalColiform.Enabled = False
-        Me.chkFecalColiform.Location = New System.Drawing.Point(6, 134)
+        Me.chkFecalColiform.Location = New System.Drawing.Point(248, 65)
         Me.chkFecalColiform.Name = "chkFecalColiform"
         Me.chkFecalColiform.Size = New System.Drawing.Size(109, 17)
         Me.chkFecalColiform.TabIndex = 17
@@ -262,6 +264,8 @@ Partial Class StartUp
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.chkHeat)
+        Me.GroupBox2.Controls.Add(Me.chkDO)
         Me.GroupBox2.Controls.Add(Me.chkFecalColiform)
         Me.GroupBox2.Controls.Add(Me.chkBODBalance)
         Me.GroupBox2.Controls.Add(Me.chkTotalPhosphorus)
@@ -270,7 +274,7 @@ Partial Class StartUp
         Me.GroupBox2.Controls.Add(Me.chkTotalNitrogen)
         Me.GroupBox2.Location = New System.Drawing.Point(18, 343)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(442, 160)
+        Me.GroupBox2.Size = New System.Drawing.Size(442, 147)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Constituent Balance Reports"
@@ -393,6 +397,26 @@ Partial Class StartUp
         Me.ttHSPEXP.SetToolTip(Me.chkHydrologySensitivity, "Under development.")
         Me.chkHydrologySensitivity.UseVisualStyleBackColor = True
         '
+        'chkDO
+        '
+        Me.chkDO.AutoSize = True
+        Me.chkDO.Location = New System.Drawing.Point(248, 19)
+        Me.chkDO.Name = "chkDO"
+        Me.chkDO.Size = New System.Drawing.Size(111, 17)
+        Me.chkDO.TabIndex = 18
+        Me.chkDO.Text = "Dissolved Oxygen"
+        Me.chkDO.UseVisualStyleBackColor = True
+        '
+        'chkHeat
+        '
+        Me.chkHeat.AutoSize = True
+        Me.chkHeat.Location = New System.Drawing.Point(248, 42)
+        Me.chkHeat.Name = "chkHeat"
+        Me.chkHeat.Size = New System.Drawing.Size(49, 17)
+        Me.chkHeat.TabIndex = 19
+        Me.chkHeat.Text = "Heat"
+        Me.chkHeat.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
@@ -464,4 +488,6 @@ Partial Class StartUp
     Friend WithEvents ttHSPEXP As ToolTip
     Friend WithEvents chkExpertStats As CheckBox
     Friend WithEvents chkHydrologySensitivity As CheckBox
+    Friend WithEvents chkDO As CheckBox
+    Friend WithEvents chkHeat As CheckBox
 End Class

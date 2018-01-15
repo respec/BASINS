@@ -88,6 +88,16 @@ Module HSPFOutputReports
         If StartUp.chkBODBalance.Checked Then
             pConstituents.Add("BOD-Labile")
         End If
+
+        If StartUp.chkDO.Checked Then
+            pConstituents.Add("DO")
+        End If
+
+        If StartUp.chkHeat.Checked Then
+            pConstituents.Add("Heat")
+        End If
+
+
         If StartUp.chkFecalColiform.Checked Then
             pConstituents.Add("FColi")
         End If
@@ -141,8 +151,6 @@ Module HSPFOutputReports
                     ListReachParametersForAllUCIFiles(pTestPath)
                     'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
                 End If
-
-
 
                 If pRunUci = True Then
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
@@ -411,10 +419,11 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
-                    Dim ConstProperties As List(Of ConstituentProperties)
+                    Dim ConstProperties As New List(Of ConstituentProperties)
 
                     For Each lConstituent As String In pConstituents
-                        Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
+                        'Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
+                        Dim ConstituentDataList As New List(Of ConstOutflowDatafromLand)
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
                         Dim lConstituentName As String = ""
@@ -422,16 +431,12 @@ Module HSPFOutputReports
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                             Case "Sediment"
                                 lConstituentName = "SED"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-                            'Case "N-PQUAL"
-                            '    lConstituentName = "N"
-
-                            'Case "P-PQUAL"
-                            '    lConstituentName = "P"
-
+                            Case "DO"
+                                lConstituentName = "DO"
+                            Case "Heat"
+                                lConstituentName = "Heat"
                             Case "TotalN"
                                 lConstituentName = "TN"
                                 ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
@@ -497,7 +502,6 @@ Module HSPFOutputReports
                             Next QUALIDItem
                         End If
 
-
                         'Done checking QUALID
                         'Dim lHspfBinDataSource As New atcDataSource
                         Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
@@ -526,79 +530,22 @@ Module HSPFOutputReports
                                     Next
                                     For Each lTs As atcTimeseries In lOpenHspfBinDataSource.DataSets
                                         Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
-                                        'If lConstituentNames.Contains(ConstituentFromTS) Then
-                                        'If ConstituentsThatUseLast.Contains(ConstituentFromTS) Then
-                                        'lTs = SubsetByDate(lTs, SDateJ, EDateJ, Nothing)
-                                        'lScenarioResults.DataSets.Add(lTs)
-                                        'Else
-                                        'Should be able to aggregate here, but need a better definition of TS that needs to be
-                                        'summed, averaged, or for the ones that need last.
-                                        'lTs = Aggregate(lTs, atcTimeUnit.TUMonth, 1, atcTran.TranAverSame)
                                         lScenarioResults.DataSets.Add(lTs)
-                                        'End If
-
-                                        'End If
                                     Next lTs
                                 End If
 
                             End If
 
-
                         Next i
 
                         If lScenarioResults.DataSets.Count > 0 Then
 
-
                             Dim lReportCons As New atcReport.ReportText
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
-                            For lcount As Integer = 0 To ConstProperties.Count - 1
 
-                                ConstituentDataList.Add(QUALReports(aHspfUci, lScenarioResults, ConstProperties(lcount)))
-
-                            Next lcount
-                            If lConstituentName = "TN" Or lConstituentName = "TP" Then
-
-                                For i As Integer = 0 To ConstituentDataList.Count - 1
-
-                                    For Each ConstOutflowData As ConstOutflowDatafromLand In ConstituentDataList(i)
-                                        Dim TotalConstituent As New ConstOutflowDatafromLand
-                                        TotalConstituent.LandConstituentNameForHSPEXP = lConstituentName
-                                        TotalConstituent.LandConstituentNameInUCI = lConstituentName
-                                        TotalConstituent.LandType = ConstOutflowData.LandType
-                                        TotalConstituent.OperationName = ConstOutflowData.OperationName
-                                        TotalConstituent.OperationNumber = ConstOutflowData.OperationNumber
-                                        TotalConstituent.Units = ConstOutflowData.Units
-                                        Dim Test2 As New Dictionary(Of String, atcCollection)
-                                        For Each key In ConstOutflowData.OutflowData.Keys
-
-                                            Dim Test As New atcCollection
-                                            For Each YearKey In ConstOutflowData.OutflowData(key).Keys
-                                                Test.Increment(YearKey, ConstOutflowData.OutflowData(key).ItemByKey(YearKey))
-
-                                            Next YearKey
-                                            Test2.Add(key, Test)
-
-
-
-                                        Next key
-                                        TotalConstituent.OutflowData = Test2
-                                        'Stop
-
-                                    Next ConstOutflowData
-
-
-                                Next i
-
-
-                            End If
-
-                            lReportCons = PrintQUALReports(ConstituentDataList, pBaseName, lRunMade, lConstituent)
-                            SaveFileString(loutfoldername & lConstituentName & "_TestQUALReport.txt", lReportCons.ToString)
-
-
-                            'Print test data for QUALData
-
+                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, ConstProperties, SDateJ, EDateJ)
+                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, SDateJ, EDateJ)
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing
 
@@ -608,10 +555,10 @@ Module HSPFOutputReports
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
 
                                 SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
-                                lReportCons = .Item2
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                                SaveFileString(lOutFileName, lReportCons.ToString)
+                                'lReportCons = Nothing
+                                'lReportCons = .Item2
+                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                                'SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
                                 lReportCons = .Item3
 
@@ -625,18 +572,14 @@ Module HSPFOutputReports
                                     SaveFileString(lOutFileName, lReportCons.ToString)
                                 End If
                                 lReportCons = Nothing
-                                lReportCons = .Item5
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                                SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
+                                'lReportCons = .Item5
+                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                                'SaveFileString(lOutFileName, lReportCons.ToString)
+                                'lReportCons = Nothing
 
-                                If .Item6 IsNot Nothing AndAlso .Item6.LabelValueCollection.Count > 0 Then
-                                    CreateGraph_BoxAndWhisker(.Item6, loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.png")
-                                End If
-
-                                If .Item7 IsNot Nothing AndAlso .Item7.Keys.Count > 0 Then
-                                    For Each location As String In .Item7.Keys
-                                        CreateGraph_BarGraph(.Item7.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                                If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
+                                    For Each location As String In .Item6.Keys
+                                        CreateGraph_BarGraph(.Item6.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
                                     Next location
                                 End If
 
