@@ -912,7 +912,7 @@ Public Module atcConstituentTables
                     Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXIN")(0),
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
-                    Dim lGENERLoad As Double = CalculateGENERLoad()
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
                     row("NPSLoad") = HspfTable.NumFmtRE(lNPSLoad, 10)
                     row("PSLoad") = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
@@ -1077,7 +1077,7 @@ Public Module atcConstituentTables
                     Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "IHEAT")(0),
                                                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
-                    Dim lGENERLoad As Double = CalculateGENERLoad()
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
                     row("NPSLoad") = HspfTable.NumFmtRE(lNPSLoad, 10)
                     row("PSLoad") = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
@@ -1283,10 +1283,9 @@ Public Module atcConstituentTables
                             End If
 
                         Next EXTTarget
-                        If Not lGENEROperationisOutputtoWDM AndAlso Not lGENERInNetworkBlockMessageShown Then
-                            Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for." & aBalanceType)
-                            lGENERInNetworkBlockMessageShown = True
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+
 
                         End If
 

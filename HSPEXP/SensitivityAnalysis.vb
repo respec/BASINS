@@ -143,7 +143,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
         'The file listing the sensitive parameters and the output DSN already exists.
         Dim lSpecificationFileRecordsNew As New ArrayList
-        lSpecificationFileRecordsNew = ReadCSVFile(lSpecificationFile) 'Reading the UA specification file 
+        lSpecificationFileRecordsNew = ReadCSVFile(lSpecificationFile) 'Reading the MultiSim specification file 
 
         Dim listOfOutputDSN As New atcCollection
         Dim lcsvRecordIndex As Integer = 0
@@ -173,8 +173,11 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             'Going through the CSV file and getting the list of parameters.
             Dim NewParameter As New ModelParameter
             With NewParameter
-                .ParmID = Trim(Int(lcsvlinerecord(0))) 'Need to figure out better error messages if the values are not correct.
+                Try
+                    .ParmID = Trim(Int(lcsvlinerecord(0))) 'Need to figure out better error messages if the values are not correct.
+                Catch ex As Exception
 
+                End Try
                 If Not Trim(lcsvlinerecord(1)).Length = 0 Then
                     .ParmOperationType = Trim(lcsvlinerecord(1))
                 End If
@@ -185,36 +188,44 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                     .ParmName = Trim(lcsvlinerecord(3))
                 End If
 
-
-                If lcsvlinerecord.Length > 4 AndAlso Not Trim(lcsvlinerecord(4)).Length = 0 Then
+                Try
                     .ParmOccurence = CInt(Trim(lcsvlinerecord(4)))
-                End If
+                Catch
+                    .ParmOccurence = 0
+                End Try
 
-                If lcsvlinerecord.Length > 5 AndAlso Not Trim(lcsvlinerecord(6)).Length = 0 Then
+                .ParmMultFactor = 0
+
+                Try
                     .ParmMultFactor = CInt(Trim(lcsvlinerecord(5)))
-                Else
+                Catch
                     .ParmMultFactor = 0
-                End If
+                End Try
+
                 'Assume that the fixed value for parameters will be provided for a MultiSim analysis for each individual simulation.
 
-                If .ParmTable.Contains("MON-") Then .ParmMultFactor = 1 'If a monthly table is provided, a multiplication factor has to be provided.
+                If .ParmTable.ToLower.StartsWith("mon-") Then .ParmMultFactor = 1 'If a monthly table is provided, a multiplication factor has to be provided.
 
                 If Not Trim(lcsvlinerecord(6)).Length = 0 Then
                     Try
                         .ParmOperationNumber = CInt(Trim(lcsvlinerecord(6)))
                         .ParmOperationName = ""
-                    Catch ex As Exception
+                    Catch
                         .ParmOperationName = Trim(lcsvlinerecord(6))
                         .ParmOperationNumber = 0
                     End Try
 
                 End If
 
-
-                If lcsvlinerecord.Length > 7 AndAlso Not Trim(lcsvlinerecord(7)).Length = 0 AndAlso Not Trim(lcsvlinerecord(8)).Length = 0 Then
+                Try
                     .ParmLow = CDbl(Trim(lcsvlinerecord(7)))
+                Catch
+                End Try
+
+                Try
                     .ParmHigh = CDbl(Trim(lcsvlinerecord(8)))
-                End If
+                Catch
+                End Try
 
             End With
 
@@ -243,11 +254,11 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             For Each Parm As ModelParameter In ListOfParameters
 
                 Try
-                    MFactorOrParmValue = lcsvlinerecord(Parm.ParmID)
+                    MFactorOrParmValue = CDbl(lcsvlinerecord((Parm.ParmID)))
                 Catch
                     MFactorOrParmValue = Double.NaN
                 End Try
-
+                'If SimID = 8 Then Stop
 
                 If Not (Double.IsNaN(MFactorOrParmValue) Or (Parm.ParmMultFactor = 0 AndAlso MFactorOrParmValue = 1.0)) Then
                     With Parm
@@ -395,15 +406,15 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             Case Else
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParameterOperation).Ids
                     If (lOper.Id = aOperationNumber OrElse lOper.Description = aOperationName OrElse (aOperationNumber = 0 AndAlso aOperationName = "")) Then
-
-                        Dim lTable As HspfTable
-
-                        If aParameterOccurrence = 0 Then
-                            lTable = lOper.Tables(aTableName)
-                        Else
-                            lTable = lOper.Tables(aTableName & ":" & aParameterOccurrence)
-                        End If
                         Try
+                            Dim lTable As HspfTable
+
+                            If aParameterOccurrence = 0 Or aParameterOccurrence = 1 Then
+                                lTable = lOper.Tables(aTableName)
+                            Else
+                                lTable = lOper.Tables(aTableName & ":" & aParameterOccurrence)
+                            End If
+
 
                             If lTable.Name.Contains("MON-") Then
                                 For Mon = 0 To 11 'For monthly parameters, only a multiplication factor can be provided
@@ -414,20 +425,17 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                     ElseIf (lTable.Parms(Mon).Value > aUpperLimit) Then
                                         lTable.Parms(Mon).Value = aUpperLimit
                                     End If
-
-
                                 Next
-
                             Else
                                 If aParmAbsolute = 0 Then
                                     lTable.ParmValue(aParameterName) = HspfTable.NumFmtRE(lTable.ParmValue(aParameterName) * aMFactorOrParmValue, lTable.Parms(aParameterName).Def.Length)
+                                Else
+                                    lTable.ParmValue(aParameterName) = HspfTable.NumFmtRE(aMFactorOrParmValue, lTable.Parms(aParameterName).Def.Length)
                                     If (lTable.ParmValue(aParameterName) < aLowerLimit) Then
                                         lTable.ParmValue(aParameterName) = aLowerLimit
                                     ElseIf (lTable.ParmValue(aParameterName) > aUpperLimit) Then
                                         lTable.ParmValue(aParameterName) = aUpperLimit
                                     End If
-                                Else
-                                    lTable.ParmValue(aParameterName) = HspfTable.NumFmtRE(aMFactorOrParmValue, lTable.Parms(aParameterName).Def.Length)
                                 End If
 
                             End If
@@ -437,17 +445,12 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                             End
                         End Try
 
-
                     End If
                 Next
         End Select
         aUCI.GlobalBlock.RunFg = 1
 
         aUCI.Save()
-
-
-
-
     End Sub
 
     Private Function ModelRunandReportAnswers(ByVal SimID As Integer,
@@ -464,10 +467,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                  ByRef aHSPFEchofileName As String)
 
         lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
-        'If lExitCode = -1 Then
-        '    Throw New ApplicationException("winHSPFLt could not run, Analysis cannot continue")
-        '    End
-        'End If
+
 
         Dim HSPFRan As Boolean = False
         Dim lRunMade As String
@@ -521,85 +521,91 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
             Dim DatasetID As Integer = lWdmDataSource2.DataSets.Count
             For Each WDMDataset As Integer In aOutputDSN
-                Dim SimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(WDMDataset), aSDateJ, aEDateJ, Nothing)
-                DatasetID += 1
-                If DatasetID < 10000 Then
-                    SimulatedTS.Attributes.SetValue("ID", DatasetID)
-                    SimulatedTS.Attributes.SetValue("Scenario", "SIMID" & SimID)
+                Try
+                    Dim SimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(WDMDataset), aSDateJ, aEDateJ, Nothing)
 
-                    lWdmDataSource2.AddDataset(SimulatedTS)
-                End If
+                    DatasetID += 1
+                    If DatasetID < 10000 Then
+                        SimulatedTS.Attributes.SetValue("ID", DatasetID)
+                        SimulatedTS.Attributes.SetValue("Scenario", "SIMID" & SimID)
 
-                Dim lNewStatDataset As New TimeSeriesStats
-                Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
-                With lNewStatDataset
+                        lWdmDataSource2.AddDataset(SimulatedTS)
+                    End If
 
-                    .SimID = SimID
-                    .DSNID = WDMDataset
-                    .OverallSum = SimulatedTS.Attributes.GetDefinedValue("Sum").Value
-                    .AnnualSum = SimulatedTS.Attributes.GetDefinedValue("SumAnnual").Value
-                    .Mean = SimulatedTS.Attributes.GetDefinedValue("Mean").Value
-                    .GeometricMean = "Not Calculated"
-                    .AvAnnPeak = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
-                    .TenPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
-                    .TwentyFivePercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
-                    .FiftyPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
-                    .FiftyPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
-                    .TwentyFivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum25").Value
-                    .TenPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum10").Value
-                    .FivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum05").Value
-                    .TwoPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum02").Value
-                    .Exceed01 = SimulatedTS.Attributes.GetDefinedValue("%0.10").Value
-                    .Exceed1 = SimulatedTS.Attributes.GetDefinedValue("%1.00").Value
-                    .Exceed2 = SimulatedTS.Attributes.GetDefinedValue("%2.00").Value
-                    .Exceed5 = SimulatedTS.Attributes.GetDefinedValue("%5.00").Value
-                    .Exceed10 = SimulatedTS.Attributes.GetDefinedValue("%10.00").Value
-                    .Exceed20 = SimulatedTS.Attributes.GetDefinedValue("%20.00").Value
-                    .Exceed30 = SimulatedTS.Attributes.GetDefinedValue("%30.00").Value
-                    .Exceed40 = SimulatedTS.Attributes.GetDefinedValue("%40.00").Value
-                    .Exceed50 = SimulatedTS.Attributes.GetDefinedValue("%50.00").Value
-                    .Exceed60 = SimulatedTS.Attributes.GetDefinedValue("%60.00").Value
-                    .Exceed70 = SimulatedTS.Attributes.GetDefinedValue("%70.00").Value
-                    .Exceed80 = SimulatedTS.Attributes.GetDefinedValue("%80.00").Value
-                    .Exceed90 = SimulatedTS.Attributes.GetDefinedValue("%90.00").Value
-                    .Exceed95 = SimulatedTS.Attributes.GetDefinedValue("%95.00").Value
-                    .Exceed98 = SimulatedTS.Attributes.GetDefinedValue("%98.00").Value
-                    .Exceed99 = SimulatedTS.Attributes.GetDefinedValue("%99.00").Value
-                    .Exceed999 = SimulatedTS.Attributes.GetDefinedValue("%99.90").Value
+                    Dim lNewStatDataset As New TimeSeriesStats
+                    Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                    With lNewStatDataset
 
-                    lOutputline &= .SimID & ", " & .DSNID & ", " & FormatNumber(.OverallSum, 3,, TriState.False, False) &
-                        ", " & FormatNumber(.AnnualSum, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Mean, 4,, TriState.False, False) &
-                        ", " & .GeometricMean &
-                        ", " & FormatNumber(.AvAnnPeak, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.TenPercentHigh, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.TwentyFivePercentHigh, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.FiftyPercentHigh, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.FiftyPercentLow, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.TwentyFivePercentLow, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.TenPercentLow, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.FivePercentLow, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.TwoPercentLow, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed01, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed1, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed2, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed5, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed10, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed20, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed30, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed40, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed50, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed60, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed70, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed80, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed90, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed95, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed98, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed99, 4,, TriState.False, False) &
-                        ", " & FormatNumber(.Exceed999, 4,, TriState.False, False) & vbCrLf
+                        .SimID = SimID
+                        .DSNID = WDMDataset
+                        .OverallSum = SimulatedTS.Attributes.GetDefinedValue("Sum").Value
+                        .AnnualSum = SimulatedTS.Attributes.GetDefinedValue("SumAnnual").Value
+                        .Mean = SimulatedTS.Attributes.GetDefinedValue("Mean").Value
+                        .GeometricMean = "Not Calculated"
+                        .AvAnnPeak = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
+                        .TenPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
+                        .TwentyFivePercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
+                        .FiftyPercentHigh = .OverallSum - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                        .FiftyPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                        .TwentyFivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum25").Value
+                        .TenPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum10").Value
+                        .FivePercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum05").Value
+                        .TwoPercentLow = SimulatedTS.Attributes.GetDefinedValue("%Sum02").Value
+                        .Exceed01 = SimulatedTS.Attributes.GetDefinedValue("%0.10").Value
+                        .Exceed1 = SimulatedTS.Attributes.GetDefinedValue("%1.00").Value
+                        .Exceed2 = SimulatedTS.Attributes.GetDefinedValue("%2.00").Value
+                        .Exceed5 = SimulatedTS.Attributes.GetDefinedValue("%5.00").Value
+                        .Exceed10 = SimulatedTS.Attributes.GetDefinedValue("%10.00").Value
+                        .Exceed20 = SimulatedTS.Attributes.GetDefinedValue("%20.00").Value
+                        .Exceed30 = SimulatedTS.Attributes.GetDefinedValue("%30.00").Value
+                        .Exceed40 = SimulatedTS.Attributes.GetDefinedValue("%40.00").Value
+                        .Exceed50 = SimulatedTS.Attributes.GetDefinedValue("%50.00").Value
+                        .Exceed60 = SimulatedTS.Attributes.GetDefinedValue("%60.00").Value
+                        .Exceed70 = SimulatedTS.Attributes.GetDefinedValue("%70.00").Value
+                        .Exceed80 = SimulatedTS.Attributes.GetDefinedValue("%80.00").Value
+                        .Exceed90 = SimulatedTS.Attributes.GetDefinedValue("%90.00").Value
+                        .Exceed95 = SimulatedTS.Attributes.GetDefinedValue("%95.00").Value
+                        .Exceed98 = SimulatedTS.Attributes.GetDefinedValue("%98.00").Value
+                        .Exceed99 = SimulatedTS.Attributes.GetDefinedValue("%99.00").Value
+                        .Exceed999 = SimulatedTS.Attributes.GetDefinedValue("%99.90").Value
 
-                End With
-            Next
+                        lOutputline &= .SimID & ", " & .DSNID & ", " & FormatNumber(.OverallSum, 3,, TriState.False, False) &
+                            ", " & FormatNumber(.AnnualSum, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Mean, 4,, TriState.False, False) &
+                            ", " & .GeometricMean &
+                            ", " & FormatNumber(.AvAnnPeak, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.TenPercentHigh, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.TwentyFivePercentHigh, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.FiftyPercentHigh, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.FiftyPercentLow, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.TwentyFivePercentLow, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.TenPercentLow, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.FivePercentLow, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.TwoPercentLow, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed01, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed1, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed2, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed5, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed10, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed20, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed30, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed40, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed50, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed60, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed70, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed80, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed90, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed95, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed98, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed99, 4,, TriState.False, False) &
+                            ", " & FormatNumber(.Exceed999, 4,, TriState.False, False) & vbCrLf
+
+                    End With
+                Catch
+                    Logger.Dbg("Could not compute statistics for ID" & WDMDataset)
+                End Try
+
+            Next WDMDataset
             lWdmDataSource.Clear()
             lWdmDataSource2.Clear()
         Else
