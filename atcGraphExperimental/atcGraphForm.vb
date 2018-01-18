@@ -619,7 +619,12 @@ Public Class atcGraphForm
                 Next
 
                 Try
+                    'temporarily remove Points to avoid blowing out 'Serial' points buffer,
+                    'values will come from referenced TS
+                    Dim lPoints As ZedGraph.IPointList = pZgc.MasterPane.PaneList(0).CurveList(0).Points
+                    pZgc.MasterPane.PaneList(0).CurveList(0).Points = Nothing
                     lSerial += ser.Serialize(pZgc.MasterPane)
+                    pZgc.MasterPane.PaneList(0).CurveList(0).Points = lPoints
                 Catch ex As Exception
                     lSerial += ex.ToString
                 End Try

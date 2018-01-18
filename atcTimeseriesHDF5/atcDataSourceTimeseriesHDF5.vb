@@ -12,6 +12,13 @@ Public Class atcDataSourceTimeseriesHSF5
     Private Shared pFilter As String = "HDF5 Files (*.h5)|*.h5"
     Private pColDefs As Hashtable
 
+    Public ReadOnly Property AvailableAttributes() As Collection
+        Get
+            'needed to edit attributes? that can't be done for this type!
+            Return New Collection 'empty!
+        End Get
+    End Property
+
     Public Overrides ReadOnly Property Description() As String
         Get
             Return "Timeseries HDF5"
@@ -42,6 +49,13 @@ Public Class atcDataSourceTimeseriesHSF5
         End Get
     End Property
 
+
+    Public ReadOnly Property Label() As String
+        Get
+            Return "HDF5"
+        End Get
+    End Property
+
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
             H5.Open()
@@ -49,65 +63,87 @@ Public Class atcDataSourceTimeseriesHSF5
 
             Dim lFileId As H5FileId = H5F.open(aFileName, H5F.OpenMode.ACC_RDONLY)
             Debug.Print("ID " & lFileId.Id & " for " & aFileName)
+            Dim lGrpName As String
+            Dim lGrpId As H5GroupId
+            Dim lAtCnt As Integer
 
-            'input timeseries
-            Dim lGrpName As String = "/TIMESERIES"
-            Dim lGrpId As H5GroupId = H5G.open(lFileId, lGrpName)
-            Dim lAtCnt As Integer = H5A.getNumberOfAttributes(lGrpId)
-            Debug.Print("Attirbute Count for Input Timeseries" & lAtCnt & " for " & lGrpName)
-            Dim lCnt As Integer = H5G.getNumObjects(lGrpId)
-            Debug.Print("Potential Input Timeseries Count " & lCnt)
+            If aAttributes.GetValue("ProcessInputTS", True) Then
+                'input timeseries
+                lGrpName = "/TIMESERIES"
+                lGrpId = H5G.open(lFileId, lGrpName)
+                lAtCnt = H5A.getNumberOfAttributes(lGrpId)
+                Debug.Print("Attirbute Count for Input Timeseries" & lAtCnt & " for " & lGrpName)
+                Dim lCnt As Integer = H5G.getNumObjects(lGrpId)
+                Debug.Print("Potential Input Timeseries Count " & lCnt)
+                For lTsID As Integer = 0 To lCnt - 1
+                    Dim lTsName As String = H5G.getObjectNameByIndex(lGrpId, lTsID)
+                    If lTsName.StartsWith("TS") Then
+                        AddDataSet(BuildTimeSeries(lGrpId, lTsName, "OBSERVED"))
+                    End If
+                Next
+                Debug.Print("Actual Input Timeseries Count " & DataSets.Count)
+            Else
+                Debug.Print("Input Timeseries Skipped " & DataSets.Count)
+            End If
 
-            For lTsID As Integer = 0 To lCnt - 1
-                Dim lTsName As String = H5G.getObjectNameByIndex(lGrpId, lTsID)
-                If lTsName.StartsWith("TS") Then
-                    Me.AddDataSet(BuildTimeSeries(lGrpId, lTsName, "OBSERVED"))
-                End If
-            Next
-            Debug.Print("Actual Input Timeseries Count " & Me.DataSets.Count)
+            If aAttributes.GetValue("ProcessOutputTS", True) Then
+                'output timeseries
+                Dim lOutputConstituent As String = aAttributes.GetValue("OutputConstituent", "")
+                Dim lOutputLocation As String = aAttributes.GetValue("OutputLocation", "")
 
-            'output timeseries
-            lGrpName = "/RESULTS"
-            lGrpId = H5G.open(lFileId, lGrpName)
-            lAtCnt = H5A.getNumberOfAttributes(lGrpId)
-            Debug.Print("Attirbute Count for " & lGrpName & " is " & lAtCnt)
-            Dim lOpCnt As Integer = H5G.getNumObjects(lGrpId)
-            Debug.Print("Operation Count " & lOpCnt)
-            For lOpInd As Integer = 0 To lOpCnt - 1
-                Dim lOpnName As String = H5G.getObjectNameByIndex(lGrpId, lOpInd)
-                Dim lOpnId As H5GroupId = H5G.open(lGrpId, lOpnName)
-                Dim lSectCnt As Integer = H5G.getNumObjects(lOpnId)
-                Debug.Print("Section Count for " & lOpnName & " is " & lSectCnt)
-                For lSecInd As Integer = 0 To lSectCnt - 1
-                    Dim lSecName As String = H5G.getObjectNameByIndex(lOpnId, lSecInd)
-                    Dim lSecId As H5GroupId = H5G.open(lOpnId, lSecName)
-                    Dim lSecCnt As Integer = H5G.getNumObjects(lSecId)
-                    Dim lConsId As H5DataSetId = H5D.open(lSecId, H5G.getObjectNameByIndex(lSecId, 2))
-                    Dim lConsStorageSize As Integer = H5D.getStorageSize(lConsId)
-                    Dim lConsArraySize As Integer = lConsStorageSize / 6
-                    Debug.Print("  Number of Timser " & lConsArraySize)
-                    Dim lConsTypeId As H5DataTypeId = H5D.getType(lConsId)
-                    Dim lCons(lConsStorageSize - 1) As Byte
-                    H5D.read(Of Byte)(lConsId, lConsTypeId, New H5Array(Of Byte)(lCons))
-                    Dim lConsNames(lConsArraySize - 1) As String
-                    Dim lConsDateDatasetIndex As Integer = Me.DataSets.Count
-                    For lConInd As Integer = 0 To lConsArraySize - 1
-                        lConsNames(lConInd) = System.Text.Encoding.ASCII.GetString(lCons, lConInd * 6, 6).Replace(vbNullChar, " ")
-                        Debug.Print("  ConName " & lConsNames(lConInd))
-                        Dim lTimeSeries As New atcTimeseries(Me)
-                        lTimeSeries.Attributes.Add("Constituent", lConsNames(lConInd))
-                        lTimeSeries.Attributes.Add("Location", lOpnName)
-                        lTimeSeries.Attributes.Add("Scenario", "Simulated")
-                        If lConInd > 0 Then 'use dates from first dataset in this group
-                            lTimeSeries.Dates = Me.DataSets(lConsDateDatasetIndex).Dates.Clone
-                        End If
-                        ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
-                        Me.AddDataSet(lTimeSeries)
+                lGrpName = "/RESULTS"
+                lGrpId = H5G.open(lFileId, lGrpName)
+                lAtCnt = H5A.getNumberOfAttributes(lGrpId)
+                Debug.Print("Attirbute Count for " & lGrpName & " is " & lAtCnt)
+                Dim lOpCnt As Integer = H5G.getNumObjects(lGrpId)
+                Debug.Print("Operation Count " & lOpCnt)
+                For lOpInd As Integer = 0 To lOpCnt - 1
+                    Dim lOpnName As String = H5G.getObjectNameByIndex(lGrpId, lOpInd)
+                    Dim lOpnId As H5GroupId = H5G.open(lGrpId, lOpnName)
+                    Dim lSectCnt As Integer = H5G.getNumObjects(lOpnId)
+                    Debug.Print("Section Count for " & lOpnName & " is " & lSectCnt)
+                    For lSecInd As Integer = 0 To lSectCnt - 1
+                        Dim lSecName As String = H5G.getObjectNameByIndex(lOpnId, lSecInd)
+                        Dim lSecId As H5GroupId = H5G.open(lOpnId, lSecName)
+                        Dim lSecCnt As Integer = H5G.getNumObjects(lSecId)
+                        Dim lConsId As H5DataSetId = H5D.open(lSecId, H5G.getObjectNameByIndex(lSecId, 2))
+                        Dim lConsStorageSize As Integer = H5D.getStorageSize(lConsId)
+                        Dim lConsSpaceId As H5DataSpaceId = H5D.getSpace(lConsId)
+                        Dim lConsDims() As Long = H5S.getSimpleExtentDims(lConsSpaceId)
+                        Dim lConsArraySize As Integer = lConsDims(0)
+                        Dim lConsLength As Integer = lConsStorageSize / lConsArraySize
+                        Debug.Print("  Section " & lSecName & "  Timseries Count " & lConsArraySize)
+                        Dim lConsTypeId As H5DataTypeId = H5D.getType(lConsId)
+                        Dim lCons(lConsStorageSize - 1) As Byte
+                        H5D.read(Of Byte)(lConsId, lConsTypeId, New H5Array(Of Byte)(lCons))
+                        Dim lConsNames(lConsArraySize - 1) As String
+                        Dim lConsDateDatasetIndex As Integer = DataSets.Count
+                        For lConInd As Integer = 0 To lConsArraySize - 1
+                            lConsNames(lConInd) = System.Text.Encoding.ASCII.GetString(lCons, lConInd * lConsLength, lConsLength).Replace(vbNullChar, " ")
+                            Dim lConsName As String = lConsNames(lConInd).Trim
+                            'Debug.Print("    ConName " & lConsName)
+                            If ((lOutputConstituent.Length = 0 Or lConsName = lOutputConstituent) AndAlso
+                                (lOutputLocation.Length = 0 Or lOpnName = lOutputLocation)) Then
+                                Dim lTimeSeries As New atcTimeseries(Me)
+                                lTimeSeries.Attributes.Add("Constituent", lConsName)
+                                lTimeSeries.Attributes.Add("Location", lOpnName)
+                                lTimeSeries.Attributes.Add("Scenario", "Simulated")
+                                If lConsDateDatasetIndex < 50 Then 'too many datasets run out of memory, need to just build headers then read data as needed
+                                    If DataSets.Count <> lConsDateDatasetIndex Then 'use dates from first dataset in this group
+                                        lTimeSeries.Dates = DataSets(lConsDateDatasetIndex).Dates.Clone
+                                    End If
+                                    ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
+                                End If
+                                AddDataSet(lTimeSeries)
+                            End If
+                        Next
                     Next
                 Next
-            Next
+            Else
+                Debug.Print("Output Timeseries Skipped " & DataSets.Count)
+            End If
         End If
-
+        Debug.Print("Dataset Count " & DataSets.Count)
     End Function
 
     Public Sub New()
@@ -173,7 +209,7 @@ Public Class atcDataSourceTimeseriesHSF5
         Dim lColumn As Integer = aColumn
         If lColumn < 0 Then lColumn = 0
 
-        If aColumn <= 0 Then
+        If IsNothing(aTimeseries.Dates) Then 'need dates
             Dim lDateGrpId As H5DataSetId = H5D.open(aTsGrpId, aDateTableName)
             Dim lDateStorageSize As Integer = H5D.getStorageSize(lDateGrpId)
             lNumValues = lDateStorageSize / 8
@@ -197,7 +233,7 @@ Public Class atcDataSourceTimeseriesHSF5
             Debug.Print(DumpDate(lDatesJ(lNumValues)))
             aTimeseries.Dates = New atcTimeseries(Me)
             aTimeseries.Dates.Values = lDatesJ
-        Else
+        Else 'using dates from first column
             lNumValues = aTimeseries.Dates.numValues
         End If
 
