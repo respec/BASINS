@@ -21,9 +21,9 @@ Module HSPFOutputReports
     Private pWaterYears As Boolean = False
     'following were added by Becky:
     'Private pProgressBar As New RWZProgress
-    Private pMakeStdGraphs As Boolean 'flag to indicate user wants standard graphs (monthly, daily, storms, flow duration)
-    Private pMakeLogGraphs As Boolean 'flag to indicate user wants logarithmic graphs (all that are logarithmic)
-    Private pMakeSupGraphs As Boolean 'flag to indicate user wants supporting graphs (UZS, LZS, ET, cumulative diff)
+    'Private pMakeStdGraphs As Boolean 'flag to indicate user wants standard graphs (monthly, daily, storms, flow duration)
+    'Private pMakeLogGraphs As Boolean 'flag to indicate user wants logarithmic graphs (all that are logarithmic)
+
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
     Friend pHSPFExe As String '= FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
@@ -58,9 +58,7 @@ Module HSPFOutputReports
         pGraphSaveFormat = ".png"
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
-        pMakeStdGraphs = True
-        pMakeLogGraphs = True
-        pMakeSupGraphs = True
+
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
 
@@ -357,52 +355,52 @@ Module HSPFOutputReports
                                 lOutFileName = loutfoldername & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
                                 SaveFileString(lOutFileName, lStr)
 
-                                If pMakeLogGraphs Or pMakeStdGraphs Or pMakeSupGraphs Then
-                                    Logger.Status(Now & " Preparing Graphs", True)
-                                    Dim lTimeSeries As New atcTimeseriesGroup
-                                    Logger.Dbg(Now & " Creating nonstorm graphs")
-                                    lTimeSeries.Add("Observed", lObsTSer)
-                                    lTimeSeries.Add("Simulated", lSimTSer)
-                                    If PercentMissingObservedData > 0 Then
-                                        lTimeSeries.Add("SimulatedBroken", lTSerBroken)
-                                    End If
-                                    lTimeSeries.Add("Precipitation", lPrecTser)
-                                    lTimeSeries.Add("LZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(9)))
-                                    lTimeSeries.Add("UZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(8)))
-                                    lTimeSeries.Add("PotET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(6)))
-                                    lTimeSeries.Add("ActET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(7)))
-                                    lTimeSeries.Add("Baseflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(4)))
-                                    lTimeSeries.Add("Interflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(3)))
-                                    lTimeSeries.Add("Surface", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(2)))
-                                    GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ,
+
+                                Logger.Status(Now & " Preparing Graphs", True)
+                                Dim lTimeSeries As New atcTimeseriesGroup
+                                Logger.Dbg(Now & " Creating nonstorm graphs")
+                                lTimeSeries.Add("Observed", lObsTSer)
+                                lTimeSeries.Add("Simulated", lSimTSer)
+                                If PercentMissingObservedData > 0 Then
+                                    lTimeSeries.Add("SimulatedBroken", lTSerBroken)
+                                End If
+                                lTimeSeries.Add("Precipitation", lPrecTser)
+                                lTimeSeries.Add("LZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(9)))
+                                lTimeSeries.Add("UZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(8)))
+                                lTimeSeries.Add("PotET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(6)))
+                                lTimeSeries.Add("ActET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(7)))
+                                lTimeSeries.Add("Baseflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(4)))
+                                lTimeSeries.Add("Interflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(3)))
+                                lTimeSeries.Add("Surface", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(2)))
+                                GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ,
                                              lCons, lSiteName,
                                              lTimeSeries,
                                              pGraphSaveFormat,
                                              pGraphSaveWidth,
                                              pGraphSaveHeight,
                                              pGraphAnnual, loutfoldername,
-                                             pMakeStdGraphs, pMakeLogGraphs,
-                                             pMakeSupGraphs, PercentMissingObservedData)
-                                    lTimeSeries.Clear()
+                                            True, True,
+                                             True, PercentMissingObservedData)
+                                lTimeSeries.Clear()
 
-                                    If pMakeStdGraphs Then 'Becky added, only make storm graphs (log or normal) if we want standard graphs
-                                        Logger.Dbg(Now & " Creating storm graphs")
-                                        lSimTSer = InchesToCfs(lSimTSerInchesOriginal, lArea)
 
-                                        lTimeSeries.Add("Observed", lObsTSerOriginal)
-                                        lTimeSeries.Add("Simulated", lSimTSer)
-                                        lTimeSeries.Add("Prec", lPrecTserOriginal)
+                                Logger.Dbg(Now & " Creating storm graphs")
+                                lSimTSer = InchesToCfs(lSimTSerInchesOriginal, lArea)
 
-                                        lTimeSeries(0).Attributes.SetValue("Units", "cfs")
-                                        lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
-                                        lTimeSeries(1).Attributes.SetValue("Units", "cfs")
-                                        lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
-                                        lTimeSeries(2).Attributes.SetValue("YAxis", "Aux")
-                                        IO.Directory.CreateDirectory(loutfoldername & "\Storms\")
-                                        GraphStorms(lTimeSeries, 2, loutfoldername & "Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, pMakeLogGraphs)
-                                        lTimeSeries.Dispose()
-                                    End If
-                                End If
+                                lTimeSeries.Add("Observed", lObsTSerOriginal)
+                                lTimeSeries.Add("Simulated", lSimTSer)
+                                lTimeSeries.Add("Prec", lPrecTserOriginal)
+
+                                lTimeSeries(0).Attributes.SetValue("Units", "cfs")
+                                lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
+                                lTimeSeries(1).Attributes.SetValue("Units", "cfs")
+                                lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
+                                lTimeSeries(2).Attributes.SetValue("YAxis", "Aux")
+                                IO.Directory.CreateDirectory(loutfoldername & "\Storms\")
+                                GraphStorms(lTimeSeries, 2, loutfoldername & "Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, True)
+                                lTimeSeries.Dispose()
+
+
 
                             Next
 
