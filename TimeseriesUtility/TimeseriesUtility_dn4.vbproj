@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B738FFB5-FE42-4420-A254-3B1209FF78DF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>TimeseriesUtility.My.MyApplication</StartupObject>
+    <RootNamespace>TimeseriesUtility</RootNamespace>
+    <AssemblyName>TimeseriesUtility</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>TimeseriesUtility.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>TimeseriesUtility.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SARA.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="ZedGraph">
+      <HintPath>..\local\x86Debug\ZedGraph.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="frmAbout.Designer.vb">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmExtensions.Designer.vb">
+      <DependentUpon>frmExtensions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmExtensions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.vb">
+      <DependentUpon>frmMain.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSelectMet.Designer.vb">
+      <DependentUpon>frmSelectMet.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSelectMet.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="mod_demo.vb" />
+    <Compile Include="mod_extensions.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmAbout.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmExtensions.resx">
+      <DependentUpon>frmExtensions.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSelectMet.resx">
+      <DependentUpon>frmSelectMet.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-D4EM10.vbproj">
+      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
+      <Name>atcTimeseriesNdayHighLow-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSWAT\atcTimeseriesSWAT-D4EM10.vbproj">
+      <Project>{8157c92a-68a6-498d-84b7-ef2a299ab7ba}</Project>
+      <Name>atcTimeseriesSWAT-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ-D4EM10.vbproj">
+      <Project>{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}</Project>
+      <Name>atcBasinsObsWQ-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls-D4EM10.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcDataTree\atcDataTree-D4EM10.vbproj">
+      <Project>{F4EF0925-945B-418C-9A81-8490D89985DB}</Project>
+      <Name>atcDataTree-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-D4EM10.vbproj">
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Name>atcData-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph-D4EM10.vbproj">
+      <Project>{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}</Project>
+      <Name>atcGraph-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut-D4EM10.vbproj">
+      <Project>{61FAB3D2-9A2D-4D0A-BC4D-41C499DBE4B9}</Project>
+      <Name>atcHspfBinOut-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList-D4EM10.vbproj">
+      <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
+      <Name>atcList-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp-D4EM10.vbproj">
+      <Project>{72264BDC-23F5-4A55-B53D-0752099CB263}</Project>
+      <Name>atcMetCmp-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation-D4EM10.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesGSSHA\atcTimeseriesGSSHA.vbproj">
+      <Project>{CA09C348-000B-443B-AE64-539504F7567A}</Project>
+      <Name>atcTimeseriesGSSHA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-D4EM10.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNCDC\atcTimeseriesNCDC-D4EM10.vbproj">
+      <Project>{2AA4FCFA-94D1-47C5-B515-E417DA3AF8DC}</Project>
+      <Name>atcTimeseriesNCDC-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-D4EM10.vbproj">
+      <Project>{82530A5B-FF39-4B9F-8A04-881468DFC662}</Project>
+      <Name>atcTimeseriesRDB-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-D4EM10.vbproj">
+      <Project>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</Project>
+      <Name>atcTimeseriesScript-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-D4EM10.vbproj">
+      <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
+      <Name>atcTimeseriesStatistics-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesSUSTAIN\atcTimeseriesSUSTAIN-D4EM10.vbproj">
+      <Project>{D985BBC0-EF47-461B-B6BE-21463BCD588D}</Project>
+      <Name>atcTimeseriesSUSTAIN-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUCI\atcUCI-D4EM10.vbproj">
+      <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
+      <Name>atcUCI-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-D4EM10.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM-D4EM10.vbproj">
+      <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
+      <Name>atcWDM-D4EM10</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="transparent177x121.png" />
+    <Content Include="SARA.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
