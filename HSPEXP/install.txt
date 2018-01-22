@@ -1,3 +1,12 @@
+Dated: 01/17/2018
+Features:
+1. Sensitivity/Uncertainty analysis was improved with better error checking and parameter limits.
+2. DO and Heat reports from land surfaces and reach budget reports were added.
+3. Box-Whisker plots were added for DO, Heat, NO3, NH4, PO4, and organic N and P constituents.
+4. Land reports for most constituents were improved so that the vlaues can be easily filtered by the user.
+
+
+HSPEXP+1.40beta5
 Dated 11/10/2017
 HSPEXP+1.40beta4
 Features:

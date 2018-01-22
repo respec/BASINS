@@ -1,8 +1,0 @@
-<h>Regan Plots</h>
-
-<p>HSPEXP+ has the capability to automatically produce plots of phytoplankton, benthic algae, dissolved inorganic phosphorus, dissolved total ammonia, and dissolved nitrate concentrations. Although observed water quality data is generally not available for all modeled reaches, visualizing these constituents at each reach can guide a modeler in ensuring that the reach behavior is generally stable over the analysis period. Figure 1 shows an example of a Regan Plot.</p>
-
-<p align ="center"><img src="ReganPlot.png"></p>
-<p align="center"><b>Figure 1. Regan Plot visualizing the variations in concentrations of phytoplankton, benthic algae, and dissolved nutrients over the model analysis period.</b></p>
-
-<p>To run this analysis, the PLANK section must be active and the nutrient and plank outputs must be written to a HBN file at monthly or shorter intervals.</p>

@@ -1,28 +1,0 @@
-<html><head></head>
-<body>
-<ul>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="HSPEXP+ Version 1.11 User's Manual">    <param name="Local" value="HSPEXP+ Version 1.1 User's Manual.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Disclaimer">    <param name="Local" value="Disclaimer.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Acknowledgements">    <param name="Local" value="Acknowledgements.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="User Assistance and Feedback">    <param name="Local" value="Assistance.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Introduction">    <param name="Local" value="Introduction.html">    </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Background">        <param name="Local" value="Introduction\Background.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Capabilities of HSPEXP+">        <param name="Local" value="Introduction\Capabilities.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Hydrologic Calibration">        <param name="Local" value="Introduction\Hydrologic Calibration.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Water Quality Calibration">        <param name="Local" value="Introduction\Water Quality Calibration.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Automated Graph Generation">        <param name="Local" value="Introduction\Automated Graph Generation.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Caveats">        <param name="Local" value="Introduction\Caveats.html">        </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Using HSPEXP+">    <param name="Local" value="Using HSPEXP+.html">    </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="User Interface">        <param name="Local" value="Using HSPEXP+\User Interface.html">        </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Setting up the Project">        <param name="Local" value="Using HSPEXP+\Setting up the Project.html">        </OBJECT>
-        <li><OBJECT type="text/sitemap">            <param name="Name" value="Setting up UCI and Other Files">            <param name="Local" value="Using HSPEXP+\Setting up the Project\Setting up UCI and other files.html">            </OBJECT>
-        <li><OBJECT type="text/sitemap">            <param name="Name" value="Setting up EXS File(s)">            <param name="Local" value="Using HSPEXP+\Setting up the Project\Setting up EXS File(s).html">            </OBJECT>
-        <li><OBJECT type="text/sitemap">            <param name="Name" value="Setting up Graph Specification File (s) for Generating Additional Graphs">            <param name="Local" value="Using HSPEXP+\Setting up the Project\Setting up graph specification file for additional graphs.html">            </OBJECT>
-        <li><OBJECT type="text/sitemap">            <param name="Name" value="Setting up BASINS Observed Water Quality Data File">            <param name="Local" value="Using HSPEXP+\Setting up the Project\Setting up BASINS Observed WQ File.html">            </OBJECT>
-    <li><OBJECT type="text/sitemap">        <param name="Name" value="Running HSPEXP+">        <param name="Local" value="Using HSPEXP+\Running HSPEXP+.html">        </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Resolving Errors">    <param name="Local" value="Resolving Errors.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="Load Allocation Tool">    <param name="Local" value="Load Allocation Tool.html">    </OBJECT>
-<li><OBJECT type="text/sitemap">    <param name="Name" value="References">    <param name="Local" value="References.html">    </OBJECT>
-</ul>
-</body>
-</html>

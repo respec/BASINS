@@ -19,10 +19,6 @@ Module HSPFOutputReports
     Private pCurveStepType As String = "NonStep"
     Private pConstituents As New atcCollection
     Private pWaterYears As Boolean = False
-    'following were added by Becky:
-    'Private pProgressBar As New RWZProgress
-    'Private pMakeStdGraphs As Boolean 'flag to indicate user wants standard graphs (monthly, daily, storms, flow duration)
-    'Private pMakeLogGraphs As Boolean 'flag to indicate user wants logarithmic graphs (all that are logarithmic)
 
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
     Friend pHSPFExe As String '= FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
@@ -417,11 +413,11 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
-                    Dim ConstProperties As New List(Of ConstituentProperties)
+                    Dim lConstProperties As New List(Of ConstituentProperties)
 
                     For Each lConstituent As String In pConstituents
                         'Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
-                        Dim ConstituentDataList As New List(Of ConstOutflowDatafromLand)
+                        'Dim ConstituentDataList As New List(Of ConstOutflowDatafromLand)
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
                         Dim AcceptableQUALNames As New List(Of String)
                         Dim lConstituentName As String = ""
@@ -437,19 +433,20 @@ Module HSPFOutputReports
                                 lConstituentName = "Heat"
                             Case "TotalN"
                                 lConstituentName = "TN"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("NO3")
                                 AcceptableQUALNames.Add("NH3+NH4")
                                 AcceptableQUALNames.Add("BOD")
                             Case "TotalP"
                                 lConstituentName = "TP"
-                                ConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("ORTHO P")
                                 AcceptableQUALNames.Add("BOD")
                             Case "BOD-Labile"
                                 lConstituentName = "BOD-Labile"
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 CheckQUALID = True
                                 AcceptableQUALNames.Add("BOD")
                             Case "FColi"
@@ -542,17 +539,17 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, ConstProperties, SDateJ, EDateJ)
+                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
                             ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, SDateJ, EDateJ)
                             Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
                             lReportCons = Nothing
 
                             With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
-                                                                      lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ)
+                                                                      lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ, lConstProperties)
                                 lReportCons = .Item1
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
+                                If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
 
-                                SaveFileString(lOutFileName, lReportCons.ToString)
                                 'lReportCons = Nothing
                                 'lReportCons = .Item2
                                 'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
@@ -561,7 +558,7 @@ Module HSPFOutputReports
                                 lReportCons = .Item3
 
                                 lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
-                                SaveFileString(lOutFileName, lReportCons.ToString)
+                                If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
                                 lReportCons = Nothing
 
                                 lReportCons = .Item4
