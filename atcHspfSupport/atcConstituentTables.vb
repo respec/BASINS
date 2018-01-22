@@ -682,30 +682,33 @@ Public Module atcConstituentTables
 
                 Next lOperation
 
-                For Each lOperation As String In lOperationNameNumber
-                    For Each lYear As String In lYears
-                        Dim SelectExpression As String = "OpTypeNumber = '" & lOperation & "' And Year = '" & lYear & "'"
-                        Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
-                        row = Land_Constituent_Table.NewRow
-                        row("OpTypeNumber") = foundRows(0)("OpTypeNumber")
-                        row("OpDesc") = foundRows(0)("OpDesc")
-                        row("Year") = foundRows(0)("Year")
-                        row("ConstName") = aBalanceType
-                        row("ConstNameEXP") = aBalanceType
-                        row("Unit") = foundRows(0)("Unit")
+                If aConstProperties.Count > 1 Then
+                    For Each lOperation As String In lOperationNameNumber 'Summing constituents of TN and TP
+                        For Each lYear As String In lYears
+                            Dim SelectExpression As String = "OpTypeNumber = '" & lOperation & "' And Year = '" & lYear & "'"
+                            Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
+                            row = Land_Constituent_Table.NewRow
+                            row("OpTypeNumber") = foundRows(0)("OpTypeNumber")
+                            row("OpDesc") = foundRows(0)("OpDesc")
+                            row("Year") = foundRows(0)("Year")
+                            row("ConstName") = aBalanceType
+                            row("ConstNameEXP") = aBalanceType
+                            row("Unit") = foundRows(0)("Unit")
 
-                        For Each foundrow As DataRow In foundRows
-                            For i As Integer = 6 To foundrow.ItemArray.Length - 1
-                                If IsDBNull(row(i)) And Not IsDBNull(foundrow(i)) Then
-                                    row(i) = foundrow(i)
-                                ElseIf Not (IsDBNull(row(i)) AndAlso IsDBNull(foundrow(i))) Then
-                                    row(i) += foundrow(i)
-                                End If
-                            Next i
-                        Next foundrow
-                        Land_Constituent_Table.Rows.Add(row)
-                    Next lYear
-                Next lOperation
+                            For Each foundrow As DataRow In foundRows
+                                For i As Integer = 6 To foundrow.ItemArray.Length - 1
+                                    If IsDBNull(row(i)) And Not IsDBNull(foundrow(i)) Then
+                                        row(i) = foundrow(i)
+                                    ElseIf Not (IsDBNull(row(i)) AndAlso IsDBNull(foundrow(i))) Then
+                                        row(i) += foundrow(i)
+                                    End If
+                                Next i
+                            Next foundrow
+                            Land_Constituent_Table.Rows.Add(row)
+                        Next lYear
+                    Next lOperation
+                End If
+
 
         End Select
 
@@ -780,12 +783,12 @@ Public Module atcConstituentTables
         Dim lUnits As String = ""
 
         Select Case aBalanceType
-            Case "Water"
-                If aUCI.GlobalBlock.EmFg = 1 Then
-                    lUnits = "ac-ft"
-                Else
-                    lUnits = "Mm3"
-                End If
+            'Case "Water"
+            '    If aUCI.GlobalBlock.EmFg = 1 Then
+            '        lUnits = "ac-ft"
+            '    Else
+            '        lUnits = "Mm3"
+            '    End If
             Case "DO"
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     lUnits = "lbs"
@@ -880,6 +883,12 @@ Public Module atcConstituentTables
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "DOXFLUX-BENTHIC"
+                column.Caption = "DO Phytoplankton (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "DOXFLUX-ZOO"
                 column.Caption = "DO Zooplankton (" & lUnits & ")"
                 Reach_Budget_Table.Columns.Add(column)
@@ -934,6 +943,8 @@ Public Module atcConstituentTables
                     row("DOXFLUX-NITR") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-NITR")(0),
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
                     row("DOXFLUX-PHYTO") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-PHYTO")(0),
+                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                    row("DOXFLUX-BENTHIC") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-BENTHIC")(0),
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
                     row("DOXFLUX-ZOO") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-ZOO")(0),
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
@@ -1108,6 +1119,173 @@ Public Module atcConstituentTables
 
                     Reach_Budget_Table.Rows.Add(row)
                 Next lReach
+            Case "BOD-Labile"
+                Dim lUnits2 As String = ""
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    lUnits = "lbs"
+                Else
+                    lUnits = "kg"
+
+                End If
+                'Work on this case.
+                Dim column As DataColumn
+                Dim row As DataRow
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpTypeNumber"
+                column.Caption = "Operation Type & NUmber"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.String")
+                column.ColumnName = "OpDesc"
+                column.Caption = "Operation Description"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "NPSLoad"
+                column.Caption = "Nonpoint Source Loads (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "PSLoad"
+                column.Caption = "Point Source Loads (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "Diversion"
+                column.Caption = "Diversion (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "MassBalance"
+                column.Caption = "Mass Balance (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "UpstreamIn"
+                column.Caption = "Upstream Load (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODIN"
+                column.Caption = "Total BOD Inflow (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-TOT"
+                column.Caption = "Total BOD Flux (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-BODDEC"
+                column.Caption = "BOD Decay (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-SINK"
+                column.Caption = "BOD Sink (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-BENTHAL"
+                column.Caption = "BOD Benthal (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-BENTHIC"
+                column.Caption = "BOD Benthic (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-DENITR"
+                column.Caption = "BOD Denitrification (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-PHYTO"
+                column.Caption = "BOD Phytoplankton (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODFLUX-ZOO"
+                column.Caption = "BOD Zooplankton (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "BODOUTTOT"
+                column.Caption = "BOD Outflow (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
+
+                For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
+                    row = Reach_Budget_Table.NewRow
+                    If Not lReach.Name = "RCHRES" Then Continue For
+                    Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+
+                    Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
+                    Dim lTS As New atcTimeseries(Nothing)
+                    Dim AddTS As New atcDataGroup
+                    Dim lTotalTS As New atcTimeseries(Nothing)
+                    Dim lDownstreamReachID As Integer = lReach.DownOper("RCHRES")
+                    Dim lUpstreamIn As Double = 0.0
+                    If lUpstreamInflows.Keys.Contains(lReach.Id) Then
+                        lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
+                    End If
+                    Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
+                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
+                    Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "BODOUTTOT")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "BODIN")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                    Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
+                    row("NPSLoad") = HspfTable.NumFmtRE(lNPSLoad, 10)
+                    row("PSLoad") = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
+                    row("Diversion") = HspfTable.NumFmtRE(lDiversion, 10)
+                    row("MassBalance") = HspfTable.NumFmtRE(lMassBalance, 10)
+                    row("UpstreamIn") = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                    For Each columnValue As DataColumn In Reach_Budget_Table.Columns
+                        Dim ColumnName As String = columnValue.ColumnName
+                        Select Case ColumnName
+                            Case "OpTypeNumber"
+                                row(ColumnName) = LocationName
+                            Case "OpDesc"
+                                row(ColumnName) = lReach.Description
+                            Case "NPSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                            Case "PSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
+                            Case "Diversion"
+                                row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                            Case "MassBalance"
+                                row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                            Case "UpstreamIn"
+                                row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                            Case Else
+                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                        End Select
+                    Next columnValue
+
+
+                    Reach_Budget_Table.Rows.Add(row)
+                    Next lReach
 
         End Select
 
@@ -1291,9 +1469,49 @@ Public Module atcConstituentTables
 
                     End If
                 Next lSource
+
+            Case "Sediment"
+                For Each lSource As HspfConnection In aReach.Sources
+                    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+
+                        Dim lGENERID As Integer = lSource.Source.VolId
+                        Dim lMfact As Double = lSource.MFact
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
+                        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+
+                            If EXTTarget.Target.VolName.Contains("WDM") Then
+                                lGENEROperationisOutputtoWDM = True
+                                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                                Dim lDSN As Integer = EXTTarget.Target.VolId
+                                For i As Integer = 0 To aUCI.FilesBlock.Count
+                                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
+                                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                        If lDataSource Is Nothing Then
+                                            If atcDataManager.OpenDataSource(lFileName) Then
+                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                            End If
+                                        End If
+                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
+
+                                    End If
+                                Next
+
+                            End If
+                        Next EXTTarget
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+
+
+                        End If
+
+                    End If
+                Next lSource
+
         End Select
-
-
 
         Return lGENERLoad
     End Function

@@ -1228,8 +1228,7 @@ Public Module Utility
 
                     Case "TotalP"
                         'If aConstituent.Contains("SOQUAL") Then Stop
-                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString &
-                            "_" & lMassLink.Target.MemSub1
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
 
                             Case "POQUAL-ORTHO P_NUIF1_4", "SOQO-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4",
                                  "AOQUAL-ORTHO P_NUIF1_4", "SCRQS-ORTHO P_NUIF1_4", "WASHQS-ORTHO P_NUIF1_4"
@@ -1297,11 +1296,11 @@ Public Module Utility
 
                         End If
 
-            Case "BOD-Labile"
-                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString &
-                            "_" & lMassLink.Target.MemSub1
+                    Case "BOD-Labile"
+                        Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
 
-                            Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2", "POQUAL-BOD_OXIF_2"
+                            Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2",
+                                 "POQUAL-BOD_OXIF_2", "SOQO-BOD_OXIF_2"
                                 lMassLinkFactor = lMassLink.MFact
                                 Return lMassLinkFactor
                             Case "ORGN - TOTAL OUTFLOW_OXIF_2"
@@ -1428,7 +1427,7 @@ Public Module Utility
 
         For Each lML As HspfMassLink In aUCI.MassLinks
             Select Case aBalanceType
-                Case "BOD"
+                Case "BOD-Labile"
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
 
@@ -1440,7 +1439,7 @@ Public Module Utility
                             lTableName = "QUAL-PROPS"
                         End If
 
-                        QUALNames.ConstNameForEXPPlus = "NO3"
+                        QUALNames.ConstNameForEXPPlus = "BOD-Labile"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
                         If aUCI.GlobalBlock.EmFg = 1 Then
                             QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"

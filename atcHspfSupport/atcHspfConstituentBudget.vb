@@ -19,7 +19,8 @@ Public Module ConstituentBudget
                            ByVal aOutputLocations As atcCollection,
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
-                           ByVal aEDateJ As Double) As _
+                           ByVal aEDateJ As Double,
+                           Optional ByVal ConstProperties As List(Of ConstituentProperties) = Nothing) As _
                            Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcCollection)
 
         Dim lNumberFormat As String = "#,##0.###"
@@ -92,17 +93,21 @@ Public Module ConstituentBudget
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
+                If ConstProperties IsNot Nothing Then
+                    Dim ConstituentList As New List(Of String)
+                    For Each consituent As ConstituentProperties In ConstProperties
 
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-NO3"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-NO3"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-NO3"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-NH3+NH4"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-NH3+NH4"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-NH3+NH4"))
+                        Dim ConstituentName As String = consituent.ConstituentNameInUCI
+                        If Not ConstituentList.Contains(ConstituentName) Then
+                            ConstituentList.Add(ConstituentName)
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & ConstituentName))
+                        End If
 
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-BOD"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-BOD"))
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-BOD"))
+
+                    Next
+                End If
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
@@ -120,34 +125,32 @@ Public Module ConstituentBudget
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
                 'lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POPHOS")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-ORTHO P")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-ORTHO P")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-ORTHO P")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-BOD")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-BOD")))
-                lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-BOD")))
+                If ConstProperties IsNot Nothing Then
+                    Dim ConstituentList As New List(Of String)
+                    For Each consituent As ConstituentProperties In ConstProperties
+                        Dim ConstituentName As String = consituent.ConstituentNameInUCI
+                        If Not ConstituentList.Contains(ConstituentName) Then
+                            ConstituentList.Add(ConstituentName)
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & ConstituentName))
+                        End If
+                    Next
+                End If
                 lAtmDepData.Add((aScenarioResults.DataSets.FindData("Constituent", "PO4-ATMDEPTOT")))
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-IN"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-OUT"))
 
-                'Case "BOD-PQUAL"
-                '    lUnits = "(lbs)"
-                '    lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-BOD")))
-                '    lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-BOD")))
-                '    lNonpointData.Add((aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-BOD")))
-
-                '    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "BODIN"))
-                '    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "BODOUTTOT"))
-
             Case Else
-                lReport.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                lReport2.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                lReport3.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcCollection)(lReport, lReport2, lReport3, lReport5, lReportLoadingRate, Nothing)
+                'lReport.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                'lReport2.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                'lReport3.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                'lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                'lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                'lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
+                Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport,
+                    atcCollection)(Nothing, Nothing, Nothing, Nothing, Nothing, Nothing)
 
         End Select
 
