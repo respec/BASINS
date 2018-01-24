@@ -637,7 +637,7 @@ Public Module Utility
 
                     .Add("P:Total3", "    Total P Loss")
 
-                    .Add("P:Header2", "Plant P")
+                    .Add("P:Header2", "Plant P Uptake")
                     .Add("P:PLANT P - SURFACE LAYER", "    Surface")
                     .Add("P:PLANT P - UPPER PRINCIPAL", "    Upper")
                     .Add("P:PLANT P - LOWER LAYER", "    Lower")

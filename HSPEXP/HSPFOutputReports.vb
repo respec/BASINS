@@ -413,9 +413,10 @@ Module HSPFOutputReports
                 End If
 
                 If pConstituents.Count > 0 Then
-                    Dim lConstProperties As New List(Of ConstituentProperties)
+
 
                     For Each lConstituent As String In pConstituents
+                        Dim lConstProperties As New List(Of ConstituentProperties)
                         'Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
                         'Dim ConstituentDataList As New List(Of ConstOutflowDatafromLand)
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
@@ -541,7 +542,8 @@ Module HSPFOutputReports
 
                             LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
                             ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, SDateJ, EDateJ)
-                            Logger.Dbg(Now & " Calculating Constituent Budget for " & lConstituent)
+                            Logger.Status(Now & " Generating Reports for " & lConstituent)
+                            Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
 
                             With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,

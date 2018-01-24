@@ -31,6 +31,7 @@ Public Module atcConstituentTables
         Dim landUseNameForTheCollection As String = ""
         Dim lUnits As String = ""
 
+        Land_Constituent_Table = AddFirstThreeColumnsLandLoading(Land_Constituent_Table)
         Select Case aBalanceType
             Case "Water"
 
@@ -43,23 +44,6 @@ Public Module atcConstituentTables
 
                 Dim column As DataColumn
                 Dim row As DataRow
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "Year"
-                column.Caption = "Year"
-                Land_Constituent_Table.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.String")
@@ -249,23 +233,6 @@ Public Module atcConstituentTables
 
                 Dim column As DataColumn
                 Dim row As DataRow
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "Year"
-                column.Caption = "Year"
-                Land_Constituent_Table.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
@@ -381,22 +348,6 @@ Public Module atcConstituentTables
 
                 Dim column As New DataColumn
                 Dim row As DataRow
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "Year"
-                column.Caption = "Year"
-                Land_Constituent_Table.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
@@ -495,16 +446,6 @@ Public Module atcConstituentTables
                 Dim column As DataColumn
                 Dim row As DataRow
                 column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Land_Constituent_Table.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.String")
@@ -516,12 +457,6 @@ Public Module atcConstituentTables
                 column.DataType = Type.GetType("System.String")
                 column.ColumnName = "ConstNameEXP"
                 column.Caption = "Constituent Name in EXP+"
-                Land_Constituent_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "Year"
-                column.Caption = "Year"
                 Land_Constituent_Table.Columns.Add(column)
 
                 column = New DataColumn()
@@ -780,64 +715,20 @@ Public Module atcConstituentTables
         Dim lCumulativePointNonpointColl As New atcCollection
 
         Reach_Budget_Table = New DataTable("ReachBudgetTable")
+
         Dim lUnits As String = ""
 
         Select Case aBalanceType
-            'Case "Water"
-            '    If aUCI.GlobalBlock.EmFg = 1 Then
-            '        lUnits = "ac-ft"
-            '    Else
-            '        lUnits = "Mm3"
-            '    End If
+
             Case "DO"
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     lUnits = "lbs"
                 Else
                     lUnits = "kgs"
                 End If
-                Dim column As DataColumn
+                Reach_Budget_Table = AddFirstSixColumnsReachBudget(Reach_Budget_Table, lUnits)
                 Dim row As DataRow
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "NPSLoad"
-                column.Caption = "Nonpoint Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "PSLoad"
-                column.Caption = "Point Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "Diversion"
-                column.Caption = "Diversion (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "MassBalance"
-                column.Caption = "Mass Balance (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "UpstreamIn"
-                column.Caption = "Upstream Load (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
+                Dim column As DataColumn
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
@@ -903,8 +794,6 @@ Public Module atcConstituentTables
                     row = Reach_Budget_Table.NewRow
                     If Not lReach.Name = "RCHRES" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
-                    row("OpTypeNumber") = LocationName
-                    row("OpDesc") = lReach.Description
                     Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
@@ -923,31 +812,28 @@ Public Module atcConstituentTables
                     Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
                     Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
-                    row("NPSLoad") = HspfTable.NumFmtRE(lNPSLoad, 10)
-                    row("PSLoad") = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
-                    row("Diversion") = HspfTable.NumFmtRE(lDiversion, 10)
-                    row("MassBalance") = HspfTable.NumFmtRE(lMassBalance, 10)
-                    row("UpstreamIn") = HspfTable.NumFmtRE(lUpstreamIn, 10)
-                    row("DOXIN") = HspfTable.NumFmtRE(lTotalIn, 10)
-                    row("DOXOUTTOT") = HspfTable.NumFmtRE(lOutflow, 10)
-                    row("DOXFLUX-TOT") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-TOT")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-
-                    row("DOXFLUX-REAER") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-REAER")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-
-                    row("DOXFLUX-BODDEC") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-BODDEC")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("DOXFLUX-BENTHAL") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-BENTHAL")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("DOXFLUX-NITR") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-NITR")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("DOXFLUX-PHYTO") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-PHYTO")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("DOXFLUX-BENTHIC") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-BENTHIC")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("DOXFLUX-ZOO") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXFLUX-ZOO")(0),
-                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                    For Each columnValue As DataColumn In Reach_Budget_Table.Columns
+                        Dim ColumnName As String = columnValue.ColumnName
+                        Select Case ColumnName
+                            Case "OpTypeNumber"
+                                row(ColumnName) = LocationName
+                            Case "OpDesc"
+                                row(ColumnName) = lReach.Description
+                            Case "NPSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                            Case "PSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
+                            Case "Diversion"
+                                row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                            Case "MassBalance"
+                                row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                            Case "UpstreamIn"
+                                row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                            Case Else
+                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                        End Select
+                    Next columnValue
 
                     Reach_Budget_Table.Rows.Add(row)
                 Next lReach
@@ -964,48 +850,7 @@ Public Module atcConstituentTables
                 End If
                 Dim column As DataColumn
                 Dim row As DataRow
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "NPSLoad"
-                column.Caption = "Nonpoint Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "PSLoad"
-                column.Caption = "Point Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "Diversion"
-                column.Caption = "Diversion (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "MassBalance"
-                column.Caption = "Mass Balance (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "UpstreamIn"
-                column.Caption = "Upstream Load (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
+                Reach_Budget_Table = AddFirstSixColumnsReachBudget(Reach_Budget_Table, lUnits)
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "IHEAT"
@@ -1070,8 +915,6 @@ Public Module atcConstituentTables
                     row = Reach_Budget_Table.NewRow
                     If Not lReach.Name = "RCHRES" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
-                    row("OpTypeNumber") = LocationName
-                    row("OpDesc") = lReach.Description
                     Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
@@ -1090,32 +933,28 @@ Public Module atcConstituentTables
                     Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
                     Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
-                    row("NPSLoad") = HspfTable.NumFmtRE(lNPSLoad, 10)
-                    row("PSLoad") = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
-                    row("Diversion") = HspfTable.NumFmtRE(lDiversion, 10)
-                    row("MassBalance") = HspfTable.NumFmtRE(lMassBalance, 10)
-                    row("UpstreamIn") = HspfTable.NumFmtRE(lUpstreamIn, 10)
-                    row("IHEAT") = HspfTable.NumFmtRE(lTotalIn, 10)
-                    row("ROHEAT") = HspfTable.NumFmtRE(lOutflow, 10)
-                    row("HTEXCH") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "HTEXCH")(0),
+                    For Each columnValue As DataColumn In Reach_Budget_Table.Columns
+                        Dim ColumnName As String = columnValue.ColumnName
+                        Select Case ColumnName
+                            Case "OpTypeNumber"
+                                row(ColumnName) = LocationName
+                            Case "OpDesc"
+                                row(ColumnName) = lReach.Description
+                            Case "NPSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                            Case "PSLoad"
+                                row(ColumnName) = HspfTable.NumFmtRE(CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType), 10)
+                            Case "Diversion"
+                                row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                            Case "MassBalance"
+                                row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                            Case "UpstreamIn"
+                                row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                            Case Else
+                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
                                                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-
-                    row("QTOTAL") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QTOTAL")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-
-                    row("QSOLAR") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QSOLAR")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("QLONGW") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QLONGW")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("QEVAP") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QEVAP")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("QCON") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QCON")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                    row("QPREC") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QPREC")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-
-                    row("QBED") = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "QBED")(0),
-                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                        End Select
+                    Next columnValue
 
                     Reach_Budget_Table.Rows.Add(row)
                 Next lReach
@@ -1127,51 +966,9 @@ Public Module atcConstituentTables
                     lUnits = "kg"
 
                 End If
-                'Work on this case.
-                Dim column As DataColumn
+                Reach_Budget_Table = AddFirstSixColumnsReachBudget(Reach_Budget_Table, lUnits)
                 Dim row As DataRow
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpTypeNumber"
-                column.Caption = "Operation Type & NUmber"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.String")
-                column.ColumnName = "OpDesc"
-                column.Caption = "Operation Description"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "NPSLoad"
-                column.Caption = "Nonpoint Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "PSLoad"
-                column.Caption = "Point Source Loads (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "Diversion"
-                column.Caption = "Diversion (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "MassBalance"
-                column.Caption = "Mass Balance (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
-                column = New DataColumn()
-                column.DataType = Type.GetType("System.Double")
-                column.ColumnName = "UpstreamIn"
-                column.Caption = "Upstream Load (" & lUnits & ")"
-                Reach_Budget_Table.Columns.Add(column)
-
+                Dim column As DataColumn
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "BODIN"
@@ -1283,9 +1080,11 @@ Public Module atcConstituentTables
                         End Select
                     Next columnValue
 
-
                     Reach_Budget_Table.Rows.Add(row)
-                    Next lReach
+                Next lReach
+
+
+
 
         End Select
 
@@ -1514,5 +1313,74 @@ Public Module atcConstituentTables
         End Select
 
         Return lGENERLoad
+    End Function
+    Private Function AddFirstSixColumnsReachBudget(ByRef aDataTable As Data.DataTable, ByRef aUnits As String) As DataTable
+        Dim column As DataColumn
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.String")
+        column.ColumnName = "OpTypeNumber"
+        column.Caption = "Operation Type & Number"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.String")
+        column.ColumnName = "OpDesc"
+        column.Caption = "Operation Description"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "NPSLoad"
+        column.Caption = "Nonpoint Source Loads (" & aUnits & ")"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "PSLoad"
+        column.Caption = "Point Source Loads (" & aUnits & ")"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "Diversion"
+        column.Caption = "Diversion (" & aUnits & ")"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "MassBalance"
+        column.Caption = "Mass Balance (" & aUnits & ")"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "UpstreamIn"
+        column.Caption = "Upstream Load (" & aUnits & ")"
+        aDataTable.Columns.Add(column)
+
+
+
+        Return aDataTable
+    End Function
+    Private Function AddFirstThreeColumnsLandLoading(ByRef aDataTable As Data.DataTable) As DataTable
+        Dim column As DataColumn
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.String")
+        column.ColumnName = "OpTypeNumber"
+        column.Caption = "Operation Type & Number"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.String")
+        column.ColumnName = "OpDesc"
+        column.Caption = "Operation Description"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.String")
+        column.ColumnName = "Year"
+        column.Caption = "Year"
+        aDataTable.Columns.Add(column)
+        Return aDataTable
     End Function
 End Module
