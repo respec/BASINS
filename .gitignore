@@ -205,7 +205,6 @@ atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON15.vbproj.FileListAbsolute.txt
 *.force
 *.xml
 *.FIL
-HSPEXP/bin/x86/Debug/HSPEXP+.chm
 *.exe
 *.config
 *.config
@@ -221,3 +220,5 @@ Resources.resx
 *.dll
 *.resources
 *.manifest
+*.chm
+*.wdu
