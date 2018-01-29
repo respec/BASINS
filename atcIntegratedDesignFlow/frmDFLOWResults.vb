@@ -939,7 +939,7 @@ Public Class frmDFLOWResults
                 .i_BuildDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_BuildDate, "")
                 .i_RunDateTime = pInputArgs.GetValue(DFLOWReportUtil.Info.i_RunDateTime, "")
                 .i_Username = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Username, "User")
-                .i_Seasonal = False
+                .i_Seasonal = pInputArgs.GetValue(DFLOWReportUtil.Info.i_Seasonal, False)
                 .i_SeasonStartDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartDate, "")
                 .i_SeasonEndDate = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonEndDate, "")
                 .i_SeasonStartYear = pInputArgs.GetValue(DFLOWReportUtil.Info.i_SeasonStartYear, 0)
