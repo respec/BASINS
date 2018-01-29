@@ -140,12 +140,12 @@ Module HSPFOutputReports
 
                 End If
 
-                pListModelParameters = True
+                pListModelParameters = False
                 If pListModelParameters Then
                     ListReachParametersForAllUCIFiles(pTestPath)
-                    'modListUCIParameters.ListReachParameters(aHspfUci, loutfoldername)
                 End If
 
+#Region "HSPF Run"
                 If pRunUci = True Then
                     Logger.Status(Now & " Running HSPF Simulation of " & pBaseName & ".uci", True)
                     Dim lExitCode As Integer
@@ -159,7 +159,7 @@ Module HSPFOutputReports
                     End If
                 End If
                 Logger.Status(Now & " HSPF Simulation of " & pBaseName & ".uci" & " finished.", True)
-
+#End Region
                 'build collection of operation types to report
                 Dim lOperationTypes As New atcCollection
                 lOperationTypes.Add("P:", "PERLND")
@@ -178,7 +178,7 @@ Module HSPFOutputReports
                     Return
                 End If
 
-
+#Region "Read Echo File to decide if Model Ran"
                 Dim HSPFRan As Boolean = False
                 Using echoFileReader As StreamReader = File.OpenText(lHspfEchoFileName)
                     While Not echoFileReader.EndOfStream
@@ -198,7 +198,7 @@ Module HSPFOutputReports
                                  " file runs properly!")
                     End
                 End If
-
+#End Region
                 loutfoldername = pTestPath
 
                 Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") &
@@ -222,7 +222,7 @@ Module HSPFOutputReports
                 If StartUp.chkReganGraphs.Checked Then
                     ReganGraphs(aHspfUci, SDateJ, EDateJ, loutfoldername)
                 End If
-
+#Region "Area Report Generation"
                 If pMakeAreaReports Then
                     Dim alocations As New atcCollection
                     For Each lRCHRES As HspfOperation In aHspfUci.OpnSeqBlock.Opns
@@ -237,9 +237,10 @@ Module HSPFOutputReports
                     lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
                     SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
                 End If
+#End Region
 
+#Region "Hydrology Calibration"
                 If StartUp.chkExpertStats.Checked = True Then
-
                     Dim lExpertSystemFileNames As New NameValueCollection
                     AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
                     If lExpertSystemFileNames.Count < 1 Then 'Becky added this if-then to warn the user if no EXS files exist
@@ -411,7 +412,9 @@ Module HSPFOutputReports
                         End Try
                     Next lExpertSystemFileName
                 End If
+#End Region
 
+#Region "Water Quality"
                 If pConstituents.Count > 0 Then
 
 
@@ -541,7 +544,7 @@ Module HSPFOutputReports
                             Dim lOutFileName As String = ""
 
                             LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
-                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, SDateJ, EDateJ)
+                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
                             Logger.Status(Now & " Generating Reports for " & lConstituent)
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
@@ -625,10 +628,11 @@ Module HSPFOutputReports
                     Next lConstituent
 
                 End If
+#End Region
 
-                Logger.Dbg(Now & " Output Written to " & loutfoldername)
+                Logger.Status(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
-RWZProgramEnding:
+
                 'pProgressBar.pbProgress.Increment(39)
 
                 Logger.Dbg(Now & " HSPEXP+ Complete")
