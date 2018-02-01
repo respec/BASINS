@@ -375,6 +375,16 @@ Friend Class frmAbout
                 lblConfigFile.Text = g_Project.ConfigFileName
             Catch
             End Try
+            Try
+#If ProgramName = "USGS GW Toolbox" Then
+
+#ElseIf ProgramName = "USGS SW Toolbox" Then
+                Me.Width += 30
+#Else
+
+#End If
+            Catch ex As Exception
+            End Try
             Me.Show()
         Catch ex As System.Exception
             g_MapWin.ShowErrorDialog(ex)
