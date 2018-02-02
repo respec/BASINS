@@ -2057,6 +2057,28 @@ Public Class frmSWSTATmod
         Return lMsg
     End Function
 
+    Private Function IsSeasonal() As String
+        Dim lName As String = GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "")
+        If String.IsNullOrEmpty(lName) Then
+            Return "high low not defined"
+        End If
+        Dim lYearStartMonth As Integer = GetSetting("atcFrequencyGrid", "StartMonth", lName, -1)
+        Dim lYearStartDay As Integer = GetSetting("atcFrequencyGrid", "StartDay", lName, -1)
+        Dim lYearEndMonth As Integer = GetSetting("atcFrequencyGrid", "EndMonth", lName, -1)
+        Dim lYearEndDay As Integer = GetSetting("atcFrequencyGrid", "EndDay", lName, -1)
+        If lYearStartMonth < 0 OrElse lYearStartDay < 0 OrElse lYearEndMonth < 0 OrElse lYearEndDay < 0 Then
+            Return "month or day not defined"
+        End If
+        If lYearStartMonth - 1 = lYearEndMonth OrElse (lYearStartMonth = 1 And lYearEndMonth = 12) Then
+            If lYearEndDay = DayMon(1901, lYearEndMonth) OrElse lYearEndDay = DayMon(2000, lYearEndMonth) Then
+                If lYearStartDay = 1 Then
+                    Return "not seasonal"
+                End If
+            End If
+        End If
+        Return "seasonal"
+    End Function
+
     Private Sub SeasonsYearsFromForm()
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
@@ -3229,6 +3251,9 @@ Public Class frmSWSTATmod
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),
                                                          aReturns:=ListToArray(lstRecurrence))
+
+            SeasonsYearsFromForm()
+
             lFreqForm.SWSTATformmod = Me
 
             Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -3953,6 +3978,9 @@ Public Class frmSWSTATmod
         'DFLOWCalcs.fBioExcursions = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         'Dim lfrmResult As New DFLOWAnalysis.frmDFLOWResults(pDataGroup, , True)
 
+        'This call ensure the season boundaries are applied to the data group before analysis begin
+        SeasonsYearsFromForm()
+
         'build all scenarios
         If pDFLOWScenarios IsNot Nothing Then
             pDFLOWScenarios.Clear()
@@ -4074,6 +4102,7 @@ Public Class frmSWSTATmod
             Next 'lEScenNBio 
         Next 'lEScenBio
         If pDFLOWScenarios.Count > 0 Then
+            Dim lIsSeasonal As String = IsSeasonal()
             If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
                 Dim lInputArgs As atcDataAttributes = Me.DateArgsFromForm()
                 With lInputArgs
@@ -4092,6 +4121,11 @@ Public Class frmSWSTATmod
                     .SetValue(DFLOWReportUtil.Info.i_YearsIncluded, lEndYear - lStartYear + 1)
                     .SetValue(DFLOWReportUtil.Info.i_SeasonStartYear, lStartYear)
                     .SetValue(DFLOWReportUtil.Info.i_SeasonEndYear, lEndYear)
+                    If lIsSeasonal.StartsWith("seasonal") Then
+                        .SetValue(DFLOWReportUtil.Info.i_Seasonal, True)
+                    Else
+                        .SetValue(DFLOWReportUtil.Info.i_Seasonal, False)
+                    End If
                 End With
                 For Each lScen As clsInteractiveDFLOW In pDFLOWScenarios
                     Dim lBioParam As New atcCollection()
