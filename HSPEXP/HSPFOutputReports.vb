@@ -196,6 +196,7 @@ Module HSPFOutputReports
                     Dim ans As Integer
                     ans = MsgBox("ECHO File contains a message that the run was terminated last time. HSPEXP+ will quit. Please make sure that UCI" &
                                  " file runs properly!")
+                    OpenFile(lHspfEchoFileName)
                     End
                 End If
 #End Region

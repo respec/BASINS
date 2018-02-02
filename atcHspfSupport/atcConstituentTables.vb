@@ -2,7 +2,6 @@
 Imports atcData
 Imports MapWinUtility
 Imports atcUCI
-Imports System.Data.DataTable
 Imports System.Data
 Public Module atcConstituentTables
     Public Land_Constituent_Table As DataTable
@@ -1497,6 +1496,7 @@ Public Module atcConstituentTables
                     End If
                 Next lSource
 
+            Case "PO4"
                 For Each lSource As HspfPointSource In aReach.PointSources
                     If (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) OrElse
                        (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 1) OrElse
