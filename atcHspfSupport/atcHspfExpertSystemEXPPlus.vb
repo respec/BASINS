@@ -138,8 +138,8 @@ Public Class atcExpertSystem
                 lDate(3) = 24
                 lDate(4) = 0
                 EDateJ = Date2J(lDate)
-                Logger.Msg("Analysis time period mismatch.: Analysis time period does not match the time period in the EXS file " & lFileName & "." &
-"The time period from the EXS file will be used for the hydrologic calibration", vbOKOnly)
+                Logger.Status("Analysis time period in the EXS file " & lFileName & " is used for the hydrologic calibration")
+                Logger.Dbg("Analysis time period in the EXS file " & lFileName & " is used for the hydrologic calibration")
 
             End If
 

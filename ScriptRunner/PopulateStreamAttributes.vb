@@ -12,8 +12,8 @@ Public Module PopulateStreamAttributes
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pInputPath)
         Logger.Dbg(" CurDir:" & CurDir())
-        Dim lStreamsLayerName As String = "stream11"
-        Dim lSubbasinLayerName As String = "subbasin8"
+        Dim lStreamsLayerName As String = "stream1"
+        Dim lSubbasinLayerName As String = "subbasin9"
         Dim lElevationLayerName As String = "10190003demg_2"
         Dim lElevUnits As String = "meters"
         Dim lTmp As Integer = 0

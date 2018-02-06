@@ -143,12 +143,6 @@ Public Module ConstituentBudget
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-OUT"))
 
             Case Else
-                'lReport.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                'lReport2.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                'lReport3.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                'lReport4.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                'lReport5.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
-                'lReport6.AppendLine("Budget report not yet defined for balance type '" & aBalanceType & "'")
                 Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport,
                     atcCollection)(Nothing, Nothing, Nothing, Nothing, Nothing, Nothing)
 
@@ -256,10 +250,8 @@ Public Module ConstituentBudget
                                         lPointSourceLoad *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                   TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         lPointVol += lPointSourceLoad
-
                                     End If
                                 Next
-
                             End If
                         Next lSource
                         Dim lGENERLoad As Double = 0.0
@@ -365,8 +357,6 @@ Public Module ConstituentBudget
                             lReachTrappingEfficiency = 0
                         End Try
 
-
-
                         lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
                         lField = 0
@@ -384,7 +374,6 @@ Public Module ConstituentBudget
                         lField += 1 : .Value(lField) = DoubleToString(lTotalInflow, , lNumberFormat,,, lNumberOfSignificantDigits)
                         lField += 1 : .Value(lField) = DoubleToString(lOutflow, , lNumberFormat,,, lNumberOfSignificantDigits)
                         lField += 1 : .Value(lField) = DoubleToString(lEvapLoss, , lNumberFormat,,, lNumberOfSignificantDigits)
-
 
                     Next
                     lReport.Append(.ToString)
@@ -497,7 +486,6 @@ Public Module ConstituentBudget
                                         Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
                                                     Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
                                         'lGENERInNetworkBlockMessageShown = True
-
                                     End If
 
                                 End If
@@ -725,10 +713,7 @@ Public Module ConstituentBudget
                                         Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
                                                     Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
                                         'lGENERInNetworkBlockMessageShown = True
-
                                     End If
-
-
 
                                 End If
                             Next lSource
@@ -772,9 +757,7 @@ Public Module ConstituentBudget
                             Catch ex As Exception
                                 Logger.Msg("Trouble reading the parameters of RCHRES " & lID.Id & ". Constituent Reports will not be generated.", MsgBoxStyle.Critical, "RCHRES Parameter Issue.")
                                 Return Nothing
-
                             End Try
-
 
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
                                                          lDiversion, aSDateJ, aEDateJ)
@@ -784,7 +767,7 @@ Public Module ConstituentBudget
                             End With
 
                             lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn - lPointlbs - lGENERLoad
-                            'If lID.Id = 637 Then Stop
+
                             Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs + lAdditionalSourcelbs
                             If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
                                 lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
@@ -797,14 +780,12 @@ Public Module ConstituentBudget
                                 lReachTrappingEfficiency = 0
                             End Try
 
-
                             Dim lCululativeTrappingEfficiency As Double = 0
                             Try
                                 lCululativeTrappingEfficiency = 1 - (lOutflow / lCumulativePointNonpoint)
                             Catch
                                 lReachTrappingEfficiency = 0
                             End Try
-
 
                             lCumulativePointNonpointColl.Increment(lDownstreamReachID, lCumulativePointNonpoint)
 
@@ -867,7 +848,6 @@ Public Module ConstituentBudget
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = lUnits : .FieldName(lField) = "Cumulative Total"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Cumulative Trapping"
                     lField += 1 : .FieldLength(lField) = 15 : .FieldType(lField) = "N" : .Value(lField) = " (%)" : .FieldName(lField) = "Reach Trapping"
-
 
                     For Each lID As HspfOperation In lRchresOperations
                         If Not lID.TableExists("ACTIVITY") Then
@@ -964,16 +944,10 @@ Public Module ConstituentBudget
                                         Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
                                                     Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
                                         'lGENERInNetworkBlockMessageShown = True
-
                                     End If
-
-
 
                                 End If
                             Next lSource
-
-
-
 
                             Dim lNonpointlbs As Double = 0.0
                             Dim lUpstreamIn As Double = 0.0
@@ -1071,7 +1045,7 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then 'Or aBalanceType = "BOD-PQUAL" Then
+        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)
             Dim lLandusesHeader As String = ""
@@ -1093,10 +1067,8 @@ Public Module ConstituentBudget
             lLandusesHeader = lLandusesHeader.Replace("GENERSources", "GENER Sources")
             lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Differences/Additional Sources*")
 
-
             Dim PointSourcesPlacesLocation As Integer = lLandusesHeader.IndexOf("PointSources")
             Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
-
 
             Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre/yr" & vbCrLf
 
@@ -1142,7 +1114,6 @@ Public Module ConstituentBudget
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
                     vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
 
-
                 lReportLoadingRate.AppendLine(LoadingRateLine1)
                 lReportLoadingRate.AppendLine(LoadingRateLine2)
 
@@ -1151,8 +1122,6 @@ Public Module ConstituentBudget
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine(LoadingRateSummary)
-
-
 
             lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             lReport4.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
@@ -1163,7 +1132,6 @@ Public Module ConstituentBudget
                 lReport5.AppendLine("Load Allocation Report was not requested for specific reaches.  The Load Allocation Report")
                 lReport5.AppendLine("for all the reaches is available as " & aBalanceType & "_" & aScenario & "_" & "LoadAllocation.txt")
             End If
-
 
             For Each lReach As String In lReaches
                 Dim lDataForOneBarGraph As New BarGraphItem

@@ -28,51 +28,6 @@ Public Module Utility
 
     End Class
 
-    Public Class ConstOutflowDatafromLand
-        ''' <summary>
-        ''' PERLND or IMPLND
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property LandType As String = ""
-        ''' <summary>
-        ''' Operation Number
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property OperationNumber As Integer = 0
-        ''' <summary>
-        ''' Name of operation specified in the GEN-INFO block
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property OperationName As String = ""
-        ''' <summary>
-        ''' Name of the Quality Constituent in the UCI file, or "Water", "Sediment", "Heat" or, "DO" 
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property LandConstituentNameInUCI As String = ""
-        ''' <summary>
-        ''' Name of the Land Constituent for HSPEXP, or "Water", "Sediment", "Heat" or, "DO" 
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property LandConstituentNameForHSPEXP As String = ""
-        ''' <summary>
-        ''' Units specified in the UCI file in QTYID parameter for PQUAL and UCI units for water, sediment, heat, and DO
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property Units As String = ""
-        ''' <summary>
-        ''' Number of years of simulation
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property NumberOfYears As Integer = 0
-        ''' <summary>
-        ''' Outflow data from each operation
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property MonthlyTimeSeriesOutflowData As atcTimeseriesGroup 'This is a group of time series like constituent names WASHQS, SCRQS etc.
-
-    End Class
     Public Function ConstituentsThatUseLast() As Generic.List(Of String)
         Static pConstituentsThatUseLast As Generic.List(Of String) = Nothing
         If pConstituentsThatUseLast Is Nothing Then
@@ -183,6 +138,7 @@ Public Module Utility
                                 Optional ByVal aCategory As Boolean = False) As atcCollection
         Dim lConstituentsToOutput As New atcCollection
         Select Case aType
+#Region "Case Water"
             Case "Water"
                 With lConstituentsToOutput
                     .Add("I:Header0", "Influx")
@@ -240,6 +196,8 @@ Public Module Utility
                     .Add("R:PRSUPY", "    SurfPrecVol")
                     .Add("R:VOLEV", "    SurfEvapVol")
                 End With
+#End Region
+#Region "Case Sediment"
             Case "Sediment"
                 With lConstituentsToOutput
                     .Add("I:Header0", "Storage(tons/acre)")
@@ -282,6 +240,8 @@ Public Module Utility
                     .Add("R:OSED-TOT-EXIT4", "  TotalExit4")
                     .Add("R:OSED-TOT-EXIT5", "  TotalExit5")
                 End With
+#End Region
+#Region "Case SedimentCopper"
             Case "SedimentCopper"
                 With lConstituentsToOutput
                     .Add("I:SOSLD", "Solids   ")
@@ -306,6 +266,8 @@ Public Module Utility
                     .Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                     .Add("R:Copper-TROQAL", "Total Cu")
                 End With
+#End Region
+#Region "Case FColi"
             Case "FColi"
                 With lConstituentsToOutput
                     .Add("P:Header1", "F.Coliform (10^9 org/ac)")
@@ -320,6 +282,8 @@ Public Module Utility
                     .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
                     .Add("R:F.Coliform-TROQAL", "  Outflow")
                 End With
+#End Region
+#Region "Case N-PQUAL"
             Case "N-PQUAL"
                 With lConstituentsToOutput
 
@@ -341,6 +305,8 @@ Public Module Utility
                     .Add("R:N-TOT-IN", "  Total N Inflow")
                     .Add("R:N-TOT-OUT", "  Total N Outflow")
                 End With
+#End Region
+#Region "Case P-PQUAL"
             Case "P-PQUAL"
                 With lConstituentsToOutput
                     .Add("P:Header1", "ORTHO P (lb/ac)")
@@ -355,6 +321,8 @@ Public Module Utility
                     .Add("R:P-TOT-IN", "  Total P Inflow")
                     .Add("R:P-TOT-OUT", "  Total P Outflow")
                 End With
+#End Region
+#Region "Case TotalN"
             Case "TotalN" 'use PQUAL
                 With lConstituentsToOutput
                     .Add("P:Header1", "Nitrogen Loss (lb/ac)")
@@ -622,6 +590,8 @@ Public Module Utility
                 '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
                 '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
                 '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
+#End Region
+#Region "Case TotalP"
             Case "TotalP"
                 With lConstituentsToOutput
                     .Add("P:Header1", "Phosphorus Loss (lb/ac")
@@ -637,7 +607,7 @@ Public Module Utility
 
                     .Add("P:Total3", "    Total P Loss")
 
-                    .Add("P:Header2", "Plant P")
+                    .Add("P:Header2", "Plant P Uptake")
                     .Add("P:PLANT P - SURFACE LAYER", "    Surface")
                     .Add("P:PLANT P - UPPER PRINCIPAL", "    Upper")
                     .Add("P:PLANT P - LOWER LAYER", "    Lower")
@@ -754,6 +724,8 @@ Public Module Utility
                     .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
 
                 End With
+#End Region
+#Region "Case BOD-Labile"
             Case "BOD-Labile"
                 With lConstituentsToOutput
                     .Add("P:Header1", "BOD")
@@ -777,6 +749,7 @@ Public Module Utility
                     .Add("R:BODFLUX-BENTHIC", "  BODFLUX-BENTHIC")
                     .Add("R:BODOUTTOT", "  BODOUTTOT")
                 End With
+#End Region
         End Select
         Return lConstituentsToOutput
     End Function
@@ -971,9 +944,6 @@ Public Module Utility
         lReport.AppendLine("")
 
         lReport.AppendLine("Location" & vbTab & "TotalArea".PadLeft(12) & vbTab & "LocalArea".PadLeft(12) & vbTab & "UpstreamReaches")
-        'Becky changed the following to cycle through all locations
-        'Dim lLocation As String = aLocations.Item(aLocations.Count - 1)
-
 
         For Each lLocation As String In aLocations 'added by Becky - should force land use reports for ALL relevant reaches 
             'and also add the total for all relevant reaches to a single overall report
@@ -1485,7 +1455,7 @@ Public Module Utility
                         Else
                             lTableName = "QUAL-PROPS"
                         End If
-                        QUALNames.ConstNameForEXPPlus = "NH3+NH4"
+                        QUALNames.ConstNameForEXPPlus = "TAM"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
                         If aUCI.GlobalBlock.EmFg = 1 Then
                             QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
@@ -1549,7 +1519,7 @@ Public Module Utility
                         Else
                             lTableName = "QUAL-PROPS"
                         End If
-                        QUALNames.ConstNameForEXPPlus = "PO4P"
+                        QUALNames.ConstNameForEXPPlus = "PO4"
                         QUALNames.ConstituentNameInUCI = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QUALID").Value)
                         If aUCI.GlobalBlock.EmFg = 1 Then
                             QUALNames.ConstituentUnit = Trim(lPERLNDOperations(0).Tables(lTableName).Parms("QTYID").Value) & "/ac"
@@ -1720,25 +1690,6 @@ Public Module Utility
                 lOutflowDataType = {"WASHQS" & "-" & QualityConstituent, "SCRQS" & "-" & QualityConstituent,
                                     "SOQO" & "-" & QualityConstituent, "IOQUAL" & "-" & QualityConstituent,
                                     "AOQUAL" & "-" & QualityConstituent, "TotalOutflow" & "-" & QualityConstituent}
-        End Select
-
-        Return lOutflowDataType
-    End Function
-
-    Public Function ConstituentListRCHRES(ByVal aBalanceType As String) As String()
-        Dim lOutflowDataType As String() = {}
-
-        Select Case aBalanceType
-            Case "Water"
-                lOutflowDataType = {}
-            Case "Sediment"
-                lOutflowDataType = {}
-            Case "DO"
-                lOutflowDataType = {"NPSLoad", "PSLoad", "Diversion", "MassBalance", "UpStreamIn", "DOXIN", "DOXFLUX-TOT", "DOXFLUX-REAER",
-                    "DOXFLUX-BODDEC", "DOXFLUX-BENTHAL", "DOXFLUX-NITR", "DOXFLUX-PHYTO", "DOXFLUX-ZOO", "DOXOUTTOT"}
-            Case "Heat"
-                lOutflowDataType = {}
-
         End Select
 
         Return lOutflowDataType
