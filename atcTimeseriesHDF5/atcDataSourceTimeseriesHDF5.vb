@@ -21,7 +21,7 @@ Public Class atcDataSourceTimeseriesHSF5
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "Timeseries HDF5"
+            Return "HDF5 Timeseries"
         End Get
     End Property
 
@@ -57,17 +57,21 @@ Public Class atcDataSourceTimeseriesHSF5
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        If MyBase.Open(aFileName, aAttributes) Then
+        Dim lAttributes As atcData.atcDataAttributes = aAttributes
+        If lAttributes Is Nothing Then
+            lAttributes = New atcData.atcDataAttributes
+        End If
+        If MyBase.Open(aFileName, lAttributes) Then
             H5.Open()
             Debug.Print("H5Version " & H5.Version.Major & ":" & H5.Version.Minor)
 
-            Dim lFileId As H5FileId = H5F.open(aFileName, H5F.OpenMode.ACC_RDONLY)
+            Dim lFileId As H5FileId = H5F.open(Specification, H5F.OpenMode.ACC_RDONLY)
             Debug.Print("ID " & lFileId.Id & " for " & aFileName)
             Dim lGrpName As String
             Dim lGrpId As H5GroupId
             Dim lAtCnt As Integer
 
-            If aAttributes.GetValue("ProcessInputTS", True) Then
+            If lAttributes.GetValue("ProcessInputTS", True) Then
                 'input timeseries
                 lGrpName = "/TIMESERIES"
                 lGrpId = H5G.open(lFileId, lGrpName)
@@ -86,10 +90,10 @@ Public Class atcDataSourceTimeseriesHSF5
                 Debug.Print("Input Timeseries Skipped " & DataSets.Count)
             End If
 
-            If aAttributes.GetValue("ProcessOutputTS", True) Then
+            If lAttributes.GetValue("ProcessOutputTS", True) Then
                 'output timeseries
-                Dim lOutputConstituent As String = aAttributes.GetValue("OutputConstituent", "")
-                Dim lOutputLocation As String = aAttributes.GetValue("OutputLocation", "")
+                Dim lOutputConstituent As String = lAttributes.GetValue("OutputConstituent", "")
+                Dim lOutputLocation As String = lAttributes.GetValue("OutputLocation", "")
 
                 lGrpName = "/RESULTS"
                 lGrpId = H5G.open(lFileId, lGrpName)
@@ -128,13 +132,13 @@ Public Class atcDataSourceTimeseriesHSF5
                                 lTimeSeries.Attributes.Add("Constituent", lConsName)
                                 lTimeSeries.Attributes.Add("Location", lOpnName)
                                 lTimeSeries.Attributes.Add("Scenario", "Simulated")
-                                If lConsDateDatasetIndex < 50 Then 'too many datasets run out of memory, need to just build headers then read data as needed
+                                If lConsDateDatasetIndex < 200 Then 'too many datasets run out of memory, need to just build headers then read data as needed
                                     If DataSets.Count <> lConsDateDatasetIndex Then 'use dates from first dataset in this group
                                         lTimeSeries.Dates = DataSets(lConsDateDatasetIndex).Dates.Clone
                                     End If
                                     ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
+                                    AddDataSet(lTimeSeries)
                                 End If
-                                AddDataSet(lTimeSeries)
                             End If
                         Next
                     Next
@@ -144,6 +148,7 @@ Public Class atcDataSourceTimeseriesHSF5
             End If
         End If
         Debug.Print("Dataset Count " & DataSets.Count)
+        Return True
     End Function
 
     Public Sub New()
