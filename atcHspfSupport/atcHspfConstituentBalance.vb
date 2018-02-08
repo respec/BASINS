@@ -9,11 +9,11 @@ Public Module ConstituentBalance
                               ByVal aOperations As atcCollection,
                               ByVal aBalanceTypes As atcCollection,
                               ByVal aScenario As String,
-                              ByVal aScenarioResults As atcDataSource,
-                              ByVal aLocations As atcCollection,
+                              ByVal aScenarioResults As atcDataSource,'ByVal aLocations As atcCollection,
                               ByVal aRunMade As String,
                               ByVal aSDateJ As Double,
                               ByVal aEDateJ As Double,
+                              ByVal aConstProperties As List(Of ConstituentProperties),
                      Optional ByVal aDateColumns As Boolean = False,
                      Optional ByVal aDecimalPlaces As Integer = 3,
                      Optional ByVal aSignificantDigits As Integer = 5,
@@ -21,8 +21,8 @@ Public Module ConstituentBalance
 
         For Each lBalanceType As String In aBalanceTypes
             Dim lReport As atcReport.ReportText = Report(aUci, lBalanceType, aOperations,
-                                                         aScenario, aScenarioResults, aLocations,
-                                                         aRunMade, aSDateJ, aEDateJ,
+                                                         aScenario, aScenarioResults, 'aLocations,
+                                                         aRunMade, aSDateJ, aEDateJ, aConstProperties,
                                                          aDateColumns, aDecimalPlaces, aSignificantDigits, aFieldWidth)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
@@ -34,16 +34,16 @@ Public Module ConstituentBalance
                            ByVal aBalanceType As String,
                            ByVal aOperationTypes As atcCollection,
                            ByVal aScenario As String,
-                           ByVal aScenarioResults As atcDataSource,
-                           ByVal aLocations As atcCollection,
+                           ByVal aScenarioResults As atcDataSource, 'ByVal aLocations As atcCollection
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double,
+                           ByVal aConstProperties As List(Of ConstituentProperties),
                   Optional ByVal aDateRows As Boolean = False,
                   Optional ByVal aDecimalPlaces As Integer = 3,
                   Optional ByVal aSignificantDigits As Integer = 5,
                   Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
-        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties)
 
 
         Dim lReport As New atcReport.ReportText
@@ -63,7 +63,8 @@ Public Module ConstituentBalance
         End If
         lReport.AppendLine(vbCrLf)
         Dim lConstituentKey As String
-
+        Dim aLocations As New atcCollection
+        aLocations.AddRange(aScenarioResults.DataSets.SortedAttributeValues("Location"))
         For Each lOperationKey As String In aOperationTypes.Keys
             Dim lLocationProgress As Integer = 0
             Dim lLastLocation As Integer = aLocations.Count
@@ -184,7 +185,7 @@ Public Module ConstituentBalance
                                         Dim lTotalArea As Double = 0.0
                                         Dim MassLinkExists As Boolean = True
 
-                                        If ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+                                        If lConstituentDataName.ToUpper.Contains("QUAL") OrElse ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
 
                                             For Each lConnection As HspfConnection In lOperation.Targets
 
@@ -194,7 +195,8 @@ Public Module ConstituentBalance
                                                         Continue For
                                                         'Anurag added the continue for here to take care of the cases when a PERLND
                                                         'or IMPLD connects to a reach that does not exist in OPN SEQUENCE
-                                                        MsgBox("The Reach " & lConnection.Target.VolId & " does not exist.  Constituent Balance reports will not be generated.")
+                                                        Logger.Dbg("The Reach " & lConnection.Target.VolId & " does not exist. Constituent Balance reports will not be generated 
+                                                                    for Operation " & lOperation.Caption)
 
                                                     End If
                                                     Dim aConversionFactor As Double = 0.0
@@ -206,7 +208,22 @@ Public Module ConstituentBalance
 
                                                     If Not lMassLinkID = 0 Then
 
-                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType,
+                                                        Dim ConstNameMassLink As String = lConstituentDataName.ToUpper
+                                                        If Not (aConstProperties Is Nothing OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
+                                                                lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
+                                                            ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
+                                                            Dim ConstNameEXP As String = ""
+                                                            For Each constt As ConstituentProperties In aConstProperties
+                                                                If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                                                    ConstNameEXP = constt.ConstNameForEXPPlus
+                                                                    If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
+                                                                    ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
+                                                                End If
+                                                            Next
+                                                        End If
+
+
+                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, ConstNameMassLink, aBalanceType,
                                                                                        aConversionFactor, lMultipleIndex)
 
                                                     Else
@@ -294,9 +311,18 @@ Public Module ConstituentBalance
                                         lPendingOutput &= lConstituentName
                                         Dim lSkipTo As String = FindSkipTo(lConstituentDataName)
                                         If lSkipTo IsNot Nothing Then
-                                            Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
-                                            If lSkipToIndex > lConstituentIndex Then
-                                                lConstituentIndex = lSkipToIndex - 1
+                                            Dim lSkipToindex2 As Integer = 2000
+
+                                            If lSkipTo.StartsWith("NO3+NO2") Then
+                                                lSkipTo = "NO3+NO2 (PQUAL)"
+                                                Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
+                                                lSkipToindex2 = lConstituentsToOutput.IndexOf(lSkip2)
+                                            End If
+                                            Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+
+                                            If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
+                                            If lSkipToindex > lConstituentIndex Then
+                                                lConstituentIndex = lSkipToindex - 1
                                             End If
                                             lPendingOutput = ""
                                         End If

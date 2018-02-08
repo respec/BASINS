@@ -176,11 +176,11 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.chm")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.pdf")
     End Sub
 
-    Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHydrologySensitivity.CheckedChanged
-        If chkHydrologySensitivity.Checked = True Then
+    Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged
+        If chkMultiSim.Checked = True Then
             chkRunHSPF.Enabled = False
             chkRunHSPF.Checked = False
             chkAreaReports.Enabled = False
@@ -249,5 +249,7 @@ Public Class StartUp
         UciChanged()
     End Sub
 
+    Private Sub cmbUCIPath_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.SelectedIndexChanged
 
+    End Sub
 End Class

@@ -21,7 +21,7 @@ End Class
 
 
 Public Module MultiSimAnalysis
-    Sub SensitivityAnalysis(ByVal aHSPFEXE As String, ByVal pBaseName As String, ByVal pTestPath As String,
+    Sub SubMultiSim(ByVal aHSPFEXE As String, ByVal pBaseName As String, ByVal pTestPath As String,
                             aSDateJ As Double, aEDateJ As Double, ByVal aHSPFEchofilename As String)
 
         Dim lMsg As New atcUCI.HspfMsg
@@ -208,6 +208,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             lcsvRecordIndex += 1
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
         Loop
+        If File.Exists(Path.Combine(pTestPath, "MultiSim_" & pBaseName & ".wdm")) Then File.Delete(Path.Combine(pTestPath, "MultiSim_" & pBaseName & ".wdm"))
 
         Do
             lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
@@ -310,7 +311,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                 lMassLinkID = aParm.ParmOccurence
                 Dim lMassLinkParts(7) As String
                 If aParm.ParmOperationName.Length > 0 Then
-                    lMassLinkParts = aParm.ParmOperationName.Split(":")
+                    lMassLinkParts = aParm.ParmName.Split(":")
                     ReDim Preserve lMassLinkParts(7)
 
                 End If
@@ -337,18 +338,59 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                 Next
 
             Case aParm.ParmTable.Contains("EXTNL")
-                Dim MetSegRec As Integer
-                For Each lMetSeg As HspfMetSeg In aUCI.MetSegs
-                    Select Case aParm.ParmName
-                        Case "PREC"
-                            MetSegRec = 0
-                        Case "ATEM"
-                            MetSegRec = 2
-                        Case "SOLR"
-                            MetSegRec = 5
-                        Case ""
 
+                If aParm.ParmOperationType.ToLower = "point" Then
+                    Dim lConnections(3) As String
+                    If aParm.ParmName.Length > 0 Then
+                        lConnections = aParm.ParmName.Split(":")
+
+                        For Each lID As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+                            For Each lpointsource As HspfPointSource In lID.PointSources
+                                If lpointsource.Target.Group = "INFLOW" AndAlso lpointsource.Target.Member = lConnections(0) AndAlso
+                                            lpointsource.Target.MemSub1 = lConnections(1) AndAlso lpointsource.Target.MemSub2 = lConnections(2) AndAlso
+                                            (lID.Id = aParm.ParmOperationNumber OrElse lID.Description = aParm.ParmOperationName OrElse
+                                            (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
+                                    If aParm.ParmMultFactor = 1 Then
+                                        lpointsource.MFact = HspfTable.NumFmtRE(lpointsource.MFact * aMFactorOrParmValue, 5)
+                                    Else
+                                        lpointsource.MFact = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
+                                    End If
+                                End If
+                            Next
+                        Next
+                    End If
+                ElseIf aParm.ParmOperationType.ToLower = "point_ts" Then
+                    Dim lConnections(3) As String
+                    If aParm.ParmName.Length > 0 Then
+                        lConnections = aParm.ParmName.Split(":")
+
+                        For Each lID As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+                            For Each lpointsource As HspfPointSource In lID.PointSources
+                                If lpointsource.Target.Group = "INFLOW" AndAlso lpointsource.Target.Member = lConnections(0) AndAlso
+                                            lpointsource.Target.MemSub1 = lConnections(1) AndAlso lpointsource.Target.MemSub2 = lConnections(2) AndAlso
+                                            (lID.Id = aParm.ParmOperationNumber OrElse lID.Description = aParm.ParmOperationName OrElse
+                                            (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
+                                    lpointsource.Source.VolId = aMFactorOrParmValue
+                                End If
+                            Next
+                        Next
+                    End If
+                End If
+
+                Dim MetSegRec As Integer = -1
+                For Each lMetSeg As HspfMetSeg In aUCI.MetSegs
+
+                    Select Case aParm.ParmName.ToLower
+                        Case "prec"
+                            MetSegRec = 0
+                        Case "atem"
+                            MetSegRec = 2
+                        Case "solr"
+                            MetSegRec = 5
+                        Case Else
+                            MetSegRec = -1
                     End Select
+                    If MetSegRec = -1 Then Exit For
                     Try
                         If aParm.ParmMultFactor = 1 Then
                             lMetSeg.MetSegRecs(MetSegRec).MFactP = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(MetSegRec).MFactP * aMFactorOrParmValue, 5)
@@ -515,6 +557,28 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
                             Case "50%High"
                                 row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                            Case "30-day GeoMean"
+                                If SimulatedTS.Values.Count >= 30 Then
+                                    Dim GeoMean As New List(Of Double)
+                                    Dim lCount As Integer = 0
+                                    Dim Test As Double = 0.0
+                                    For i As Integer = 1 To SimulatedTS.Values.Count-1
+                                        If SimulatedTS.Value(i) > 0 Then
+                                            Test += Math.Log10(SimulatedTS.Value(i))
+                                        End If
+                                        If i >= 31 Then
+                                            If SimulatedTS.Value(i - 30) > 0 Then Test -= Math.Log10(SimulatedTS.Value(i - 30))
+
+                                            GeoMean.Add(10 ^ (Test / 30))
+                                        End If
+
+                                    Next i
+                                    For Each lValue As Double In GeoMean
+                                        Test += lValue
+                                    Next
+                                    row(ColumnName) = Test / GeoMean.Count
+                                End If
+
                             Case Else
                                 row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
                         End Select
@@ -563,15 +627,27 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
         column = New DataColumn()
         column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "mean"
+        column.Caption = "Mean"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
         column.ColumnName = "SumAnnual"
         column.Caption = "Annual Sum"
         aDataTable.Columns.Add(column)
 
-        'column = New DataColumn()
-        'column.DataType = Type.GetType("System.String")
-        'column.ColumnName = "GeoMean"
-        'column.Caption = "GeoMetric Mean"
-        'aDataTable.Columns.Add(column)
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "geometric mean"
+        column.Caption = "Geometric Mean"
+        aDataTable.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = Type.GetType("System.Double")
+        column.ColumnName = "30-day GeoMean"
+        column.Caption = "30-day Geometric Mean"
+        aDataTable.Columns.Add(column)
 
         column = New DataColumn()
         column.DataType = Type.GetType("System.Double")

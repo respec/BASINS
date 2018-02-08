@@ -20,7 +20,7 @@ Public Module atcConstituentTables
         Dim lReport As New atcReport.ReportText
         Land_Constituent_Table = New DataTable("LandConstituentTable")
         Dim QualityConstituent As Boolean = False
-        Dim lOutflowDataTypes As String() = ConstituentList(aBalanceType, QualityConstituent)
+        'Dim lOutflowDataTypes As String() = ConstituentList(aBalanceType, QualityConstituent)
         Dim lDataForBoxWhiskerPlot As New BoxWhiskerItem
         lDataForBoxWhiskerPlot.Constituent = aBalanceType
         lDataForBoxWhiskerPlot.Scenario = aScenario
@@ -153,11 +153,11 @@ Public Module atcConstituentTables
                     End If
 
                     Dim lTSNumber As Integer = 0
-                    Dim lOutflowDataTypes1 As String() = ConstituentList(aBalanceType)
+                    Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
                     Dim lTotalTS As New atcTimeseries(Nothing)
-                    For Each lOutflowDataType As String In lOutflowDataTypes1
+                    For Each lOutflowDataType As String In lOutflowDataTypes1.Keys
 
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
@@ -269,11 +269,11 @@ Public Module atcConstituentTables
                     End If
 
                     Dim lTSNumber As Integer = 0
-                    Dim lOutflowDataTypes1 As String() = ConstituentList(aBalanceType)
+                    Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
                     Dim lTotalTS As New atcTimeseries(Nothing)
-                    For Each lOutflowDataType As String In lOutflowDataTypes1
+                    For Each lOutflowDataType As String In lOutflowDataTypes1.Keys
 
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
@@ -379,11 +379,11 @@ Public Module atcConstituentTables
                     End If
 
                     Dim lTSNumber As Integer = 0
-                    Dim lOutflowDataTypes1 As String() = ConstituentList(aBalanceType)
+                    Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
                     Dim lTotalTS As New atcTimeseries(Nothing)
-                    For Each lOutflowDataType As String In lOutflowDataTypes1
+                    For Each lOutflowDataType As String In lOutflowDataTypes1.Keys
 
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
@@ -393,6 +393,7 @@ Public Module atcConstituentTables
                         End If
                         If lTS IsNot Nothing Then
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
+                            Logger.Dbg(lTS.Attributes.GetDefinedValue("Constituent").Value)
                             Dim lTSAttributes As String = lTS.Attributes.GetDefinedValue("Constituent").Value
                             If lTSAttributes = "WSSD" OrElse lTSAttributes = "SCRSD" OrElse lTSAttributes = "SOSLD" Then
                                 If lTotalTS.Dates Is Nothing Then
@@ -515,10 +516,15 @@ Public Module atcConstituentTables
                 Dim lOperationNameNumber As New List(Of String)
                 Dim lYears As New List(Of String)
                 For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
-                    If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
+                    If Not (lOperation.Name = "PERLND" AndAlso lOperation.Tables("ACTIVITY").Parms("PQALFG").Value = "1") OrElse
+                        (lOperation.Name = "IMPLND" AndAlso lOperation.Tables("ACTIVITY").Parms("IQALFG").Value = "1") Then Continue For
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+
+                    'If lOperation.Tables("ACTIVITY").Parms("PQUALFG").Value = "0" Then Continue For
+
                     lOperationNameNumber.Add(LocationName)
+
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
                     'Look at this. Do not want operation id with this
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
@@ -537,18 +543,18 @@ Public Module atcConstituentTables
                             lConstituentNames.Add(constituent.ConstNameForEXPPlus)
                         End If
 
-                        Dim lOutflowDataTypes1 As String() = ConstituentList(aBalanceType, constituent.ConstituentNameInUCI)
+                        Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType, constituent.ConstituentNameInUCI, constituent.ConstNameForEXPPlus)
                         Dim lTSNumber As Integer = 0
                         Dim lTS As New atcTimeseries(Nothing)
                         Dim AddTS As New atcDataGroup
                         Dim lTotalTS As New atcTimeseries(Nothing)
 
-                        For Each lOutflowDataType As String In lOutflowDataTypes1
+                        For Each lOutflowDataType As String In lOutflowDataTypes1.Keys
 
                             If lOutflowDataType.StartsWith("TotalOutflow") And lTotalTS.Dates IsNot Nothing Then
                                 lTS = lTotalTS
                             Else
-                                lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
+                                lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataTypes1(lOutflowDataType))(0)
                             End If
                             Dim lMassLinkFactor As Double = 1.0
                             If lTS Is Nothing Then Continue For
@@ -609,7 +615,8 @@ Public Module atcConstituentTables
                                     row("ConstName") = constituent.ConstituentNameInUCI
                                     row("ConstNameEXP") = constituent.ConstNameForEXPPlus
                                     row("Unit") = constituent.ConstituentUnit
-                                    row("WASHQS") = lValue
+                                    'row("WASHQS") = lValue
+                                    row(lTSAttributes.Split("-")(0)) = lValue
                                     Land_Constituent_Table.Rows.Add(row)
                                 Else
                                     Land_Constituent_Table.Rows(RowNumber - 1)(lTSAttributes.Split("-")(0)) = HspfTable.NumFmtRE(lValue, 10)
@@ -627,6 +634,7 @@ Public Module atcConstituentTables
                             Dim SelectExpression As String = "OpTypeNumber = '" & lOperation & "' And Year = '" & lYear & "'"
                             Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
                             row = Land_Constituent_Table.NewRow
+                            Logger.Dbg(SelectExpression)
                             row("OpTypeNumber") = foundRows(0)("OpTypeNumber")
                             row("OpDesc") = foundRows(0)("OpDesc")
                             row("Year") = foundRows(0)("Year")
@@ -636,10 +644,13 @@ Public Module atcConstituentTables
 
                             For Each foundrow As DataRow In foundRows
                                 For i As Integer = 6 To foundrow.ItemArray.Length - 1
-                                    If IsDBNull(row(i)) And Not IsDBNull(foundrow(i)) Then
+                                    If IsDBNull(row(i)) AndAlso Not IsDBNull(foundrow(i)) Then
                                         row(i) = foundrow(i)
-                                    ElseIf Not (IsDBNull(row(i)) AndAlso IsDBNull(foundrow(i))) Then
+
+                                    ElseIf Not IsDBNull(row(i)) AndAlso Not IsDBNull(foundrow(i)) Then
                                         row(i) += foundrow(i)
+                                        'ElseIf IsDBNull(foundrow(i) AndAlso Not IsDBNull(row(i))) Then
+
                                     End If
                                 Next i
                             Next foundrow
@@ -735,6 +746,12 @@ Public Module atcConstituentTables
                 Reach_Budget_Table = AddFirstSixColumnsReachBudget(Reach_Budget_Table, lUnits)
                 Dim row As DataRow
                 Dim column As DataColumn
+
+                column = New DataColumn()
+                column.DataType = Type.GetType("System.Double")
+                column.ColumnName = "DOXIN-PREC"
+                column.Caption = "DO Input In Precip (" & lUnits & ")"
+                Reach_Budget_Table.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
@@ -836,8 +853,12 @@ Public Module atcConstituentTables
                             Case "UpstreamIn"
                                 row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
                             Case Else
-                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
+                                If lTest IsNot Nothing Then
+                                    row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
                                                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                                End If
+
                         End Select
                     Next columnValue
 
@@ -1361,8 +1382,10 @@ Public Module atcConstituentTables
         Dim NPSLoad As Double = 0.0
         Dim SelectExpression As String = ""
         For Each lReachSource As HspfConnection In aReach.Sources
-            If Not (lReachSource.Source.VolName = "PERLND" OrElse lReachSource.Source.VolName = "IMPLND") Then Continue For
+            'If Not (lReachSource.Source.VolName = "PERLND" OrElse lReachSource.Source.VolName = "IMPLND") Then Continue For
             If lReachSource.Source.Opn Is Nothing Then Continue For
+            If Not (lReachSource.Source.Opn.Name = "PERLND" AndAlso lReachSource.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "1") OrElse
+                        (lReachSource.Source.Opn.Name = "IMPLND" AndAlso lReachSource.Source.Opn.Tables("ACTIVITY").Parms("IQALFG").Value = "1") Then Continue For
             Dim lConnectionArea As Double = lReachSource.MFact
             Dim lOperationTypeNumber As String = SafeSubstring(lReachSource.Source.VolName, 0, 1) & ":" & lReachSource.Source.VolId
             If aConstituentName = "NO3" Or aConstituentName = "TAM" Or aConstituentName = "PO4" Then

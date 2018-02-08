@@ -25,7 +25,7 @@ Module HSPFOutputReports
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
-    Private pSensitivity As Boolean = False
+    Private MultiSimulation As Boolean = False
     Private pListModelParameters As Boolean = False
     Private ASDate, AEDate As Date
 
@@ -61,8 +61,8 @@ Module HSPFOutputReports
         Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.cmbUCIPath.Text)
         Logger.Status("Beginning analysis of " & lTestName, True)
 
-        If StartUp.chkHydrologySensitivity.Checked Then
-            pSensitivity = True
+        If StartUp.chkMultiSim.Checked Then
+            MultiSimulation = True
         End If
         pConstituents.Clear()
         If StartUp.chkWaterBalance.Checked Then
@@ -132,8 +132,8 @@ Module HSPFOutputReports
                     End If
                 Next
 
-                If pSensitivity Then
-                    SensitivityAnalysis(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ, lHspfEchoFileName)
+                If MultiSimulation Then
+                    SubMultiSim(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ, lHspfEchoFileName)
                     Logger.Msg("Sensitivity/Uncertainty Analysis Complete", vbOKOnly)
                     OpenFile(pTestPath)
                     End
@@ -417,126 +417,107 @@ Module HSPFOutputReports
 
 #Region "Water Quality"
                 If pConstituents.Count > 0 Then
+                    'Dim lHspfBinDataSource As New atcDataSource
+                    Dim lOpenHspfBinDataSource As New atcDataSource
 
+                    Logger.Dbg(Now & " Opening the binary output files.")
+
+                    'Dim lLocations As New atcCollection
+                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
+                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                            If lOpenHspfBinDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                End If
+                            End If
+                        End If
+                    Next i
 
                     For Each lConstituent As String In pConstituents
                         Dim lConstProperties As New List(Of ConstituentProperties)
-                        'Dim ConstituentDataList As New List(Of List(Of ConstOutflowDatafromLand))
-                        'Dim ConstituentDataList As New List(Of ConstOutflowDatafromLand)
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
-                        Dim AcceptableQUALNames As New List(Of String)
+                        Logger.Status("Begin summary for " & lConstituent)
                         Dim lConstituentName As String = ""
+                        Dim lActiveSections As New List(Of String)
                         Dim CheckQUALID As Boolean = False
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
+                                lActiveSections.Add("PWATER")
+                                lActiveSections.Add("IWATER")
+                                lActiveSections.Add("HYDR")
                             Case "Sediment"
                                 lConstituentName = "SED"
+                                lActiveSections.Add("SEDMNT")
+                                lActiveSections.Add("SOLIDS")
+                                lActiveSections.Add("SEDTRN")
                             Case "DO"
                                 lConstituentName = "DO"
+                                lActiveSections.Add("PWTGAS")
+                                lActiveSections.Add("IWTGAS")
+                                lActiveSections.Add("OXRX")
                             Case "Heat"
                                 lConstituentName = "Heat"
+                                lActiveSections.Add("PWTGAS")
+                                lActiveSections.Add("IWTGAS")
+                                lActiveSections.Add("HTRCH")
                             Case "TotalN"
                                 lConstituentName = "TN"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-                                CheckQUALID = True
-                                AcceptableQUALNames.Add("NO3")
-                                AcceptableQUALNames.Add("NH3+NH4")
-                                AcceptableQUALNames.Add("BOD")
+
+                                lActiveSections.Add("NITR")
+                                lActiveSections.Add("PQUAL")
+                                lActiveSections.Add("IQUAL")
+                                lActiveSections.Add("NUTRX")
+                                lActiveSections.Add("PLANK")
+
                             Case "TotalP"
                                 lConstituentName = "TP"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-                                CheckQUALID = True
-                                AcceptableQUALNames.Add("ORTHO P")
-                                AcceptableQUALNames.Add("BOD")
+                                lActiveSections.Add("PHOS")
+                                lActiveSections.Add("PQUAL")
+                                lActiveSections.Add("IQUAL")
+                                lActiveSections.Add("NUTRX")
+                                lActiveSections.Add("PLANK")
+
                             Case "BOD-Labile"
                                 lConstituentName = "BOD-Labile"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-                                CheckQUALID = True
-                                AcceptableQUALNames.Add("BOD")
+                                lActiveSections.Add("PQUAL")
+                                lActiveSections.Add("IQUAL")
+                                lActiveSections.Add("OXRX")
+                                lActiveSections.Add("NUTRX")
+                                lActiveSections.Add("PLANK")
                             Case "FColi"
                                 lConstituentName = "FColi"
+                                lActiveSections.Add("PQUAL")
+                                lActiveSections.Add("IQUAL")
+                                lActiveSections.Add("RQUAL")
                         End Select
 
-                        'Following part of code checks if UCI file contains proper QUALID name before going any further for all operations. May be time consuming for lot of operations.
-                        Dim NQUALS As Integer = 0
-                        Dim QUALID As String = ""
-
-                        If CheckQUALID Then 'Model had issues when PQUAL was not active
-                            Dim QUALIDS As New List(Of String)
-                            For i As Integer = 0 To aHspfUci.OpnSeqBlock.Opns.Count - 1
-                                Dim lOperationType As String = aHspfUci.OpnSeqBlock.Opns(i).Name
-                                If lOperationType = "PERLND" Or lOperationType = "IMPLND" Then
-                                    Dim QUAL As String = lOperationType.Substring(0, 1) & "QALFG"
-                                    Dim QUALActivity As Integer = aHspfUci.OpnSeqBlock.Opn(i).Tables("ACTIVITY").Parms(QUAL).Value
-                                    If QUALActivity = 0 Then 'Make sure to double check code for AGCHEM cases.
-
-                                        Logger.Dbg("The operation " & lOperationType & " " & aHspfUci.OpnSeqBlock.Opns(i).Id &
-                                                     "does not have PQUAL section active. Please check output for consistency!")
-                                    Else
-                                        NQUALS = aHspfUci.OpnSeqBlock.Opn(i).Tables("QUAL-PROPS").OccurCount
-                                        For k As Integer = 0 To aHspfUci.OpnSeqBlock.Opn(i).Tables.Count - 1
-                                            If aHspfUci.OpnSeqBlock.Opn(i).Tables(k).Name = "QUAL-PROPS" Then
-
-                                                QUALID = aHspfUci.OpnSeqBlock.Opn(i).Tables(k).Parms(0).Value
-                                                If Not QUALIDS.Contains(QUALID) Then
-                                                    QUALIDS.Add(QUALID)
-                                                End If
-
-                                                If Not AcceptableQUALNames.Contains(QUALID) Then
-
-                                                End If
-                                            End If
-                                        Next k
-                                    End If
+                        Dim lScenarioResults As New atcDataSource
+                        If lOpenHspfBinDataSource.DataSets.Count > 1 Then
+                            Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent, lConstProperties)
+                            For Each ConstituentForAnalysis As String In lConstituentsToOutput.Keys
+                                'If ConstituentForAnalysis.StartsWith("I:") Then Stop
+                                ConstituentForAnalysis = SafeSubstring(ConstituentForAnalysis, 2)
+                                If ConstituentForAnalysis.EndsWith("1") Or ConstituentForAnalysis.EndsWith("2") Then
+                                    ConstituentForAnalysis = Left(ConstituentForAnalysis, ConstituentForAnalysis.Length - 1)
                                 End If
-                            Next i
-                            For Each QUALIDItem In AcceptableQUALNames
-                                If Not QUALIDS.Contains(QUALIDItem) Then
-                                    Dim ans As Integer
-                                    ans = MsgBox("The QUALID " & QUALIDItem & "has not been used for all the operations. The nutrient balance reports will not continue" &
-                                                 " and the program will exit!")
-                                    End
+                                lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Constituent", ConstituentForAnalysis))
 
-                                End If
-                            Next QUALIDItem
+                            Next
+
                         End If
 
-                        'Done checking QUALID
-                        'Dim lHspfBinDataSource As New atcDataSource
-                        Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent)
-                        Logger.Dbg(Now & " Opening the binary output files.")
-                        Dim lScenarioResults As New atcDataSource
-                        Dim lLocations As New atcCollection
-                        For i As Integer = 0 To aHspfUci.FilesBlock.Count
-                            If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
-                                Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                Dim lOpenHspfBinDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                If lOpenHspfBinDataSource Is Nothing Then
-                                    If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                                        lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                    End If
-                                End If
-                                If lOpenHspfBinDataSource.DataSets.Count > 1 Then
+                        If lScenarioResults.DataSets.Count = 0 Then
+                            For Each activeSection As String In lActiveSections
+                                lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Section", activeSection))
+                            Next
+                        End If
 
-                                    lLocations.AddRange(lOpenHspfBinDataSource.DataSets.SortedAttributeValues("Location"))
-                                    Dim lConstituentNames As New SortedSet(Of String)
-                                    For Each lKey As String In lConstituentsToOutput.Keys
-                                        If (lKey.EndsWith("1") Or lKey.EndsWith("2")) And Not (lKey.ToUpper.Contains("EXIT") Or lKey.ToUpper.Contains("OVOL")) Then
-                                            lKey = Left(lKey, lKey.Length - 1)
-                                        End If
-
-                                        lConstituentNames.Add(lKey.Substring(2).ToUpper)
-                                    Next
-                                    For Each lTs As atcTimeseries In lOpenHspfBinDataSource.DataSets
-                                        Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
-                                        lScenarioResults.DataSets.Add(lTs)
-                                    Next lTs
-                                End If
-
-                            End If
-
-                        Next i
 
                         If lScenarioResults.DataSets.Count > 0 Then
 
@@ -550,74 +531,79 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
 
-                            With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                            If Not (lConstituent = "DO" Or lConstituent = "Heat" Or lConstituent = "BOD-Labile") Then
+                                With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
                                                                       lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ, lConstProperties)
-                                lReportCons = .Item1
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
-                                If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
+                                    lReportCons = .Item1
+                                    lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
+                                    If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
 
-                                'lReportCons = Nothing
-                                'lReportCons = .Item2
-                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                                'SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
-                                lReportCons = .Item3
+                                    'lReportCons = Nothing
+                                    'lReportCons = .Item2
+                                    'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                                    'SaveFileString(lOutFileName, lReportCons.ToString)
+                                    lReportCons = Nothing
+                                    lReportCons = .Item3
 
-                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
-                                If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
-                                lReportCons = Nothing
+                                    lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
+                                    If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
+                                    lReportCons = Nothing
 
-                                lReportCons = .Item4
-                                If pOutputLocations.Count > 0 Then
-                                    lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
-                                    SaveFileString(lOutFileName, lReportCons.ToString)
+                                    lReportCons = .Item4
+                                    If pOutputLocations.Count > 0 Then
+                                        lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
+                                        SaveFileString(lOutFileName, lReportCons.ToString)
+                                    End If
+                                    lReportCons = Nothing
+                                    'lReportCons = .Item5
+                                    'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                                    'SaveFileString(lOutFileName, lReportCons.ToString)
+                                    'lReportCons = Nothing
+
+                                    If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
+                                        For Each location As String In .Item6.Keys
+                                            CreateGraph_BarGraph(.Item6.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                                        Next location
+                                    End If
+
+
+                                End With
+                                'Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
+
+
+
+                                lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                lScenarioResults, lRunMade, SDateJ, EDateJ, lConstProperties)
+                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
+
+                                SaveFileString(lOutFileName, lReportCons.ToString)
+
+                                'Logger.Dbg("Summary at " & lLocations.Count & " locations")
+                                'constituent balance
+
+
+                                lReportCons = HspfSupport.WatershedConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                lScenarioResults, lRunMade, SDateJ, EDateJ, lConstProperties)
+                                lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
+
+                                SaveFileString(lOutFileName, lReportCons.ToString)
+
+                                If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                                    HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                                       (aHspfUci, lConstituent, lOperationTypes, pBaseName,
+                                        lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ,
+                                        lConstProperties, loutfoldername, True)
+                                    'now pivoted version
+                                    'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+                                    '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
+                                    '    lHspfBinDataSource, pOutputLocations, lRunMade, _
+                                    '    lOutFolderName, True, True)
                                 End If
-                                lReportCons = Nothing
-                                'lReportCons = .Item5
-                                'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                                'SaveFileString(lOutFileName, lReportCons.ToString)
-                                'lReportCons = Nothing
-
-                                If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
-                                    For Each location As String In .Item6.Keys
-                                        CreateGraph_BarGraph(.Item6.ItemByKey(location), loutfoldername & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
-                                    Next location
-                                End If
-
-
-                            End With
-                            Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
-
-
-                            lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
-                                lScenarioResults, lLocations, lRunMade, SDateJ, EDateJ)
-                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
-
-                            SaveFileString(lOutFileName, lReportCons.ToString)
-
-                            Logger.Dbg("Summary at " & lLocations.Count & " locations")
-                            'constituent balance
-
-
-                            lReportCons = HspfSupport.WatershedConstituentBalance.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
-                            lScenarioResults, lRunMade, SDateJ, EDateJ)
-                            lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
-
-                            SaveFileString(lOutFileName, lReportCons.ToString)
-
-                            If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
-                                HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                                   (aHspfUci, lConstituent, lOperationTypes, pBaseName,
-                                    lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ,
-                                    loutfoldername, True)
-                                'now pivoted version
-                                'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
-                                '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _
-                                '    lHspfBinDataSource, pOutputLocations, lRunMade, _
-                                '    lOutFolderName, True, True)
                             End If
+
+
                         Else
-                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
+                                Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
                                 lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
                             Dim ans As Integer
                             ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " &

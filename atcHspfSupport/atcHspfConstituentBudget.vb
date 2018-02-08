@@ -20,7 +20,7 @@ Public Module ConstituentBudget
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double,
-                           Optional ByVal ConstProperties As List(Of ConstituentProperties) = Nothing) As _
+                           Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing) As _
                            Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcCollection)
 
         Dim lNumberFormat As String = "#,##0.###"
@@ -93,26 +93,24 @@ Public Module ConstituentBudget
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
-                If ConstProperties IsNot Nothing Then
+                If aConstProperties IsNot Nothing Then
                     Dim ConstituentList As New List(Of String)
-                    For Each consituent As ConstituentProperties In ConstProperties
-
+                    For Each consituent As ConstituentProperties In aConstProperties
                         Dim ConstituentName As String = consituent.ConstituentNameInUCI
                         If Not ConstituentList.Contains(ConstituentName) Then
                             ConstituentList.Add(ConstituentName)
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WASHQS-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRQS-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQO-" & ConstituentName))
                             lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & ConstituentName))
                             lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & ConstituentName))
                         End If
-
-
                     Next
                 End If
 
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
-
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
 
             Case "TotalP"
@@ -125,13 +123,15 @@ Public Module ConstituentBudget
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
                 'lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POPHOS")))
-                If ConstProperties IsNot Nothing Then
+                If aConstProperties IsNot Nothing Then
                     Dim ConstituentList As New List(Of String)
-                    For Each consituent As ConstituentProperties In ConstProperties
+                    For Each consituent As ConstituentProperties In aConstProperties
                         Dim ConstituentName As String = consituent.ConstituentNameInUCI
                         If Not ConstituentList.Contains(ConstituentName) Then
                             ConstituentList.Add(ConstituentName)
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQUAL-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WASHQS-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRQS-" & ConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQO-" & ConstituentName))
                             lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & ConstituentName))
                             lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & ConstituentName))
                         End If
@@ -145,12 +145,10 @@ Public Module ConstituentBudget
             Case Else
                 Return New Tuple(Of atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport, atcReport.IReport,
                     atcCollection)(Nothing, Nothing, Nothing, Nothing, Nothing, Nothing)
-
         End Select
 
         Dim lUpstreamInflows As New atcCollection
         Dim lCumulativePointNonpointColl As New atcCollection
-
 
         lReport.AppendLine(aScenario & " " & "Average Annual " & aBalanceType & " Budget by Reach " & lUnits & ".")
         lReport.AppendLine("   Run Made " & aRunMade)
@@ -760,7 +758,7 @@ Public Module ConstituentBudget
                             End Try
 
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
-                                                         lDiversion, aSDateJ, aEDateJ)
+                                                         lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
                                 lGENERLoad = .Item3
@@ -991,7 +989,7 @@ Public Module ConstituentBudget
 
                             Dim lDepScour As Double = lOutflow - lTotalInflow - lDiversion
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lGENERLoad, lTotalAtmDep,
-                                                         lDepScour, lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ)
+                                                         lDepScour, lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
                                 lGENERLoad = .Item3
@@ -1270,7 +1268,8 @@ Public Module ConstituentBudget
                         ByRef aLoadingByLanduse As String,
                         ByRef aReachTotal As Double,
                         ByVal aReporting As Boolean,
-                        ByRef aContribPercent As atcCollection)
+                        ByRef aContribPercent As atcCollection,
+                        Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing)
 
         Dim lTotalIndex As Integer = 0
         Dim lTotal As Double = 0
@@ -1303,7 +1302,23 @@ Public Module ConstituentBudget
 
                             Dim lMassLinkFactor As Double = 0.0
                             If lTs.Attributes.GetValue("SumAnnual") > 0 Then
-                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lTs.Attributes.GetValue("Constituent"), aBalanceType,
+                                Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
+                                If Not (aConstProperties Is Nothing OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
+                                        lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
+                                    ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
+                                    Dim ConstNameEXP As String = ""
+                                    For Each constt As ConstituentProperties In aConstProperties
+                                        If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                            ConstNameEXP = constt.ConstNameForEXPPlus
+                                            If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
+                                            ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(0) & "-" & ConstNameEXP
+                                            Exit For
+                                        End If
+                                    Next
+                                End If
+
+
+                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, ConstNameMassLink, aBalanceType,
                                                                                aConversionFactor, aMultipleIndex:=0)
                             End If
 
@@ -1424,14 +1439,16 @@ Public Module ConstituentBudget
                                                  ByVal aUpstreamIn As Double,
                                                  ByVal aDiversion As Double,
                                                  ByVal aSDateJ As Double,
-                                                 ByVal aEDateJ As Double) As Tuple(Of String, Double, Double)
+                                                 ByVal aEDateJ As Double,
+                                                 Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing) As Tuple(Of String, Double, Double)
         Dim LoadingByLanduse As String = ""
         Dim lReachTotal As Double = 0.0
         Dim UpStreamDiversion As Double = 0.0
         Dim lContribPercent As New atcCollection
+
         'If aReach.Id = "148" Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
 
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
@@ -1441,8 +1458,8 @@ Public Module ConstituentBudget
         Next
         aTotalInflow += -UpStreamDiversion
         'If aReach.Id = 102 Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
         'If aReach.Id = 102 Then Stop
 
         Dim GENERTSinWDM As Boolean = False
