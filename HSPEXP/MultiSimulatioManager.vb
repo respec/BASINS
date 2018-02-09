@@ -310,7 +310,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                 Dim lMassLinkID As Integer
                 lMassLinkID = aParm.ParmOccurence
                 Dim lMassLinkParts(7) As String
-                If aParm.ParmOperationName.Length > 0 Then
+                If aParm.ParmName.Length > 0 Then
                     lMassLinkParts = aParm.ParmName.Split(":")
                     ReDim Preserve lMassLinkParts(7)
 

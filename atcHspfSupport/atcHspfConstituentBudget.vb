@@ -324,7 +324,7 @@ Public Module ConstituentBudget
                         End If
 
                         With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, lGENERLoad, 0.0, 0.0,
-                                                         lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ)
+                                                         lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ, aConstProperties)
                             lReport2.Append(.Item1)
                             lNonpointVol = .Item2
                             lGENERLoad = .Item3
@@ -526,7 +526,7 @@ Public Module ConstituentBudget
                             End Try
 
                             With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, lGENERLoad, 0.0, -lDepScour, lTotalInflow, lUpstreamIn,
-                                                         lDiversion, aSDateJ, aEDateJ)
+                                                         lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointTons = .Item2
                                 lGENERLoad = + .Item3
@@ -1303,7 +1303,7 @@ Public Module ConstituentBudget
                             Dim lMassLinkFactor As Double = 0.0
                             If lTs.Attributes.GetValue("SumAnnual") > 0 Then
                                 Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
-                                If Not (aConstProperties Is Nothing OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
+                                If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
                                         lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
                                     ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
                                     Dim ConstNameEXP As String = ""

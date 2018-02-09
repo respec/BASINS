@@ -209,7 +209,7 @@ Public Module ConstituentBalance
                                                     If Not lMassLinkID = 0 Then
 
                                                         Dim ConstNameMassLink As String = lConstituentDataName.ToUpper
-                                                        If Not (aConstProperties Is Nothing OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
+                                                        If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
                                                                 lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
                                                             ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
                                                             Dim ConstNameEXP As String = ""
