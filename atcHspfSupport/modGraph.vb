@@ -149,27 +149,29 @@ Public Module Graph
         lZgc = CreateZgc()
         lZgc.Width = aGraphSaveWidth
         lZgc.Height = aGraphSaveHeight
-        Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
-        lGraphScatter.AddFitLine()
+        If Not aPercentMissingData > 0 Then
+            Dim lGraphScatter As New clsGraphScatter(lDataGroup, lZgc)
+            lGraphScatter.AddFitLine()
 
-        lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
+            lZgc.SaveIn(lOutFileBase & "_scatDay" & aGraphSaveFormat)
 
-        With lZgc.MasterPane.PaneList(0)
-            .YAxis.Type = AxisType.Log
-            .XAxis.Type = AxisType.Log
-            .Title.Text = lOutFileBase
-        End With
-        lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
+            With lZgc.MasterPane.PaneList(0)
+                .YAxis.Type = AxisType.Log
+                .XAxis.Type = AxisType.Log
+                .Title.Text = lOutFileBase
+            End With
+            lZgc.SaveIn(lOutFileBase & "_scatDay_log" & aGraphSaveFormat)
 
-        lGraphScatter.Dispose()
-        lZgc.Dispose()
+            lGraphScatter.Dispose()
+            lZgc.Dispose()
 
-        'scatter - Observed vs Error(cfs)    
-        lZgc = CreateZgc()
-        lZgc.Width = aGraphSaveWidth
-        lZgc.Height = aGraphSaveHeight
-        If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
-            lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
+            'scatter - Observed vs Error(cfs)    
+            lZgc = CreateZgc()
+            lZgc.Width = aGraphSaveWidth
+            lZgc.Height = aGraphSaveHeight
+            If GraphScatterError(lZgc, lDataGroup, aSDateJ, aEDateJ, aTimeSeries.ItemByKey("Observed"), "Observed (cfs)", AxisType.Log) Then
+                lZgc.SaveIn(lOutFileBase & "_Error_ObsFlow" & aGraphSaveFormat)
+            End If
         End If
 
 

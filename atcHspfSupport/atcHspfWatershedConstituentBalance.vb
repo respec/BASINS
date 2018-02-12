@@ -38,6 +38,7 @@ Public Module WatershedConstituentBalance
                               ByVal aRunMade As String,
                               ByVal aSDateJ As String,
                               ByVal aEDateJ As String,
+                              ByVal aConstProperties As List(Of ConstituentProperties),
                      Optional ByVal aOutFilePrefix As String = "",
                      Optional ByVal aOutletDetails As Boolean = False,
                      Optional ByVal aSegmentRows As Boolean = False,
@@ -52,7 +53,8 @@ Public Module WatershedConstituentBalance
             Dim lReport As atcReport.ReportText = Report(aUci, aBalanceType,
                                                aOperationTypes,
                                                aScenario, aScenarioResults,
-                                               aRunMade, aSDateJ, aEDateJ, lOutletLocation,
+                                               aRunMade, aSDateJ, aEDateJ, aConstProperties,
+                                                         lOutletLocation,
                                                aOutFilePrefix, True,
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
 
@@ -246,6 +248,7 @@ Public Module WatershedConstituentBalance
                            ByVal aRunMade As String,
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double,
+                           ByVal aConstProperties As List(Of ConstituentProperties),
                   Optional ByVal aOutletLocation As String = "",
                   Optional ByVal aOutFilePrefix As String = "",
                   Optional ByVal aOutletDetails As Boolean = False,
@@ -260,7 +263,7 @@ Public Module WatershedConstituentBalance
             lOutletReport = True
         End If
 
-        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties)
         Logger.Dbg("ConstituentCount:" & lConstituentsToOutput.Count)
         Dim lConstituentTotals As New atcCollection
         Dim lConstituentLandUseTotals As New atcCollection
@@ -430,8 +433,22 @@ Public Module WatershedConstituentBalance
                                                             lMassLinkID = lConnection.MassLink
 
                                                             If Not lMassLinkID = 0 Then
+                                                                Dim ConstNameMassLink As String = lConstituentDataName
+                                                                If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
+                                                                        lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
+                                                                    ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
+                                                                    Dim ConstNameEXP As String = ""
+                                                                    For Each constt As ConstituentProperties In aConstProperties
+                                                                        If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                                                            ConstNameEXP = constt.ConstNameForEXPPlus
+                                                                            If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
+                                                                            ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
+                                                                        End If
+                                                                    Next
+                                                                End If
 
-                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstituentDataName.ToUpper, aBalanceType,
+
+                                                                lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, ConstNameMassLink, aBalanceType,
                                                                                                aConversionFactor, lMultipleIndex)
                                                             Else
                                                                 MassLinkExists = False
@@ -528,9 +545,18 @@ Public Module WatershedConstituentBalance
                                                 .Value(1) = ""
                                                 .CurrentRecord -= 1
 
-                                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
-                                                If lSkipToIndex > lConstituentIndex Then
-                                                    lConstituentIndex = lSkipToIndex - 1
+                                                Dim lSkipToindex2 As Integer = 2000
+
+                                                If lSkipTo.StartsWith("NO3+NO2") Then
+                                                    lSkipTo = "NO3+NO2 (PQUAL)"
+                                                    Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
+                                                    lSkipToindex2 = lConstituentsToOutput.IndexOf(lSkip2)
+                                                End If
+                                                Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+
+                                                If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
+                                                If lSkipToindex > lConstituentIndex Then
+                                                    lConstituentIndex = lSkipToindex - 1
                                                 End If
                                             Else
                                                 lSomeLocationHasData = True
@@ -621,9 +647,18 @@ Public Module WatershedConstituentBalance
                                                 '.Value(1) = ""
                                                 '.CurrentRecord -= 1
 
-                                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
-                                                If lSkipToIndex > lConstituentIndex Then
-                                                    lConstituentIndex = lSkipToIndex - 1
+                                                Dim lSkipToindex2 As Integer = 2000
+
+                                                If lSkipTo.StartsWith("NO3+NO2") Then
+                                                    lSkipTo = "NO3+NO2 (PQUAL)"
+                                                    Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
+                                                    lSkipToindex2 = lConstituentsToOutput.IndexOf(lSkip2)
+                                                End If
+                                                Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+
+                                                If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
+                                                If lSkipToindex > lConstituentIndex Then
+                                                    lConstituentIndex = lSkipToindex - 1
                                                 End If
                                                 lPendingOutput = ""
                                             End If
@@ -745,7 +780,7 @@ Public Module WatershedConstituentBalance
 
                                         ElseIf lConstituentKey.Substring(2).StartsWith("Total") AndAlso
                                                 lConstituentKey.Substring(2).Length > 5 AndAlso
-                                                IsNumeric(safesubstring(lConstituentKey, 7, 1)) Then
+                                                IsNumeric(SafeSubstring(lConstituentKey, 7, 1)) Then
                                             Dim lTotalCount As Integer = lConstituentKey.Substring(7, 1)
                                             Dim lCurFieldValues(.NumFields) As Double
                                             Dim lCurrentRecordSave As Integer = .CurrentRecord
@@ -759,7 +794,7 @@ Public Module WatershedConstituentBalance
                                                     End If
                                                 Next
                                             Next
-                                            .CurrentRecord+=lTotalCount
+                                            .CurrentRecord += lTotalCount
 
                                             .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                             For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
@@ -795,9 +830,18 @@ Public Module WatershedConstituentBalance
                                                     .Value(1) = ""
                                                     .CurrentRecord -= 1
 
-                                                    Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
-                                                    If lSkipToIndex > lConstituentIndex Then
-                                                        lConstituentIndex = lSkipToIndex - 1
+                                                    Dim lSkipToindex2 As Integer = 2000
+
+                                                    If lSkipTo.StartsWith("NO3+NO2") Then
+                                                        lSkipTo = "NO3+NO2 (PQUAL)"
+                                                        Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
+                                                        lSkipToindex2 = lConstituentsToOutput.IndexOf(lSkip2)
+                                                    End If
+                                                    Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+
+                                                    If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
+                                                    If lSkipToindex > lConstituentIndex Then
+                                                        lConstituentIndex = lSkipToindex - 1
                                                     End If
                                                     lPendingOutput = ""
                                                 End If
@@ -956,10 +1000,10 @@ Public Module WatershedConstituentBalance
                                     End If
 
                                     If aBalanceType <> "Water" Then
-                                            SumLoads(lLoadTotals, lConstituentName, lLoadUnit, lLoadTotal, lLoadOverall)
-                                        End If
+                                        SumLoads(lLoadTotals, lConstituentName, lLoadUnit, lLoadTotal, lLoadOverall)
                                     End If
-                                    lSummaryReport.AppendLine()
+                                End If
+                                lSummaryReport.AppendLine()
                             Else
                                 'Logger.Dbg("SkipNoData:" & lConstituentKey)
                             End If
@@ -981,11 +1025,20 @@ Public Module WatershedConstituentBalance
                             If lSkipTo IsNot Nothing Then
                                 'At this point the specific data for AGCHEM N constitunet
                                 'in HBN file is missing and code skips to PQUAL constituents                                                
-                                Dim lSkipToIndex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
-                                If lSkipToIndex > lConstituentIndex Then
-                                    lConstituentIndex = lSkipToIndex - 1
+                                Dim lSkipToindex2 As Integer = 2000
+
+                                If lSkipTo.StartsWith("NO3+NO2") Then
+                                    lSkipTo = "NO3+NO2 (PQUAL)"
+                                    Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
+                                    lSkipToindex2 = lConstituentsToOutput.IndexOf(lSkip2)
                                 End If
-                                lSummaryReport.Body.Remove(lHeaderStart, lSummaryReport.Body.Length - lHeaderStart)
+                                Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
+
+                                If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
+                                If lSkipToindex > lConstituentIndex Then
+                                    lConstituentIndex = lSkipToindex - 1
+                                End If
+                                lSummaryReport.Body.Remove(lHeaderStart + 10, lSummaryReport.Body.Length - lHeaderStart - 10)
 
                             Else
 
@@ -1086,7 +1139,7 @@ Public Module WatershedConstituentBalance
     Public Function FindSkipTo(ByVal aConstituentKey As String) As String
         Dim lSkipTo As String = Nothing
         Select Case aConstituentKey
-            Case "P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3 (PQUAL)"
+            Case "P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "NO3+NO2-N - SURFACE LAYER OUTFLOW" : lSkipTo = "NO3+NO2 (PQUAL)"
             Case "P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" : lSkipTo = "ORTHO P (PQUAL)"
             Case "P:SOQUAL-ORTHO P", "SOQUAL-ORTHO P" : lSkipTo = "ORTHO P (IQUAL)"
             Case "P:SOQUAL-NO3", "SOQUAL-NO3" : lSkipTo = "NO3 (IQUAL)"

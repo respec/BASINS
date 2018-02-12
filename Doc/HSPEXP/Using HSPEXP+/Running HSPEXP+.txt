@@ -1,8 +1,0 @@
-<h>Running HSPEXP+</h>
-
-<p>Running HSPEXP+ is straightforward, provided you have followed all the set up procedures. Browse to "HSPEXP+" from the program menu on your computer and click on it to open. Browse to the UCI file and then set the start and/or end date of the analysis period if it differs from the model simulation period specified in the UCI. Select options as needed and click on "Start" to run it.</p>
-
-
-
-
-
