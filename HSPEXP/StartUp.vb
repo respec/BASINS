@@ -207,6 +207,7 @@ Public Class StartUp
             chkDO.Enabled = False
             chkHeat.Checked = False
             chkHeat.Enabled = False
+            txtRCH.Enabled = False
 
         Else
             chkRunHSPF.Enabled = True
