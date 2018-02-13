@@ -602,7 +602,7 @@ FoundMatch:
                     'see if the history attribute contains a file name
                     lSourceFile = lTimeseries.Attributes.GetValue("History 1").Substring(10)
                 End If
-                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lSourceFile   'Make this easy to find again even if label changes
+                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lSourceFile  'Make this easy to find again even if label changes
 
                 If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
 
@@ -1071,7 +1071,8 @@ FoundMatch:
             'get timeseries
             Dim lIndex As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
             Dim lID As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
-            Dim lDataFileName As String = lCurve
+            Dim lDataFileName As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
+            Dim lYAxis As String = lCurve
 
             Dim lTimeSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(lDataFileName)
             If lTimeSource Is Nothing AndAlso lDataFileName.Length > 0 Then 'not already open
@@ -1082,6 +1083,10 @@ FoundMatch:
                 If lDataSource.Specification = lDataFileName Then
                     For Each lTimSer As atcTimeseries In lDataSource.DataSets
                         If lTimSer.Attributes.GetValue("ID").ToString = lID Then
+                            If lYAxis.Length > 0 Then
+                                'need to set axis to override default axix assignment
+                                lTimSer.Attributes.SetValue("YAxis", lYAxis)
+                            End If
                             lTimeseriesGroup.Add(lTimSer)
                             Exit For
                         End If
