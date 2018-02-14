@@ -2057,6 +2057,28 @@ Public Class frmSWSTATmod
         Return lMsg
     End Function
 
+    Private Function IsSeasonal() As String
+        Dim lName As String = GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "")
+        If String.IsNullOrEmpty(lName) Then
+            Return "high low not defined"
+        End If
+        Dim lYearStartMonth As Integer = GetSetting("atcFrequencyGrid", "StartMonth", lName, -1)
+        Dim lYearStartDay As Integer = GetSetting("atcFrequencyGrid", "StartDay", lName, -1)
+        Dim lYearEndMonth As Integer = GetSetting("atcFrequencyGrid", "EndMonth", lName, -1)
+        Dim lYearEndDay As Integer = GetSetting("atcFrequencyGrid", "EndDay", lName, -1)
+        If lYearStartMonth < 0 OrElse lYearStartDay < 0 OrElse lYearEndMonth < 0 OrElse lYearEndDay < 0 Then
+            Return "month or day not defined"
+        End If
+        If lYearStartMonth - 1 = lYearEndMonth OrElse (lYearStartMonth = 1 And lYearEndMonth = 12) Then
+            If lYearEndDay = DayMon(1901, lYearEndMonth) OrElse lYearEndDay = DayMon(2000, lYearEndMonth) Then
+                If lYearStartDay = 1 Then
+                    Return "not seasonal"
+                End If
+            End If
+        End If
+        Return "seasonal"
+    End Function
+
     Private Sub SeasonsYearsFromForm()
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
@@ -3229,6 +3251,9 @@ Public Class frmSWSTATmod
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),
                                                          aReturns:=ListToArray(lstRecurrence))
+
+            SeasonsYearsFromForm()
+
             lFreqForm.SWSTATformmod = Me
 
             Me.Cursor = System.Windows.Forms.Cursors.Default
@@ -3242,6 +3267,9 @@ Public Class frmSWSTATmod
                                                              aHigh:=radioHigh.Checked,
                                                              aNday:=ListToArray(lstNday),
                                                              aReturns:=ListToArray(lstRecurrence))
+
+        Calculate("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
+
         lFreqForm.Visible = False
 
         Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
@@ -3950,6 +3978,9 @@ Public Class frmSWSTATmod
         'DFLOWCalcs.fBioExcursions = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
         'Dim lfrmResult As New DFLOWAnalysis.frmDFLOWResults(pDataGroup, , True)
 
+        'This call ensure the season boundaries are applied to the data group before analysis begin
+        SeasonsYearsFromForm()
+
         'build all scenarios
         If pDFLOWScenarios IsNot Nothing Then
             pDFLOWScenarios.Clear()
@@ -4071,6 +4102,7 @@ Public Class frmSWSTATmod
             Next 'lEScenNBio 
         Next 'lEScenBio
         If pDFLOWScenarios.Count > 0 Then
+            Dim lIsSeasonal As String = IsSeasonal()
             If pDataGroup IsNot Nothing AndAlso pDataGroup.Count > 0 Then
                 Dim lInputArgs As atcDataAttributes = Me.DateArgsFromForm()
                 With lInputArgs
@@ -4089,6 +4121,11 @@ Public Class frmSWSTATmod
                     .SetValue(DFLOWReportUtil.Info.i_YearsIncluded, lEndYear - lStartYear + 1)
                     .SetValue(DFLOWReportUtil.Info.i_SeasonStartYear, lStartYear)
                     .SetValue(DFLOWReportUtil.Info.i_SeasonEndYear, lEndYear)
+                    If lIsSeasonal.StartsWith("seasonal") Then
+                        .SetValue(DFLOWReportUtil.Info.i_Seasonal, True)
+                    Else
+                        .SetValue(DFLOWReportUtil.Info.i_Seasonal, False)
+                    End If
                 End With
                 For Each lScen As clsInteractiveDFLOW In pDFLOWScenarios
                     Dim lBioParam As New atcCollection()
@@ -4205,44 +4242,53 @@ Public Class frmSWSTATmod
     End Sub
 
     Private Function DateArgsFromForm() As atcDataAttributes
+        Dim lFirstYear As Integer
+        Dim lStartMonth As Integer
+        Dim lStartDay As Integer
+        Dim lLastYear As Integer
+        Dim lEndMonth As Integer
+        Dim lEndDay As Integer
+        lStartDay = 1
+        If radioHigh.Checked Then
+            lStartMonth = 10
+            lEndMonth = 9
+            lEndDay = 30
+        ElseIf radioLow.Checked Then
+            lStartMonth = 4
+            lEndMonth = 3
+            lEndDay = 31
+        End If
         Dim lInputArgs As New atcDataAttributes()
         With lInputArgs
-            Dim lFirstYear As Integer = 0
-            Dim lStartMonth As Integer = 4
-            Dim lStartDay As Integer = 1
-            Dim lLastYear As Integer = 0
-            Dim lEndMonth As Integer = 3
-            Dim lEndDay As Integer = 31
             If Integer.TryParse(txtOmitBeforeYear.Text, lFirstYear) Then
                 If lFirstYear > 1900 Then .SetValue(InputNamesDFLOW.StartYear, lFirstYear)
             Else
                 .SetValue(InputNamesDFLOW.StartYear, 0)
-            End If
-            If Integer.TryParse(cboStartMonth.SelectedItem.ToString(), lStartMonth) Then
-                .SetValue(InputNamesDFLOW.StartMonth, lStartMonth)
-            Else
-                .SetValue(InputNamesDFLOW.StartMonth, 4)
-            End If
-            If Integer.TryParse(txtStartDay.Text, lStartDay) Then
-                .SetValue(InputNamesDFLOW.StartDay, lStartDay)
-            Else
-                .SetValue(InputNamesDFLOW.StartDay, 1)
             End If
             If Integer.TryParse(txtOmitAfterYear.Text, lLastYear) Then
                 If lLastYear > 1900 AndAlso lLastYear > lFirstYear Then .SetValue(InputNamesDFLOW.EndYear, lLastYear)
             Else
                 .SetValue(InputNamesDFLOW.EndYear, 0)
             End If
-            If Integer.TryParse(cboEndMonth.SelectedItem.ToString(), lEndMonth) Then
-                .SetValue(InputNamesDFLOW.EndMonth, lEndMonth)
-            Else
-                .SetValue(InputNamesDFLOW.EndMonth, 3)
+            If cboStartMonth.SelectedIndex >= 0 Then
+                lStartMonth = cboStartMonth.SelectedIndex + 1
             End If
-            If Integer.TryParse(txtEndDay.Text, lEndDay) Then
-                .SetValue(InputNamesDFLOW.EndDay, lEndDay)
-            Else
-                .SetValue(InputNamesDFLOW.EndDay, 31)
+            .SetValue(InputNamesDFLOW.StartMonth, lStartMonth)
+            If cboEndMonth.SelectedIndex >= 0 Then
+                lEndMonth = cboEndMonth.SelectedIndex + 1
             End If
+            .SetValue(InputNamesDFLOW.EndMonth, lEndMonth)
+
+            Integer.TryParse(txtStartDay.Text, lStartDay)
+            If lStartDay <= 0 OrElse lStartDay > DayMon(2000, lStartMonth) Then
+                lStartDay = 1
+            End If
+            .SetValue(InputNamesDFLOW.StartDay, lStartDay)
+            Integer.TryParse(txtEndDay.Text, lEndDay)
+            If lEndDay < 0 OrElse lEndDay > DayMon(2000, lEndMonth) Then
+                lEndDay = DayMon(2000, lEndMonth)
+            End If
+            .SetValue(InputNamesDFLOW.EndDay, lEndDay)
         End With
         Return lInputArgs
     End Function
@@ -4323,6 +4369,8 @@ Public Class frmSWSTATmod
     End Sub
 
     Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
+        Logger.Msg("Outlier Test is under development.", MsgBoxStyle.Exclamation, "Group Outlier Test")
+        Exit Sub
         If pDataGroup.Count < 5 Then
             Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Group Outlier Test")
             Exit Sub

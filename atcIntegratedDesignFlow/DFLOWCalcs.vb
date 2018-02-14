@@ -718,7 +718,7 @@ Public Class DFLOWCalcs
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
             Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
             Dim lFirstDate As Double = lHydrologicTS2.Attributes.GetValue("start date")
-            Dim lHydrologicDS As atcDataSet = lHydrologicTS2
+            Dim lHydrologicDS As atcTimeseries = lHydrologicTS2
             Dim lSYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("start date"))).Substring(0, 4)
             Dim lEYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
             Dim lYears As Integer = lEYear - lSYear

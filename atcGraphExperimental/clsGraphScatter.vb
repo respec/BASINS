@@ -81,8 +81,19 @@ Public Class clsGraphScatter
                         lCurve.Symbol.Size = 2
                     End If
                     lCurve.Line.IsVisible = False
-                    lCurve.Tag = lTimeseriesY.Serial & "|" & lTimeseriesY.Attributes.GetValue("ID") & "|" & lTimeseriesY.Attributes.GetValue("Data Source") & "||" &
-                                 lTimeseriesX.Serial & "|" & lTimeseriesX.Attributes.GetValue("ID") & "|" & lTimeseriesX.Attributes.GetValue("Data Source")
+                    'Try 'Data Source' first for Tag, then use 'History 1' (for Subsetbydate TS)
+                    Dim lSourceFileX As String = lTimeseriesX.Attributes.GetValue("Data Source", "")
+                    Dim lSourceFileY As String = lTimeseriesY.Attributes.GetValue("Data Source", "")
+                    If Not IO.File.Exists(lSourceFileX) And (lTimeseriesX.Attributes.ContainsAttribute("History 1") AndAlso lTimeseriesX.Attributes.GetValue("History 1").Length > 9) Then
+                        'see if the history attribute contains a file name
+                        lSourceFileX = lTimeseriesX.Attributes.GetValue("History 1").Substring(10)
+                    End If
+                    If Not IO.File.Exists(lSourceFileY) And (lTimeseriesY.Attributes.ContainsAttribute("History 1") AndAlso lTimeseriesY.Attributes.GetValue("History 1").Length > 9) Then
+                        'see if the history attribute contains a file name
+                        lSourceFileY = lTimeseriesY.Attributes.GetValue("History 1").Substring(10)
+                    End If
+                    lCurve.Tag = lTimeseriesX.Serial & "|" & lTimeseriesX.Attributes.GetValue("ID") & "|" & lSourceFileX & "||" &
+                                 lTimeseriesY.Serial & "|" & lTimeseriesY.Attributes.GetValue("ID") & "|" & lSourceFileY
                 End With
                 ScaleAxis(lSubsetGroup, lPane.YAxis)
                 lPane.XAxis.Scale.Min = lPane.YAxis.Scale.Min

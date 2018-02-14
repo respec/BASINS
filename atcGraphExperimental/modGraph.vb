@@ -602,7 +602,7 @@ FoundMatch:
                     'see if the history attribute contains a file name
                     lSourceFile = lTimeseries.Attributes.GetValue("History 1").Substring(10)
                 End If
-                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lSourceFile   'Make this easy to find again even if label changes
+                lCurve.Tag = lTimeseries.Serial & "|" & lTimeseries.Attributes.GetValue("ID") & "|" & lSourceFile  'Make this easy to find again even if label changes
 
                 If aYAxisName.ToUpper.Equals("RIGHT") Then lCurve.IsY2Axis = True
 
@@ -1060,7 +1060,10 @@ FoundMatch:
         'open json to find timeseries needed and plot type
         Dim lGraphType As String = ""
         Dim lCurveContents As New atcCollection
-        atcGraph.ReadGraphBasicsFromJSON(aJsonFileName, lGraphType, lCurveContents)
+        Dim lWidth As Double = 600
+        Dim lHeight As Double = 500
+        Dim lIncludeFitLine As Boolean = False
+        atcGraph.ReadGraphBasicsFromJSON(aJsonFileName, lGraphType, lCurveContents, lWidth, lHeight, lIncludeFitLine)
 
         'put data in data group
         Dim lTimeseriesGroup As New atcTimeseriesGroup
@@ -1068,10 +1071,11 @@ FoundMatch:
             'get timeseries
             Dim lIndex As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
             Dim lID As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
-            Dim lDataFileName As String = lCurve
+            Dim lDataFileName As String = MapWinUtility.Strings.StrSplit(lCurve, "|", """")
+            Dim lYAxis As String = lCurve
 
             Dim lTimeSource As atcTimeseriesSource = atcDataManager.DataSourceBySpecification(lDataFileName)
-            If lTimeSource Is Nothing Then 'not already open
+            If lTimeSource Is Nothing AndAlso lDataFileName.Length > 0 Then 'not already open
                 atcDataManager.OpenDataSource(lDataFileName)
             End If
 
@@ -1079,6 +1083,10 @@ FoundMatch:
                 If lDataSource.Specification = lDataFileName Then
                     For Each lTimSer As atcTimeseries In lDataSource.DataSets
                         If lTimSer.Attributes.GetValue("ID").ToString = lID Then
+                            If lYAxis.Length > 0 Then
+                                'need to set axis to override default axix assignment
+                                lTimSer.Attributes.SetValue("YAxis", lYAxis)
+                            End If
                             lTimeseriesGroup.Add(lTimSer)
                             Exit For
                         End If
@@ -1103,7 +1111,7 @@ FoundMatch:
         End If
 
         'create basic plot
-        Dim lZgc As ZedGraphControl = CreateZgc()
+        Dim lZgc As ZedGraphControl = CreateZgc(, lWidth, lHeight)
         Select Case lGraphType
             Case "Timeseries", "Time-Series", "Time Series"
                 Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
@@ -1125,6 +1133,7 @@ FoundMatch:
                 Dim lGrapher As New clsGraphCumulativeDifference(lTimeseriesGroupSubset, lZgc)
             Case "Scatter (TS2 vs TS1)"
                 Dim lGrapher As New clsGraphScatter(lTimeseriesGroup, lZgc)
+                If lIncludeFitLine Then lGrapher.AddFitLine()
         End Select
 
         'apply specs from json
@@ -1136,7 +1145,10 @@ FoundMatch:
 
     End Sub
 
-    Private Sub ReadGraphBasicsFromJSON(ByVal aFilename As String, ByRef aGraphType As String, ByRef aCurveContents As atcCollection)
+    Private Sub ReadGraphBasicsFromJSON(ByVal aFilename As String, ByRef aGraphType As String,
+                                        ByRef aCurveContents As atcCollection,
+                                        ByRef aWidth As Double, ByRef aHeight As Double,
+                                        ByRef aIncludeFitLine As Boolean)
         Try
             Dim lBuffer() As Byte = File.ReadAllBytes(aFilename)
             Dim lReader As XmlDictionaryReader = JsonReaderWriterFactory.CreateJsonReader(lBuffer, New XmlDictionaryReaderQuotas())
@@ -1148,6 +1160,14 @@ FoundMatch:
             For Each lNode As XmlNode In lDoc.ChildNodes(0).ChildNodes
                 If lNode.Name = "Tag" Then
                     aGraphType = lNode.InnerText
+                ElseIf lNode.Name = "Rect" Then
+                    For Each lRect As XmlNode In lNode.ChildNodes
+                        If lRect.Name = "Width" Then
+                            aWidth = CDbl(lRect.InnerText)
+                        ElseIf lRect.Name = "Height" Then
+                            aHeight = CDbl(lRect.InnerText)
+                        End If
+                    Next
                 End If
             Next
 
@@ -1164,6 +1184,9 @@ FoundMatch:
                                             'like a scatter plot where there are 2 timeseries on a curve
                                             aCurveContents.Add(lDelims(0))
                                             aCurveContents.Add(lDelims(1))
+                                        ElseIf lDelims(0).StartsWith("45DegLine") Or
+                                            lDelims(0).StartsWith("RegLine") Then
+                                            aIncludeFitLine = True
                                         Else
                                             aCurveContents.Add(lChildNode.InnerText)
                                         End If

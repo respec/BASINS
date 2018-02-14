@@ -23,6 +23,7 @@ Public Class BFBatchInputNames
     Public Shared OUTPUTDIR As String = "OUTPUTDIR"
     Public Shared OUTPUTPrefix As String = "OUTPUTPrefix"
     Public Shared SAVERESULT As String = "SAVERESULT"
+    Public Shared FullSpanDuration As String = "FullSpanDuration"
 
     Public Shared BFM_HYFX As String = "HYFX"
     Public Shared BFM_HYLM As String = "HYLM"
@@ -342,6 +343,13 @@ Public Class clsBatchBFSpec
                 ElseIf lReportBySpec = BFBatchInputNames.ReportByCalendar.ToUpper() Then
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.Reportby, atcTimeseriesBaseflow.BFInputNames.ReportbyCY)
                 End If
+            Case atcTimeseriesBaseflow.BFInputNames.FullSpanDuration.ToLower()
+                Dim lDoDuration As String = lArr(1).Trim().ToUpper()
+                If lDoDuration = "YES" Then
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.FullSpanDuration, True)
+                Else
+                    GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.FullSpanDuration, False)
+                End If
             Case Else
                 GlobalSettings.Add(lArr(0), lArr(1))
         End Select
@@ -541,6 +549,15 @@ Public Class clsBatchBFSpec
                         lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.TwoPRDFBFImax, lBFImax)
                     Next
                 End If
+            Case atcTimeseriesBaseflow.BFInputNames.FullSpanDuration.ToLower()
+                Dim lDoDurationText As String = lArr(1).Trim().ToUpper()
+                Dim lDoDuration As Boolean = False
+                If lDoDurationText = "YES" Then
+                    lDoDuration = True
+                End If
+                For Each lStation As clsBatchUnitStation In lListBatchUnits
+                    lStation.BFInputs.SetValue(atcTimeseriesBaseflow.BFInputNames.FullSpanDuration, lDoDuration)
+                Next
             Case BFBatchInputNames.OUTPUTDIR.ToLower
                 Dim lOutputDir As String = lArr(1).Trim()
                 If Not String.IsNullOrEmpty(lOutputDir) Then
@@ -1011,6 +1028,7 @@ Public Class clsBatchBFSpec
                                 .SetValue("ReportFileSuffix", "fullspan")
                                 .SetValue("ForFullSpan", True)
                                 .SetValue(BFBatchInputNames.ReportBy, lStation.BFInputs.GetValue(BFBatchInputNames.ReportBy, "calendar"))
+                                .SetValue(BFBatchInputNames.FullSpanDuration, lStation.BFInputs.GetValue(BFBatchInputNames.FullSpanDuration, False))
 
                                 'passing in parameter information for common ascii report generation
                                 .SetValue(atcTimeseriesBaseflow.BFInputNames.BFMethods, lMethods)

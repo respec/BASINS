@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "1.40beta3"
+#define MyAppVersion "1.40beta7"
 #define MyAppPublisher "RESPEC"
-#define MyAppURL "http://www.aquaterra.com/resources/downloads/HSPEXPplus.php"
+#define MyAppURL "http://www.respec.com/product/hspexp/"
 #define MyAppExeName "HSPEXP+.exe"
 
 [Setup]
@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={reg:HKLM\SOFTWARE\RESPEC\BASINS41,Base Directory|{pf}\HSPEXP+}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=HSPEXP+1.40beta3SetUp
+OutputBaseFilename=HSPEXP+1.40beta7SetUp
 Compression=lzma
 SolidCompression=yes
 InfoBeforeFile=install.txt
@@ -36,7 +36,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
-Source: "C:\Dev\BASINS\BASINS\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+;Source: "C:\Dev\BASINS\BASINS\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversiono" on any shared system files
 

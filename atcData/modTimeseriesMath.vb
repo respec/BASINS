@@ -1432,8 +1432,8 @@ Finished:
             aNote &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
                         aTSerY.ToString & " has " & aTSerY.numValues & "." & vbCrLf
         End If
-        If aTSerX.Dates.Value(0) <> aTSerY.Dates.Value(0) Then
-            aNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
+        If Math.Abs(aTSerX.Dates.Value(0) - aTSerY.Dates.Value(0)) > JulianSecond Then
+            aNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " &
                         aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
         End If
         If aNote.Length > 0 Then
@@ -1514,8 +1514,8 @@ Finished:
             lNote &= aTSerX.ToString & " has " & aTSerX.numValues & " values, " & _
                         aTSerY.ToString & " has " & aTSerY.numValues & "." & vbCrLf
         End If
-        If aTSerX.Dates.Value(0) <> aTSerY.Dates.Value(0) Then
-            lNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " & _
+        If Math.Abs(aTSerX.Dates.Value(0) - aTSerY.Dates.Value(0)) > JulianSecond Then
+            lNote &= aTSerX.ToString & " starts on " & aTSerX.Dates.Value(0).ToString & ", " &
                         aTSerY.ToString & " starts on " & aTSerY.Dates.Value(0).ToString & "." & vbCrLf
         End If
         If lNote.Length > 0 Then

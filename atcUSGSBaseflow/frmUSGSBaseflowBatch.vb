@@ -111,6 +111,8 @@ Public Class frmUSGSBaseflowBatch
         Dim lDates(5) As Integer
 
         If Not pSetGlobal Then
+            btnExamineData.Visible = True
+            btnPlotDur.Visible = True
             Dim lStations As ArrayList = pBasicAttributes.GetValue("StationInfo", Nothing)
             For Each lDataset As atcData.atcTimeseries In pDataGroup
                 If lDataset.Dates.numValues > 0 Then
@@ -150,6 +152,8 @@ Public Class frmUSGSBaseflowBatch
             grdStations.Visible = True
             btnWriteASCIIOutput.Text = "Set Parameters: " & pBasicAttributes.GetValue("Group", "")
         Else
+            btnExamineData.Visible = False
+            btnPlotDur.Visible = False
             grdStations.Visible = False
             btnWriteASCIIOutput.Text = "Set Parameters: Global Defaults"
             pCommonStart = pBasicAttributes.GetValue("SJDATECommon", 0)
@@ -295,6 +299,11 @@ Public Class frmUSGSBaseflowBatch
         txtOutputDir.Text = pOutputDir
         OutputFilenameRoot = pBasicAttributes.GetValue(BFBatchInputNames.OUTPUTPrefix, "")
         txtOutputRootName.Text = OutputFilenameRoot
+        If pBasicAttributes.GetValue(BFInputNames.FullSpanDuration, False) Then
+            rdoDurationYes.Checked = True
+        Else
+            rdoDurationNo.Checked = True
+        End If
     End Sub
 
     Public Function AskUser(ByVal aName As String, _
@@ -470,6 +479,7 @@ Public Class frmUSGSBaseflowBatch
                 Args.SetValue(BFInputNames.TwoParamEstMethod, pTwoParamEstimationMethod)
             End If
             Args.SetValue(BFInputNames.BFMethods, pMethods)
+            Args.SetValue(BFInputNames.FullSpanDuration, rdoDurationYes.Checked)
         End If
         Return lErrMsg
     End Function

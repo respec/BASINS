@@ -1867,9 +1867,20 @@ Public Module modUtil
                 .CellValue(3, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_YearsIncluded)
                 .CellValue(3, 1) = lYears.ItemByIndex(0) & "~" & lYears.ItemByIndex(lYears.Count - 1)
                 .CellValue(4, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonStartYear)
-                .CellValue(4, 1) = i_SeasonStartYear
+                If lYears.ItemByIndex(0) <> i_SeasonStartYear Then
+                    'This is when user picked Oct 1 as starting date, the routine auto set it back by one for water year
+                    .CellValue(4, 1) = lYears.ItemByIndex(0)
+                Else
+                    .CellValue(4, 1) = i_SeasonStartYear
+                End If
                 .CellValue(5, 0) = DFLOWReportUtil.ReportInfos.Item(DFLOWReportUtil.Info.i_SeasonEndYear)
-                .CellValue(5, 1) = i_SeasonEndYear
+                If i_SeasonEndYear > 1000 Then
+                    .CellValue(5, 1) = i_SeasonEndYear
+                Else
+                    Dim ldate(5) As Integer
+                    J2Date(lTs.Dates.Value(lTs.numValues), ldate)
+                    .CellValue(5, 1) = ldate(0).ToString()
+                End If
                 .CellValue(6, 0) = "Flow Statistic"
                 .CellValue(6, 1) = "Flow Value"
                 .CellValue(6, 2) = "Percentile"

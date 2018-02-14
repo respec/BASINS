@@ -53,11 +53,14 @@ Public Class StartUp
         chkTotalNitrogen.Enabled = lExists
         chkTotalPhosphorus.Enabled = lExists
         chkBODBalance.Enabled = lExists
+        chkDO.Enabled = lExists
+        chkHeat.Enabled = lExists
         txtRCH.Enabled = lExists
         lblRCH.Enabled = lExists
         lblOutReach2.Enabled = lExists
         pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
+
 
 
         Dim lUCI As String = cmbUCIPath.Text
@@ -97,7 +100,13 @@ Public Class StartUp
     End Sub
 
     Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged, chkFecalColiform.CheckedChanged
-        If chkWaterBalance.Checked OrElse chkSedimentBalance.Checked OrElse chkTotalNitrogen.Checked OrElse chkTotalPhosphorus.Checked OrElse chkBODBalance.Checked OrElse chkFecalColiform.Checked Then
+        If chkWaterBalance.Checked OrElse
+            chkSedimentBalance.Checked OrElse
+            chkTotalNitrogen.Checked OrElse
+            chkTotalPhosphorus.Checked OrElse
+            chkBODBalance.Checked OrElse
+            chkFecalColiform.Checked Then
+
             lblRCH.Enabled = True
             lblOutReach2.Enabled = True
             txtRCH.Enabled = True
@@ -167,11 +176,11 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.chm")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.pdf")
     End Sub
 
-    Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkHydrologySensitivity.CheckedChanged
-        If chkHydrologySensitivity.Checked = True Then
+    Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged
+        If chkMultiSim.Checked = True Then
             chkRunHSPF.Enabled = False
             chkRunHSPF.Checked = False
             chkAreaReports.Enabled = False
@@ -194,6 +203,10 @@ Public Class StartUp
             chkWaterBalance.Enabled = False
             chkSedimentBalance.Checked = False
             chkSedimentBalance.Enabled = False
+            chkDO.Checked = False
+            chkDO.Enabled = False
+            chkHeat.Checked = False
+            chkHeat.Enabled = False
 
         Else
             chkRunHSPF.Enabled = True
@@ -207,6 +220,8 @@ Public Class StartUp
             chkTotalPhosphorus.Enabled = True
             chkWaterBalance.Enabled = True
             chkSedimentBalance.Enabled = True
+            chkDO.Enabled = True
+            chkHeat.Enabled = True
         End If
 
 
@@ -234,5 +249,7 @@ Public Class StartUp
         UciChanged()
     End Sub
 
+    Private Sub cmbUCIPath_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.SelectedIndexChanged
 
+    End Sub
 End Class

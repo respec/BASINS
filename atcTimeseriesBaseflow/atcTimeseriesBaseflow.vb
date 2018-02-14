@@ -25,6 +25,7 @@ Public Class BFInputNames
     Public Shared TwoPRDFBFImax As String = "TwoPRDF_BFImax"
     Public Shared TwoParamEstMethod As String = "TwoParamEstimationMethod"
     Public Shared StationFile As String = "StationFile"
+    Public Shared FullSpanDuration As String = "FullSpanDuration"
 End Class
 
 Public Class atcTimeseriesBaseflow

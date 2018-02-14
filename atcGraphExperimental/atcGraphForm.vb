@@ -616,10 +616,23 @@ Public Class atcGraphForm
                         lAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
                     Next
                     lPane.XAxis.Scale.FontSpec.Border.GradientFill.Brush = Nothing
+                    'also add axis location to Tag
+                    For i As Integer = 0 To lPane.CurveList.Count - 1
+                        If lPane.CurveList(i).IsY2Axis Then
+                            lPane.CurveList(i).Tag &= "|RIGHT"
+                        Else
+                            lPane.CurveList(i).Tag &= "|LEFT"
+                        End If
+                    Next
                 Next
 
                 Try
+                    'temporarily remove Points to avoid blowing out 'Serial' points buffer,
+                    'values will come from referenced TS
+                    Dim lPoints As ZedGraph.IPointList = pZgc.MasterPane.PaneList(0).CurveList(0).Points
+                    pZgc.MasterPane.PaneList(0).CurveList(0).Points = Nothing
                     lSerial += ser.Serialize(pZgc.MasterPane)
+                    pZgc.MasterPane.PaneList(0).CurveList(0).Points = lPoints
                 Catch ex As Exception
                     lSerial += ex.ToString
                 End Try

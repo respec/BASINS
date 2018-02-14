@@ -1,0 +1,10 @@
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\ScriptRunner.dll
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\ScriptRunner.pdb
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\ScriptRunner.xml
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner15.vbprojResolveAssemblyReference.cache
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.frmSelectScript.resources
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.Resources.resources
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner15.vbproj.GenerateResource.Cache
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.dll
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.xml
+C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.pdb
