@@ -130,11 +130,20 @@ Public Class frmGraphEditor
 
     Private Function AxisFromCombo() As Axis
         If Not pPane Is Nothing Then
+            chkHoldOpposite.Visible = False
             If radioAxisBottom.Checked Then
                 Return pPane.XAxis
             ElseIf radioAxisLeft.Checked Then
+                If pPane.YAxis.IsVisible And pPane.Y2Axis.IsVisible Then
+                    chkHoldOpposite.Text = "Hold Right"
+                    chkHoldOpposite.Visible = True
+                End If
                 Return pPane.YAxis
             ElseIf radioAxisRight.Checked Then
+                If pPane.YAxis.IsVisible And pPane.Y2Axis.IsVisible Then
+                    chkHoldOpposite.Text = "Hold Left"
+                    chkHoldOpposite.Visible = True
+                End If
                 Return pPane.Y2Axis
             ElseIf radioAxisAux.Checked Then
                 If pPaneAux Is Nothing Then
@@ -263,7 +272,7 @@ Public Class frmGraphEditor
                 Dim lNewMax As Double
                 If Double.TryParse(txtAxisDisplayMinimum.Text, lNewMin) AndAlso _
                    Double.TryParse(txtAxisDisplayMaximum.Text, lNewMax) Then
-                    SetYAxisScales(aAxis, lNewMin, lNewMax)
+                    SetYAxisScales(aAxis, lNewMin, lNewMax, chkHoldOpposite.Checked)
                 End If
 
                 .MajorGrid.Color = txtAxisMajorGridColor.BackColor
@@ -293,7 +302,7 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub SetYAxisScales(ByVal aYAxis As Axis, ByVal aMin As Double, ByVal aMax As Double)
+    Private Sub SetYAxisScales(ByVal aYAxis As Axis, ByVal aMin As Double, ByVal aMax As Double, Optional aHoldOpposite As Boolean = False)
         Dim lOppositeYAxis As Axis = Nothing
         If aYAxis IsNot Nothing Then
             Dim lName As String = aYAxis.GetType().Name
@@ -322,22 +331,24 @@ Public Class frmGraphEditor
             lIsReversed = .Scale.IsReverse
         End With
         If lOppositeYAxis IsNot Nothing Then
-            Dim lChangeFractionMin As Double = (aMin - lYAxisMin0) / (lYAxisMax0 - lYAxisMin0)
-            Dim lChangeFractionMax As Double = (aMax - lYAxisMax0) / (lYAxisMax0 - lYAxisMin0)
-            With lOppositeYAxis.Scale
-                Dim lIsReversedOp As Boolean = .IsReverse
-                Dim lYAxisMinOp0 As Double = .Min
-                Dim lYAxisMaxOp0 As Double = .Max
-                .MinAuto = False
-                .MaxAuto = False
-                If (lIsReversed And Not lIsReversedOp) OrElse (Not lIsReversed And lIsReversedOp) Then
-                    .Max -= lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
-                    .Min -= lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
-                Else
-                    .Min += lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
-                    .Max += lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
-                End If
-            End With
+            If Not aHoldOpposite Then
+                Dim lChangeFractionMin As Double = (aMin - lYAxisMin0) / (lYAxisMax0 - lYAxisMin0)
+                Dim lChangeFractionMax As Double = (aMax - lYAxisMax0) / (lYAxisMax0 - lYAxisMin0)
+                With lOppositeYAxis.Scale
+                    Dim lIsReversedOp As Boolean = .IsReverse
+                    Dim lYAxisMinOp0 As Double = .Min
+                    Dim lYAxisMaxOp0 As Double = .Max
+                    .MinAuto = False
+                    .MaxAuto = False
+                    If (lIsReversed And Not lIsReversedOp) OrElse (Not lIsReversed And lIsReversedOp) Then
+                        .Max -= lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
+                        .Min -= lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
+                    Else
+                        .Min += lChangeFractionMin * (lYAxisMaxOp0 - lYAxisMinOp0)
+                        .Max += lChangeFractionMax * (lYAxisMaxOp0 - lYAxisMinOp0)
+                    End If
+                End With
+            End If
         End If
     End Sub
 
