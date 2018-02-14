@@ -281,17 +281,25 @@ Public Class frmHspfSimulationManager
             Logger.Dbg("Beginning Connection Report")
 
             Dim lUCIs As New atcCollection
+            Dim lUpstreamUCIs As New atcCollection
+            Dim lDownstreamUCIs As New atcCollection
             For Each lIcon As clsIcon In SchematicDiagram.AllIcons
                 If lIcon.Scenario IsNot Nothing Then
                     If lIcon.UciFile IsNot Nothing Then
                         Logger.Dbg("Connection Report:Adding UCI:" & lIcon.UciFileName)
                         lUCIs.Add(lIcon.UciFile)
+                        If lIcon.UpstreamIcons.Count Then
+                            lDownstreamUCIs.Add(lIcon.UciFile)
+                        End If
+                        If lIcon.DownstreamIcon IsNot Nothing Then
+                            lUpstreamUCIs.Add(lIcon.UciFile)
+                        End If
                         Logger.Dbg("Connection Report:Added UCI:" & lIcon.UciFile.Name)
                     End If
                 End If
             Next
             Logger.Dbg("Connection Report:Finished Adding UCIs")
-            Dim lTransferWDM As String = UsesTransfer(lUCIs)
+            Dim lTransferWDM As String = UsesTransfer(lUpstreamUCIs, lDownstreamUCIs)
             Logger.Dbg("Connection Report:Transfer WDM:" & lTransferWDM)
             lReport &= vbCrLf & "Transfer WDM Used: " & lTransferWDM & vbCrLf
 
@@ -368,19 +376,29 @@ Public Class frmHspfSimulationManager
             Logger.Dbg("In TransferWDMCheck")
 
             Dim lUCIs As New atcCollection
+            Dim lUpstreamUCIs As New atcCollection
+            Dim lDownstreamUCIs As New atcCollection
             For Each lIcon As clsIcon In SchematicDiagram.AllIcons
                 If lIcon.Scenario IsNot Nothing Then
                     Logger.Dbg("TransferWDMCheck:Adding UCI:" & lIcon.UciFileName)
+                    Logger.Status("Opening UCI: " & lIcon.UciFileName)
                     lUCIs.Add(lIcon.UciFile)
+                    If lIcon.UpstreamIcons.Count Then
+                        lDownstreamUCIs.Add(lIcon.UciFile)
+                    End If
+                    If lIcon.DownstreamIcon IsNot Nothing Then
+                        lUpstreamUCIs.Add(lIcon.UciFile)
+                    End If
                     Logger.Dbg("TransferWDMCheck:Added UCI:" & lIcon.UciFile.Name)
                 End If
             Next
             Logger.Dbg("TransferWDMCheck:Finished Adding UCIs")
+            Logger.Status("")
             If lUCIs.Count > 1 Then
                 'return blank if models are not connected
                 'return name of transfer wdm if models are connected using a single transfer wdm
                 'return 'MULTIPLE' if models are connected but connections use multiple wdms 
-                Dim lTransferWDM As String = UsesTransfer(lUCIs)
+                Dim lTransferWDM As String = UsesTransfer(lUpstreamUCIs, lDownstreamUCIs)
                 Logger.Dbg("TransferWDMCheck:Transfer WDM:" & lTransferWDM)
                 If lTransferWDM.Length = 0 Then
                     'these models are not connected
