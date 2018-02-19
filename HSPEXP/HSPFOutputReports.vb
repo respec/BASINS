@@ -134,7 +134,7 @@ Module HSPFOutputReports
 
                 If MultiSimulation Then
                     SubMultiSim(pHSPFExe, pBaseName, pTestPath, SDateJ, EDateJ, lHspfEchoFileName)
-                    Logger.Msg("Sensitivity/Uncertainty Analysis Complete", vbOKOnly)
+                    Logger.Msg("Multi Simulation Manager Process Complete", vbOKOnly)
                     OpenFile(pTestPath)
                     End
 

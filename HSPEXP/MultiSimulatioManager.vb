@@ -106,7 +106,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             SensitivityParameterFile.Close()
         End If
 
-        Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
+        'Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
         Dim loutputTable As DataTable
         loutputTable = New DataTable("MultiSimOutput")
         loutputTable = AddOutputTableColumns(loutputTable)
@@ -115,7 +115,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         For Each TableColumn As DataColumn In loutputTable.Columns 'Writing the table headings
             TextToWrite &= TableColumn.Caption & ","
         Next
-        lOutputFile.WriteLine(TextToWrite)
+        'lOutputFile.WriteLine(TextToWrite)
 
         'The file listing the sensitive parameters and the output DSN already exists.
         Dim lSpecificationFileRecordsNew As New ArrayList
@@ -246,15 +246,17 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             End If
 
         Loop While lcsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
-
-        For Each TableRow As DataRow In loutputTable.Rows 'Writing the table contents
-            TextToWrite = ""
-            For Each TableColumn As DataColumn In loutputTable.Columns
-                TextToWrite &= TableRow(TableColumn) & ","
-            Next TableColumn
-            lOutputFile.WriteLine(TextToWrite)
-        Next TableRow
-        lOutputFile.Close()
+        Dim lOutputFile2 As StreamWriter = File.CreateText(Path.Combine(pTestPath, "MultiSimOutput.xml"))
+        loutputTable.WriteXml(lOutputFile2)
+        'For Each TableRow As DataRow In loutputTable.Rows 'Writing the table contents
+        '    TextToWrite = ""
+        '    For Each TableColumn As DataColumn In loutputTable.Columns
+        '        TextToWrite &= TableRow(TableColumn) & ","
+        '    Next TableColumn
+        '    lOutputFile.WriteLine(TextToWrite)
+        'Next TableRow
+        'lOutputFile.Close()
+        lOutputFile2.Close()
 
     End Sub
     Private Function ReadCSVFile(aSensitivitySpecificationFile As String)
@@ -567,7 +569,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                         If lDailyTs.Value(i) > 0 Then
                                             Test += Math.Log10(lDailyTs.Value(i))
                                         End If
-                                        If i >= 31 Then
+                                        If i >= 30 Then
                                             If lDailyTs.Value(i - 30) > 0 Then Test -= Math.Log10(lDailyTs.Value(i - 30))
 
                                             GeoMean.Add(10 ^ (Test / 30))

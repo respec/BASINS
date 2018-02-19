@@ -23,6 +23,7 @@ Public Module CookieCutterGraphs
         If Not System.IO.Directory.Exists(lOutputFolder) Then
             System.IO.Directory.CreateDirectory(lOutputFolder)
         End If
+
         With lConstituentsToGraph
             .Add("BALCLA1", "Benthic Algae")
             .Add("PHYCLA", "Phytoplankton as Chlorophyll a")
@@ -31,9 +32,10 @@ Public Module CookieCutterGraphs
             .Add("NO3-CONCDIS", "Nitrate")
             .Add("IVOL", "Water Volume")
             .Add("P-TOT-IN", "Input of Total P (Existing Conditions)")
-            .Add("SSED-TOT", "Total Suspended Solids (mg/l)")
+            .Add("SSED-TOT", "Total Suspended Solids (mg/L)")
             .Add("RO", "Flow (cfs)")
             .Add("BEDDEP", "Bed Depth (ft)")
+            .Add("DOXCONC", "Dissolved Oxygen (mg/L)")
         End With
 
         Dim lLocations As New atcCollection
@@ -62,7 +64,9 @@ Public Module CookieCutterGraphs
                         End If
                     Next lTs
                 End If
+
                 For Each RCHRES In lLocations
+#Region "Plotting Nutrient Curves"
                     If RCHRES.Contains("R:") Then
 
                         Dim lRchId = RCHRES.split(":")(1)
@@ -174,9 +178,9 @@ Public Module CookieCutterGraphs
                             '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
                             'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
                         End If
-
+#End Region
                         'Plotting the TSS Curve
-
+#Region "Plotting TSS Curve"
 
                         lTimeseriesGroup = New atcTimeseriesGroup
 
@@ -247,12 +251,45 @@ Public Module CookieCutterGraphs
                             lCurve.Label.Text = "Bed Depth (ft)"
                             lZgc.SaveIn(lOutputFolder & "TSS_RCHRES_" & lRchId & ".png")
                         End If
+#End Region
 
+                        'Plotting DO Concentrations
+                        Dim lTimeseriesGroupDO As New atcTimeseriesGroup
+                        Dim lTimeSeriesDO As New atcTimeseries(Nothing)
+                        lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
+                        If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value <= 3 Then
+                            lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMax))
+                            lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMin))
+
+                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                            Dim lGrapher As New clsGraphTime(lTimeseriesGroupDO, lZgc)
+                            Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
+
+                            Dim lCurve As ZedGraph.LineItem = Nothing
+                            lCurve = lMainPane.CurveList.Item(0)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("red")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Maximum Daily DO Concentration"
+                            lCurve = lMainPane.CurveList.Item(1)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("green")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Minimum Daily DO Concentration"
+
+                            lMainPane.YAxis.Title.Text = "Dissolved Oxygen (mg/L)"
+                            lMainPane.YAxis.Scale.Min = 0
+                            lMainPane.YAxis.Scale.Max = 20
+                            lZgc.SaveIn(lOutputFolder & "DO_Concentration_RCHRES_" & RCHRES.split(":")(1) & ".png")
+
+                        End If
 
                         'Plotting Load Duration Curve
                         'Read the RES_TP_Standard.csv
+#Region "Plotting RES Curve"
                         If CommonRESStandard = 0.0 Then
-
 
                             If Not (lRchId = LowerRangeRCHId Or lRchId = HigherRangeRCHId Or
                                                         (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId)) Then
@@ -348,13 +385,13 @@ Public Module CookieCutterGraphs
                                 lCurve = lMainPane.CurveList.Item(0)
                                 lCurve.Line.IsVisible = True
                                 lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("orange")
+                                lCurve.Line.Color = Drawing.Color.FromName("green")
                                 lCurve.Line.Width = 2
                                 lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
                                 lCurve = lMainPane.CurveList.Item(1)
                                 lCurve.Line.IsVisible = True
                                 lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("blue")
+                                lCurve.Line.Color = Drawing.Color.FromName("red")
                                 lCurve.Line.Width = 2
                                 lCurve.Label.Text = "Baseline"
 
@@ -368,7 +405,12 @@ Public Module CookieCutterGraphs
 
                         End If
 
+
+
                     End If
+#End Region
+
+
 
 
 
@@ -376,8 +418,9 @@ Public Module CookieCutterGraphs
 
 
             End If
-            atcDataManager.DataSets.Clear()
+
         Next i
+
         Dim lGraphFilesCount = 0
         'Dim lRCH As HspfOperation
 
