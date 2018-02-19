@@ -861,8 +861,11 @@ Public Module atcConstituentTables
         lReport_Monthly.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
         lReport_Monthly.AppendLine("   Run Made " & aRunMade)
         lReport_Monthly.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
-        SaveFileString(aoutfoldername & aBalanceType & "_Monthly_Land_Loadings.txt", lReport_Monthly.ToString)
+        SaveFileString(aoutfoldername & "\MonthlyLoadings\" & aBalanceType & "_Monthly_Land_Loadings.txt", lReport_Monthly.ToString)
 
+        Dim lMonthNames() As String = {"Mean Month 01 Jan", "Mean Month 02 Feb", "Mean Month 03 Mar", "Mean Month 04 Apr",
+                                           "Mean Month 05 May", "Mean Month 06 Jun", "Mean Month 07 Jul", "Mean Month 08 Aug",
+                                           "Mean Month 09 Sep", "Mean Month 10 Oct", "Mean Month 11 Nov", "Mean Month 12 Dec"}
         If Not aConstProperties.Count = 0 Then
             For Each Constituent As ConstituentProperties In aConstProperties
                 lDataForBoxWhiskerPlot.Constituent = Constituent.ConstNameForEXPPlus
@@ -882,6 +885,38 @@ Public Module atcConstituentTables
                 CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, aoutfoldername & Constituent.ConstNameForEXPPlus & "_BoxWhisker.png")
                 landUseSumAnnualValues.Clear()
             Next
+
+            For Each Constituent As ConstituentProperties In aConstProperties
+                lDataForBoxWhiskerPlot.Constituent = Constituent.ConstNameForEXPPlus
+                For Each item As String In listLanduses
+                    Dim OpType1 As String = item.Split("-")(0)
+                    Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And OpDesc ='" & item.Split(":")(1) & "' And ConstNameEXP = '" & Constituent.ConstNameForEXPPlus & "'"
+                    Dim foundRows() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpression)
+
+                    For Each month As String In lMonthNames
+                        Dim Values As New List(Of Double)
+                        For Each MonthRow As DataRow In foundRows
+                            Values.Add(MonthRow(month))
+                        Next
+                        landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
+                    Next
+
+                    lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
+                    lDataForBoxWhiskerPlot.Units = "(" & foundRows(0)("Unit") & ")"
+
+                    CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & Constituent.ConstNameForEXPPlus & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
+                                              "Monthly Loading Rate from Land Use " & item & "")
+                    landUseSumAnnualValues.Clear()
+
+
+
+                Next item
+
+
+            Next
+
+
+
         Else
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
             For Each item As String In listLanduses
@@ -898,6 +933,30 @@ Public Module atcConstituentTables
             lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
             CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, aoutfoldername & aBalanceType & "_BoxWhisker.png")
             landUseSumAnnualValues.Clear()
+
+
+            lDataForBoxWhiskerPlot.Constituent = aBalanceType
+            For Each item As String In listLanduses
+                Dim OpType1 As String = item.Split("-")(0)
+                Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And OpDesc ='" & item.Split(":")(1) & "'"
+                Dim foundRows() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpression)
+
+                For Each month As String In lMonthNames
+                    Dim Values As New List(Of Double)
+                    For Each MonthRow As DataRow In foundRows
+                        Values.Add(MonthRow(month))
+                    Next
+                    landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
+                Next
+
+                lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
+                lDataForBoxWhiskerPlot.Units = "(" & lUnits & ")"
+
+                CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & aBalanceType & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
+                                              "Monthly Loading Rate from Land Use " & item & "")
+                landUseSumAnnualValues.Clear()
+            Next
+
         End If
 
 
@@ -1017,9 +1076,16 @@ Public Module atcConstituentTables
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXIN")(0),
                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lPrecIn As Double = 0
+                    Try
+                        lPrecIn = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXIN-PREC")(0),
+                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Catch
+                        Logger.Dbg("Precipitation does not contain DO in this model.")
+                    End Try
                     Dim lDiversion As Double = CalculateDiversion(lReach, lUpstreamInflows, lDownstreamReachID, lOutflow)
                     Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
-                    Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
+                    Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lPrecIn
                     For Each columnValue As DataColumn In Reach_Budget_Table.Columns
                         Dim ColumnName As String = columnValue.ColumnName
                         Select Case ColumnName
