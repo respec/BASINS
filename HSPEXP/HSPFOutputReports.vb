@@ -494,23 +494,24 @@ Module HSPFOutputReports
                                 lConstituentName = "FColi"
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
-                                lActiveSections.Add("RQUAL")
+                                lActiveSections.Add("GQUAL")
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
-                        If lOpenHspfBinDataSource.DataSets.Count > 1 Then
-                            Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent, lConstProperties)
-                            For Each ConstituentForAnalysis As String In lConstituentsToOutput.Keys
-                                'If ConstituentForAnalysis.StartsWith("I:") Then Stop
-                                ConstituentForAnalysis = SafeSubstring(ConstituentForAnalysis, 2)
-                                If ConstituentForAnalysis.EndsWith("1") Or ConstituentForAnalysis.EndsWith("2") Then
-                                    ConstituentForAnalysis = Left(ConstituentForAnalysis, ConstituentForAnalysis.Length - 1)
-                                End If
-                                lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Constituent", ConstituentForAnalysis))
+                        'If lOpenHspfBinDataSource.DataSets.Count > 1 Then
+                        '    Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent, lConstProperties)
+                        '    For Each ConstituentForAnalysis As String In lConstituentsToOutput.Keys
+                        '        Dim OpnType As String = SafeSubstring(ConstituentForAnalysis, 0, 2)
+                        '        ConstituentForAnalysis = SafeSubstring(ConstituentForAnalysis, 2)
+                        '        If Not OpnType = "R:" AndAlso (ConstituentForAnalysis.EndsWith("1") Or ConstituentForAnalysis.EndsWith("2")) Then
 
-                            Next
+                        '            ConstituentForAnalysis = Left(ConstituentForAnalysis, ConstituentForAnalysis.Length - 1)
+                        '        End If
+                        '        lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Constituent", ConstituentForAnalysis))
 
-                        End If
+                        '    Next
+
+                        'End If
 
                         If lScenarioResults.DataSets.Count = 0 Then
                             For Each activeSection As String In lActiveSections

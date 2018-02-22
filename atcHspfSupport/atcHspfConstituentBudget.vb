@@ -316,8 +316,8 @@ Public Module ConstituentBudget
                                 lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                             Else
                                 Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OVOL-" & lExitNumber)(0)
-                                lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
-                                lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetDefinedValue("SumAnnual").Value)
+                                lOutflow = lExitOutFlow.Attributes.GetDefinedValue("SumAnnual").Value
                                 lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                             End If
 
@@ -513,8 +513,8 @@ Public Module ConstituentBudget
                                         lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                                     Else
                                         Dim lExitOutFlow As atcTimeseries = aScenarioResults.DataSets.FindData("Location", "R:" & lID.Id).FindData("Constituent", "OSED-TOT-EXIT" & lExitNumber)(0)
-                                        lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetValue("SumAnnual"))
-                                        lOutflow = lExitOutFlow.Attributes.GetValue("SumAnnual")
+                                        lDiversion = -(lOutflow - lExitOutFlow.Attributes.GetDefinedValue("SumAnnual").Value)
+                                        lOutflow = lExitOutFlow.Attributes.GetDefinedValue("SumAnnual").Value
                                         lUpstreamInflows.Increment(lDownstreamReachID, lOutflow)
                                     End If
 
@@ -1578,28 +1578,7 @@ This message box will not be shown again for." & aBalanceType)
         Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, TotalGENERLoad)
     End Function
 
-    Private Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,
-                                              ByVal aReachID As HspfOperation,
-                                              ByRef aExitNumber As Integer) As Integer
-        'Function to find the EXIT number through which the flow is sent to the downstream waterbody.
-        Dim lDownstreamReachID As Integer = aReachID.DownOper("RCHRES")
-        For Each lReachConnection As HspfConnection In aReachID.Targets
-            If lReachConnection.Target.VolId = lDownstreamReachID Then
-                Dim lMasslinkID As Integer = lReachConnection.MassLink
-                For Each lMasslink As HspfMassLink In aUCI.MassLinks
-                    If lMasslink.MassLinkId = lMasslinkID Then
-                        If lMasslink.Source.Member.ToString = "ROFLOW" Then
-                            aExitNumber = 0
-                        Else
-                            aExitNumber = lMasslink.Source.MemSub1
-                            Exit For
-                        End If
-                    End If
-                Next
-            End If
-        Next
-        Return aExitNumber
-    End Function
+
     Private Function MultiFactorForPointSource(ByVal aTStep As Integer, ByVal aTimeUnit As String, ByVal aTransformation As String,
                                                ByVal aDelta As atcTimeUnit) As Double
         Dim MultiFactor As Double = 0.0

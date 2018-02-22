@@ -1404,20 +1404,50 @@ Public Module Utility
                     End If
 
                 Case "BOD-Labile"
-                    Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
 
-                        Case "WASHQS-BOD-Labile_OXIF_2", "SOQUAL-BOD-Labile_OXIF_2", "IOQUAL-BOD-Labile_OXIF_2", "AOQUAL-BOD-Labile_OXIF_2",
-                                 "POQUAL-BOD-Labile_OXIF_2", "SOQO-BOD-Labile_OXIF_2"
+                    Select Case True
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS") AndAlso
+                            aConstituent = "WASHQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2",
-                                 "POQUAL-BOD_OXIF_2", "SOQO-BOD_OXIF_2"
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS") AndAlso
+                            aConstituent = "SCRQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "SOQO-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "IOQUAL-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "AOQUAL-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
                     End Select
+
+                    'Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
+
+                    '    'Case "WASHQS-BOD-Labile_OXIF_2", "SOQUAL-BOD-Labile_OXIF_2", "IOQUAL-BOD-Labile_OXIF_2", "AOQUAL-BOD-Labile_OXIF_2",
+                    '    '             "POQUAL-BOD-Labile_OXIF_2", "SOQO-BOD-Labile_OXIF_2"
+                    '    '    If lMassLink.Source.Member.Substring(0, 3) = aConstituent.Substring(0, 3) Or lMassLink.Source.Member = "POQUAL" Or
+                    '    '                (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        lMassLinkFactor = lMassLink.MFact
+                    '    '        Return lMassLinkFactor
+                    '    '    End If
+                    '    'Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2",
+                    '    '         "POQUAL-BOD_OXIF_2", "SOQO-BOD_OXIF_2"
+                    '    '    lMassLinkFactor = lMassLink.MFact
+                    '    '    Return lMassLinkFactor
+                    '    Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                    '        lMassLinkFactor = lMassLink.MFact
+                    '        Return lMassLinkFactor
+                    'End Select
                 Case "DO"
                     Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString &
                             "_" & lMassLink.Target.MemSub1
@@ -1869,4 +1899,26 @@ Public Module Utility
         Return lOutflowDataType
     End Function
 
+    Public Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,
+                                          ByVal aReachID As HspfOperation,
+                                          ByRef aExitNumber As Integer) As Integer
+        'Function to find the EXIT number through which the flow is sent to the downstream waterbody.
+        Dim lDownstreamReachID As Integer = aReachID.DownOper("RCHRES")
+        For Each lReachConnection As HspfConnection In aReachID.Targets
+            If lReachConnection.Target.VolId = lDownstreamReachID Then
+                Dim lMasslinkID As Integer = lReachConnection.MassLink
+                For Each lMasslink As HspfMassLink In aUCI.MassLinks
+                    If lMasslink.MassLinkId = lMasslinkID Then
+                        If lMasslink.Source.Member.ToString = "ROFLOW" Then
+                            aExitNumber = 0
+                        Else
+                            aExitNumber = lMasslink.Source.MemSub1
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+        Next
+        Return aExitNumber
+    End Function
 End Module

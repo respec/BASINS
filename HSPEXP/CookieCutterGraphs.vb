@@ -173,7 +173,7 @@ Public Module CookieCutterGraphs
                             lCurve.Line.Color = Drawing.Color.FromName("Black")
                             lCurve.Line.Width = 1
                             lCurve.Label.Text = "Dissolved NO3-N"
-                            lZgc.SaveIn(lOutputFolder & "RCHRES_" & lRchId & ".png")
+                            lZgc.SaveIn(lOutputFolder & "Nutrient_RCHRES_" & lRchId & ".png")
                         Else
                             '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
                             'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
