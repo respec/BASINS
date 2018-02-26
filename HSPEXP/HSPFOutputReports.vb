@@ -476,6 +476,7 @@ Module HSPFOutputReports
                             Case "TotalP"
                                 lConstituentName = "TP"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                lActiveSections.Add("NITR")
                                 lActiveSections.Add("PHOS")
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")

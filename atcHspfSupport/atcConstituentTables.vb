@@ -445,10 +445,7 @@ Public Module atcConstituentTables
 
                     If Not ((lOperation.Name = "PERLND" AndAlso lOperation.Tables("ACTIVITY").Parms("SEDFG").Value = "1") OrElse
                             (lOperation.Name = "IMPLND" AndAlso lOperation.Tables("ACTIVITY").Parms("SLDFG").Value = "1")) Then Continue For
-
-
-                    'If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
-                    'If Not lOperation.Tables("ACTIVITY").Parms("SEDFG").Value = "1" Then Continue For
+                    'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
@@ -780,7 +777,7 @@ Public Module atcConstituentTables
                             Dim SelectExpression As String = "OpTypeNumber = '" & lOperation & "' And Year = '" & lYear & "'"
                             Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
                             row = Land_Constituent_Table.NewRow
-                            Logger.Dbg(SelectExpression)
+                            'Logger.Dbg(SelectExpression)
                             row("OpTypeNumber") = foundRows(0)("OpTypeNumber")
                             row("OpDesc") = foundRows(0)("OpDesc")
                             row("Year") = foundRows(0)("Year")
@@ -1486,12 +1483,28 @@ Public Module atcConstituentTables
                             Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent)
                             Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-OUTTOT")(0),
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+
                             Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-INTOT")(0),
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             Dim lTotalAtmDep As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT")(0),
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                            Dim lProcFluxTot As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-PROCFLUX-TOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                            If lReachConstituent = "NO3" Then
+                                Try
+                                    lOutflow += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-OUTTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                                    lTotalIn += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-INTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                                    lProcFluxTot += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-PROCFLUX-TOT")(0),
+                                                                              aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                                Catch
+                                End Try
+
+                            End If
+
                             Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, lReachConstituent)
-                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each columnValue As DataColumn In Reach_Budget_Table.Columns
                                 Dim ColumnName As String = columnValue.ColumnName
@@ -1504,15 +1517,24 @@ Public Module atcConstituentTables
                                         row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
                                     Case "PSLoad"
                                         row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
+                                    Case "GENERLoad"
+                                        row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
                                     Case "Diversion"
                                         row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
                                     Case "MassBalance"
                                         row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
                                     Case "UpstreamIn"
                                         row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                                    Case lReachConstituent & "-INTOT"
+                                        row(ColumnName) = HspfTable.NumFmtRE(lTotalIn, 10)
+                                    Case lReachConstituent & "-PROCFLUX-TOT"
+                                        row(ColumnName) = lProcFluxTot
+                                    Case lReachConstituent & "-OUTTOT"
+                                        row(ColumnName) = lOutflow
                                     Case Else
                                         row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+
                                 End Select
                             Next columnValue
 
@@ -1607,7 +1629,7 @@ Public Module atcConstituentTables
 
                             Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, lReachConstituent)
 
-                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each columnValue As DataColumn In Reach_Budget_Table.Columns
                                 Dim ColumnName As String = columnValue.ColumnName
@@ -1620,6 +1642,8 @@ Public Module atcConstituentTables
                                         row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
                                     Case "PSLoad"
                                         row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
+                                    Case "GENERLoad"
+                                        row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
                                     Case "Diversion"
                                         row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
                                     Case "MassBalance"
@@ -1667,7 +1691,7 @@ Public Module atcConstituentTables
         Dim SelectExpression As String = ""
         For Each lReachSource As HspfConnection In aReach.Sources
             Try
-                If lReachSource.Source.Opn Is Nothing Then Continue For
+                If lReachSource.Source.Opn Is Nothing OrElse lReachSource.Source.Opn.Name = "RCHRES" Then Continue For
                 'If Not ((lReachSource.Source.Opn.Name = "PERLND" AndAlso lReachSource.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "1") OrElse
                 '           (lReachSource.Source.Opn.Name = "IMPLND" AndAlso lReachSource.Source.Opn.Tables("ACTIVITY").Parms("IQALFG").Value = "1")) Then Continue For
                 Dim lConnectionArea As Double = lReachSource.MFact
@@ -1679,7 +1703,7 @@ Public Module atcConstituentTables
                 End If
 
                 Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
-                'If foundRows.Length > 1 Then Stop
+                If foundRows.Length = 0 Then Continue For
                 NPSLoad += lConnectionArea * foundRows(0)("TotalOutflow")
             Catch
             End Try
@@ -1896,7 +1920,7 @@ Public Module atcConstituentTables
         Dim lDiversion As Double = 0.0
         Try
             If aReach.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
-                Logger.Dbg(aReach.Id)
+                'Logger.Dbg(aReach.Id)
                 aUpstreamInflows.Increment(aDownstreamReachID, aOutflow)
             Else
                 Dim lExitNUmber As Integer = 0
@@ -1945,7 +1969,7 @@ Public Module atcConstituentTables
 
                     Case "PO4"
 
-
+                        lExitFlowConstituent = "PO4-OUTDIS-EXIT" & lExitNUmber
                         lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
                             FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
                         lExitFlowConstituent = "PO4-OUTPART-TOT-EXIT" & lExitNUmber
@@ -1970,180 +1994,236 @@ Public Module atcConstituentTables
         Dim lGENERLoad As Double = 0.0
 
         Select Case aConstituentName
-            Case "Heat"
+            Case "PO4"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
                 For Each lSource As HspfConnection In aReach.Sources
-                    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IHEAT" Then
-
-                        Dim lGENERID As Integer = lSource.Source.VolId
-                        Dim lMfact As Double = lSource.MFact
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
-
-                            If EXTTarget.Target.VolName.Contains("WDM") Then
-                                lGENEROperationisOutputtoWDM = True
-                                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                For i As Integer = 0 To aUCI.FilesBlock.Count
-
-                                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                        If lDataSource Is Nothing Then
-                                            If atcDataManager.OpenDataSource(lFileName) Then
-                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                            End If
-                                        End If
-                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
-
-                                    End If
-                                Next
-
-                            End If
-
-                        Next EXTTarget
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
                         If Not lGENEROperationisOutputtoWDM Then
                             Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
-
-
                         End If
-
                     End If
+
+                Next lSource
+            Case "TAM"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
+                For Each lSource As HspfConnection In aReach.Sources
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                        End If
+                    End If
+
+                Next lSource
+            Case "NO3"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
+                For Each lSource As HspfConnection In aReach.Sources
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                ElseIf lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 3 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                        End If
+                    End If
+
+                Next lSource
+            Case "Heat"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
+                For Each lSource As HspfConnection In aReach.Sources
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "IHEAT" Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IHEAT" Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                        End If
+                    End If
+
                 Next lSource
             Case "DO"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
                 For Each lSource As HspfConnection In aReach.Sources
-                    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 1 Then
-
-                        Dim lGENERID As Integer = lSource.Source.VolId
-                        Dim lMfact As Double = lSource.MFact
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
-
-                            If EXTTarget.Target.VolName.Contains("WDM") Then
-                                lGENEROperationisOutputtoWDM = True
-                                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                For i As Integer = 0 To aUCI.FilesBlock.Count
-
-                                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                        If lDataSource Is Nothing Then
-                                            If atcDataManager.OpenDataSource(lFileName) Then
-                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                            End If
-                                        End If
-                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
-
-                                    End If
-                                Next
-
-                            End If
-
-                        Next EXTTarget
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 1 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 1 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
                         If Not lGENEROperationisOutputtoWDM Then
                             Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
-
-
                         End If
-
                     End If
+
                 Next lSource
             Case "BOD-Labile"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
                 For Each lSource As HspfConnection In aReach.Sources
-                    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2 Then
-
-                        Dim lGENERID As Integer = lSource.Source.VolId
-                        Dim lMfact As Double = lSource.MFact
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
-
-                            If EXTTarget.Target.VolName.Contains("WDM") Then
-                                lGENEROperationisOutputtoWDM = True
-                                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                For i As Integer = 0 To aUCI.FilesBlock.Count
-
-                                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                        If lDataSource Is Nothing Then
-                                            If atcDataManager.OpenDataSource(lFileName) Then
-                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                            End If
-                                        End If
-                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
-
-                                    End If
-                                Next
-
-                            End If
-
-                        Next EXTTarget
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2 Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2 Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
                         If Not lGENEROperationisOutputtoWDM Then
                             Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
-
-
                         End If
-
                     End If
+
                 Next lSource
+
             Case "Sediment"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
                 For Each lSource As HspfConnection In aReach.Sources
-                    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
-
-                        Dim lGENERID As Integer = lSource.Source.VolId
-                        Dim lMfact As Double = lSource.MFact
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
-
-                            If EXTTarget.Target.VolName.Contains("WDM") Then
-                                lGENEROperationisOutputtoWDM = True
-                                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                Dim lDSN As Integer = EXTTarget.Target.VolId
-                                For i As Integer = 0 To aUCI.FilesBlock.Count
-                                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                        If lDataSource Is Nothing Then
-                                            If atcDataManager.OpenDataSource(lFileName) Then
-                                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                            End If
-                                        End If
-                                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
-
-                                    End If
-                                Next
-
-                            End If
-                        Next EXTTarget
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "ISED" Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
                         If Not lGENEROperationisOutputtoWDM Then
                             Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
-
-
                         End If
-
                     End If
+
                 Next lSource
+
 
         End Select
 
         Return lGENERLoad
     End Function
+
     Private Function AddFirstSixColumnsReachBudget(ByRef aDataTable As Data.DataTable, ByRef aUnits As String) As DataTable
         Dim column As DataColumn
         column = New DataColumn()

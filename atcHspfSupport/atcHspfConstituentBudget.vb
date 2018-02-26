@@ -223,17 +223,18 @@ Public Module ConstituentBudget
 
 
                     For Each lID As HspfOperation In lRchresOperations
+
+                        Dim lTotalPointVol As Double = 0.0
                         .CurrentRecord += 1
 
-                        Dim lPointVol As Double = 0.0
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
+                                Dim lPointVol As Double = 0.0
                                 Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
                                 Dim VolName As String = lSource.Source.VolName
                                 Dim lDSN As Integer = lSource.Source.VolId
                                 Dim lMfact As Double = lSource.MFact
                                 For i As Integer = 0 To aUci.FilesBlock.Count
-                                    Dim lPointSourceLoad As Double = 0.0
                                     If aUci.FilesBlock.Value(i).Typ = VolName Then
                                         Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
                                         Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
@@ -244,57 +245,45 @@ Public Module ConstituentBudget
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                         ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        lPointSourceLoad = ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                        lPointSourceLoad *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                  TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
-                                        lPointVol += lPointSourceLoad
+                                        lPointVol += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                                        lPointVol *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                     End If
                                 Next
+                                lTotalPointVol += lPointVol
                             End If
-                        Next lSource
+                        Next
+
                         Dim lGENERLoad As Double = 0.0
                         For Each lSource As HspfConnection In lID.Sources
-                            If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Member = "IVOL" Then
-
-                                Dim lGENERID As Integer = lSource.Source.VolId
-                                Dim lMfact As Double = lSource.MFact
+                            Dim lGENERTSSum As Double = 0.0
+                            Dim lMfact As Double = 0.0
+                            If lSource.Source.VolName = "GENER" Then
                                 Dim lGENEROperationisOutputtoWDM As Boolean = False
-                                Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                                For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+                                With GetGENERSum(aUci, lSource, aSDateJ, aEDateJ)
+                                    lGENERTSSum = .Item1
+                                    lGENEROperationisOutputtoWDM = .Item2
+                                End With
+                                If lSource.MassLink > 0 Then
+                                    lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
+                                    For Each lMassLink As HspfMassLink In aUci.MassLinks
+                                        Dim GENERMassLinkMFact As Double = 0
+                                        If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "IVOL" Then
+                                            GENERMassLinkMFact = lMassLink.MFact
+                                            lMfact += GENERMassLinkMFact
 
-                                    If EXTTarget.Target.VolName.Contains("WDM") Then
-                                        lGENEROperationisOutputtoWDM = True
-                                        Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                        Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                        For i As Integer = 0 To aUci.FilesBlock.Count
-                                            Dim lGENERSourceLoad As Double = 0.0
-                                            If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
-                                                Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                If lDataSource Is Nothing Then
-                                                    If atcDataManager.OpenDataSource(lFileName) Then
-                                                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                    End If
-                                                End If
-                                                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                                lGENERSourceLoad = ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                                lGENERLoad += lGENERSourceLoad
-
-                                            End If
-                                        Next
-
-                                    End If
-
-                                Next EXTTarget
-                                If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                    Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
-                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
-                                    'lGENERInNetworkBlockMessageShown = True
-
+                                        End If
+                                    Next lMassLink
+                                    lGENERTSSum *= lMfact
+                                    lGENERLoad += lGENERTSSum
+                                ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
+                                    Dim lGENERTSSourceMFact As Double = lSource.MFact
+                                    lGENERTSSum *= lGENERTSSourceMFact
+                                    lGENERLoad += lGENERTSSum
                                 End If
-
+                                If Not lGENEROperationisOutputtoWDM Then
+                                    Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & lID.Id & " has loadings input for the constituent " & aBalanceType & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                                End If
                             End If
                         Next lSource
 
@@ -323,7 +312,7 @@ Public Module ConstituentBudget
 
                         End If
 
-                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointVol, lGENERLoad, 0.0, 0.0,
+                        With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lTotalPointVol, lGENERLoad, 0.0, 0.0,
                                                          lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ, aConstProperties)
                             lReport2.Append(.Item1)
                             lNonpointVol = .Item2
@@ -335,8 +324,8 @@ Public Module ConstituentBudget
 
                         Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData)
                         Dim lAdditionalSource As Double = 0.0
-                        lAdditionalSource = lTotalInflow - lNonpointVol - lUpstreamIn - lPointVol - lGENERLoad
-                        Dim lCumulativePointNonpoint As Double = lNonpointVol + lPointVol + lAdditionalSource
+                        lAdditionalSource = lTotalInflow - lNonpointVol - lUpstreamIn - lTotalPointVol - lGENERLoad
+                        Dim lCumulativePointNonpoint As Double = lNonpointVol + lTotalPointVol + lAdditionalSource
                         If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
                             lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
                         End If
@@ -360,7 +349,7 @@ Public Module ConstituentBudget
                         lField = 0
                         lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                         lField += 1 : .Value(lField) = DoubleToString(lNonpointVol, , lNumberFormat,,, lNumberOfSignificantDigits)
-                        lField += 1 : .Value(lField) = DoubleToString(lPointVol, , lNumberFormat,,, lNumberOfSignificantDigits)
+                        lField += 1 : .Value(lField) = DoubleToString(lTotalPointVol, , lNumberFormat,,, lNumberOfSignificantDigits)
 
                         If pGENERLoadingExists Then
                             lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat,,, lNumberOfSignificantDigits)
@@ -416,11 +405,12 @@ Public Module ConstituentBudget
                         End If
                         If lID.Tables("ACTIVITY").Parms("SEDFG").Value = 1 Then
 
-                            Dim lPointTons As Double = 0.0
+                            Dim lTotalPointTons As Double = 0.0
                             .CurrentRecord += 1
-                            'If lID.Id = 610 Then Stop
+
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+                                    Dim lPointTons As Double = 0.0
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
@@ -438,54 +428,44 @@ Public Module ConstituentBudget
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
                                             lPointTons += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                             lPointTons *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                                    TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
-
+                                    lTotalPointTons += lPointTons
                                 End If
-                            Next lSource
+                            Next
 
                             Dim lGENERLoad As Double = 0.0
+
                             For Each lSource As HspfConnection In lID.Sources
-                                If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
-
-                                    Dim lGENERID As Integer = lSource.Source.VolId
-                                    Dim lMfact As Double = lSource.MFact
+                                Dim lGENERTSSum As Double = 0.0
+                                Dim lMfact As Double = 0.0
+                                If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
-                                    Dim lGENEROperation As HspfOperation = lSource.Source.Opn
-                                    For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+                                    With GetGENERSum(aUci, lSource, aSDateJ, aEDateJ)
+                                        lGENERTSSum = .Item1
+                                        lGENEROperationisOutputtoWDM = .Item2
+                                    End With
+                                    If lSource.MassLink > 0 Then
+                                        lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
+                                        For Each lMassLink As HspfMassLink In aUci.MassLinks
+                                            Dim GENERMassLinkMFact As Double = 0
+                                            If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "ISED" Then
+                                                GENERMassLinkMFact = lMassLink.MFact
+                                                lMfact += GENERMassLinkMFact
 
-                                        If EXTTarget.Target.VolName.Contains("WDM") Then
-                                            lGENEROperationisOutputtoWDM = True
-                                            Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                            Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                            For i As Integer = 0 To aUci.FilesBlock.Count
-
-                                                If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
-                                                    Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                    If lDataSource Is Nothing Then
-                                                        If atcDataManager.OpenDataSource(lFileName) Then
-                                                            lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                        End If
-                                                    End If
-                                                    Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                                    lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-
-                                                End If
-                                            Next
-
-                                        End If
-
-                                    Next EXTTarget
-                                    If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                        Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
-                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
-                                        'lGENERInNetworkBlockMessageShown = True
+                                            End If
+                                        Next lMassLink
+                                        lGENERTSSum *= lMfact
+                                        lGENERLoad += lGENERTSSum
+                                    ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
+                                        Dim lGENERTSSourceMFact As Double = lSource.MFact
+                                        lGENERTSSum *= lGENERTSSourceMFact
+                                        lGENERLoad += lGENERTSSum
                                     End If
-
+                                    If Not lGENEROperationisOutputtoWDM Then
+                                        Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & lID.Id & " has loadings input for the constituent " & aBalanceType & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                                    End If
                                 End If
                             Next lSource
 
@@ -525,7 +505,7 @@ Public Module ConstituentBudget
 
                             End Try
 
-                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lPointTons, lGENERLoad, 0.0, -lDepScour, lTotalInflow, lUpstreamIn,
+                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, 0.0, lTotalPointTons, lGENERLoad, 0.0, -lDepScour, lTotalInflow, lUpstreamIn,
                                                          lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointTons = .Item2
@@ -534,8 +514,8 @@ Public Module ConstituentBudget
                                 'scour is the gain from the stream. Using this terminology for Load Allocation report makes it consistent for the Load Allocation Report.
 
                             End With
-                            Dim lAdditionalSourceTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn - lPointTons - lGENERLoad
-                            Dim lCumulativePointNonpoint As Double = lNonpointTons + lAdditionalSourceTons + lPointTons
+                            Dim lAdditionalSourceTons As Double = lTotalInflow - lNonpointTons - lUpstreamIn - lTotalPointTons - lGENERLoad
+                            Dim lCumulativePointNonpoint As Double = lNonpointTons + lAdditionalSourceTons + lTotalPointTons
                             If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
                                 lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
                             End If
@@ -560,7 +540,7 @@ Public Module ConstituentBudget
                             lField = 0
                             lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                             lField += 1 : .Value(lField) = DoubleToString(lNonpointTons, , lNumberFormat,,, lNumberOfSignificantDigits)
-                            lField += 1 : .Value(lField) = DoubleToString(lPointTons, , lNumberFormat,,, lNumberOfSignificantDigits)
+                            lField += 1 : .Value(lField) = DoubleToString(lTotalPointTons, , lNumberFormat,,, lNumberOfSignificantDigits)
                             If pGENERLoadingExists Then
                                 lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat,,, lNumberOfSignificantDigits)
                             End If
@@ -620,21 +600,20 @@ Public Module ConstituentBudget
                                 Return Nothing
                             End If
 
-                            Dim lPointlbs As Double = 0.0
+                            Dim lTotalPointlbs As Double = 0.0
                             .CurrentRecord += 1
 
                             Dim CVON As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
                             For Each lSource As HspfPointSource In lID.PointSources
-                                If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                        Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                            (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                            (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) OrElse
+                                                                            (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub2 = 1) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                            (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                    Dim lPointlbs As Double = 0.0
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
@@ -658,62 +637,119 @@ Public Module ConstituentBudget
                                                                                                                                 TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
+                                    lTotalPointlbs += lPointlbs
                                 End If
                             Next
 
                             Dim lGENERLoad As Double = 0.0
+
                             For Each lSource As HspfConnection In lID.Sources
-                                If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 1) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                        Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
-
-                                    Dim lGENERID As Integer = lSource.Source.VolId
-                                    Dim lMfact As Double = lSource.MFact
-                                    If lSource.Target.Member = "OXIF" Then lMfact *= CVON
-                                    If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
-                                    Dim lGENEROperation As HspfOperation = lSource.Source.Opn
+                                Dim lGENERTSSum As Double = 0.0
+                                Dim lMfact As Double = 0.0
+                                If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
-                                    For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+                                    With GetGENERSum(aUci, lSource, aSDateJ, aEDateJ)
+                                        lGENERTSSum = .Item1
+                                        lGENEROperationisOutputtoWDM = .Item2
+                                    End With
+                                    If lSource.MassLink > 0 Then
+                                        lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
+                                        For Each lMassLink As HspfMassLink In aUci.MassLinks
+                                            Dim GENERMassLinkMFact As Double = 0
+                                            If lMassLink.MassLinkId = lSource.MassLink AndAlso
+                                                                        ((lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
+                                                                        (lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
+                                                                        (lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 3) OrElse
+                                                                        (lMassLink.Target.Member = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 1) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
+                                                                        (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
+                                                GENERMassLinkMFact = lMassLink.MFact
+                                                If lMassLink.Target.Member = "OXIF" Then GENERMassLinkMFact = lMassLink.MFact * CVON
+                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then GENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                                lMfact += GENERMassLinkMFact
 
-                                        If EXTTarget.Target.VolName.Contains("WDM") Then
-                                            lGENEROperationisOutputtoWDM = True
-                                            Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                            Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                            For i As Integer = 0 To aUci.FilesBlock.Count
-
-                                                If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
-                                                    Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                    If lDataSource Is Nothing Then
-                                                        If atcDataManager.OpenDataSource(lFileName) Then
-                                                            lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                        End If
-                                                    End If
-                                                    Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                                    lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-
-                                                End If
-                                            Next
-
-                                        End If
-
-                                    Next EXTTarget
-                                    If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                        Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
-                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
-                                        'lGENERInNetworkBlockMessageShown = True
+                                            End If
+                                        Next lMassLink
+                                        lGENERTSSum *= lMfact
+                                        lGENERLoad += lGENERTSSum
+                                    ElseIf lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                        (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                        (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) OrElse
+                                                                        (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub2 = 1) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                        (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                        Dim lGENERTSSourceMFact As Double = lSource.MFact
+                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= CVON
+                                        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                        lGENERTSSum *= lGENERTSSourceMFact
+                                        lGENERLoad += lGENERTSSum
                                     End If
-
+                                    If Not lGENEROperationisOutputtoWDM Then
+                                        Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & lID.Id & " has loadings input for the constituent " & aBalanceType & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                                    End If
                                 End If
+
+
+
+                                'If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) _
+                                '                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) _
+                                '                                        Or (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) _
+                                '                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 1) _
+                                '                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 1) _
+                                '                                        Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 1) _
+                                '                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 3) _
+                                '                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
+                                '                                        Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
+                                '                                        Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+
+                                'Dim lGENERID As Integer = lSource.Source.VolId
+                                'Dim lMfact As Double = lSource.MFact
+                                'If lSource.Target.Member = "OXIF" Then lMfact *= CVON
+                                'If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                'Dim lGENEROperation As HspfOperation = lSource.Source.Opn
+                                'Dim lGENEROperationisOutputtoWDM As Boolean = False
+                                'With GetGENERSum(aUci, lSource, aSDateJ, aEDateJ)
+                                '    lGENERLoad = .Item1 * lMfact
+                                '    lGENEROperationisOutputtoWDM = .Item2
+                                'End With
+                                'For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+
+                                '    If EXTTarget.Target.VolName.Contains("WDM") Then
+                                '        lGENEROperationisOutputtoWDM = True
+                                '        Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                                '        Dim lDSN As Integer = EXTTarget.Target.VolId
+
+                                '        For i As Integer = 0 To aUci.FilesBlock.Count
+
+                                '            If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
+                                '                Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                '                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                '                If lDataSource Is Nothing Then
+                                '                    If atcDataManager.OpenDataSource(lFileName) Then
+                                '                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                '                    End If
+                                '                End If
+                                '                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                '                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                '                lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+
+                                '            End If
+                                '        Next
+
+                                '    End If
+
+                                'Next EXTTarget
+                                'If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
+                                '    Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
+                                '                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
+                                '    'lGENERInNetworkBlockMessageShown = True
+                                'End If
+
+                                'End If
                             Next lSource
 
                             Dim lNonpointlbs As Double = 0.0
@@ -757,16 +793,16 @@ Public Module ConstituentBudget
                                 Return Nothing
                             End Try
 
-                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
+                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lTotalPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
                                                          lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
                                 lGENERLoad = .Item3
                             End With
 
-                            lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn - lPointlbs - lGENERLoad
+                            lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lTotalAtmDep - lUpstreamIn - lTotalPointlbs - lGENERLoad
 
-                            Dim lCumulativePointNonpoint As Double = lNonpointlbs + lPointlbs + lAdditionalSourcelbs
+                            Dim lCumulativePointNonpoint As Double = lNonpointlbs + lTotalPointlbs + lAdditionalSourcelbs
                             If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
                                 lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lID.Id)
                             End If
@@ -790,7 +826,7 @@ Public Module ConstituentBudget
                             lField = 0
                             lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                             lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, 15, lNumberFormat,,, lNumberOfSignificantDigits)
-                            lField += 1 : .Value(lField) = DoubleToString(lPointlbs, 15, lNumberFormat,,, lNumberOfSignificantDigits)
+                            lField += 1 : .Value(lField) = DoubleToString(lTotalPointlbs, 15, lNumberFormat,,, lNumberOfSignificantDigits)
                             lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, 15, lNumberFormat,,, lNumberOfSignificantDigits)
                             If pGENERLoadingExists Then
                                 lField += 1 : .Value(lField) = DoubleToString(lGENERLoad, , lNumberFormat,,, lNumberOfSignificantDigits)
@@ -854,20 +890,18 @@ Public Module ConstituentBudget
                         End If
                         If lID.Tables("ACTIVITY").Parms("NUTFG").Value = 1 Then
                             'If lID.Id = 815 Then Stop
-
-                            Dim lPointlbs As Double = 0.0
+                            Dim lTotalPointlbs As Double = 0.0
                             .CurrentRecord += 1
-                            Dim CVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
 
+                            Dim CVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
                             For Each lSource As HspfPointSource In lID.PointSources
-                                If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                       Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) OrElse
+                                                                            (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub2 = 2) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                            (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                            (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                    Dim lPointlbs As Double = 0.0
                                     Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
@@ -891,61 +925,149 @@ Public Module ConstituentBudget
                                                                                                                                 TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
+                                    lTotalPointlbs += lPointlbs
                                 End If
                             Next
 
                             Dim lGENERLoad As Double = 0.0
+
                             For Each lSource As HspfConnection In lID.Sources
-                                If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 2) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
-                                                                       Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
-                                                                       Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
-
-                                    Dim lGENERID As Integer = lSource.Source.VolId
-                                    Dim lMfact As Double = lSource.MFact
-                                    If lSource.Target.Member = "OXIF" Then lMfact *= CVOP
-                                    If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
-                                    Dim lGENEROperation As HspfOperation = lSource.Source.Opn
+                                Dim lGENERTSSum As Double = 0.0
+                                Dim lMfact As Double = 0.0
+                                If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
-                                    For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+                                    With GetGENERSum(aUci, lSource, aSDateJ, aEDateJ)
+                                        lGENERTSSum = .Item1
+                                        lGENEROperationisOutputtoWDM = .Item2
+                                    End With
+                                    If lSource.MassLink > 0 Then
+                                        lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
+                                        For Each lMassLink As HspfMassLink In aUci.MassLinks
+                                            Dim GENERMassLinkMFact As Double = 0
+                                            If lMassLink.MassLinkId = lSource.MassLink AndAlso
+                                                                        ((lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4) OrElse
+                                                                        (lMassLink.Target.Member = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 4) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
+                                                                        (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
+                                                                        (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
+                                                GENERMassLinkMFact = lMassLink.MFact
+                                                If lMassLink.Target.Member = "OXIF" Then GENERMassLinkMFact = lMassLink.MFact * CVOP
+                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then GENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                                lMfact += GENERMassLinkMFact
 
-                                        If EXTTarget.Target.VolName.Contains("WDM") Then
-                                            lGENEROperationisOutputtoWDM = True
-                                            Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                                            Dim lDSN As Integer = EXTTarget.Target.VolId
-
-                                            For i As Integer = 0 To aUci.FilesBlock.Count
-
-                                                If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
-                                                    Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                                    Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                    If lDataSource Is Nothing Then
-                                                        If atcDataManager.OpenDataSource(lFileName) Then
-                                                            lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                        End If
-                                                    End If
-                                                    Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                                    lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-
-                                                End If
-                                            Next
-
-                                        End If
-
-                                    Next EXTTarget
-                                    If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
-                                        Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
-                                                    Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
-                                        'lGENERInNetworkBlockMessageShown = True
+                                            End If
+                                        Next lMassLink
+                                        lGENERTSSum *= lMfact
+                                        lGENERLoad += lGENERTSSum
+                                    ElseIf lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) OrElse
+                                                                        (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub2 = 2) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                                        (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
+                                                                        (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                        Dim lGENERTSSourceMFact As Double = lSource.MFact
+                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= CVOP
+                                        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                        lGENERTSSum *= lGENERTSSourceMFact
+                                        lGENERLoad += lGENERTSSum
                                     End If
-
+                                    If Not lGENEROperationisOutputtoWDM Then
+                                        Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & lID.Id & " has loadings input for the constituent " & aBalanceType & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                                    End If
                                 End If
                             Next lSource
+                            'Dim lPointlbs As Double = 0.0
+                            '.CurrentRecord += 1
+                            'Dim CVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
+
+                            'For Each lSource As HspfPointSource In lID.PointSources
+                            '    If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
+                            '                                           Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                            '        Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                            '        Dim VolName As String = lSource.Source.VolName
+                            '        Dim lDSN As Integer = lSource.Source.VolId
+                            '        Dim lMfact As Double = lSource.MFact
+                            '        If lSource.Target.Member = "OXIF" Then lMfact *= CVOP
+                            '        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                            '        For i As Integer = 0 To aUci.FilesBlock.Count
+
+                            '            If aUci.FilesBlock.Value(i).Typ = VolName Then
+                            '                Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            '                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            '                If lDataSource Is Nothing Then
+                            '                    If atcDataManager.OpenDataSource(lFileName) Then
+                            '                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            '                    End If
+                            '                End If
+                            '                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                            '                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                            '                lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                            '                lPointlbs *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                            '                                                                                                    TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                            '            End If
+                            '        Next
+                            '    End If
+                            'Next
+
+                            'Dim lGENERLoad As Double = 0.0
+                            'For Each lSource As HspfConnection In lID.Sources
+                            '    If lSource.Source.VolName = "GENER" AndAlso lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 1 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 2 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub1 = 3 AndAlso lSource.Target.MemSub2 = 2) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 4) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) _
+                            '                                           Or (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) _
+                            '                                           Or (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+
+                            '        Dim lGENERID As Integer = lSource.Source.VolId
+                            '        Dim lMfact As Double = lSource.MFact
+                            '        If lSource.Target.Member = "OXIF" Then lMfact *= CVOP
+                            '        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                            '        Dim lGENEROperation As HspfOperation = lSource.Source.Opn
+                            '        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                            '        For Each EXTTarget As HspfConnection In lGENEROperation.Targets
+
+                            '            If EXTTarget.Target.VolName.Contains("WDM") Then
+                            '                lGENEROperationisOutputtoWDM = True
+                            '                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                            '                Dim lDSN As Integer = EXTTarget.Target.VolId
+
+                            '                For i As Integer = 0 To aUci.FilesBlock.Count
+
+                            '                    If aUci.FilesBlock.Value(i).Typ = lWDMFile Then
+                            '                        Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            '                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            '                        If lDataSource Is Nothing Then
+                            '                            If atcDataManager.OpenDataSource(lFileName) Then
+                            '                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            '                            End If
+                            '                        End If
+                            '                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                            '                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                            '                        lGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+
+                            '                    End If
+                            '                Next
+
+                            '            End If
+
+                            '        Next EXTTarget
+                            '        If Not lGENEROperationisOutputtoWDM Then 'AndAlso Not lGENERInNetworkBlockMessageShown Then
+                            '            Logger.Dbg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections in the Network Block. 
+                            '                        Please make sure that these GENER operations output to a WDM dataset for accurate source accounting." & aBalanceType)
+                            '            'lGENERInNetworkBlockMessageShown = True
+                            '        End If
+
+                            '    End If
+                            'Next lSource
 
                             Dim lNonpointlbs As Double = 0.0
                             Dim lUpstreamIn As Double = 0.0
@@ -988,13 +1110,13 @@ Public Module ConstituentBudget
                             End Try
 
                             Dim lDepScour As Double = lOutflow - lTotalInflow - lDiversion
-                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lPointlbs, lGENERLoad, lTotalAtmDep,
+                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lTotalPointlbs, lGENERLoad, lTotalAtmDep,
                                                          lDepScour, lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
                                 lGENERLoad = .Item3
                             End With
-                            lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lUpstreamIn - lTotalAtmDep - lPointlbs - lGENERLoad
+                            lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lUpstreamIn - lTotalAtmDep - lTotalPointlbs - lGENERLoad
 
                             Dim lCumulativePointNonpoint As Double = lNonpointlbs + lAdditionalSourcelbs
                             If lCumulativePointNonpointColl.Keys.Contains(lID.Id) Then
@@ -1020,7 +1142,7 @@ Public Module ConstituentBudget
                             lField = 0
                             lField += 1 : .Value(lField) = lID.Name & " " & lID.Id & " - " & lID.Description
                             lField += 1 : .Value(lField) = DoubleToString(lNonpointlbs, , lNumberFormat,,, lNumberOfSignificantDigits)
-                            lField += 1 : .Value(lField) = DoubleToString(lPointlbs, , lNumberFormat,,, lNumberOfSignificantDigits)
+                            lField += 1 : .Value(lField) = DoubleToString(lTotalPointlbs, , lNumberFormat,,, lNumberOfSignificantDigits)
                             lField += 1 : .Value(lField) = DoubleToString(lTotalAtmDep, , lNumberFormat,,, lNumberOfSignificantDigits)
 
                             If pGENERLoadingExists Then
@@ -1301,7 +1423,7 @@ Public Module ConstituentBudget
                         For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
 
                             Dim lMassLinkFactor As Double = 0.0
-                            If lTs.Attributes.GetValue("SumAnnual") > 0 Then
+                            If lTs.Attributes.GetDefinedValue("SumAnnual").Value > 0 Then
                                 Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
                                 If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
                                         lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
@@ -1317,7 +1439,7 @@ Public Module ConstituentBudget
                                     Next
                                 End If
 
-
+                                'If ConstNameMassLink = "SOSLD" Then Stop
                                 lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, ConstNameMassLink, aBalanceType,
                                                                                aConversionFactor, aMultipleIndex:=0)
                             End If
@@ -1432,7 +1554,7 @@ Public Module ConstituentBudget
                                                  ByVal aNonpointData As atcTimeseriesGroup,
                                                  ByVal aConversionFactor As Double,
                                                  ByVal aPoint As Double,
-                                                 ByRef aGENERLoad As Double,
+                                                 ByVal aGENERLoad As Double,
                                                  ByVal aAtmDep As Double,
                                                  ByVal GainLoss As Double,
                                                  ByVal aTotalInflow As Double,
@@ -1462,63 +1584,63 @@ Public Module ConstituentBudget
         felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
         'If aReach.Id = 102 Then Stop
 
-        Dim GENERTSinWDM As Boolean = False
-        Dim SingleGENERLoad As Double = 0.0
-        Dim TotalGENERLoad As Double = 0.0
-        Dim lGENERLoadingExists As Boolean = False
+        'Dim GENERTSinWDM As Boolean = False
+        'Dim SingleGENERLoad As Double = 0.0
+        'Dim TotalGENERLoad As Double = 0.0
+        'Dim lGENERLoadingExists As Boolean = False
 
-        For Each GENERConnection As HspfConnection In aReach.Sources
-            If GENERConnection.Source.VolName = "GENER" Then
-                Dim GENERID As String = GENERConnection.Source.VolId
-                Dim lSchematicMFact As Double = GENERConnection.MFact
-                Dim lMassLinkID As Integer = GENERConnection.MassLink
-                If Not aUCI.OperationExists("GENER", GENERID) Or lMassLinkID = 0 Then Continue For
-                lGENERLoadingExists = True
+        'For Each GENERConnection As HspfConnection In aReach.Sources
+        '    If GENERConnection.Source.VolName = "GENER" Then
+        '        Dim GENERID As String = GENERConnection.Source.VolId
+        '        Dim lSchematicMFact As Double = GENERConnection.MFact
+        '        Dim lMassLinkID As Integer = GENERConnection.MassLink
+        '        If Not aUCI.OperationExists("GENER", GENERID) Or lMassLinkID = 0 Then Continue For
+        '        lGENERLoadingExists = True
 
-                For Each EXTTarget As HspfConnection In aUCI.Connections
-                    If EXTTarget.Source.VolName = "GENER" AndAlso EXTTarget.Source.VolId = GENERID AndAlso EXTTarget.Target.VolName.Contains("WDM") Then
-                        'The GENER timeseries is available as a WDM timeseries
-                        GENERTSinWDM = True
-                        Dim VolName As String = EXTTarget.Target.VolName
-                        Dim lDSN As Integer = EXTTarget.Target.VolId
-                        Dim lMfact As Double = EXTTarget.MFact
-                        For i As Integer = 0 To aUCI.FilesBlock.Count
-                            If aUCI.FilesBlock.Value(i).Typ = VolName Then
-                                Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                If lDataSource Is Nothing Then
-                                    If atcDataManager.OpenDataSource(lFileName) Then
-                                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                    End If
-                                End If
-                                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                SingleGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
-                                Exit For
-                            End If
-                        Next
+        '        For Each EXTTarget As HspfConnection In aUCI.Connections
+        '            If EXTTarget.Source.VolName = "GENER" AndAlso EXTTarget.Source.VolId = GENERID AndAlso EXTTarget.Target.VolName.Contains("WDM") Then
+        '                'The GENER timeseries is available as a WDM timeseries
+        '                GENERTSinWDM = True
+        '                Dim VolName As String = EXTTarget.Target.VolName
+        '                Dim lDSN As Integer = EXTTarget.Target.VolId
+        '                Dim lMfact As Double = EXTTarget.MFact
+        '                For i As Integer = 0 To aUCI.FilesBlock.Count
+        '                    If aUCI.FilesBlock.Value(i).Typ = VolName Then
+        '                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+        '                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        '                        If lDataSource Is Nothing Then
+        '                            If atcDataManager.OpenDataSource(lFileName) Then
+        '                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        '                            End If
+        '                        End If
+        '                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+        '                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+        '                        SingleGENERLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearCount(aSDateJ, aEDateJ)
+        '                        Exit For
+        '                    End If
+        '                Next
 
-                    End If
+        '            End If
 
-                Next
+        '        Next
 
-                SingleGENERLoad *= FindMassLinkFactor(aUCI, lMassLinkID, "GENER", aBalanceType, aConversionFactor, aMultipleIndex:=0)
-                SingleGENERLoad *= lSchematicMFact
+        '        SingleGENERLoad *= FindMassLinkFactor(aUCI, lMassLinkID, "GENER", aBalanceType, aConversionFactor, aMultipleIndex:=0)
+        '        SingleGENERLoad *= lSchematicMFact
 
-            End If
-            TotalGENERLoad += SingleGENERLoad
-            SingleGENERLoad = 0.0
+        '    End If
+        '    TotalGENERLoad += SingleGENERLoad
+        '    SingleGENERLoad = 0.0
 
-        Next GENERConnection
+        'Next GENERConnection
 
 
-        aGENERLoad += TotalGENERLoad
+        'aGENERLoad += TotalGENERLoad
         Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERLoad + UpStreamDiversion
-        If lGENERLoadingExists AndAlso (Not GENERTSinWDM) AndAlso (Not pMessageShown) Then
-            Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
-This message box will not be shown again for." & aBalanceType)
-            pMessageShown = True
-        End If
+        '        If lGENERLoadingExists AndAlso (Not GENERTSinWDM) AndAlso (Not pMessageShown) Then
+        '            Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
+        'This message box will not be shown again for." & aBalanceType)
+        '            pMessageShown = True
+        '        End If
 
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
@@ -1528,7 +1650,7 @@ This message box will not be shown again for." & aBalanceType)
                 aAtmDep += pRunningTotals.ItemByKey("Reach" & lTributaryId & " DirectAtmosphericDeposition")
                 aDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
                 If pGENERLoadingExists Then
-                    aGENERLoad += pRunningTotals.ItemByKey("Reach" & lTributaryId & " GENERSources")
+                    'aGENERLoad += pRunningTotals.ItemByKey("Reach" & lTributaryId & " GENERSources")
                 End If
                 pRunningTotals.Increment("Reach" & aReach.Id & " Gain", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Gain"))
                 pRunningTotals.Increment("Reach" & aReach.Id & " Loss", pRunningTotals.ItemByKey("Reach" & lTributaryId & " Loss"))
@@ -1575,7 +1697,7 @@ This message box will not be shown again for." & aBalanceType)
 
         End If
 
-        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, TotalGENERLoad)
+        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, aGENERLoad)
     End Function
 
 
