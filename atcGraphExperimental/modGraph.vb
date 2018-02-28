@@ -1309,6 +1309,8 @@ FoundMatch:
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Min" Then
                                             aZgc.MasterPane.PaneList(lPaneCount).YAxis.Scale.Min = lScaleNode.InnerText
+                                            'force MinAuto to False for all plots (gets set to True for Log scale)
+                                            aZgc.MasterPane.PaneList(lPaneCount).YAxis.Scale.MinAuto = False
                                         ElseIf lScaleNode.Name = "Max" Then
                                             aZgc.MasterPane.PaneList(lPaneCount).YAxis.Scale.Max = lScaleNode.InnerText
                                         End If
@@ -1327,6 +1329,8 @@ FoundMatch:
                                     For Each lScaleNode As XmlNode In lChildItem.ChildNodes
                                         If lScaleNode.Name = "Min" Then
                                             aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Scale.Min = lScaleNode.InnerText
+                                            'force MinAuto to False for all plots (gets set to True for Log scale)
+                                            aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Scale.MinAuto = False
                                         ElseIf lScaleNode.Name = "Max" Then
                                             aZgc.MasterPane.PaneList(lPaneCount).Y2Axis.Scale.Max = lScaleNode.InnerText
                                         End If
