@@ -91,10 +91,28 @@ Module HSPFOutputReports
             pConstituents.Add("Heat")
         End If
 
-
-        If StartUp.chkFecalColiform.Checked Then
-            pConstituents.Add("FColi")
+        If StartUp.chkGQUAL1.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL1.Text)
         End If
+        If StartUp.chkGQUAL2.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL2.Text)
+        End If
+        If StartUp.chkGQUAL3.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL3.Text)
+        End If
+        If StartUp.chkGQUAL4.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL4.Text)
+        End If
+        If StartUp.chkGQUAL5.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL5.Text)
+        End If
+        If StartUp.chkGQUAL6.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL6.Text)
+        End If
+        If StartUp.chkGQUAL7.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL7.Text)
+        End If
+
         'set up the timeseries attributes for statistics
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
 
@@ -491,8 +509,9 @@ Module HSPFOutputReports
                                 lActiveSections.Add("OXRX")
                                 lActiveSections.Add("NUTRX")
                                 lActiveSections.Add("PLANK")
-                            Case "FColi"
-                                lConstituentName = "FColi"
+                            Case Else
+                                lConstituentName = lConstituent
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
@@ -605,8 +624,8 @@ Module HSPFOutputReports
 
 
                         Else
-                                Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
-                                lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
+                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
+                            lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
                             Dim ans As Integer
                             ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " &
                                          "Did uci file run properly last time?")

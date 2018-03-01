@@ -48,7 +48,7 @@ Public Module ConstituentBalance
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & "Annual Loading Rates of " & aBalanceType & " For Each PERLND, and IMPLND, and")
-        lReport.AppendLine("Annual Loadings of" & aBalanceType & " For Each Reach.")
+        lReport.AppendLine("Annual Loadings of " & aBalanceType & " For Each Reach.")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
@@ -144,11 +144,16 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
                                                 Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
-                                                Case "FColi_PERLND", "FColi_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org/ac)"
-                                                Case "FColi_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (10^9 org)"
-
+                                                Case Else
+                                                    Dim lUnits As String = "QTYID"
+                                                    If aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
+                                                        lUnits = "10^9 org"
+                                                    End If
+                                                    If lOperName = "PERLND" Or lOperName = "IMPLND" Then
+                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lUnits & "/ac)"
+                                                    ElseIf lOperName = "RCHRES" Then
+                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lUnits & ")"
+                                                    End If
                                             End Select
 
                                             .NumHeaderRows = 1
@@ -246,9 +251,7 @@ Public Module ConstituentBalance
 
                                         End If
 
-
-                                        If lConstituentDataName.Contains("F.Coliform") Then 'Assuming that unit of F.Coliform unit is #ORG
-
+                                        If lConstituentDataName.ToUpper.Contains("F.COLIFORM") Or lConstituentDataName.ToUpper.StartsWith("BACT") Then 'Assuming that unit of F.Coliform unit is #ORG
                                             lMult = 1 / 1000000000.0 '10^9
                                         End If
 
@@ -364,6 +367,5 @@ Public Module ConstituentBalance
 
         Return lReport
     End Function
-
 
 End Module

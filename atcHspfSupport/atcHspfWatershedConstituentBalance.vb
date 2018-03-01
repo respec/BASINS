@@ -347,12 +347,18 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
                                                 Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
-                                                Case "FColi_PERLND", "FColi_IMPLND"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (10^9 org/ac)" & vbCrLf
-                                                Case "FColi_RCHRES"
-                                                    .Header = aBalanceType & " Balance Report For " & lLandUse & "  (10^9 org)" & vbCrLf
-
+                                                Case Else
+                                                    Dim lUnits As String = "QTYID"
+                                                    If aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
+                                                        lUnits = "10^9 org"
+                                                    End If
+                                                    If lOperationType = "PERLND" Or lOperationType = "IMPLND" Then
+                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lUnits & "/ac)" & vbCrLf
+                                                    ElseIf lOperationType = "RCHRES" Then
+                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lUnits & ")" & vbCrLf
+                                                    End If
                                             End Select
+
                                             .NumHeaderRows = 2
                                             If lOutletReport And lOperationType <> "RCHRES" Then
                                                 .NumFields = lLandUseOperations.Count + 2
@@ -473,9 +479,10 @@ Public Module WatershedConstituentBalance
                                                 End If
 
 
-                                                If aBalanceType = "FColi" Then
+                                                If aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
                                                     lMult = 1 / 1000000000.0 '10^9
                                                 End If
+
                                                 Dim lAttribute As atcDefinedValue = Nothing
                                                 If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
                                                     'lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
@@ -903,7 +910,7 @@ Public Module WatershedConstituentBalance
                 lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) &
                                                             vbTab & "tons".PadLeft(12) &
                                                             vbTab & "tons/ac".PadLeft(12))
-            ElseIf aBalanceType = "FColi" Then
+            ElseIf aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
                 lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
                                                             vbTab & "10^9".PadLeft(12) &
                                                             vbTab & "10^9/ac".PadLeft(12))
@@ -936,7 +943,7 @@ Public Module WatershedConstituentBalance
                                 ElseIf aBalanceType = "Sediment" Then
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) &
                                                                                 vbTab & "tons/ac".PadLeft(12))
-                                ElseIf aBalanceType = "FColi" Then
+                                ElseIf aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
                                                                                 vbTab & "10^9".PadLeft(12))
                                 Else

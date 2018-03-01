@@ -267,22 +267,6 @@ Public Module Utility
                     .Add("R:Copper-TROQAL", "Total Cu")
                 End With
 #End Region
-#Region "Case FColi"
-            Case "FColi"
-                With lConstituentsToOutput
-                    .Add("P:Header1", "F.Coliform (10^9 org/ac)")
-                    .Add("P:SOQUAL-F.Coliform", "  Surface")
-                    .Add("P:IOQUAL-F.Coliform", "  Interflow")
-                    .Add("P:AOQUAL-F.Coliform", "  Baseflow")
-                    .Add("P:Total3", "  Total")
-                    .Add("I:Header2", "F.Coliform (10^9 org/ac)")
-                    .Add("I:SOQUAL-F.Coliform", "  ImpervSurf")
-                    .Add("R:Header3", "F.Coliform (10^9 org)")
-                    .Add("R:F.Coliform-TIQAL", "  Inflow")
-                    .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
-                    .Add("R:F.Coliform-TROQAL", "  Outflow")
-                End With
-#End Region
 #Region "Case N-PQUAL"
             Case "N-PQUAL"
                 With lConstituentsToOutput
@@ -810,6 +794,26 @@ Public Module Utility
                     .Add("R:BODFLUX-BENTHIC", "  BODFLUX-BENTHIC")
                     .Add("R:BODFLUX-TOT", "  BODFLUX-Total")
                     .Add("R:BODOUTTOT", "  BODOUTTOT")
+                End With
+#End Region
+#Region "Case Else"
+            Case Else
+                Dim lUnits As String = "QTYID"
+                If aType.ToUpper.Contains("F.COLIFORM") Or aType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
+                    lUnits = "10^9 org"
+                End If
+                With lConstituentsToOutput
+                    .Add("P:Header1", aType & " (" & lUnits & "/ac)")
+                    .Add("P:SOQUAL-" & aType, "  Surface")
+                    .Add("P:IOQUAL-" & aType, "  Interflow")
+                    .Add("P:AOQUAL-" & aType, "  Baseflow")
+                    .Add("P:Total3", "  Total")
+                    .Add("I:Header2", aType & " (" & lUnits & "/ac)")
+                    .Add("I:SOQUAL-" & aType, "  ImpervSurf")
+                    .Add("R:Header3", aType & " (" & lUnits & ")")
+                    .Add("R:" & aType & "-TIQAL", "  Inflow")
+                    .Add("R:" & aType & "-DDQAL-TOT", "  Decay")
+                    .Add("R:" & aType & "-TROQAL", "  Outflow")
                 End With
 #End Region
         End Select
@@ -1910,6 +1914,19 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
+
+            Case Else
+                QUALNames = New ConstituentProperties
+                QUALNames.ConstNameForEXPPlus = aBalanceType
+                QUALNames.ConstituentNameInUCI = aBalanceType
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    QUALNames.ConstituentUnit = "unk"
+                Else
+                    QUALNames.ConstituentUnit = "unk"
+                End If
+                QUALNames.ReportType = aBalanceType
+                QUALs.Add(QUALNames)
+                Return QUALs
         End Select
 
 
@@ -1970,7 +1987,7 @@ Public Module Utility
                 lOutflowDataType.Add("AOHT", "AOHT")
                 lOutflowDataType.Add("TotalOutflow", "TotalOutflow")
 
-            Case Else
+            Case "TotalN", "TotalP"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
                 lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
@@ -1978,6 +1995,12 @@ Public Module Utility
                 lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
                 lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
                 lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
+            Case Else
+                'case for GQuals
+                'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
+                'lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                'lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                'lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
         End Select
 
 

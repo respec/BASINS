@@ -60,7 +60,20 @@ Public Class StartUp
         lblOutReach2.Enabled = lExists
         pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
-
+        chkGQUAL1.Visible = False
+        chkGQUAL2.Visible = False
+        chkGQUAL3.Visible = False
+        chkGQUAL4.Visible = False
+        chkGQUAL5.Visible = False
+        chkGQUAL6.Visible = False
+        chkGQUAL7.Visible = False
+        chkGQUAL1.Enabled = False
+        chkGQUAL2.Enabled = False
+        chkGQUAL3.Enabled = False
+        chkGQUAL4.Enabled = False
+        chkGQUAL5.Enabled = False
+        chkGQUAL6.Enabled = False
+        chkGQUAL7.Enabled = False
 
 
         Dim lUCI As String = cmbUCIPath.Text
@@ -78,6 +91,51 @@ Public Class StartUp
 
                 DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
                 DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+
+                'list of available gquals 
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA") Then
+                    chkGQUAL1.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA").ParmValue("GQID")
+                    chkGQUAL1.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA").ParmValue("QTYID")
+                    chkGQUAL1.Enabled = True
+                    chkGQUAL1.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:2") Then
+                    chkGQUAL2.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:2").ParmValue("GQID")
+                    chkGQUAL2.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:2").ParmValue("QTYID")
+                    chkGQUAL2.Enabled = True
+                    chkGQUAL2.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:3") Then
+                    chkGQUAL3.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:3").ParmValue("GQID")
+                    chkGQUAL3.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:3").ParmValue("QTYID")
+                    chkGQUAL3.Enabled = True
+                    chkGQUAL3.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:4") Then
+                    chkGQUAL4.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:4").ParmValue("GQID")
+                    chkGQUAL4.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:4").ParmValue("QTYID")
+                    chkGQUAL4.Enabled = True
+                    chkGQUAL4.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:5") Then
+                    chkGQUAL5.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:5").ParmValue("GQID")
+                    chkGQUAL5.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:5").ParmValue("QTYID")
+                    chkGQUAL5.Enabled = True
+                    chkGQUAL5.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:6") Then
+                    chkGQUAL6.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:6").ParmValue("GQID")
+                    chkGQUAL6.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:6").ParmValue("QTYID")
+                    chkGQUAL6.Enabled = True
+                    chkGQUAL6.Visible = True
+                End If
+                If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA:7") Then
+                    chkGQUAL7.Text = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:7").ParmValue("GQID")
+                    chkGQUAL7.Tag = pUci.OpnBlks("RCHRES").Ids(0).Tables("GQ-QALDATA:7").ParmValue("QTYID")
+                    chkGQUAL7.Enabled = True
+                    chkGQUAL7.Visible = True
+                End If
+
             Catch ex As Exception
                 Logger.Msg("HSPEXP+ had trouble opening " & lUCI, MsgBoxStyle.Critical, "UCI Reading Issue!")
                 pUci = Nothing
@@ -99,13 +157,20 @@ Public Class StartUp
 
     End Sub
 
-    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged, chkFecalColiform.CheckedChanged
+    Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged,
+                                            chkGQUAL1.CheckedChanged, chkGQUAL2.CheckedChanged, chkGQUAL3.CheckedChanged, chkGQUAL4.CheckedChanged, chkGQUAL5.CheckedChanged, chkGQUAL6.CheckedChanged, chkGQUAL7.CheckedChanged
         If chkWaterBalance.Checked OrElse
             chkSedimentBalance.Checked OrElse
             chkTotalNitrogen.Checked OrElse
             chkTotalPhosphorus.Checked OrElse
             chkBODBalance.Checked OrElse
-            chkFecalColiform.Checked Then
+            chkGQUAL1.Checked OrElse
+            chkGQUAL2.Checked OrElse
+            chkGQUAL3.Checked OrElse
+            chkGQUAL4.Checked OrElse
+            chkGQUAL5.Checked OrElse
+            chkGQUAL6.Checked OrElse
+            chkGQUAL7.Checked Then
 
             lblRCH.Enabled = True
             lblOutReach2.Enabled = True
@@ -193,8 +258,8 @@ Public Class StartUp
             chkAdditionalgraphs.Checked = False
             chkBODBalance.Enabled = False
             chkBODBalance.Checked = False
-            chkFecalColiform.Checked = False
-            chkFecalColiform.Enabled = False
+            chkGQUAL1.Checked = False
+            chkGQUAL1.Enabled = False
             chkTotalNitrogen.Enabled = False
             chkTotalNitrogen.Checked = False
             chkTotalPhosphorus.Enabled = False
@@ -207,6 +272,20 @@ Public Class StartUp
             chkDO.Enabled = False
             chkHeat.Checked = False
             chkHeat.Enabled = False
+            chkGQUAL1.Checked = False
+            chkGQUAL2.Checked = False
+            chkGQUAL3.Checked = False
+            chkGQUAL4.Checked = False
+            chkGQUAL5.Checked = False
+            chkGQUAL6.Checked = False
+            chkGQUAL7.Checked = False
+            chkGQUAL1.Enabled = False
+            chkGQUAL2.Enabled = False
+            chkGQUAL3.Enabled = False
+            chkGQUAL4.Enabled = False
+            chkGQUAL5.Enabled = False
+            chkGQUAL6.Enabled = False
+            chkGQUAL7.Enabled = False
             txtRCH.Enabled = False
 
         Else
@@ -216,13 +295,19 @@ Public Class StartUp
             chkReganGraphs.Enabled = True
             chkAdditionalgraphs.Enabled = True
             chkBODBalance.Enabled = True
-            chkFecalColiform.Enabled = True
             chkTotalNitrogen.Enabled = True
             chkTotalPhosphorus.Enabled = True
             chkWaterBalance.Enabled = True
             chkSedimentBalance.Enabled = True
             chkDO.Enabled = True
             chkHeat.Enabled = True
+            chkGQUAL1.Enabled = True
+            chkGQUAL2.Enabled = True
+            chkGQUAL3.Enabled = True
+            chkGQUAL4.Enabled = True
+            chkGQUAL5.Enabled = True
+            chkGQUAL6.Enabled = True
+            chkGQUAL7.Enabled = True
         End If
 
 
