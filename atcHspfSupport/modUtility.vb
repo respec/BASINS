@@ -514,29 +514,32 @@ Public Module Utility
                         Select Case ConstProperty.ConstNameForEXPPlus
                             Case "NO3"
                                 .Add("P:Header4", "NO3+NO2 (PQUAL)")
-                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow")
-                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
-                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Surface Flow")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Groundwater Flow")
                             Case "TAM"
                                 .Add("P:Header5", "NH3+NH4 (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Sediment Attached")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow")
-                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
-                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Scoured Sediment Attached")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Surface Flow")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Groundwater Flow")
 
                             Case "lab-OrgN"
                                 .Add("P:Header6", "LabileOrgN (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Sediment Attached")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow")
-                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Interflow")
-                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Groundwater Flow")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Scoured Sediment Attached")
+                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Surface Flow")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Groundwater Flow")
 
                             Case "Ref-OrgN"
                                 .Add("P:Header7", "RefOrgN (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Sediment Attached")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow")
-                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Interflow")
-                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Groundwater Flow")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Scoured Sediment Attached")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Dissolved with Surface Flow")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Dissolved with Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Dissolved with Groundwater Flow")
 
                         End Select
                         .Add("P:Total3" & headerLabel(headerLabelCount), "  Total")
@@ -692,25 +695,28 @@ Public Module Utility
                             Case "PO4"
                                 .Add("P:Header7", "ORTHO P (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Scoured Sediment")
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
-                                .Add("P:Total3a", "  Total")
+                                .Add("P:Total3c", "  Total")
                             Case "Ref-OrgP"
                                 .Add("P:Header8", "RefOrgP (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Scoured Sediment")
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Groundwater Flow")
-                                .Add("P:Total3b", "  Total")
+                                .Add("P:Total3d", "  Total")
 
                             Case "lab-OrgP"
                                 .Add("P:Header9", "LabileOrgP (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Scoured Sediment")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Groundwater Flow")
-                                .Add("P:Total3c", "  Total")
+                                .Add("P:Total3e", "  Total")
 
                         End Select
                     Next
@@ -1157,102 +1163,83 @@ Public Module Utility
                     End If
 
                 Case "TotalN"
-
-                    Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
-                        Case "NO3+NO2-N - SURFACE LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - UPPER LAYER OUTFLOW_NUIF1_1", "NO3+NO2-N - GROUNDWATER OUTFLOW_NUIF1_1",
-                                "NO3-N - TOTAL OUTFLOW_NUIF1_1"
+                    Select Case True
+                        Case (aConstituent = "NO3+NO2-N - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NO3+NO2-N - UPPER LAYER OUTFLOW" OrElse
+                                aConstituent = "NO3+NO2-N - GROUNDWATER OUTFLOW" OrElse aConstituent = "NO3-N - TOTAL OUTFLOW") AndAlso
+                                lMassLink.Target.Member.ToString = "NUIF1" And lMassLink.Target.MemSub1 = 1
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW_NUIF1_2", "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW_NUIF1_2",
-                                "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW_NUIF1_2"
+
+                        Case (aConstituent = "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW" OrElse
+                            aConstituent = "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_1"
-                            If lMassLink.Target.MemSub2 = 1 Then
-                                lMassLinkFactor += lMassLink.MFact
-                            End If
-                        Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_2"
-                            If lMassLink.Target.MemSub2 = 1 Then
-                                lMassLinkFactor += lMassLink.MFact
-                            End If
-                        Case "NH4-N ADS - SEDIMENT ASSOC OUTFLOW_NUIF2_3"
-                            If lMassLink.Target.MemSub2 = 1 Then
-                                lMassLinkFactor += lMassLink.MFact
-                            End If
-
-                        Case "POQUAL-NH3+NH4_NUIF1_2", "SOQUAL-NH3+NH4_NUIF1_2",
-                                 "AOQUAL-NH3+NH4_NUIF1_2", "IOQUAL-NH3+NH4_NUIF1_2",
-                                 "SOQO-NH3+NH4_NUIF1_2"
-
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                        Case aConstituent = "NH4-N ADS - SEDIMENT ASSOC OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
+                                             lMassLink.Target.MemSub2 = 1 'lMassLink.Target.MemSub1 = 1 AndAlso 
+                            lMassLinkFactor += lMassLink.MFact
+                        Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "AOQUAL-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                                (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "IOQUAL-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                                (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (aConstituent = "WASHQS-NH3+NH4" OrElse aConstituent = "SCRQS-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
+                                    lMassLink.Target.MemSub1 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case (aConstituent = "SOQUAL-NO3" OrElse aConstituent = "SOQO-NO3") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "AOQUAL-NO3" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
+                                (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "IOQUAL-NO3" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
+                                (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
+                            aConstituent = "WASHQS-Ref-OrgN" OrElse aConstituent = "SCRQS-Ref-OrgN" OrElse aConstituent = "SOQO-Ref-OrgN" OrElse aConstituent = "SOQUAL-Ref-OrgN" OrElse
+                            aConstituent = "WASHQS-lab-OrgN" OrElse aConstituent = "SCRQS-lab-OrgN" OrElse aConstituent = "SOQO-lab-OrgN" OrElse aConstituent = "SOQUAL-lab-OrgN") AndAlso
+                            lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
                                 lMassLinkFactor = lMassLink.MFact
-                                'Return lMassLinkFactor
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "SOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "SOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-
-                        Case "POQUAL-NH3+NH4_NUIF2_2", "SOQUAL-NH3+NH4_NUIF2_2", "AOQUAL-NH3+NH4_NUIF2_2", "IOQUAL-NH3+NH4_NUIF2_2",
-                                "POQUAL-NH3+NH4_NUIF2_3", "SOQUAL-NH3+NH4_NUIF2_3", "AOQUAL-NH3+NH4_NUIF2_3", "IOQUAL-NH3+NH4_NUIF2_3",
-                                "POQUAL-NH3+NH4_NUIF2_1", "SOQUAL-NH3+NH4_NUIF2_1", "AOQUAL-NH3+NH4_NUIF2_1", "IOQUAL-NH3+NH4_NUIF2_1",
-                                 "WASHQS-NH3+NH4_NUIF2_1", "WASHQS-NH3+NH4_NUIF2_2", "WASHQS-NH3+NH4_NUIF2_3",
-                                 "SCRQS-NH3+NH4_NUIF2_1", "SCRQS-NH3+NH4_NUIF2_2", "SCRQS-NH3+NH4_NUIF2_3"
-                            If lMassLink.Target.MemSub2 = 1 Then
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
-                                    lMassLinkFactor += lMassLink.MFact
-                                    'Return lMassLinkFactor
-                                End If
-
-                            End If
-
-
-                        Case "SOQO-NO3_NUIF1_1", "POQUAL-NO3_NUIF1_1", "SOQUAL-NO3_NUIF1_1", "IOQUAL-NO3_NUIF1_1", "AOQUAL-NO3_NUIF1_1"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                            Return lMassLinkFactor
+                        Case (aConstituent = "IOQUAL-BOD" OrElse aConstituent = "IOQUAL-Ref-OrgN" OrElse aConstituent = "IOQUAL-lab-OrgN") AndAlso
+                            lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3 AndAlso
+                            (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
                                 lMassLinkFactor = lMassLink.MFact
-                                Return lMassLinkFactor
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "IOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "IOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-                        Case "WASHQS-BOD_PKIF_3", "SCRQS-BOD_PKIF_3", "SOQO-BOD_PKIF_3", "SOQUAL-BOD_PKIF_3", "IOQUAL-BOD_PKIF_3", "AOQUAL-BOD_PKIF_3", "POQUAL-BOD_PKIF_3"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-
+                            Return lMassLinkFactor
+                        Case (aConstituent = "AOQUAL-BOD" OrElse aConstituent = "AOQUAL-Ref-OrgN" OrElse aConstituent = "AOQUAL-lab-OrgN") AndAlso
+                            lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3 AndAlso
+                            (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
+                                lMassLinkFactor = lMassLink.MFact
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-                        Case "WASHQS-Ref-OrgN_PKIF_3", "SCRQS-Ref-OrgN_PKIF_3", "SOQO-Ref-OrgN_PKIF_3", "SOQUAL-Ref-OrgN_PKIF_3", "IOQUAL-Ref-OrgN_PKIF_3", "AOQUAL-Ref-OrgN_PKIF_3", "POQUAL-Ref-OrgN_PKIF_3"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-
-                            End If
-
-                        Case "WASHQS-lab-OrgN_PKIF_3", "SCRQS-lab-OrgN_PKIF_3", "SOQO-lab-OrgN_PKIF_3", "SOQUAL-lab-OrgN_PKIF_3", "IOQUAL-lab-OrgN_PKIF_3", "AOQUAL-lab-OrgN_PKIF_3", "POQUAL-lab-OrgN_PKIF_3"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-
-                            End If
-
-
-                        Case "ORGN - TOTAL OUTFLOW_PKIF_3"
+                            Return lMassLinkFactor
+                        Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3
                             If aMultipleIndex = 2 Then
                                 lMassLinkFactor = lMassLink.MFact
                             ElseIf aMultipleIndex = 1 Then
@@ -1261,163 +1248,294 @@ Public Module Utility
                                 lMassLinkFactor = 1
                             End If
                             Return lMassLinkFactor
-                        Case "LABILE ORGN - SEDIMENT ASSOC OUTFLOW_PKIF_3", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW_PKIF_3"
+                        Case (aConstituent = "LABILE ORGN - SEDIMENT ASSOC OUTFLOW" OrElse aConstituent = "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW") AndAlso
+                                lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3
                             If aConstituent.Contains("REFRAC") Then
                                 lMassLinkFactor = 0
                             Else
                                 lMassLinkFactor = 0
                             End If
                             Return lMassLinkFactor
+                        Case aConstituent.Contains("NITROGEN - TOTAL OUTFLOW")
+                            lMassLinkFactor = 1
+                            Return lMassLinkFactor
+
                     End Select
-                    If aConstituent.Contains("NITROGEN - TOTAL OUTFLOW") Then
-                        lMassLinkFactor = 1
-                        Return lMassLinkFactor
-                    ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) Then
-                        lMassLinkFactor += lMassLink.MFact
 
-                    ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2) Then
-                        lMassLinkFactor += lMassLink.MFact
+                    '    'Anurag does not remember what specific cases do three following lines address.
+                    'ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) Then
+                    '    lMassLinkFactor += lMassLink.MFact
 
-                    ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
-                        lMassLinkFactor += lMassLink.MFact * aConversionFactor
+                    'ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                    '    lMassLinkFactor += lMassLink.MFact
 
-                    End If
+                    'ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                    '    lMassLinkFactor += lMassLink.MFact * aConversionFactor
+
+                    'End If
 
 
                 Case "TotalP"
                     'If aConstituent.Contains("SOQUAL") Then Stop
-                    Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
+                    Select Case True
+                        Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "AOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                                (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "IOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                                (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
+                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
 
-                        Case "POQUAL-ORTHO P_NUIF1_4", "SOQO-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4",
-                                 "AOQUAL-ORTHO P_NUIF1_4", "SCRQS-ORTHO P_NUIF1_4", "WASHQS-ORTHO P_NUIF1_4"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
+                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+
+                        Case (aConstituent = "SOQUAL-ORTHO P" OrElse aConstituent = "SOQO-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "AOQUAL-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                                (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "IOQUAL-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                                (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
+                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
+                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
+                        aConstituent = "WASHQS-Ref-OrgP" OrElse aConstituent = "SCRQS-Ref-OrgP" OrElse aConstituent = "SOQO-Ref-OrgP" OrElse aConstituent = "SOQUAL-Ref-OrgP" OrElse
+                        aConstituent = "WASHQS-lab-OrgP" OrElse aConstituent = "SCRQS-lab-OrgP" OrElse aConstituent = "SOQO-lab-OrgP" OrElse aConstituent = "SOQUAL-lab-OrgP") AndAlso
+                        lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
                                 lMassLinkFactor = lMassLink.MFact
-                                'Return lMassLinkFactor
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "SOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "SOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-
-                        Case "POQUAL-PO4_NUIF1_4", "SOQO-PO4_NUIF1_4", "SOQUAL-PO4_NUIF1_4", "IOQUAL-PO4_NUIF1_4",
-                             "AOQUAL-PO4_NUIF1_4", "SCRQS-PO4_NUIF1_4", "WASHQS-PO4_NUIF1_4"
-                            If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                            Return lMassLinkFactor
+                        Case (aConstituent = "IOQUAL-BOD" OrElse aConstituent = "IOQUAL-Ref-OrgP" OrElse aConstituent = "IOQUAL-lab-OrgP") AndAlso
+                            lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                            (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
                                 lMassLinkFactor = lMassLink.MFact
-                                'Return lMassLinkFactor
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "IOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "IOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-
-                        Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2",
-                                "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3",
-                                "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1",
-                                 "WASHQS-ORTHO P_NUIF2_1", "WASHQS-ORTHO P_NUIF2_2", "WASHQS-ORTHO P_NUIF2_3",
-                                 "SCRQS-ORTHO P_NUIF2_1", "SCRQS-ORTHO P_NUIF2_2", "SCRQS-ORTHO P_NUIF2_3"
-
-                            If lMassLink.Target.MemSub2 = 2 Then
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
-                                    lMassLinkFactor += lMassLink.MFact
-                                    'Return lMassLinkFactor
-                                End If
+                            Return lMassLinkFactor
+                        Case (aConstituent = "AOQUAL-BOD" OrElse aConstituent = "AOQUAL-Ref-OrgP" OrElse aConstituent = "AOQUAL-lab-OrgP") AndAlso
+                            lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                            (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            If aMultipleIndex = 1 Then
+                                lMassLinkFactor = lMassLink.MFact
+                            ElseIf aMultipleIndex = 2 Then
+                                lMassLinkFactor = BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
+                            ElseIf aMultipleIndex = 0 Then
+                                lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
-
-
-                        Case "POQUAL-PO4_NUIF2_2", "SOQUAL-PO4_NUIF2_2", "AOQUAL-PO4_NUIF2_2", "IOQUAL-PO4_NUIF2_2",
-                            "POQUAL-PO4_NUIF2_3", "SOQUAL-PO4_NUIF2_3", "AOQUAL-PO4_NUIF2_3", "IOQUAL-PO4_NUIF2_3",
-                            "POQUAL-PO4_NUIF2_1", "SOQUAL-PO4_NUIF2_1", "AOQUAL-PO4_NUIF2_1", "IOQUAL-PO4_NUIF2_1",
-                             "WASHQS-PO4_NUIF2_1", "WASHQS-PO4_NUIF2_2", "WASHQS-PO4_NUIF2_3",
-                             "SCRQS-PO4_NUIF2_1", "SCRQS-PO4_NUIF2_2", "SCRQS-PO4_NUIF2_3"
-
-                            If lMassLink.Target.MemSub2 = 2 Then
-                                If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
-                                    lMassLinkFactor += lMassLink.MFact
-                                    'Return lMassLinkFactor
-                                End If
-                            End If
-
-                        Case "WASHQS-BOD_PKIF_4", "SOQUAL-BOD_PKIF_4", "IOQUAL-BOD_PKIF_4", "AOQUAL-BOD_PKIF_4", "POQUAL-BOD_PKIF_4"
-                            If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-                            End If
-
-                        Case "WASHQS-Ref-OrgP_PKIF_4", "SOQO-Ref-OrgP_PKIF_4", "IOQUAL-Ref-OrgP_PKIF_4", "AOQUAL-Ref-OrgP_PKIF_4", "POQUAL-Ref-OrgP_PKIF_4"
-                            If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-                            End If
-
-                        Case "WASHQS-lab-OrgP_PKIF_4", "SOQO-lab-OrgP_PKIF_4", "IOQUAL-lab-OrgP_PKIF_4", "AOQUAL-lab-OrgP_PKIF_4", "POQUAL-lab-OrgP_PKIF_4"
-                            If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
-                                    (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
-                                If aMultipleIndex = 1 Then
-                                    lMassLinkFactor = lMassLink.MFact
-                                ElseIf aMultipleIndex = 2 Then
-                                    lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                ElseIf aMultipleIndex = 0 Then
-                                    lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
-                                End If
-                                Return lMassLinkFactor
-                            End If
-
-
-                        Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW_NUIF1_4"
+                            Return lMassLinkFactor
+                        Case aConstituent = "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW" AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW_NUIF1_4"
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        Case "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW_NUIF1_4"
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        Case "SDP4A_NUIF2_1", "SDP4A_NUIF2_2", "SDP4A_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_1",
-                                "SOQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_3"
-                            If lMassLink.Target.MemSub2 = 2 Then
-                                lMassLinkFactor += lMassLink.MFact
-                            End If
 
-                        Case "SDORP_PKIF_4"
+                        Case aConstituent = "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW" AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                        Case aConstituent = "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW" AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "SDP4A" AndAlso lMassLink.Target.Member = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2
+
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SDORP" AndAlso lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 4
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact * aConversionFactor
                             Return lMassLinkFactor
-
                     End Select
 
-                    If (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4) Then
-                        lMassLinkFactor += lMassLink.MFact
+                    'Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
 
-                    ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
-                        lMassLinkFactor += lMassLink.MFact * aConversionFactor
+                    '    'Case "POQUAL-ORTHO P_NUIF1_4", "SOQO-ORTHO P_NUIF1_4", "SOQUAL-ORTHO P_NUIF1_4", "IOQUAL-ORTHO P_NUIF1_4",
+                    '    '         "AOQUAL-ORTHO P_NUIF1_4", "SCRQS-ORTHO P_NUIF1_4", "WASHQS-ORTHO P_NUIF1_4"
+                    '    '    If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Or
+                    '    '            (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        lMassLinkFactor = lMassLink.MFact
+                    '    '        'Return lMassLinkFactor
+                    '    '    End If
 
-                    End If
+                    '    'Case "POQUAL-PO4_NUIF1_4", "SOQO-PO4_NUIF1_4", "SOQUAL-PO4_NUIF1_4", "IOQUAL-PO4_NUIF1_4",
+                    '    '     "AOQUAL-PO4_NUIF1_4", "SCRQS-PO4_NUIF1_4", "WASHQS-PO4_NUIF1_4"
+                    '    '    If lMassLink.Source.Member = aConstituent.Substring(0, 6) OrElse lMassLink.Source.Member = "POQUAL" OrElse
+                    '    '            lMassLink.Source.Member = "SOQUAL" Then 'AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        lMassLinkFactor = lMassLink.MFact
+                    '    '        'Return lMassLinkFactor
+                    '    '    End If
+
+                    '    'Case "POQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_2", "AOQUAL-ORTHO P_NUIF2_2", "IOQUAL-ORTHO P_NUIF2_2",
+                    '    '        "POQUAL-ORTHO P_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_3", "AOQUAL-ORTHO P_NUIF2_3", "IOQUAL-ORTHO P_NUIF2_3",
+                    '    '        "POQUAL-ORTHO P_NUIF2_1", "SOQUAL-ORTHO P_NUIF2_1", "AOQUAL-ORTHO P_NUIF2_1", "IOQUAL-ORTHO P_NUIF2_1",
+                    '    '         "WASHQS-ORTHO P_NUIF2_1", "WASHQS-ORTHO P_NUIF2_2", "WASHQS-ORTHO P_NUIF2_3",
+                    '    '         "SCRQS-ORTHO P_NUIF2_1", "SCRQS-ORTHO P_NUIF2_2", "SCRQS-ORTHO P_NUIF2_3"
+
+                    '    '    If lMassLink.Target.MemSub2 = 2 Then
+                    '    '        If lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL" Then
+                    '    '            lMassLinkFactor += lMassLink.MFact
+                    '    '            'Return lMassLinkFactor
+                    '    '        End If
+                    '    '    End If
+
+
+                    '    'Case "POQUAL-PO4_NUIF2_2", "SOQUAL-PO4_NUIF2_2", "AOQUAL-PO4_NUIF2_2", "IOQUAL-PO4_NUIF2_2",
+                    '    '    "POQUAL-PO4_NUIF2_3", "SOQUAL-PO4_NUIF2_3", "AOQUAL-PO4_NUIF2_3", "IOQUAL-PO4_NUIF2_3",
+                    '    '    "POQUAL-PO4_NUIF2_1", "SOQUAL-PO4_NUIF2_1", "AOQUAL-PO4_NUIF2_1", "IOQUAL-PO4_NUIF2_1",
+                    '    '     "WASHQS-PO4_NUIF2_1", "WASHQS-PO4_NUIF2_2", "WASHQS-PO4_NUIF2_3",
+                    '    '     "SCRQS-PO4_NUIF2_1", "SCRQS-PO4_NUIF2_2", "SCRQS-PO4_NUIF2_3"
+
+                    '    '    If lMassLink.Target.MemSub2 = 2 Then
+                    '    '        If lMassLink.Source.Member = aConstituent.Substring(0, 6) OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SOQUAL" Then
+                    '    '            lMassLinkFactor += lMassLink.MFact
+                    '    '            'Return lMassLinkFactor
+                    '    '        End If
+                    '    '    End If
+
+                    '    'Case "WASHQS-BOD_PKIF_4", "SOQUAL-BOD_PKIF_4", "IOQUAL-BOD_PKIF_4", "AOQUAL-BOD_PKIF_4", "POQUAL-BOD_PKIF_4"
+                    '    '    If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
+                    '    '            (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        If aMultipleIndex = 1 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact
+                    '    '        ElseIf aMultipleIndex = 2 Then
+                    '    '            lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        ElseIf aMultipleIndex = 0 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        End If
+                    '    '        Return lMassLinkFactor
+                    '    '    End If
+
+                    '    'Case "WASHQS-Ref-OrgP_PKIF_4", "SOQO-Ref-OrgP_PKIF_4", "IOQUAL-Ref-OrgP_PKIF_4", "AOQUAL-Ref-OrgP_PKIF_4", "POQUAL-Ref-OrgP_PKIF_4"
+                    '    '    If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
+                    '    '            (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        If aMultipleIndex = 1 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact
+                    '    '        ElseIf aMultipleIndex = 2 Then
+                    '    '            lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        ElseIf aMultipleIndex = 0 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        End If
+                    '    '        Return lMassLinkFactor
+                    '    '    End If
+
+                    '    'Case "WASHQS-lab-OrgP_PKIF_4", "SOQO-lab-OrgP_PKIF_4", "IOQUAL-lab-OrgP_PKIF_4", "AOQUAL-lab-OrgP_PKIF_4", "POQUAL-lab-OrgP_PKIF_4"
+                    '    '    If (lMassLink.Source.Member = aConstituent.Substring(0, 6) Or lMassLink.Source.Member = "POQUAL") Or
+                    '    '            (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        If aMultipleIndex = 1 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact
+                    '    '        ElseIf aMultipleIndex = 2 Then
+                    '    '            lMassLinkFactor = BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        ElseIf aMultipleIndex = 0 Then
+                    '    '            lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, aConstituent, lMassLink.MassLinkId) * aConversionFactor
+                    '    '        End If
+                    '    '        Return lMassLinkFactor
+                    '    '    End If
+
+
+                    '    'Case "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW_NUIF1_4"
+                    '    '    lMassLinkFactor = lMassLink.MFact
+                    '    '    Return lMassLinkFactor
+                    '    Case "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW_NUIF1_4"
+                    '        lMassLinkFactor = lMassLink.MFact
+                    '        Return lMassLinkFactor
+                    '    Case "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW_NUIF1_4"
+                    '        lMassLinkFactor = lMassLink.MFact
+                    '        Return lMassLinkFactor
+                    '    Case "SDP4A_NUIF2_1", "SDP4A_NUIF2_2", "SDP4A_NUIF2_3", "SOQUAL-ORTHO P_NUIF2_1",
+                    '            "SOQUAL-ORTHO P_NUIF2_2", "SOQUAL-ORTHO P_NUIF2_3"
+                    '        If lMassLink.Target.MemSub2 = 2 Then
+                    '            lMassLinkFactor += lMassLink.MFact
+                    '        End If
+
+                    '    Case "SDORP_PKIF_4"
+                    '        lMassLinkFactor = lMassLink.MFact
+                    '        Return lMassLinkFactor
+                    '    Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                    '        lMassLinkFactor = lMassLink.MFact * aConversionFactor
+                    '        Return lMassLinkFactor
+
+                    'End Select
+
+                    'Anurag is not sure about following two cases.
+                    'If (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4) Then
+                    '    lMassLinkFactor += lMassLink.MFact
+
+                    'ElseIf (lMassLink.Source.VolName = aConstituent AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2) Then
+                    '    lMassLinkFactor += lMassLink.MFact * aConversionFactor
+
+                    'End If
 
                 Case "BOD-Labile"
-                    Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
 
-                        Case "WASHQS-BOD-Labile_OXIF_2", "SOQUAL-BOD-Labile_OXIF_2", "IOQUAL-BOD-Labile_OXIF_2", "AOQUAL-BOD-Labile_OXIF_2",
-                                 "POQUAL-BOD-Labile_OXIF_2", "SOQO-BOD-Labile_OXIF_2"
+                    Select Case True
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS") AndAlso
+                            aConstituent = "WASHQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2",
-                                 "POQUAL-BOD_OXIF_2", "SOQO-BOD_OXIF_2"
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS") AndAlso
+                            aConstituent = "SCRQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "SOQO-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "IOQUAL-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL") AndAlso
+                            aConstituent = "AOQUAL-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
                     End Select
+
+                    'Select Case aConstituent & "_" & lMassLink.Target.Member.ToString & "_" & lMassLink.Target.MemSub1
+
+                    '    'Case "WASHQS-BOD-Labile_OXIF_2", "SOQUAL-BOD-Labile_OXIF_2", "IOQUAL-BOD-Labile_OXIF_2", "AOQUAL-BOD-Labile_OXIF_2",
+                    '    '             "POQUAL-BOD-Labile_OXIF_2", "SOQO-BOD-Labile_OXIF_2"
+                    '    '    If lMassLink.Source.Member.Substring(0, 3) = aConstituent.Substring(0, 3) Or lMassLink.Source.Member = "POQUAL" Or
+                    '    '                (lMassLink.Source.Member = "SOQUAL" AndAlso lMassLink.Source.Group = "IQUAL") Then
+                    '    '        lMassLinkFactor = lMassLink.MFact
+                    '    '        Return lMassLinkFactor
+                    '    '    End If
+                    '    'Case "WASHQS-BOD_OXIF_2", "SOQUAL-BOD_OXIF_2", "IOQUAL-BOD_OXIF_2", "AOQUAL-BOD_OXIF_2",
+                    '    '         "POQUAL-BOD_OXIF_2", "SOQO-BOD_OXIF_2"
+                    '    '    lMassLinkFactor = lMassLink.MFact
+                    '    '    Return lMassLinkFactor
+                    '    Case "ORGN - TOTAL OUTFLOW_OXIF_2"
+                    '        lMassLinkFactor = lMassLink.MFact
+                    '        Return lMassLinkFactor
+                    'End Select
                 Case "DO"
                     Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString &
                             "_" & lMassLink.Target.MemSub1
@@ -1869,4 +1987,56 @@ Public Module Utility
         Return lOutflowDataType
     End Function
 
+    Public Function FindDownStreamExitNumber(ByVal aUCI As HspfUci,
+                                          ByVal aReachID As HspfOperation,
+                                          ByRef aExitNumber As Integer) As Integer
+        'Function to find the EXIT number through which the flow is sent to the downstream waterbody.
+        Dim lDownstreamReachID As Integer = aReachID.DownOper("RCHRES")
+        For Each lReachConnection As HspfConnection In aReachID.Targets
+            If lReachConnection.Target.VolId = lDownstreamReachID Then
+                Dim lMasslinkID As Integer = lReachConnection.MassLink
+                For Each lMasslink As HspfMassLink In aUCI.MassLinks
+                    If lMasslink.MassLinkId = lMasslinkID Then
+                        If lMasslink.Source.Member.ToString = "ROFLOW" Then
+                            aExitNumber = 0
+                        Else
+                            aExitNumber = lMasslink.Source.MemSub1
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+        Next
+        Return aExitNumber
+    End Function
+    Public Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
+        Dim aGenerSum As Double = 0
+        Dim aGENERID As Integer = aSource.Source.VolId
+        Dim aGENEROperationisOutputtoWDM As Boolean = False
+        Dim aGENEROperation As HspfOperation = aSource.Source.Opn
+        For Each EXTTarget As HspfConnection In aGENEROperation.Targets
+            If EXTTarget.Target.VolName.Contains("WDM") Then
+                aGENEROperationisOutputtoWDM = True
+                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                Dim lDSN As Integer = EXTTarget.Target.VolId
+                For i As Integer = 0 To aUCI.FilesBlock.Count
+                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
+                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                        If lDataSource Is Nothing Then
+                            If atcDataManager.OpenDataSource(lFileName) Then
+                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            End If
+                        End If
+                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                        aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+
+                    End If
+                Next
+            End If
+        Next EXTTarget
+
+        Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
+    End Function
 End Module

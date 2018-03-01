@@ -100,13 +100,17 @@ Public Class frmEditWatershed
 
             'do connection check to see if this newly added UCI is connected to the downstream UCI
             Dim lUCIs As New atcCollection
+            Dim lUpstreamUCIs As New atcCollection
+            Dim lDownstreamUCIs As New atcCollection
             lUCIs.Add(pIcon.UciFile)
+            lUpstreamUCIs.Add(pIcon.UciFile)
             Dim lDownIcon As clsIcon = Nothing
             If cboDownstream.SelectedItem.Trim <> "None" Then
                 lDownIcon = Schematic.AllIcons.FindOrAddIcon(cboDownstream.SelectedItem.Trim)
             End If
             If lDownIcon IsNot Nothing AndAlso lDownIcon.UciFile IsNot Nothing Then
                 lUCIs.Add(lDownIcon.UciFile)
+                lDownstreamUCIs.Add(lDownIcon.UciFile)
                 Logger.Dbg("frmEditWatershed_clicked_ok added icon: " & lDownIcon.UciFileName)
                 Logger.Dbg("frmEditWatershed_clicked_ok added icon name: " & lDownIcon.UciFile.Name)
             End If
@@ -115,7 +119,7 @@ Public Class frmEditWatershed
                 'return name of transfer wdm if models are connected using a single transfer wdm
                 'return 'MULTIPLE' if models are connected but connections use multiple wdms 
                 Logger.Progress(1, 1)  'attempt to get rid of lingering progress messages
-                Dim lTransferWDM As String = UsesTransfer(lUCIs)
+                Dim lTransferWDM As String = UsesTransfer(lUpstreamUCIs, lDownstreamUCIs)
                 Logger.Dbg("frmEditWatershed_clicked_ok transfer wdm: " & lTransferWDM)
                 If lTransferWDM.Length = 0 Then
                     'these models are not connected, ask about connecting them

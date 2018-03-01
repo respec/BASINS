@@ -163,16 +163,17 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
         Return lAllWDMs
     End Function
 
-    Public Function UsesTransfer(ByVal aUCIs As atcCollection) As String
+    Public Function UsesTransfer(ByVal aSourceUCIs As atcCollection, ByVal aTargetUCIs As atcCollection) As String
         'return blank if models are not connected
         'return name of transfer wdm if models are connected using a single transfer wdm
         'return 'MULTIPLE' if models are connected but connections use multiple wdms 
         Dim lUsesTransfer As String = ""
 
-        For Each lTargetUCI As HspfUci In aUCIs
-            For Each lSourceUCI As HspfUci In aUCIs
+        For Each lTargetUCI As HspfUci In aTargetUCIs
+            For Each lSourceUCI As HspfUci In aSourceUCIs
                 If lSourceUCI.Name <> lTargetUCI.Name Then
 
+                    Logger.Status("Checking connections into " & lTargetUCI.Name)
                     'build collection of wdms used by source uci 
                     Dim lSourceWDMs As New atcCollection
                     For lIndex As Integer = 1 To lSourceUCI.FilesBlock.Count
@@ -242,6 +243,7 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                 End If
             Next
         Next
+        Logger.Status("")
         Return lUsesTransfer
     End Function
 
@@ -265,9 +267,13 @@ FindMsg:        lMsgFile = FindFile("Locate Message WDM", lMsgFile, "wdm", aUser
                     Dim lConnections As New atcCollection
                     'Do a check on just these 2 UCIs to see if they already use this transfer WDM
                     Dim lUcis As New atcCollection
+                    Dim lUpstreamUcis As New atcCollection
+                    Dim lDownstreamUcis As New atcCollection
                     lUcis.Add(lSourceUCI)
+                    lUpstreamUcis.Add(lSourceUCI)
                     lUcis.Add(lTargetUCI)
-                    Dim lTrans As String = UsesTransfer(lUcis)
+                    lDownstreamUcis.Add(lTargetUCI)
+                    Dim lTrans As String = UsesTransfer(lUpstreamUcis, lDownstreamUcis)
                     If Not lTrans.ToLower = aTransferWDMName.ToLower Then
                         'they don't use the transfer wdm yet, so update them
                         lConnections = FindConnections(lSourceUCI, lTargetUCI, lTransferWDM)

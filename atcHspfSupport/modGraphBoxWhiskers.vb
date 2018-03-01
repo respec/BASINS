@@ -43,16 +43,22 @@ End Class
 
 Public Module modGraphBoxWhiskers
 
-    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem, aOutputFileName As String)
+    Public Sub CreateGraph_BoxAndWhisker(items As BoxWhiskerItem, aOutputFileName As String, Optional aTitle As String = "")
 
         Dim lZgc As New ZedGraph.ZedGraphControl()
         lZgc.Width = 1024
         lZgc.Height = 768
 
         Dim lGrapher As New atcGraph.clsGraphBoxWhisker(Nothing, lZgc, True)
-
-        lGrapher.Title = "Box-Whisker plot of " & items.Constituent & " loading rate from all land uses in " & items.Scenario & " model." &
+        If aTitle.Length > 1 Then
+            lGrapher.Title = aTitle
+        Else
+            lGrapher.Title = "Box-Whisker plot of " & items.Constituent & " loading rate from all land uses in " & items.Scenario & " model." &
             vbCrLf & items.TimeSpan
+        End If
+
+
+
         'Select Case items.Constituent
         '    Case "Sediment"
         '        lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses in " & items.Scenario & " model." &

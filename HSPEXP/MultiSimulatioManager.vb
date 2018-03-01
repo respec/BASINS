@@ -106,7 +106,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             SensitivityParameterFile.Close()
         End If
 
-        Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
+        'Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
         Dim loutputTable As DataTable
         loutputTable = New DataTable("MultiSimOutput")
         loutputTable = AddOutputTableColumns(loutputTable)
@@ -115,7 +115,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         For Each TableColumn As DataColumn In loutputTable.Columns 'Writing the table headings
             TextToWrite &= TableColumn.Caption & ","
         Next
-        lOutputFile.WriteLine(TextToWrite)
+        'lOutputFile.WriteLine(TextToWrite)
 
         'The file listing the sensitive parameters and the output DSN already exists.
         Dim lSpecificationFileRecordsNew As New ArrayList
@@ -246,15 +246,17 @@ You can edit this specification file and add more parameters and outputs.", vbOK
             End If
 
         Loop While lcsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
-
-        For Each TableRow As DataRow In loutputTable.Rows 'Writing the table contents
-            TextToWrite = ""
-            For Each TableColumn As DataColumn In loutputTable.Columns
-                TextToWrite &= TableRow(TableColumn) & ","
-            Next TableColumn
-            lOutputFile.WriteLine(TextToWrite)
-        Next TableRow
-        lOutputFile.Close()
+        Dim lOutputFile2 As StreamWriter = File.CreateText(Path.Combine(pTestPath, "MultiSimOutput.xml"))
+        loutputTable.WriteXml(lOutputFile2)
+        'For Each TableRow As DataRow In loutputTable.Rows 'Writing the table contents
+        '    TextToWrite = ""
+        '    For Each TableColumn As DataColumn In loutputTable.Columns
+        '        TextToWrite &= TableRow(TableColumn) & ","
+        '    Next TableColumn
+        '    lOutputFile.WriteLine(TextToWrite)
+        'Next TableRow
+        'lOutputFile.Close()
+        lOutputFile2.Close()
 
     End Sub
     Private Function ReadCSVFile(aSensitivitySpecificationFile As String)
@@ -557,26 +559,28 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
                             Case "50%High"
                                 row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
-                            Case "30-day GeoMean"
-                                If SimulatedTS.Values.Count >= 30 Then
+                            Case "max(30-day GeoMean)"
+                                Dim lDailyTs As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                If lDailyTs.Values.Count >= 30 Then
                                     Dim GeoMean As New List(Of Double)
                                     Dim lCount As Integer = 0
                                     Dim Test As Double = 0.0
-                                    For i As Integer = 1 To SimulatedTS.Values.Count-1
-                                        If SimulatedTS.Value(i) > 0 Then
-                                            Test += Math.Log10(SimulatedTS.Value(i))
+                                    For i As Integer = 1 To lDailyTs.Values.Count - 1
+                                        If lDailyTs.Value(i) > 0 Then
+                                            Test += Math.Log10(lDailyTs.Value(i))
                                         End If
-                                        If i >= 31 Then
-                                            If SimulatedTS.Value(i - 30) > 0 Then Test -= Math.Log10(SimulatedTS.Value(i - 30))
+                                        If i >= 30 Then
+                                            If lDailyTs.Value(i - 30) > 0 Then Test -= Math.Log10(lDailyTs.Value(i - 30))
 
                                             GeoMean.Add(10 ^ (Test / 30))
                                         End If
 
                                     Next i
+                                    Test = 0.0
                                     For Each lValue As Double In GeoMean
-                                        Test += lValue
+                                        If lValue > Test Then Test = lValue
                                     Next
-                                    row(ColumnName) = Test / GeoMean.Count
+                                    row(ColumnName) = Test
                                 End If
 
                             Case Else
@@ -645,8 +649,8 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
         column = New DataColumn()
         column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "30-day GeoMean"
-        column.Caption = "30-day Geometric Mean"
+        column.ColumnName = "max(30-day GeoMean)"
+        column.Caption = "Max(30-day Geometric Mean)"
         aDataTable.Columns.Add(column)
 
         column = New DataColumn()
