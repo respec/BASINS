@@ -707,14 +707,14 @@ Public Module atcConstituentTables
                                         Dim aConversionFactor As Double = 0.0
                                         If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
                                             aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
-                                        End If
-                                        Dim lMassLinkID As Integer = lConnection.MassLink
-                                        If Not lMassLinkID = 0 Then
-                                            lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
-                                                                             constituent.ReportType, aConversionFactor, lMultipleIndex)
-                                            Exit For
-                                        End If
 
+                                            Dim lMassLinkID As Integer = lConnection.MassLink
+                                            If Not lMassLinkID = 0 Then
+                                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
+                                                                             constituent.ReportType, aConversionFactor, lMultipleIndex)
+                                                Exit For
+                                            End If
+                                        End If
                                     End If
                                 Next lConnection
                             End If

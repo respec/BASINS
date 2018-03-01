@@ -1919,11 +1919,35 @@ Public Module Utility
                 QUALNames = New ConstituentProperties
                 QUALNames.ConstNameForEXPPlus = aBalanceType
                 QUALNames.ConstituentNameInUCI = aBalanceType
-                If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = "unk"
-                Else
-                    QUALNames.ConstituentUnit = "unk"
+
+                lTableName = "QUAL-PROPS"
+                Dim lTempQual As String = ""
+                Dim lUnits As String = ""
+                If lOper.TableExists(lTableName) Then
+                    lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
+                    If aBalanceType = lTempQual Then
+                        'found it
+                        lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
+                    End If
                 End If
+                Do While lUnits.Length = 0
+                    For lIndex As Integer = 2 To 10
+                        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
+                            If aBalanceType = lTempQual Then
+                                'found it
+                                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                            End If
+                        End If
+                    Next
+                Loop
+
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    QUALNames.ConstituentUnit = lUnits & "/ac"
+                Else
+                    QUALNames.ConstituentUnit = lUnits & "/ha"
+                End If
+
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
@@ -1998,9 +2022,10 @@ Public Module Utility
             Case Else
                 'case for GQuals
                 'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
-                'lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
-                'lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
-                'lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
+                lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
         End Select
 
 
