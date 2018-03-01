@@ -411,7 +411,7 @@ Public Module atcConstituentTables
                 Dim lConversionFactor As Double = 1.0
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     lUnits = "lbs/ac"
-                    lConversionFactor = 2240
+                    lConversionFactor = 2000 'English tons to lbs - US needs to move to SI units
                 ElseIf aUCI.GlobalBlock.EmFg = 2 Then
                     lUnits = "kgs/ha"
                     lConversionFactor = 1000
@@ -2383,4 +2383,36 @@ Public Module atcConstituentTables
         aDataTable.Columns.Add(column)
         Return aDataTable
     End Function
+    Private Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
+        Dim aGenerSum As Double = 0
+        Dim aGENERID As Integer = aSource.Source.VolId
+        Dim aGENEROperationisOutputtoWDM As Boolean = False
+        Dim aGENEROperation As HspfOperation = aSource.Source.Opn
+        For Each EXTTarget As HspfConnection In aGENEROperation.Targets
+            If EXTTarget.Target.VolName.Contains("WDM") Then
+                aGENEROperationisOutputtoWDM = True
+                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                Dim lDSN As Integer = EXTTarget.Target.VolId
+                For i As Integer = 0 To aUCI.FilesBlock.Count
+                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
+                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                        If lDataSource Is Nothing Then
+                            If atcDataManager.OpenDataSource(lFileName) Then
+                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            End If
+                        End If
+                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                        aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+
+                    End If
+                Next
+            End If
+        Next EXTTarget
+
+        Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
+    End Function
+
+
 End Module
