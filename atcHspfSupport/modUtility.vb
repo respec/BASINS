@@ -135,7 +135,8 @@ Public Module Utility
         Return pConstituentsThatNeedMassLink
     End Function
     Public Function ConstituentsToOutput(ByVal aType As String, ByVal aConstProperties As List(Of ConstituentProperties),
-                                Optional ByVal aCategory As Boolean = False) As atcCollection
+                                Optional ByVal aCategory As Boolean = False,
+                                Optional ByVal aUnits As String = "") As atcCollection
         Dim lConstituentsToOutput As New atcCollection
         Select Case aType
 #Region "Case Water"
@@ -589,15 +590,15 @@ Public Module Utility
                     .Add("R:N-TOT-OUT-EXIT5", "  Total N OutflowExit5")
 
                 End With
-                '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
-                '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
-                '.Add("R:TAM-OUTPART-TOT-EXIT3", "  Particulate NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTPART-TOT-EXIT3", "  Particulate NH3 Outflow-Exit3")
 
-                '.Add("R:NO3-OUTTOT-EXIT3", "  Total NO3 Outflow - Exit 3")
+            '.Add("R:NO3-OUTTOT-EXIT3", "  Total NO3 Outflow - Exit 3")
 
-                '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
-                '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
-                '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
+            '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
+            '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
+            '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
 #End Region
 #Region "Case TotalP"
             Case "TotalP"
@@ -798,9 +799,9 @@ Public Module Utility
 #End Region
 #Region "Case Else"
             Case Else
-                Dim lUnits As String = "QTYID"
+                Dim lUnits As String = aUnits
                 If aType.ToUpper.Contains("F.COLIFORM") Or aType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
-                    lUnits = "10^9 org"
+                    lUnits = "10^9 " & aUnits
                 End If
                 With lConstituentsToOutput
                     .Add("P:Header1", aType & " (" & lUnits & "/ac)")
@@ -2022,6 +2023,8 @@ Public Module Utility
             Case Else
                 'case for GQuals
                 'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
+                lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
+                lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
                 lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
                 lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
@@ -2058,4 +2061,42 @@ Public Module Utility
         Return aExitNumber
     End Function
 
+    Public Function GQualUnits(ByVal aUCI As HspfUci, ByVal aGQualName As String) As String
+        'given a uci and gqualname, return the units of the gqual
+        Dim lUnits As String = ""
+
+        Dim lOper As New HspfOperation
+        For Each Oper As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            If Oper.Tables("ACTIVITY").Parms("GQALFG").Value = "1" Then
+                lOper = Oper
+                'Find First operation with active GQALFG
+                Exit For
+            End If
+        Next
+
+        If lOper IsNot Nothing Then
+            Dim lTableName As String = "GQ-QALDATA"
+            Dim lTempQual As String = ""
+            If lOper.TableExists(lTableName) Then
+                lTempQual = Trim(lOper.Tables(lTableName).Parms("GQID").Value)
+                If aGQualName = lTempQual Then
+                    'found it
+                    lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
+                End If
+            End If
+            Do While lUnits.Length = 0
+                For lIndex As Integer = 2 To 10
+                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+                        If aGQualName = lTempQual Then
+                            'found it
+                            lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                        End If
+                    End If
+                Next
+            Loop
+        End If
+
+        Return lUnits
+    End Function
 End Module

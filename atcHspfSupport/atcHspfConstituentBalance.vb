@@ -43,8 +43,9 @@ Public Module ConstituentBalance
                   Optional ByVal aDecimalPlaces As Integer = 3,
                   Optional ByVal aSignificantDigits As Integer = 5,
                   Optional ByVal aFieldWidth As Integer = 12) As atcReport.IReport
-        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties)
 
+        Dim lUnits As String = GQualUnits(aUci, aBalanceType)   'if not a gqual, will return a blank string
+        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties, , lUnits)
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " " & "Annual Loading Rates of " & aBalanceType & " For Each PERLND, and IMPLND, and")
@@ -145,14 +146,14 @@ Public Module ConstituentBalance
                                                 Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case Else
-                                                    Dim lUnits As String = "QTYID"
+                                                    Dim lPrefix As String = ""
                                                     If aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
-                                                        lUnits = "10^9 org"
+                                                        lPrefix = "10^9 "
                                                     End If
                                                     If lOperName = "PERLND" Or lOperName = "IMPLND" Then
-                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lUnits & "/ac)"
+                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lPrefix & lUnits & "/ac)"
                                                     ElseIf lOperName = "RCHRES" Then
-                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lUnits & ")"
+                                                        .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (" & lPrefix & lUnits & ")"
                                                     End If
                                             End Select
 

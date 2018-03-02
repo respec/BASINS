@@ -263,7 +263,8 @@ Public Module WatershedConstituentBalance
             lOutletReport = True
         End If
 
-        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties)
+        Dim lUnits As String = GQualUnits(aUci, aBalanceType)   'if not a gqual, will return a blank string
+        Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType, aConstProperties, , lUnits)
         Logger.Dbg("ConstituentCount:" & lConstituentsToOutput.Count)
         Dim lConstituentTotals As New atcCollection
         Dim lConstituentLandUseTotals As New atcCollection
@@ -348,14 +349,14 @@ Public Module WatershedConstituentBalance
                                                 Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case Else
-                                                    Dim lUnits As String = "QTYID"
+                                                    Dim lPrefix As String = ""
                                                     If aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
-                                                        lUnits = "10^9 org"
+                                                        lPrefix = "10^9 "
                                                     End If
                                                     If lOperationType = "PERLND" Or lOperationType = "IMPLND" Then
-                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lUnits & "/ac)" & vbCrLf
+                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lPrefix & lUnits & "/ac)" & vbCrLf
                                                     ElseIf lOperationType = "RCHRES" Then
-                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lUnits & ")" & vbCrLf
+                                                        .Header = aBalanceType & " Balance Report For " & lLandUse & "  (" & lPrefix & lUnits & ")" & vbCrLf
                                                     End If
                                             End Select
 

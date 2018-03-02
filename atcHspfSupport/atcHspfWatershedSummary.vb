@@ -113,9 +113,9 @@ Public Module WatershedSummary
                 lImplndConstituents.Add("SOQUAL-ZINC")
                 lRchresConstituents.Add("ZINC-TROQAL")
             Case Else
-                lUnits = "QTYID"
+                lUnits = GQualUnits(aUci, aSummaryType)
                 If aSummaryType.ToUpper.Contains("F.COLIFORM") Or aSummaryType.ToUpper.StartsWith("FCOLI") Or aSummaryType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
-                    lUnits = "10^9 org"
+                    lUnits = "10^9 " & lUnits
                 End If
                 Dim lGQualName As String = aSummaryType
                 If lGQualName = "FColi" Then
