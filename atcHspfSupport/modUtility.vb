@@ -821,8 +821,8 @@ Public Module Utility
         Return lConstituentsToOutput
     End Function
 
-    Public Function LandUses(ByVal aUci As HspfUci, _
-                             ByVal aOperationTypes As atcCollection, _
+    Public Function LandUses(ByVal aUci As HspfUci,
+                             ByVal aOperationTypes As atcCollection,
                     Optional ByVal aOutletLocation As String = "") As atcCollection
         Dim lLocations As New atcCollection
         If aOutletLocation.Length > 0 Then
@@ -880,25 +880,25 @@ Public Module Utility
         Return lLandUsesTemp
     End Function
 
-    Public Function UpstreamLocations(ByVal aUci As HspfUci, _
-                                      ByVal aOperationTypes As atcCollection, _
+    Public Function UpstreamLocations(ByVal aUci As HspfUci,
+                                      ByVal aOperationTypes As atcCollection,
                                       ByVal aLocation As String) As atcCollection
         Dim lLocations As New atcCollection 'key-location, value-total area
         UpstreamLocationAreaCalc(aUci, aLocation, aOperationTypes, lLocations)
         Return lLocations
     End Function
 
-    Private Sub UpstreamLocationAreaCalc(ByVal aUci As HspfUci, _
-                                         ByVal aLocation As String, _
-                                         ByVal aOperationTypes As atcCollection, _
+    Private Sub UpstreamLocationAreaCalc(ByVal aUci As HspfUci,
+                                         ByVal aLocation As String,
+                                         ByVal aOperationTypes As atcCollection,
                                          ByRef aLocations As atcCollection)
         LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True)
     End Sub
 
-    Public Sub LocationAreaCalc(ByVal aUci As HspfUci, _
-                                ByVal aLocation As String, _
-                                ByVal aOperationTypes As atcCollection, _
-                                ByRef aLocations As atcCollection, _
+    Public Sub LocationAreaCalc(ByVal aUci As HspfUci,
+                                ByVal aLocation As String,
+                                ByVal aOperationTypes As atcCollection,
+                                ByRef aLocations As atcCollection,
                                 ByVal aUpstream As Boolean)
 
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
@@ -920,8 +920,8 @@ Public Module Utility
                     If aUpstream Then
                         If lUpstreamChecked.Contains(lLocationKey) Then
                             Logger.Dbg("SkipDuplicate:" & lLocationKey)
-                        ElseIf aUci.Name.ToLower.Contains("scr") AndAlso _
-                               lConnection.Source.VolId = 229 AndAlso _
+                        ElseIf aUci.Name.ToLower.Contains("scr") AndAlso
+                               lConnection.Source.VolId = 229 AndAlso
                                lConnection.Target.VolId = 516 Then
                             'TODO: figure out a way not to hardcode this!
                             Logger.Dbg("Skip 229 to 516 in SantaClara")
@@ -955,7 +955,7 @@ Public Module Utility
         Return lArea
     End Function
 
-    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, _
+    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries,
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (12.0# * 24.0# * 3600.0#) / (aArea * 43560.0#)   'cfs days to inches
         Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
@@ -966,7 +966,7 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries, _
+    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries,
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (aArea * 43560.0#) / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
         Dim lInterval As Double = aTSerIn.Attributes.GetValue("interval", 1.0)
@@ -979,29 +979,29 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries, _
-                          ByVal aName As String, _
-                          ByRef aSDateJ As Double, _
-                          ByRef aEDateJ As Double, _
+    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries,
+                          ByVal aName As String,
+                          ByRef aSDateJ As Double,
+                          ByRef aEDateJ As Double,
                           ByRef aStr As String)
         Dim lDateTmp As Double = aTSer.Dates.Values(0)
         If aSDateJ < lDateTmp Then
-            aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") & _
-                                             "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+            aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") &
+                                             "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") &
                                         " due to " & aName & vbCrLf & vbCrLf
             aSDateJ = lDateTmp
         End If
         lDateTmp = aTSer.Dates.Values(aTSer.numValues)
         If aEDateJ > lDateTmp Then
-            aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") & _
-                                          " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+            aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") &
+                                          " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") &
                                       " due to " & aName & vbCrLf & vbCrLf
             aEDateJ = lDateTmp
         End If
     End Sub
 
-    Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String, _
-                               ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection, _
+    Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String,
+                               ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection,
                                ByVal aLandUseReport As Boolean, ByVal aReportPath As String) As atcReport.IReport
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine("Area Summary Report")
@@ -1020,8 +1020,8 @@ Public Module Utility
         Return lReport
     End Function
 
-    Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection, _
-                                        ByVal aLocation As String, ByVal aLandUseReport As Boolean, _
+    Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection,
+                                        ByVal aLocation As String, ByVal aLandUseReport As Boolean,
                                         ByVal aReportPath As String, ByVal aRunMade As String) As String
         If aLandUseReport Then
             Dim lReport As New atcReport.ReportText
@@ -1030,9 +1030,9 @@ Public Module Utility
             lReport.AppendLine("   Run Made " & aRunMade)
             lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
             lReport.AppendLine("")
-            lReport.AppendLine("Landuse".PadLeft(20) & vbTab & _
-                           "PervArea".PadLeft(12) & vbTab & _
-                           "ImpvArea".PadLeft(12) & vbTab & _
+            lReport.AppendLine("Landuse".PadLeft(20) & vbTab &
+                           "PervArea".PadLeft(12) & vbTab &
+                           "ImpvArea".PadLeft(12) & vbTab &
                            "TotalArea".PadLeft(12))
             Dim lLandUses As atcCollection = LandUses(aUci, aOperationtypes, aLocation)
             Dim lLandUsesCombinePervImpv As atcCollection = LandUsesCombined(lLandUses)
@@ -1051,9 +1051,9 @@ Public Module Utility
                 Dim lLandUseArea As Double = lPervArea + lImprArea
 
 
-                lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
-                               DecimalAlign(lPervArea, , 2, 7) & vbTab & _
-                               DecimalAlign(lImprArea, , 2, 7) & vbTab & _
+                lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab &
+                               DecimalAlign(lPervArea, , 2, 7) & vbTab &
+                               DecimalAlign(lImprArea, , 2, 7) & vbTab &
                                DecimalAlign(lLandUseArea, , 2, 7))
                 lTotalAreaPerv += lPervArea
                 lTotalAreaImpr += lImprArea
@@ -1062,9 +1062,9 @@ Public Module Utility
             lLandUsesCombinePervImpv.Clear()
             lLandUses.Clear()
             lReport.AppendLine("")
-            lReport.AppendLine("Total".PadLeft(20) & vbTab & _
-                           DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab & _
-                           DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab & _
+            lReport.AppendLine("Total".PadLeft(20) & vbTab &
+                           DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab &
+                           DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab &
                            DecimalAlign(lTotalAreaFromLandUses, , 2, 7))
             SaveFileString(aReportPath & SafeFilename("AreaLanduse_" & aLocation & ".txt"), lReport.ToString)
         End If
@@ -1101,9 +1101,9 @@ Public Module Utility
             lStr &= AreaReportLocation(aUci, aOperationtypes, lUpstreamLocation, aLandUseReport, aReportPath, aRunMade)
         Next
         lUpstreamLocations.Clear()
-        lStr &= aLocation.PadRight(8) & vbTab & _
-                DecimalAlign(lTotalArea, , 2, 7) & vbTab & _
-                DecimalAlign(lLocalArea, , 2, 7) & vbTab & _
+        lStr &= aLocation.PadRight(8) & vbTab &
+                DecimalAlign(lTotalArea, , 2, 7) & vbTab &
+                DecimalAlign(lLocalArea, , 2, 7) & vbTab &
                 lUpstreamLocationsString & vbCrLf
         Return lStr
     End Function
@@ -1557,6 +1557,20 @@ Public Module Utility
                                  "SOHT_POHT_IHEAT_1", "IOHT_POHT_IHEAT_1", "AOHT_POHT_IHEAT_1"
                             lMassLinkFactor = lMassLink.MFact
                     End Select
+                Case Else
+                    Dim GQUALID As Integer = Right(aBalanceType, 1)
+                    Select Case True
+                        'Need to do it for sediment associated GQUAL
+                        Case aConstituent.Contains("SOQO") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                                (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent.Contains("IOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "IOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent.Contains("AOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "AOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                    End Select
             End Select
 
         Next
@@ -1567,9 +1581,9 @@ Public Module Utility
     End Function
     Public Function BODMFact(ByVal aUCI As HspfUci, ByVal aconstituent As String, ByVal aMassLinkID As Integer) As Double
         For Each lMasslink As HspfMassLink In aUCI.MassLinks
-            If lMasslink.MassLinkId = aMassLinkID AndAlso _
-                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso _
-                lMasslink.Target.Member = "OXIF" AndAlso _
+            If lMasslink.MassLinkId = aMassLinkID AndAlso
+                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso
+                lMasslink.Target.Member = "OXIF" AndAlso
                 lMasslink.Target.MemSub1 = 2 Then
                 Return lMasslink.MFact
 
@@ -1920,28 +1934,29 @@ Public Module Utility
                 QUALNames = New ConstituentProperties
                 QUALNames.ConstNameForEXPPlus = aBalanceType
                 QUALNames.ConstituentNameInUCI = aBalanceType
-
+                Dim GQALID As Integer = Right(aBalanceType, 1)
                 lTableName = "QUAL-PROPS"
+                If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
                 Dim lTempQual As String = ""
                 Dim lUnits As String = ""
                 If lOper.TableExists(lTableName) Then
                     lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
-                    If aBalanceType = lTempQual Then
+                    If SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2) = lTempQual Then
                         'found it
                         lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                     End If
                 End If
-                Do While lUnits.Length = 0
-                    For lIndex As Integer = 2 To 10
-                        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
-                            If aBalanceType = lTempQual Then
-                                'found it
-                                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-                            End If
-                        End If
-                    Next
-                Loop
+                'Do While lUnits.Length = 0
+                '    For lIndex As Integer = 2 To 10
+                '        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                '            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
+                '            If SafeSubstring(aBalanceType, 1, aBalanceType.Length - 2) = lTempQual Then
+                '                'found it
+                '                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                '            End If
+                '        End If
+                '    Next
+                'Loop
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = lUnits & "/ac"
@@ -2023,6 +2038,8 @@ Public Module Utility
             Case Else
                 'case for GQuals
                 'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
+                EXPPlusName = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
+                QualityConstituent = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
                 lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
@@ -2030,10 +2047,6 @@ Public Module Utility
                 lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
                 lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
         End Select
-
-
-
-
 
         Return lOutflowDataType
     End Function
@@ -2064,7 +2077,7 @@ Public Module Utility
     Public Function GQualUnits(ByVal aUCI As HspfUci, ByVal aGQualName As String) As String
         'given a uci and gqualname, return the units of the gqual
         Dim lUnits As String = ""
-
+        Dim GQALID As Integer = Right(aGQualName, 1)
         Dim lOper As New HspfOperation
         For Each Oper As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             If Oper.Tables("ACTIVITY").Parms("GQALFG").Value = "1" Then
@@ -2076,6 +2089,7 @@ Public Module Utility
 
         If lOper IsNot Nothing Then
             Dim lTableName As String = "GQ-QALDATA"
+            If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
             Dim lTempQual As String = ""
             If lOper.TableExists(lTableName) Then
                 lTempQual = Trim(lOper.Tables(lTableName).Parms("GQID").Value)
@@ -2084,17 +2098,17 @@ Public Module Utility
                     lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                 End If
             End If
-            Do While lUnits.Length = 0
-                For lIndex As Integer = 2 To 10
-                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
-                        If aGQualName = lTempQual Then
-                            'found it
-                            lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-                        End If
-                    End If
-                Next
-            Loop
+            'Do While lUnits.Length = 0
+            '    For lIndex As Integer = 2 To 10
+            '        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+            '            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+            '            If aGQualName = lTempQual Then
+            '                'found it
+            '                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+            '            End If
+            '        End If
+            '    Next
+            'Loop
         End If
 
         Return lUnits

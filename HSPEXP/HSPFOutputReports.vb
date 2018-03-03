@@ -92,25 +92,25 @@ Module HSPFOutputReports
         End If
 
         If StartUp.chkGQUAL1.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL1.Text)
+            pConstituents.Add(StartUp.chkGQUAL1.Text & "-1")
         End If
         If StartUp.chkGQUAL2.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL2.Text)
+            pConstituents.Add(StartUp.chkGQUAL2.Text & "-2")
         End If
         If StartUp.chkGQUAL3.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL3.Text)
+            pConstituents.Add(StartUp.chkGQUAL3.Text & "-3")
         End If
         If StartUp.chkGQUAL4.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL4.Text)
+            pConstituents.Add(StartUp.chkGQUAL4.Text & "-4")
         End If
         If StartUp.chkGQUAL5.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL5.Text)
+            pConstituents.Add(StartUp.chkGQUAL5.Text & "-5")
         End If
         If StartUp.chkGQUAL6.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL6.Text)
+            pConstituents.Add(StartUp.chkGQUAL6.Text & "-6")
         End If
         If StartUp.chkGQUAL7.Checked Then
-            pConstituents.Add(StartUp.chkGQUAL7.Text)
+            pConstituents.Add(StartUp.chkGQUAL7.Text & "-7")
         End If
 
         'set up the timeseries attributes for statistics
@@ -460,6 +460,7 @@ Module HSPFOutputReports
                         Dim lConstituentName As String = ""
                         Dim lActiveSections As New List(Of String)
                         Dim CheckQUALID As Boolean = False
+                        Dim GQALID As Integer = 0
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
@@ -515,6 +516,7 @@ Module HSPFOutputReports
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
+                                GQALID = Right(lConstituent, 1)
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
@@ -552,7 +554,9 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
 
-                            If Not (lConstituent = "DO" Or lConstituent = "Heat" Or lConstituent = "BOD-Labile") Then
+                            If lConstituent = "TotalN" OrElse lConstituent = "TotalP" OrElse
+                                lConstituent = "Sediment" OrElse lConstituent = "Water" Then
+
                                 With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
                                                                       lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ, lConstProperties)
                                     lReportCons = .Item1

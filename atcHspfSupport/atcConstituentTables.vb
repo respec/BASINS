@@ -166,6 +166,7 @@ Public Module atcConstituentTables
                         Dim lMasslinkFactor As Double = 1.0
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
+                            If lTS Is Nothing Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -317,6 +318,7 @@ Public Module atcConstituentTables
                         Dim lMasslinkFactor As Double = 1.0
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
+                            If lTS.numValues = 0 Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -461,6 +463,7 @@ Public Module atcConstituentTables
                         Dim lMasslinkFactor As Double = 1.0
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
+                            If lTS.numValues = 0 Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -674,6 +677,7 @@ Public Module atcConstituentTables
                             Dim lMassLinkFactor As Double = 1.0
                             If lOutflowDataType.StartsWith("TotalOutflow") And lTotalTS.Dates IsNot Nothing Then
                                 lTS = lTotalTS
+                                If lTS.numValues = 0 Then Continue For
                                 'Start doing the montly calculations here.
                                 Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                                 Dim lSeasons As New atcSeasonsMonth
@@ -707,15 +711,15 @@ Public Module atcConstituentTables
                                         Dim aConversionFactor As Double = 0.0
                                         If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
                                             aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
-
-                                            Dim lMassLinkID As Integer = lConnection.MassLink
+                                        End If
+                                        Dim lMassLinkID As Integer = lConnection.MassLink
                                             If Not lMassLinkID = 0 Then
                                                 lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              constituent.ReportType, aConversionFactor, lMultipleIndex)
                                                 Exit For
                                             End If
+                                            'End If
                                         End If
-                                    End If
                                 Next lConnection
                             End If
 
@@ -880,13 +884,15 @@ Public Module atcConstituentTables
                     Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And Year = 'SumAnnual' And OpDesc ='" & item.Split(":")(1) & "' And ConstNameEXP = '" & Constituent.ConstNameForEXPPlus & "'"
                     Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
                     Dim Values As New List(Of Double)
-                    For Each foundrow As DataRow In foundRows
-                        Values.Add(foundrow("TotalOutflow"))
-                    Next foundrow
+                    If foundRows.Length > 0 Then
+                        For Each foundrow As DataRow In foundRows
+                            Values.Add(foundrow("TotalOutflow"))
+                        Next foundrow
 
-                    If Values.Count > 0 Then
-                        lDataForBoxWhiskerPlot.Units = "(" & foundRows(0)("Unit") & "/yr)"
-                        landUseSumAnnualValues.Add(item, Values.ToArray)
+                        If Values.Count > 0 Then
+                            lDataForBoxWhiskerPlot.Units = "(" & foundRows(0)("Unit") & "/yr)"
+                            landUseSumAnnualValues.Add(item, Values.ToArray)
+                        End If
                     End If
                 Next item
                 lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
@@ -900,29 +906,27 @@ Public Module atcConstituentTables
                     Dim OpType1 As String = item.Split("-")(0)
                     Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And OpDesc ='" & item.Split(":")(1) & "' And ConstNameEXP = '" & Constituent.ConstNameForEXPPlus & "'"
                     Dim foundRows() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpression)
-
-                    For Each month As String In lMonthNames
-                        Dim Values As New List(Of Double)
-                        For Each MonthRow As DataRow In foundRows
-                            Values.Add(MonthRow(month))
+                    If foundRows.Length > 0 Then
+                        For Each month As String In lMonthNames
+                            Dim Values As New List(Of Double)
+                            For Each MonthRow As DataRow In foundRows
+                                Values.Add(MonthRow(month))
+                            Next
+                            If Values.Count > 0 Then
+                                landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
+                            End If
                         Next
-                        If Values.Count > 0 Then
-                            landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
+
+                        lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
+
+                        If landUseSumAnnualValues.Count > 0 Then
+                            lDataForBoxWhiskerPlot.Units = "(" & foundRows(0)("Unit") & ")"
+
+                            CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & Constituent.ConstNameForEXPPlus & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
+                                                      "Monthly Loading Rate from Land Use " & item & "")
+                            landUseSumAnnualValues.Clear()
                         End If
-                    Next
-
-                    lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
-
-                    If landUseSumAnnualValues.Count > 0 Then
-                        lDataForBoxWhiskerPlot.Units = "(" & foundRows(0)("Unit") & ")"
-
-                        CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & Constituent.ConstNameForEXPPlus & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
-                                                  "Monthly Loading Rate from Land Use " & item & "")
-                        landUseSumAnnualValues.Clear()
                     End If
-
-
-
                 Next item
 
 
@@ -937,12 +941,15 @@ Public Module atcConstituentTables
                 Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And Year = 'SumAnnual' And OpDesc ='" & item.Split(":")(1) & "'"
                 Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
                 Dim Values As New List(Of Double)
-                For Each foundrow As DataRow In foundRows
-                    Values.Add(foundrow("TotalOutflow"))
-                Next foundrow
-                If Values.Count > 0 Then
-                    landUseSumAnnualValues.Add(item, Values.ToArray)
+                If foundRows.Length > 0 Then
+                    For Each foundrow As DataRow In foundRows
+                        Values.Add(foundrow("TotalOutflow"))
+                    Next foundrow
+                    If Values.Count > 0 Then
+                        landUseSumAnnualValues.Add(item, Values.ToArray)
+                    End If
                 End If
+
             Next item
             If landUseSumAnnualValues.Count > 0 Then
                 lDataForBoxWhiskerPlot.Units = "(" & lUnits & "/yr)"
@@ -956,8 +963,8 @@ Public Module atcConstituentTables
                     Dim OpType1 As String = item.Split("-")(0)
                     Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And OpDesc ='" & item.Split(":")(1) & "'"
                     Dim foundRows() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpression)
-
-                    For Each month As String In lMonthNames
+                    If foundRows.Length > 0 Then
+                        For Each month As String In lMonthNames
                         Dim Values As New List(Of Double)
                         For Each MonthRow As DataRow In foundRows
                             Values.Add(MonthRow(month))
@@ -968,8 +975,9 @@ Public Module atcConstituentTables
                     lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
                     lDataForBoxWhiskerPlot.Units = "(" & lUnits & ")"
 
-                    CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & aBalanceType & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
+                        CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & aBalanceType & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
                                                   "Monthly Loading Rate from Land Use " & item & "")
+                    End If
                     landUseSumAnnualValues.Clear()
                 Next
             End If
@@ -1077,6 +1085,7 @@ Public Module atcConstituentTables
                 For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
                     row = Reach_Budget_Table.NewRow
                     If Not lReach.Name = "RCHRES" Then Continue For
+                    If Not lReach.Tables("ACTIVITY").Parms("OXFG").Value = "1" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
                     'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
@@ -1231,6 +1240,7 @@ Public Module atcConstituentTables
                 For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
                     row = Reach_Budget_Table.NewRow
                     If Not lReach.Name = "RCHRES" Then Continue For
+                    If Not lReach.Tables("ACTIVITY").Parms("HTFG").Value = "1" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
                     'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
