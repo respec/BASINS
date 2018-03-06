@@ -460,7 +460,7 @@ Module HSPFOutputReports
                         Dim lConstituentName As String = ""
                         Dim lActiveSections As New List(Of String)
                         Dim CheckQUALID As Boolean = False
-                        Dim GQALID As Integer = 0
+                        Dim lGQALID As Integer = 0
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
@@ -511,30 +511,17 @@ Module HSPFOutputReports
                                 lActiveSections.Add("NUTRX")
                                 lActiveSections.Add("PLANK")
                             Case Else
-                                lConstituentName = lConstituent
-                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                lGQALID = Right(lConstituent, 1)
+                                lConstituentName = SafeSubstring(lConstituent, 0, lConstituent.Length - 2)
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituentName, lGQALID)
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
-                                GQALID = Right(lConstituent, 1)
+
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
-                        'If lOpenHspfBinDataSource.DataSets.Count > 1 Then
-                        '    Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent, lConstProperties)
-                        '    For Each ConstituentForAnalysis As String In lConstituentsToOutput.Keys
-                        '        Dim OpnType As String = SafeSubstring(ConstituentForAnalysis, 0, 2)
-                        '        ConstituentForAnalysis = SafeSubstring(ConstituentForAnalysis, 2)
-                        '        If Not OpnType = "R:" AndAlso (ConstituentForAnalysis.EndsWith("1") Or ConstituentForAnalysis.EndsWith("2")) Then
-
-                        '            ConstituentForAnalysis = Left(ConstituentForAnalysis, ConstituentForAnalysis.Length - 1)
-                        '        End If
-                        '        lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Constituent", ConstituentForAnalysis))
-
-                        '    Next
-
-                        'End If
-
+                       
                         If lScenarioResults.DataSets.Count = 0 Then
                             For Each activeSection As String In lActiveSections
                                 lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Section", activeSection))
@@ -548,8 +535,8 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
-                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
+                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
                             Logger.Status(Now & " Generating Reports for " & lConstituent)
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing

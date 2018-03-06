@@ -1140,7 +1140,8 @@ Public Module Utility
     End Function
 
     Public Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String,
-                                               ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer) As Double
+                                               ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer,
+                                       Optional ByVal aGQALID As Integer = 0) As Double
         'If aConstituent = "TAM" Then aConstituent = "NH3+NH4"
         Dim lMassLinkFactor As Double = 0.0
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -1194,9 +1195,12 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (aConstituent = "WASHQS-NH3+NH4" OrElse aConstituent = "SCRQS-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
                         Case (aConstituent = "SOQUAL-NO3" OrElse aConstituent = "SOQO-NO3") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
@@ -1294,13 +1298,14 @@ Public Module Utility
                         Case aConstituent = "IOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
-                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                        Case aConstituent = "WASHQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
-                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "SCRQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
 
                         Case (aConstituent = "SOQUAL-ORTHO P" OrElse aConstituent = "SOQO-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1314,11 +1319,13 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+                        Case aConstituent = "WASHQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
-                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+                        Case aConstituent = "SCRQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
@@ -1499,11 +1506,11 @@ Public Module Utility
                 Case "BOD-Labile"
 
                     Select Case True
-                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS") AndAlso
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS") AndAlso
                             aConstituent = "WASHQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS") AndAlso
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS") AndAlso
                             aConstituent = "SCRQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
@@ -1558,18 +1565,27 @@ Public Module Utility
                             lMassLinkFactor = lMassLink.MFact
                     End Select
                 Case Else
-                    Dim GQUALID As Integer = Right(aBalanceType, 1)
+
                     Select Case True
                         'Need to do it for sediment associated GQUAL
-                        Case aConstituent.Contains("SOQO") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                        Case aConstituent.Contains("SOQO") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
                                 (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SOQUAL")
                             lMassLinkFactor = lMassLink.MFact
-                        Case aConstituent.Contains("IOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("IOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
                             (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "IOQUAL")
                             lMassLinkFactor = lMassLink.MFact
-                        Case aConstituent.Contains("AOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = GQUALID AndAlso
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("AOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
                             (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "AOQUAL")
                             lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("WASHQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                                (lMassLink.Source.Member = "POQUAL" Or lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent.Contains("SCRQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" Or lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
                     End Select
             End Select
 
@@ -1648,7 +1664,7 @@ Public Module Utility
 
     End Function
 
-    Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String) As List(Of ConstituentProperties)
+    Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String, Optional ByVal aGQALID As Integer = 0) As List(Of ConstituentProperties)
         Dim QUALs As New List(Of ConstituentProperties)
         Dim QUALNames As ConstituentProperties
         Dim QUALName As String = ""
@@ -1934,29 +1950,30 @@ Public Module Utility
                 QUALNames = New ConstituentProperties
                 QUALNames.ConstNameForEXPPlus = aBalanceType
                 QUALNames.ConstituentNameInUCI = aBalanceType
-                Dim GQALID As Integer = Right(aBalanceType, 1)
                 lTableName = "QUAL-PROPS"
-                If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
+                'If aGQALID > 1 Then lTableName = lTableName & ":" & aGQALID
                 Dim lTempQual As String = ""
                 Dim lUnits As String = ""
+
                 If lOper.TableExists(lTableName) Then
                     lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
-                    If SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2) = lTempQual Then
+                    If aBalanceType = lTempQual Then
                         'found it
                         lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                     End If
                 End If
-                'Do While lUnits.Length = 0
-                '    For lIndex As Integer = 2 To 10
-                '        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                '            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
-                '            If SafeSubstring(aBalanceType, 1, aBalanceType.Length - 2) = lTempQual Then
-                '                'found it
-                '                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-                '            End If
-                '        End If
-                '    Next
-                'Loop
+                Do While lUnits.Length = 0
+                    For lIndex As Integer = 2 To 10
+                        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
+                            If aBalanceType = lTempQual Then
+                                'found it
+                                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                                Exit For
+                            End If
+                        End If
+                    Next
+                Loop
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = lUnits & "/ac"
@@ -2038,8 +2055,8 @@ Public Module Utility
             Case Else
                 'case for GQuals
                 'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
-                EXPPlusName = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
-                QualityConstituent = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
+                'EXPPlusName = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
+                'QualityConstituent = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
                 lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
                 lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
@@ -2089,7 +2106,7 @@ Public Module Utility
 
         If lOper IsNot Nothing Then
             Dim lTableName As String = "GQ-QALDATA"
-            If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
+            'If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
             Dim lTempQual As String = ""
             If lOper.TableExists(lTableName) Then
                 lTempQual = Trim(lOper.Tables(lTableName).Parms("GQID").Value)
@@ -2098,17 +2115,17 @@ Public Module Utility
                     lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                 End If
             End If
-            'Do While lUnits.Length = 0
-            '    For lIndex As Integer = 2 To 10
-            '        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-            '            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
-            '            If aGQualName = lTempQual Then
-            '                'found it
-            '                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-            '            End If
-            '        End If
-            '    Next
-            'Loop
+            Do While lUnits.Length = 0
+                For lIndex As Integer = 2 To 10
+                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+                        If aGQualName = lTempQual Then
+                            'found it
+                            lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                        End If
+                    End If
+                Next
+            Loop
         End If
 
         Return lUnits

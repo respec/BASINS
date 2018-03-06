@@ -13,8 +13,9 @@ Public Module atcConstituentTables
                                      ByVal aScenario As String,
                                      ByVal aRunMade As String,
                                      ByVal aBalanceType As String,
-                                     aConstProperties As List(Of ConstituentProperties),
-                                  aSDateJ As Double, aEDateJ As Double)
+                                     ByVal aConstProperties As List(Of ConstituentProperties),
+                                  ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                                  Optional ByVal aGQALID As Integer = 0)
 
         'This Sub prepares a text report for constituents like TN and TP.
         Dim lReport As New atcReport.ReportText
@@ -555,7 +556,6 @@ Public Module atcConstituentTables
             Case Else
 
                 Dim column As DataColumn
-                'Dim columnMonthly As DataColumn
                 Dim row As DataRow
 
                 column = New DataColumn()
@@ -595,11 +595,6 @@ Public Module atcConstituentTables
                 Land_Constituent_Monthly_Table.Columns.Add(column)
 
                 Land_Constituent_Monthly_Table = AddMonthlyColumnsColumns(Land_Constituent_Monthly_Table)
-                'column = New DataColumn()
-                'column.DataType = Type.GetType("System.Double")
-                'column.ColumnName = "ATDEP"
-                'column.Caption = "Atmospheric Deposition"
-                'QUALConstTable.Columns.Add(column)
 
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
@@ -651,7 +646,7 @@ Public Module atcConstituentTables
                     lOperationNameNumber.Add(LocationName)
 
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    'Look at this. Do not want operation id with this
+
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
@@ -713,13 +708,13 @@ Public Module atcConstituentTables
                                             aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
                                         End If
                                         Dim lMassLinkID As Integer = lConnection.MassLink
-                                            If Not lMassLinkID = 0 Then
-                                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
-                                                                             constituent.ReportType, aConversionFactor, lMultipleIndex)
-                                                Exit For
-                                            End If
-                                            'End If
+                                        If Not lMassLinkID = 0 Then
+                                            lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
+                                                                             constituent.ReportType, aConversionFactor, lMultipleIndex, aGQALID)
+                                            Exit For
                                         End If
+                                        'End If
+                                    End If
                                 Next lConnection
                             End If
 
@@ -965,15 +960,15 @@ Public Module atcConstituentTables
                     Dim foundRows() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpression)
                     If foundRows.Length > 0 Then
                         For Each month As String In lMonthNames
-                        Dim Values As New List(Of Double)
-                        For Each MonthRow As DataRow In foundRows
-                            Values.Add(MonthRow(month))
+                            Dim Values As New List(Of Double)
+                            For Each MonthRow As DataRow In foundRows
+                                Values.Add(MonthRow(month))
+                            Next
+                            landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
                         Next
-                        landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
-                    Next
 
-                    lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
-                    lDataForBoxWhiskerPlot.Units = "(" & lUnits & ")"
+                        lDataForBoxWhiskerPlot.LabelValueCollection = landUseSumAnnualValues
+                        lDataForBoxWhiskerPlot.Units = "(" & lUnits & ")"
 
                         CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, AbsolutePath(System.IO.Path.Combine("MonthlyLoadings\" & aBalanceType & "_" & item.Split(":")(0) & "_" & item.Split(":")(1) & "_BoxWhisker.png"), aoutfoldername),
                                                   "Monthly Loading Rate from Land Use " & item & "")
@@ -994,7 +989,7 @@ Public Module atcConstituentTables
                                      ByVal aRunMade As String,
                                      ByVal aBalanceType As String,
                                      ByVal aConstProperties As List(Of ConstituentProperties),
-                                     ByVal aSDateJ As Double, ByVal aEDateJ As Double)
+                                     ByVal aSDateJ As Double, ByVal aEDateJ As Double, Optional aGQALID As Integer = 0)
         Dim lReport As New atcReport.ReportText
         Dim lUpstreamInflows As New atcCollection
         Dim lCumulativePointNonpointColl As New atcCollection
@@ -1706,10 +1701,125 @@ Public Module atcConstituentTables
                 Next lConstituent
 #End Region
 
+#Region "Else Case"
+            Case Else
+                For Each lConstituent As ConstituentProperties In aConstProperties
+                    lUnits = lConstituent.ConstituentUnit
+
+                    Dim column As DataColumn
+                    Dim row As DataRow
+                    Reach_Budget_Table = AddFirstSixColumnsReachBudget(Reach_Budget_Table, lUnits)
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-TIQAL"
+                    column.Caption = "Total GQAL Inflow (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-PDQAL"
+                    column.Caption = "Input of QAL due to decay of parents (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-GQADEP"
+                    column.Caption = "Total Atmospheric deposition of QAL (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-DDQAL-TOT"
+                    column.Caption = "Decay of Dissolved QAL (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-TROQAL"
+                    column.Caption = "Total Outflow of QAL (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+
+                    For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
+                        row = Reach_Budget_Table.NewRow
+                        If Not lReach.Name = "RCHRES" Then Continue For
+                        If Not lReach.Tables("ACTIVITY").Parms("HTFG").Value = "1" Then Continue For
+                        Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                        'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
+                        Dim lTS As New atcTimeseries(Nothing)
+                        Dim AddTS As New atcDataGroup
+                        Dim lTotalTS As New atcTimeseries(Nothing)
+                        Dim lDownstreamReachID As Integer = lReach.DownOper("RCHRES")
+                        Dim lUpstreamIn As Double = 0.0
+                        If lUpstreamInflows.Keys.Contains(lReach.Id) Then
+                            lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
+                        End If
+                        Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType, aGQALID)
+                        Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aGQALID)
+                        Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", aBalanceType & "-TROQAL")(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", aBalanceType & "-TIQAL")(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType, aGQALID)
+                        Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aGQALID)
+                        Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
+                        For Each columnValue As DataColumn In Reach_Budget_Table.Columns
+                            Dim ColumnName As String = columnValue.ColumnName
+                            Select Case ColumnName
+                                Case "OpTypeNumber"
+                                    row(ColumnName) = LocationName
+                                Case "OpDesc"
+                                    row(ColumnName) = lReach.Description
+                                Case "NPSLoad"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                                Case "PSLoad"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
+                                Case "GENERLoad"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
+                                Case "Diversion"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                                Case "MassBalance"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                                Case "UpstreamIn"
+                                    row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                                Case Else
+                                    Try
+                                        row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                                    Catch
+                                        'row(ColumnName)
+                                    End Try
+                            End Select
+                        Next columnValue
+
+                        Reach_Budget_Table.Rows.Add(row)
+                    Next lReach
+                    Dim TextToWrite As String = ""
+                    For Each TableColumn As DataColumn In Reach_Budget_Table.Columns 'Writing the table headings
+                        TextToWrite &= TableColumn.Caption & vbTab
+                    Next
+                    lReport.AppendLine(TextToWrite)
+                    For Each TableRow As DataRow In Reach_Budget_Table.Rows 'Writing the table contents
+                        TextToWrite = ""
+                        For Each TableColumn As DataColumn In Reach_Budget_Table.Columns
+                            TextToWrite &= TableRow(TableColumn) & vbTab
+                        Next TableColumn
+                        lReport.AppendLine(TextToWrite)
+                    Next TableRow
+                    lReport.AppendLine()
+                    lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
+                    lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
+                    lReport.AppendLine("   Run Made " & aRunMade)
+                    lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                    SaveFileString(aoutfoldername & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
+                Next lConstituent
+#End Region
+
+
         End Select
     End Sub
 
-    Private Function CalculateNPSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String) As Double
+    Private Function CalculateNPSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String, Optional ByVal aGQALID As Integer = 0) As Double
         Dim NPSLoad As Double = 0.0
         Dim SelectExpression As String = ""
         For Each lReachSource As HspfConnection In aReach.Sources
@@ -1737,7 +1847,8 @@ Public Module atcConstituentTables
     End Function
     Private Function CalculatePSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation,
                                      ByVal aSDateJ As Double,
-                                      ByVal aEDateJ As Double, ByVal aConstituentName As String) As Double
+                                      ByVal aEDateJ As Double, ByVal aConstituentName As String,
+                                     Optional ByVal aGQALID As Integer = 0) As Double
         Dim PSLoad As Double = 0.0
         Select Case aConstituentName
             Case "DO"
@@ -1915,6 +2026,35 @@ Public Module atcConstituentTables
 
                     End If
                 Next lSource
+            Case Else
+                For Each lSource As HspfPointSource In aReach.PointSources
+                    If (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IDQAL" AndAlso lSource.Target.MemSub1 = aGQALID) OrElse
+                        (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISQAL" AndAlso lSource.Target.MemSub2 = aGQALID) Then
+                        Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                        Dim VolName As String = lSource.Source.VolName
+                        Dim lDSN As Integer = lSource.Source.VolId
+                        Dim lMfact As Double = lSource.MFact
+                        Dim TransformationMultFact As Double = 0
+                        For i As Integer = 0 To aUCI.FilesBlock.Count
+                            If aUCI.FilesBlock.Value(i).Typ = VolName Then
+                                Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                If lDataSource Is Nothing Then
+                                    If atcDataManager.OpenDataSource(lFileName) Then
+                                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                    End If
+                                End If
+                                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                                                                            TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
+                                PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
+                            End If
+                        Next
+
+                    End If
+                Next lSource
+
         End Select
 
 
@@ -1939,7 +2079,7 @@ Public Module atcConstituentTables
         Return MultiFactor
     End Function
     Private Function CalculateDiversion(ByVal aUCI As HspfUci, ByVal aBinaryDataSource As atcDataSource, ByVal aReach As HspfOperation, ByRef aUpstreamInflows As atcCollection,
-                                ByVal aDownstreamReachID As Integer, ByVal aOutflow As Double, ByVal aConstituent As String) As Double
+                                ByVal aDownstreamReachID As Integer, ByVal aOutflow As Double, ByVal aConstituent As String, Optional ByVal aGQALID As Integer = 0) As Double
         Dim lDiversion As Double = 0.0
         Try
             If aReach.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
@@ -2000,6 +2140,8 @@ Public Module atcConstituentTables
                             FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
                         lDiversion = aOutflow - lTotalOutFlow
 
+                    Case Else
+
                 End Select
                 aUpstreamInflows.Increment(aDownstreamReachID, lTotalOutFlow)
             End If
@@ -2013,7 +2155,7 @@ Public Module atcConstituentTables
         Return lDiversion
     End Function
     Private Function CalculateGENERLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String,
-                                        ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Double
+                                        ByVal aSDateJ As Double, ByVal aEDateJ As Double, Optional ByVal aGQALID As Integer = 0) As Double
         Dim lGENERLoad As Double = 0.0
 
         Select Case aConstituentName
@@ -2241,7 +2383,39 @@ Public Module atcConstituentTables
 
                 Next lSource
 
+            Case Else
+                lGENERLoad = 0
 
+                For Each lSource As HspfConnection In aReach.Sources
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If (lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID) OrElse
+                                    (lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID) Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IDQAL" AndAlso lSource.Target.MemSub1 = aGQALID) OrElse
+                                    (lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISQAL" AndAlso lSource.Target.MemSub2 = aGQALID) Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                        End If
+                    End If
+
+                Next lSource
         End Select
 
         Return lGENERLoad
