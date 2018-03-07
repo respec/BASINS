@@ -663,7 +663,8 @@ Public Module atcConstituentTables
                             lConstituentNames.Add(constituent.ConstNameForEXPPlus)
                         End If
 
-                        Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType, constituent.ConstituentNameInUCI, constituent.ConstNameForEXPPlus)
+                        Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType, constituent.ConstituentNameInUCI,
+                                                                                                  constituent.ConstNameForEXPPlus, False, lOperation.Name)
                         Dim lTSNumber As Integer = 0
                         Dim lTS As New atcTimeseries(Nothing)
                         Dim AddTS As New atcDataGroup
@@ -752,6 +753,7 @@ Public Module atcConstituentTables
                                     lYears.Add(Year)
                                 End If
                                 RowNumber += 1
+
                                 If lTSNumber = 0 Then
                                     row("OpTypeNumber") = LocationName
                                     row("OpDesc") = lOperation.Description
@@ -760,7 +762,11 @@ Public Module atcConstituentTables
                                     row("ConstNameEXP") = constituent.ConstNameForEXPPlus
                                     row("Unit") = constituent.ConstituentUnit
                                     'row("WASHQS") = lValue
-                                    row(lTSAttributes.Split("-")(0)) = lValue
+                                    If lTSAttributes.Split("-")(0) = "SOQS" Then 'For IMPLND, WASHQS is not a constituent, but Anurag wants to put this value in that column
+                                        row("WASHQS") = lValue
+                                    Else
+                                        row(lTSAttributes.Split("-")(0)) = lValue
+                                    End If
                                     Land_Constituent_Table.Rows.Add(row)
                                 Else
                                     Land_Constituent_Table.Rows(RowNumber - 1)(lTSAttributes.Split("-")(0)) = HspfTable.NumFmtRE(lValue, 10)
@@ -1703,8 +1709,10 @@ Public Module atcConstituentTables
 
 #Region "Else Case"
             Case Else
+                'For GQAL Constituents
                 For Each lConstituent As ConstituentProperties In aConstProperties
-                    lUnits = lConstituent.ConstituentUnit
+
+                    lUnits = GQualUnits(aUCI, lConstituent.ConstituentNameInUCI)
 
                     Dim column As DataColumn
                     Dim row As DataRow
@@ -1712,31 +1720,43 @@ Public Module atcConstituentTables
                     column = New DataColumn()
                     column.DataType = Type.GetType("System.Double")
                     column.ColumnName = aBalanceType & "-TIQAL"
-                    column.Caption = "Total GQAL Inflow (" & lUnits & ")"
+                    column.Caption = "Total " & aBalanceType & " Inflow (" & lUnits & ")"
                     Reach_Budget_Table.Columns.Add(column)
 
                     column = New DataColumn()
                     column.DataType = Type.GetType("System.Double")
                     column.ColumnName = aBalanceType & "-PDQAL"
-                    column.Caption = "Input of QAL due to decay of parents (" & lUnits & ")"
+                    column.Caption = "Input of " & aBalanceType & " due to decay of parents (" & lUnits & ")"
                     Reach_Budget_Table.Columns.Add(column)
 
                     column = New DataColumn()
                     column.DataType = Type.GetType("System.Double")
                     column.ColumnName = aBalanceType & "-GQADEP"
-                    column.Caption = "Total Atmospheric deposition of QAL (" & lUnits & ")"
+                    column.Caption = "Total Atmospheric deposition of " & aBalanceType & " (" & lUnits & ")"
                     Reach_Budget_Table.Columns.Add(column)
 
                     column = New DataColumn()
                     column.DataType = Type.GetType("System.Double")
                     column.ColumnName = aBalanceType & "-DDQAL-TOT"
-                    column.Caption = "Decay of Dissolved QAL (" & lUnits & ")"
+                    column.Caption = "Decay of Dissolved " & aBalanceType & " (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-DSQAL-TOT"
+                    column.Caption = "Dep(+)/Scour(-) of " & aBalanceType & " (" & lUnits & ")"
+                    Reach_Budget_Table.Columns.Add(column)
+
+                    column = New DataColumn()
+                    column.DataType = Type.GetType("System.Double")
+                    column.ColumnName = aBalanceType & "-ADQAL-TOT"
+                    column.Caption = "Adsorption(+)/Desorption(-) of " & aBalanceType & "(" & lUnits & ")"
                     Reach_Budget_Table.Columns.Add(column)
 
                     column = New DataColumn()
                     column.DataType = Type.GetType("System.Double")
                     column.ColumnName = aBalanceType & "-TROQAL"
-                    column.Caption = "Total Outflow of QAL (" & lUnits & ")"
+                    column.Caption = "Total Outflow of " & aBalanceType & " (" & lUnits & ")"
                     Reach_Budget_Table.Columns.Add(column)
 
 

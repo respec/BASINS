@@ -1170,19 +1170,6 @@ Public Module Utility
 
                 Case "TotalN"
                     Select Case True
-                        Case (aConstituent = "NO3+NO2-N - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NO3+NO2-N - UPPER LAYER OUTFLOW" OrElse
-                                aConstituent = "NO3+NO2-N - GROUNDWATER OUTFLOW" OrElse aConstituent = "NO3-N - TOTAL OUTFLOW") AndAlso
-                                lMassLink.Target.Member.ToString = "NUIF1" And lMassLink.Target.MemSub1 = 1
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-
-                        Case (aConstituent = "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW" OrElse
-                            aConstituent = "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        Case aConstituent = "NH4-N ADS - SEDIMENT ASSOC OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                             lMassLink.Target.MemSub2 = 1 'lMassLink.Target.MemSub1 = 1 AndAlso 
-                            lMassLinkFactor += lMassLink.MFact
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
@@ -1195,12 +1182,27 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
+
+                            'When sediment associated NH3+NH4 enters into stream as dissolved
                         Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "SOQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor = lMassLink.MFact
+
+                            'When sediment associated NH3+NH4 enters into stream as associated with sediment
+                        Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 1 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
-                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
-                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 1 AndAlso
+                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
+
+
                         Case (aConstituent = "SOQUAL-NO3" OrElse aConstituent = "SOQO-NO3") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
@@ -1213,6 +1215,7 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
+
                         Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
                             aConstituent = "WASHQS-Ref-OrgN" OrElse aConstituent = "SCRQS-Ref-OrgN" OrElse aConstituent = "SOQO-Ref-OrgN" OrElse aConstituent = "SOQUAL-Ref-OrgN" OrElse
                             aConstituent = "WASHQS-lab-OrgN" OrElse aConstituent = "SCRQS-lab-OrgN" OrElse aConstituent = "SOQO-lab-OrgN" OrElse aConstituent = "SOQUAL-lab-OrgN") AndAlso
@@ -1248,6 +1251,20 @@ Public Module Utility
                                 lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
                             Return lMassLinkFactor
+
+                            'Following are AGCHEM cases
+                        Case (aConstituent = "NO3+NO2-N - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NO3+NO2-N - UPPER LAYER OUTFLOW" OrElse
+                            aConstituent = "NO3+NO2-N - GROUNDWATER OUTFLOW" OrElse aConstituent = "NO3-N - TOTAL OUTFLOW") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" And lMassLink.Target.MemSub1 = 1
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (aConstituent = "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW" OrElse
+                            aConstituent = "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "NH4-N ADS - SEDIMENT ASSOC OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
+                                             lMassLink.Target.MemSub2 = 1 'lMassLink.Target.MemSub1 = 1 AndAlso 
+                            lMassLinkFactor += lMassLink.MFact
                         Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3
                             If aMultipleIndex = 2 Then
                                 lMassLinkFactor = lMassLink.MFact
@@ -1268,6 +1285,7 @@ Public Module Utility
                         Case aConstituent.Contains("NITROGEN - TOTAL OUTFLOW")
                             lMassLinkFactor = 1
                             Return lMassLinkFactor
+
 
                     End Select
 
@@ -1298,6 +1316,15 @@ Public Module Utility
                         Case aConstituent = "IOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
+
+                            'If sediment associated PO4 enters into stream as dissolved PO4
+                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4" OrElse aConstituent = "SOQS-PO4") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub2 = 4 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+
+                             'If sediment associated PO4 enters into stream as sediment associated
                         Case aConstituent = "WASHQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
@@ -1306,6 +1333,9 @@ Public Module Utility
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
+                        Case aConstituent = "SOQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "SOQUAL-ORTHO P" OrElse aConstituent = "SOQO-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1320,12 +1350,23 @@ Public Module Utility
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
 
+                              'If sediment associated PO4 enters into stream as dissolved PO4
+                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P" OrElse aConstituent = "SOQS-ORTHO P") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub2 = 4 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                            'If sediment associated PO4 enters into stream as sediment associated
                         Case aConstituent = "WASHQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
                         Case aConstituent = "SCRQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SOQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
@@ -1585,6 +1626,9 @@ Public Module Utility
                             lMassLinkFactor += lMassLink.MFact
                         Case aConstituent.Contains("SCRQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
                             (lMassLink.Source.Member = "POQUAL" Or lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent.Contains("SOQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
                     End Select
             End Select
@@ -2005,7 +2049,8 @@ Public Module Utility
     End Function
 
     Public Function ConstituentList(ByVal aBalanceType As String, Optional ByVal QualityConstituent As String = "",
-                                     Optional ByVal EXPPlusName As String = "", Optional ByVal AgChemConst As Boolean = False) As Dictionary(Of String, String)
+                                     Optional ByVal EXPPlusName As String = "", Optional ByVal AgChemConst As Boolean = False,
+                                    Optional ByVal aOperName As String = "") As Dictionary(Of String, String)
         'Design for AGCHEM Case as well.
         Dim lOutflowDataType As New Dictionary(Of String, String)
         Select Case aBalanceType
@@ -2046,22 +2091,29 @@ Public Module Utility
 
             Case "TotalN", "TotalP"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
-                lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
-                lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
-                lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                If aOperName = "PERLND" Then
+                    lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                ElseIf aOperName = "IMPLND" Then
+                    lOutflowDataType.Add("SOQS" & "-" & EXPPlusName, "SOQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                End If
                 lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
             Case Else
                 'case for GQuals
-                'lOutflowDataType.Add("SOQUAL" & "-" & EXPPlusName, "SOQUAL" & "-" & QualityConstituent)
-                'EXPPlusName = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
-                'QualityConstituent = SafeSubstring(aBalanceType, 0, aBalanceType.Length - 2)
-                lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
-                lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
-                lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                If aOperName = "PERLND" Then
+                    lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                ElseIf aOperName = "IMPLND" Then
+                    lOutflowDataType.Add("SOQS" & "-" & EXPPlusName, "SOQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                End If
                 lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
         End Select
 
@@ -2094,7 +2146,7 @@ Public Module Utility
     Public Function GQualUnits(ByVal aUCI As HspfUci, ByVal aGQualName As String) As String
         'given a uci and gqualname, return the units of the gqual
         Dim lUnits As String = ""
-        Dim GQALID As Integer = Right(aGQualName, 1)
+        'Dim GQALID As Integer = Right(aGQualName, 1)
         Dim lOper As New HspfOperation
         For Each Oper As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             If Oper.Tables("ACTIVITY").Parms("GQALFG").Value = "1" Then
