@@ -700,12 +700,13 @@ Public Module atcConstituentTables
                                 lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataTypes1(lOutflowDataType))(0)
 
                                 If lTS Is Nothing Then Continue For
+                                If lTS.Attributes.GetDefinedValue("Sum").Value = 0 Then Continue For
                                 lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                                 For Each lConnection As HspfConnection In lOperation.Targets
                                     If lConnection.Target.VolName = "RCHRES" Then
                                         Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                         Dim aConversionFactor As Double = 0.0
-                                        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+                                        If aBalanceType = "TN" Or aBalanceType = "TP" Then
                                             aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
                                         End If
                                         Dim lMassLinkID As Integer = lConnection.MassLink
@@ -1005,6 +1006,8 @@ Public Module atcConstituentTables
         Dim lUnits As String = ""
 
         Select Case aBalanceType
+            Case "Water", "Sediment"
+                'not generating reach budget report for water and sediment
 #Region "DO Case"
             Case "DO"
 
@@ -1451,7 +1454,7 @@ Public Module atcConstituentTables
                 SaveFileString(aoutfoldername & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "TotalN Case"
-            Case "TotalN"
+            Case "TN"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     Reach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus
@@ -1590,7 +1593,7 @@ Public Module atcConstituentTables
 #End Region
 
 #Region "TotalP Case"
-            Case "TotalP"
+            Case "TP"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     Reach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus
@@ -1765,7 +1768,7 @@ Public Module atcConstituentTables
                         If Not lReach.Name = "RCHRES" Then Continue For
                         If Not lReach.Tables("ACTIVITY").Parms("HTFG").Value = "1" Then Continue For
                         Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
-                        'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
+                        'If lReach.Id = 106 Then Stop
                         Dim lTS As New atcTimeseries(Nothing)
                         Dim AddTS As New atcDataGroup
                         Dim lTotalTS As New atcTimeseries(Nothing)
@@ -2101,6 +2104,7 @@ Public Module atcConstituentTables
     Private Function CalculateDiversion(ByVal aUCI As HspfUci, ByVal aBinaryDataSource As atcDataSource, ByVal aReach As HspfOperation, ByRef aUpstreamInflows As atcCollection,
                                 ByVal aDownstreamReachID As Integer, ByVal aOutflow As Double, ByVal aConstituent As String, Optional ByVal aGQALID As Integer = 0) As Double
         Dim lDiversion As Double = 0.0
+        Dim lTimeSeries As New atcTimeseries(Nothing)
         Try
             If aReach.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
                 'Logger.Dbg(aReach.Id)
@@ -2113,54 +2117,92 @@ Public Module atcConstituentTables
                 Select Case aConstituent
                     Case "DO"
                         lExitFlowConstituent = "DOXOUT-EXIT" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
-
                     Case "BOD-Labile"
                         lExitFlowConstituent = "BODOUT-EXIT" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
-
                     Case "Heat"
                         lExitFlowConstituent = "OHEAT - EXIT-" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
-
 
                     Case "NO3"
 
                         lExitFlowConstituent = "NO3-OUTDIS-EXIT" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lExitFlowConstituent = "NO2-OUTDIS-EXIT" & lExitNUmber
-                        lTotalOutFlow += (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow += lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
 
                     Case "TAM"
 
                         lExitFlowConstituent = "TAM-OUTDIS-EXIT" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lExitFlowConstituent = "TAM-OUTPART-TOT-EXIT" & lExitNUmber
-                        lTotalOutFlow += (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow += lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
 
                     Case "PO4"
 
                         lExitFlowConstituent = "PO4-OUTDIS-EXIT" & lExitNUmber
-                        lTotalOutFlow = (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lExitFlowConstituent = "PO4-OUTPART-TOT-EXIT" & lExitNUmber
-                        lTotalOutFlow += (aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
-                            FindData("Constituent", lExitFlowConstituent)(0).Attributes.GetDefinedValue("SumAnnual").Value)
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow += lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
                         lDiversion = aOutflow - lTotalOutFlow
 
                     Case Else
+                        lExitFlowConstituent = aConstituent & "-TOSQAL-EXIT" & lExitNUmber
+
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
+                        lExitFlowConstituent = aConstituent & "-ODQAL-EXIT" & lExitNUmber
+                        lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
+                            FindData("Constituent", lExitFlowConstituent)(0)
+                        If Not lTimeSeries Is Nothing Then
+                            lTotalOutFlow += lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
+                        End If
+                        lDiversion = aOutflow - lTotalOutFlow
 
                 End Select
                 aUpstreamInflows.Increment(aDownstreamReachID, lTotalOutFlow)

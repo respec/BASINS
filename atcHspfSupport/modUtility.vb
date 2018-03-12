@@ -1183,6 +1183,13 @@ Public Module Utility
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
 
+                            'When dissolved Nh3+NH4 enters into strean as sediment attached.
+
+                        Case aConstituent = "SOQO-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+
+
                             'When sediment associated NH3+NH4 enters into stream as dissolved
                         Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1307,7 +1314,7 @@ Public Module Utility
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
+                            lMassLinkFactor += lMassLink.MFact
                             Return lMassLinkFactor
                         Case aConstituent = "AOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1317,12 +1324,18 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
 
+                            'if dissolved PO4 enters into stream as sediment attached PO4
+                        Case aConstituent = "SOQO-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+
+
                             'If sediment associated PO4 enters into stream as dissolved PO4
                         Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4" OrElse aConstituent = "SOQS-PO4") AndAlso
-                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub2 = 4 AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
+                            lMassLinkFactor += lMassLink.MFact
+                            'Return lMassLinkFactor
 
                              'If sediment associated PO4 enters into stream as sediment associated
                         Case aConstituent = "WASHQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
@@ -1334,7 +1347,7 @@ Public Module Utility
                             lMassLinkFactor += lMassLink.MFact
 
                         Case aConstituent = "SOQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
-                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "SOQUAL-ORTHO P" OrElse aConstituent = "SOQO-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
@@ -1350,9 +1363,15 @@ Public Module Utility
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
 
-                              'If sediment associated PO4 enters into stream as dissolved PO4
+                                'if dissolved PO4 enters into stream as sediment attached PO4
+                        Case aConstituent = "SOQO-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+
+
+                            'If sediment associated PO4 enters into stream as dissolved PO4
                         Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P" OrElse aConstituent = "SOQS-ORTHO P") AndAlso
-                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub2 = 4 AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
@@ -1989,6 +2008,8 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
+            Case "BOD-Labile"
+                Return QUALs
 
             Case Else
                 QUALNames = New ConstituentProperties
@@ -2167,17 +2188,18 @@ Public Module Utility
                     lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                 End If
             End If
-            Do While lUnits.Length = 0
-                For lIndex As Integer = 2 To 10
+            'Do While lUnits.Length = 0
+            For lIndex As Integer = 2 To 10
                     If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
                         lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
                         If aGQualName = lTempQual Then
-                            'found it
-                            lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-                        End If
+                        'found it
+                        lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                        Exit For
+                    End If
                     End If
                 Next
-            Loop
+            'Loop
         End If
 
         Return lUnits
