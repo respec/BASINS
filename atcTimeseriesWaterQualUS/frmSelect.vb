@@ -28,10 +28,22 @@ Public Class frmSelect
             lstLocations.Items().Add(loc)
         Next
         lSortedList.Clear()
+        Dim lSortedListPreferred As New SortedList(Of String, Integer)()
         For Each cons As String In aRawDataGroup.GetUniqueConstituentList()
-            lSortedList.Add(cons, 0)
+            If clsWQDUSPreferred.IsPreferredWaterQuality(cons) Then
+                If Not lSortedListPreferred.ContainsKey(cons) Then
+                    lSortedListPreferred.Add(cons, 0)
+                End If
+            Else
+                If Not lSortedList.ContainsKey(cons) Then
+                    lSortedList.Add(cons, 0)
+                End If
+            End If
         Next
-        For Each cons As String In lSortedList.Keys
+        For Each cons As String In lSortedListPreferred.Keys()
+            lstConstituents.Items().Add(cons)
+        Next
+        For Each cons As String In lSortedList.Keys()
             lstConstituents.Items().Add(cons)
         Next
     End Sub
