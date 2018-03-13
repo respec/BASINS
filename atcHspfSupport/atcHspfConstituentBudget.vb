@@ -191,7 +191,7 @@ Public Module ConstituentBudget
         Dim lOutputTable As New atcTableDelimited
 
         Select Case aBalanceType
-            Case "Water"
+            Case "Water", "WAT"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (ft/ac)" & vbTab & "Total Load (ac-ft)")
@@ -366,7 +366,7 @@ Public Module ConstituentBudget
                     lReport.Append(.ToString)
                 End With
 
-            Case "Sediment"
+            Case "Sediment", "SED"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" &
                                     vbTab & "Rate (tons/ac)" & vbTab & "Total Load (tons)")
@@ -1444,7 +1444,7 @@ Public Module ConstituentBudget
                                                                                aConversionFactor, aMultipleIndex:=0)
                             End If
 
-                            lConstituentTotal = lTs.Attributes.GetValue("SumAnnual") * lMassLinkFactor * lConnectionArea
+                            lConstituentTotal = lTs.Attributes.GetDefinedValue("SumAnnual").Value * lMassLinkFactor * lConnectionArea
                             'lConstituentTotal = lConstituentRate * lConnectionArea
 
                             lTotal += lConstituentTotal
