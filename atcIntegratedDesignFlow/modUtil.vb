@@ -1624,8 +1624,6 @@ Public Module modUtil
                 'lRept.AppendLine()
                 'lRept.AppendLine(vbFormFeed)
 
-                lHeader &= DFLOWDisclaimer 'Add Message Here
-                lHeader &= vbCrLf
                 lHeader &= "Program SWToolbox         U.S. GEOLOGICAL SURVEY             Version 1.0" & vbCrLf
                 lHeader &= "Analysis: DFLOW (version " & i_Version & ")" & vbCrLf
                 lHeader &= "Run Date and Time: " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt")
