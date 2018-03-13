@@ -2189,14 +2189,14 @@ Public Module atcConstituentTables
                         lDiversion = aOutflow - lTotalOutFlow
 
                     Case Else
-                        lExitFlowConstituent = aConstituent & "-TOSQAL-EXIT" & lExitNUmber
+                        lExitFlowConstituent = aConstituent & "-OSQAL-TOT-" & lExitNUmber
 
                         lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
                             FindData("Constituent", lExitFlowConstituent)(0)
                         If Not lTimeSeries Is Nothing Then
                             lTotalOutFlow = lTimeSeries.Attributes.GetDefinedValue("SumAnnual").Value
                         End If
-                        lExitFlowConstituent = aConstituent & "-ODQAL-EXIT" & lExitNUmber
+                        lExitFlowConstituent = aConstituent & "-TOSQAL-EXIT" & lExitNUmber
                         lTimeSeries = aBinaryDataSource.DataSets.FindData("Location", "R:" & aReach.Id).
                             FindData("Constituent", lExitFlowConstituent)(0)
                         If Not lTimeSeries Is Nothing Then
