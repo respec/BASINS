@@ -44,12 +44,6 @@ Public Module WatershedSummary
                 lPerlndConstituents.Add("PODOXM")
                 lImplndConstituents.Add("SODOXM")
                 lRchresConstituents.Add("DOXOUTTOT")
-            Case "FColi"
-                lPerlndConstituents.Add("POQUAL-F.Coliform")
-                lImplndConstituents.Add("SOQUAL-F.Coliform")
-                lUnits = "10^9"
-                lTotalUnits = lUnits
-                lRchresConstituents.Add("F.Coliform-TROQAL")
             Case "Lead"
                 lPerlndConstituents.Add("POQUAL-LEAD")
                 lImplndConstituents.Add("SOQUAL-LEAD")
@@ -118,6 +112,19 @@ Public Module WatershedSummary
                 lPerlndConstituents.Add("POQUAL-ZINC")
                 lImplndConstituents.Add("SOQUAL-ZINC")
                 lRchresConstituents.Add("ZINC-TROQAL")
+            Case Else
+                lUnits = GQualUnits(aUci, aSummaryType)
+                If aSummaryType.ToUpper.Contains("F.COLIFORM") Or aSummaryType.ToUpper.StartsWith("FCOLI") Or aSummaryType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
+                    lUnits = "10^9 " & lUnits
+                End If
+                Dim lGQualName As String = aSummaryType
+                If lGQualName = "FColi" Then
+                    lGQualName = "F.Coliform"
+                End If
+                lPerlndConstituents.Add("POQUAL-" & lGQualName)
+                lImplndConstituents.Add("SOQUAL-" & lGQualName)
+                lTotalUnits = lUnits
+                lRchresConstituents.Add(lGQualName & "-TROQAL")
         End Select
 
         Dim lReport As New atcReport.ReportText

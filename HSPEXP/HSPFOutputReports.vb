@@ -91,10 +91,28 @@ Module HSPFOutputReports
             pConstituents.Add("Heat")
         End If
 
-
-        If StartUp.chkFecalColiform.Checked Then
-            pConstituents.Add("FColi")
+        If StartUp.chkGQUAL1.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL1.Text & "-1")
         End If
+        If StartUp.chkGQUAL2.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL2.Text & "-2")
+        End If
+        If StartUp.chkGQUAL3.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL3.Text & "-3")
+        End If
+        If StartUp.chkGQUAL4.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL4.Text & "-4")
+        End If
+        If StartUp.chkGQUAL5.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL5.Text & "-5")
+        End If
+        If StartUp.chkGQUAL6.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL6.Text & "-6")
+        End If
+        If StartUp.chkGQUAL7.Checked Then
+            pConstituents.Add(StartUp.chkGQUAL7.Text & "-7")
+        End If
+
         'set up the timeseries attributes for statistics
         atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
 
@@ -442,6 +460,7 @@ Module HSPFOutputReports
                         Dim lConstituentName As String = ""
                         Dim lActiveSections As New List(Of String)
                         Dim CheckQUALID As Boolean = False
+                        Dim lGQALID As Integer = 0
                         Select Case lConstituent
                             Case "Water"
                                 lConstituentName = "WAT"
@@ -491,29 +510,18 @@ Module HSPFOutputReports
                                 lActiveSections.Add("OXRX")
                                 lActiveSections.Add("NUTRX")
                                 lActiveSections.Add("PLANK")
-                            Case "FColi"
-                                lConstituentName = "FColi"
+                            Case Else
+                                lGQALID = Right(lConstituent, 1)
+                                lConstituentName = SafeSubstring(lConstituent, 0, lConstituent.Length - 2)
+                                lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituentName, lGQALID)
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
+
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
-                        'If lOpenHspfBinDataSource.DataSets.Count > 1 Then
-                        '    Dim lConstituentsToOutput As atcCollection = Utility.ConstituentsToOutput(lConstituent, lConstProperties)
-                        '    For Each ConstituentForAnalysis As String In lConstituentsToOutput.Keys
-                        '        Dim OpnType As String = SafeSubstring(ConstituentForAnalysis, 0, 2)
-                        '        ConstituentForAnalysis = SafeSubstring(ConstituentForAnalysis, 2)
-                        '        If Not OpnType = "R:" AndAlso (ConstituentForAnalysis.EndsWith("1") Or ConstituentForAnalysis.EndsWith("2")) Then
-
-                        '            ConstituentForAnalysis = Left(ConstituentForAnalysis, ConstituentForAnalysis.Length - 1)
-                        '        End If
-                        '        lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Constituent", ConstituentForAnalysis))
-
-                        '    Next
-
-                        'End If
-
+                       
                         If lScenarioResults.DataSets.Count = 0 Then
                             For Each activeSection As String In lActiveSections
                                 lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Section", activeSection))
@@ -527,13 +535,15 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
-                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituent, lConstProperties, SDateJ, EDateJ)
+                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
                             Logger.Status(Now & " Generating Reports for " & lConstituent)
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
 
-                            If Not (lConstituent = "DO" Or lConstituent = "Heat" Or lConstituent = "BOD-Labile") Then
+                            If lConstituent = "TotalN" OrElse lConstituent = "TotalP" OrElse
+                                lConstituent = "Sediment" OrElse lConstituent = "Water" Then
+
                                 With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,
                                                                       lScenarioResults, pOutputLocations, lRunMade, SDateJ, EDateJ, lConstProperties)
                                     lReportCons = .Item1
@@ -605,8 +615,8 @@ Module HSPFOutputReports
 
 
                         Else
-                                Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
-                                lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
+                            Logger.Dbg("The HBN file didn't have any data for the constituent " & lConstituent & "  therefore the balance reports for " &
+                            lConstituent & " will not be generated. Make sure that HSPF run completed last time.")
                             Dim ans As Integer
                             ans = MsgBox("HBN files do not have any data.  Constituent Balance reports will not be generated. " &
                                          "Did uci file run properly last time?")

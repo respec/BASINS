@@ -49,18 +49,29 @@ Public Class atcDataSourceTimeseriesHSF5
         End Get
     End Property
 
-
     Public ReadOnly Property Label() As String
         Get
             Return "HDF5"
         End Get
     End Property
 
+    ''' <summary>
+    ''' timeseries class for HDF5 files produced by HSP2, read only for now
+    ''' </summary>
+    ''' <param name="aFileName">name of existing hdf5 file, if missing or blank - query user for name</param>
+    ''' <param name="aAttributes">optional options</param>
+    ''' <returns></returns>
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         Dim lAttributes As atcData.atcDataAttributes = aAttributes
-        If lAttributes Is Nothing Then
+        If lAttributes Is Nothing Then 'no options provided, provide empty class to avoid problems
             lAttributes = New atcData.atcDataAttributes
+        Else 'summarize options
+            Debug.Print("OpenHDF5 File:'" & aFileName & "' Options:")
+            For Each lAttribue As atcData.atcDefinedValue In lAttributes
+                Debug.Print(lAttribue.Definition.Name & ":" & lAttribue.Value)
+            Next
         End If
+
         If MyBase.Open(aFileName, lAttributes) Then
             H5.Open()
             Debug.Print("H5Version " & H5.Version.Major & ":" & H5.Version.Minor)
@@ -71,8 +82,7 @@ Public Class atcDataSourceTimeseriesHSF5
             Dim lGrpId As H5GroupId
             Dim lAtCnt As Integer
 
-            If lAttributes.GetValue("ProcessInputTS", True) Then
-                'input timeseries
+            If lAttributes.GetValue("ProcessInputTS", True) Then 'input timeseries
                 lGrpName = "/TIMESERIES"
                 lGrpId = H5G.open(lFileId, lGrpName)
                 lAtCnt = H5A.getNumberOfAttributes(lGrpId)
@@ -82,6 +92,7 @@ Public Class atcDataSourceTimeseriesHSF5
                 For lTsID As Integer = 0 To lCnt - 1
                     Dim lTsName As String = H5G.getObjectNameByIndex(lGrpId, lTsID)
                     If lTsName.StartsWith("TS") Then
+                        'cant use dates from earlier thimeseries because each one is independent!
                         AddDataSet(BuildTimeSeries(lGrpId, lTsName, "OBSERVED"))
                     End If
                 Next
@@ -90,10 +101,16 @@ Public Class atcDataSourceTimeseriesHSF5
                 Debug.Print("Input Timeseries Skipped " & DataSets.Count)
             End If
 
-            If lAttributes.GetValue("ProcessOutputTS", True) Then
-                'output timeseries
+            If lAttributes.GetValue("ProcessOutputTS", True) Then 'output timeseries
                 Dim lOutputConstituent As String = lAttributes.GetValue("OutputConstituent", "")
                 Dim lOutputLocation As String = lAttributes.GetValue("OutputLocation", "")
+
+                Dim lOutputSection As New atcAttributeDefinition
+                lOutputSection.Name = "OutputSection"
+                lOutputSection.DefaultValue = Nothing
+                Dim lOutputColumn As New atcAttributeDefinition
+                lOutputColumn.Name = "OutputColumn"
+                lOutputColumn.DefaultValue = Nothing
 
                 lGrpName = "/RESULTS"
                 lGrpId = H5G.open(lFileId, lGrpName)
@@ -132,13 +149,20 @@ Public Class atcDataSourceTimeseriesHSF5
                                 lTimeSeries.Attributes.Add("Constituent", lConsName)
                                 lTimeSeries.Attributes.Add("Location", lOpnName)
                                 lTimeSeries.Attributes.Add("Scenario", "Simulated")
-                                If lConsDateDatasetIndex < 200 Then 'too many datasets run out of memory, need to just build headers then read data as needed
-                                    If DataSets.Count <> lConsDateDatasetIndex Then 'use dates from first dataset in this group
-                                        lTimeSeries.Dates = DataSets(lConsDateDatasetIndex).Dates.Clone
-                                    End If
-                                    ReadDatesAndData(lTimeSeries, lSecId, "axis1", "block0_values", lConInd)
-                                    AddDataSet(lTimeSeries)
+                                If DataSets.Count <> lConsDateDatasetIndex Then 'use dates from first dataset in this group
+                                    lTimeSeries.Dates = DataSets(lConsDateDatasetIndex).Dates 'reference, don't want copy/clone!
+                                Else
+                                    ReadDates(lTimeSeries, lSecId, "axis1")
                                 End If
+                                'too many datasets run out of memory, need to just build headers then read data as needed
+                                With lTimeSeries
+                                    .numValues = lTimeSeries.Dates.numValues
+                                    .Attributes.Add(New atcDefinedValue(lOutputSection, lSecId))
+                                    .Attributes.Add(New atcDefinedValue(lOutputColumn, lConInd))
+                                    lTimeSeries.Dates.Attributes.Add("Shared", True)
+                                    .ValuesNeedToBeRead = True
+                                End With
+                                AddDataSet(lTimeSeries)
                             End If
                         Next
                     Next
@@ -155,7 +179,7 @@ Public Class atcDataSourceTimeseriesHSF5
         Filter = pFilter
     End Sub
 
-    Private Function BuildTimeSeries(aGrpID As H5LocId, aTsName As String, aScenario As String) As atcTimeseries
+    Private Function BuildTimeSeries(aGrpID As H5LocId, aTsName As String, aScenario As String, Optional aDatesTS As atcTimeseries = Nothing) As atcTimeseries
         Dim lTsGrpId As H5GroupId = H5G.open(aGrpID, aTsName)
 
         Dim lTsAtCnt As Integer = H5A.getNumberOfAttributes(lTsGrpId)
@@ -203,13 +227,80 @@ Public Class atcDataSourceTimeseriesHSF5
         Next
         lTimeSeries.Attributes.Add("Name", aTsName)
 
+        If IsNothing(aDatesTS) Then
+            ReadDates(lTimeSeries, lTsGrpId, "index")
+        Else
+            lTimeSeries.Dates = aDatesTS.Dates
+        End If
+
         ReadDatesAndData(lTimeSeries, lTsGrpId, "index", "values")
 
         Return lTimeSeries
     End Function
 
-    Private Sub ReadDatesAndData(aTimeseries As atcTimeseries, aTsGrpId As H5GroupId, aDateTableName As String, aDataTableName As String, Optional aColumn As Integer = -1)
+    Private Sub ReadDates(aTimeseries As atcTimeseries, aTsGrpId As H5GroupId, aDateTableName As String)
+        Dim lNumValues As Integer
 
+        If IsNothing(aTimeseries.Dates) Then 'need dates
+            Dim lDateGrpId As H5DataSetId = H5D.open(aTsGrpId, aDateTableName)
+            Dim lDateStorageSize As Integer = H5D.getStorageSize(lDateGrpId)
+            lNumValues = lDateStorageSize / 8
+            Dim lDates(lNumValues - 1) As Long
+            Dim lDateTypeId As H5DataTypeId = H5D.getType(lDateGrpId)
+            H5D.read(Of Int64)(lDateGrpId, lDateTypeId, New H5Array(Of Long)(lDates))
+            Debug.Print(lDateStorageSize.ToString & ":" & lNumValues.ToString & ":" & lDates(0).ToString)
+            Dim lDateBase As New System.DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)
+            Dim lDateNow As System.DateTime = lDateBase.AddMilliseconds(lDates(0) / (10 ^ 6))
+            Dim lDatesJ(lNumValues) As Double
+            For lIndex As Integer = 0 To lNumValues - 1
+                lDateNow = lDateBase.AddMilliseconds(lDates(lIndex) / (10 ^ 6))
+                With lDateNow
+                    lDatesJ(lIndex) = Date2J(.Year, .Month, .Day, .Hour, .Minute, .Second)
+                End With
+                If lIndex < 3 Or lIndex > lNumValues - 2 Then
+                    Debug.Print(lDateNow.ToString & ":" & DumpDate(lDatesJ(lIndex)))
+                End If
+            Next
+            lDatesJ(lNumValues) = (2 * (lDatesJ(lNumValues - 1))) - lDatesJ(lNumValues - 2)
+            Debug.Print(DumpDate(lDatesJ(lNumValues)))
+            aTimeseries.Dates = New atcTimeseries(Me)
+            aTimeseries.Dates.Values = lDatesJ
+        Else
+            Debug.Print("Why?")
+        End If
+    End Sub
+
+    Public Overrides Sub ReadData(ByVal aData As atcDataSet)
+        If aData.Attributes.GetValue("OutputSection") Is Nothing Then
+            'data has been read
+        Else
+            Debug.Print("Need to read data for " & aData.ToString)
+            Dim lTimeseries As atcTimeseries = aData
+            Dim lNumValues As Integer = lTimeseries.Dates.numValues
+            Dim lColumn As Integer = lTimeseries.Attributes.GetValue("OutputColumn")
+            Dim lGroupId As H5GroupId = lTimeseries.Attributes.GetValue("OutputSection")
+            Dim lValueGrpId As H5DataSetId = H5D.open(lGroupId, "block0_values")
+
+            Dim lValuesArraySize As Integer = H5D.getStorageSize(lValueGrpId) / 4
+            Dim lValueArraySize As Integer = lTimeseries.Dates.numValues
+            Dim lValueColumns As Integer = lValuesArraySize / lValueArraySize
+            Dim lValues(lValuesArraySize - 1) As Single
+            Dim lValueTypeId As H5DataTypeId = H5D.getType(lValueGrpId)
+            'read all data (may be multiple ts)
+            H5D.read(Of Single)(lValueGrpId, lValueTypeId, New H5Array(Of Single)(lValues))
+            Debug.Print(lValuesArraySize.ToString & ":" & lValueArraySize.ToString & ":" & lValues(0).ToString & ":" & lValues(1).ToString)
+            ReDim lTimeseries.Values(lNumValues)
+            For lIndex As Integer = 1 To lNumValues
+                Dim lArrayIndex As Integer = (lValueColumns * (lIndex - 1)) + lColumn
+                lTimeseries.Values(lIndex) = lValues(lArrayIndex)
+            Next lIndex
+
+            lTimeseries.SetInterval()
+            lTimeseries.Attributes.CalculateAll()
+        End If
+    End Sub
+
+    Private Sub ReadDatesAndData(aTimeseries As atcTimeseries, aTsGrpId As H5GroupId, aDateTableName As String, aDataTableName As String, Optional aColumn As Integer = -1)
         Dim lNumValues As Integer
         Dim lColumn As Integer = aColumn
         If lColumn < 0 Then lColumn = 0

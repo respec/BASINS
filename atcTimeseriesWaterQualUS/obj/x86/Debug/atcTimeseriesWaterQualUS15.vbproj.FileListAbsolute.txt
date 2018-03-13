@@ -1,0 +1,10 @@
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS15.vbprojResolveAssemblyReference.cache
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS.frmSelect.resources
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS.Resources.resources
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS15.vbproj.GenerateResource.Cache
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\atcTimeseriesWaterQualUS.dll
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\atcTimeseriesWaterQualUS.pdb
+C:\Dev\BASINS\BASINS\Bin\Plugins\BASINS\atcTimeseriesWaterQualUS.xml
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS.dll
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS.xml
+C:\Dev\BASINS\BASINS\atcTimeseriesWaterQualUS\obj\x86\Debug\atcTimeseriesWaterQualUS.pdb

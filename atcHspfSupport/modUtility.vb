@@ -135,7 +135,8 @@ Public Module Utility
         Return pConstituentsThatNeedMassLink
     End Function
     Public Function ConstituentsToOutput(ByVal aType As String, ByVal aConstProperties As List(Of ConstituentProperties),
-                                Optional ByVal aCategory As Boolean = False) As atcCollection
+                                Optional ByVal aCategory As Boolean = False,
+                                Optional ByVal aUnits As String = "") As atcCollection
         Dim lConstituentsToOutput As New atcCollection
         Select Case aType
 #Region "Case Water"
@@ -265,22 +266,6 @@ Public Module Utility
                     .Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
                     .Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                     .Add("R:Copper-TROQAL", "Total Cu")
-                End With
-#End Region
-#Region "Case FColi"
-            Case "FColi"
-                With lConstituentsToOutput
-                    .Add("P:Header1", "F.Coliform (10^9 org/ac)")
-                    .Add("P:SOQUAL-F.Coliform", "  Surface")
-                    .Add("P:IOQUAL-F.Coliform", "  Interflow")
-                    .Add("P:AOQUAL-F.Coliform", "  Baseflow")
-                    .Add("P:Total3", "  Total")
-                    .Add("I:Header2", "F.Coliform (10^9 org/ac)")
-                    .Add("I:SOQUAL-F.Coliform", "  ImpervSurf")
-                    .Add("R:Header3", "F.Coliform (10^9 org)")
-                    .Add("R:F.Coliform-TIQAL", "  Inflow")
-                    .Add("R:F.Coliform-DDQAL-TOT", "  Decay")
-                    .Add("R:F.Coliform-TROQAL", "  Outflow")
                 End With
 #End Region
 #Region "Case N-PQUAL"
@@ -605,15 +590,15 @@ Public Module Utility
                     .Add("R:N-TOT-OUT-EXIT5", "  Total N OutflowExit5")
 
                 End With
-                '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
-                '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
-                '.Add("R:TAM-OUTPART-TOT-EXIT3", "  Particulate NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTDIS-EXIT3", "  Dissolved NH3 Outflow-Exit3")
+            '.Add("R:TAM-OUTPART-TOT-EXIT3", "  Particulate NH3 Outflow-Exit3")
 
-                '.Add("R:NO3-OUTTOT-EXIT3", "  Total NO3 Outflow - Exit 3")
+            '.Add("R:NO3-OUTTOT-EXIT3", "  Total NO3 Outflow - Exit 3")
 
-                '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
-                '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
-                '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
+            '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
+            '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
+            '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
 #End Region
 #Region "Case TotalP"
             Case "TotalP"
@@ -812,12 +797,32 @@ Public Module Utility
                     .Add("R:BODOUTTOT", "  BODOUTTOT")
                 End With
 #End Region
+#Region "Case Else"
+            Case Else
+                Dim lUnits As String = aUnits
+                If aType.ToUpper.Contains("F.COLIFORM") Or aType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
+                    lUnits = "10^9 " & aUnits
+                End If
+                With lConstituentsToOutput
+                    .Add("P:Header1", aType & " (" & lUnits & "/ac)")
+                    .Add("P:SOQUAL-" & aType, "  Surface")
+                    .Add("P:IOQUAL-" & aType, "  Interflow")
+                    .Add("P:AOQUAL-" & aType, "  Baseflow")
+                    .Add("P:Total3", "  Total")
+                    .Add("I:Header2", aType & " (" & lUnits & "/ac)")
+                    .Add("I:SOQUAL-" & aType, "  ImpervSurf")
+                    .Add("R:Header3", aType & " (" & lUnits & ")")
+                    .Add("R:" & aType & "-TIQAL", "  Inflow")
+                    .Add("R:" & aType & "-DDQAL-TOT", "  Decay")
+                    .Add("R:" & aType & "-TROQAL", "  Outflow")
+                End With
+#End Region
         End Select
         Return lConstituentsToOutput
     End Function
 
-    Public Function LandUses(ByVal aUci As HspfUci, _
-                             ByVal aOperationTypes As atcCollection, _
+    Public Function LandUses(ByVal aUci As HspfUci,
+                             ByVal aOperationTypes As atcCollection,
                     Optional ByVal aOutletLocation As String = "") As atcCollection
         Dim lLocations As New atcCollection
         If aOutletLocation.Length > 0 Then
@@ -875,25 +880,25 @@ Public Module Utility
         Return lLandUsesTemp
     End Function
 
-    Public Function UpstreamLocations(ByVal aUci As HspfUci, _
-                                      ByVal aOperationTypes As atcCollection, _
+    Public Function UpstreamLocations(ByVal aUci As HspfUci,
+                                      ByVal aOperationTypes As atcCollection,
                                       ByVal aLocation As String) As atcCollection
         Dim lLocations As New atcCollection 'key-location, value-total area
         UpstreamLocationAreaCalc(aUci, aLocation, aOperationTypes, lLocations)
         Return lLocations
     End Function
 
-    Private Sub UpstreamLocationAreaCalc(ByVal aUci As HspfUci, _
-                                         ByVal aLocation As String, _
-                                         ByVal aOperationTypes As atcCollection, _
+    Private Sub UpstreamLocationAreaCalc(ByVal aUci As HspfUci,
+                                         ByVal aLocation As String,
+                                         ByVal aOperationTypes As atcCollection,
                                          ByRef aLocations As atcCollection)
         LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True)
     End Sub
 
-    Public Sub LocationAreaCalc(ByVal aUci As HspfUci, _
-                                ByVal aLocation As String, _
-                                ByVal aOperationTypes As atcCollection, _
-                                ByRef aLocations As atcCollection, _
+    Public Sub LocationAreaCalc(ByVal aUci As HspfUci,
+                                ByVal aLocation As String,
+                                ByVal aOperationTypes As atcCollection,
+                                ByRef aLocations As atcCollection,
                                 ByVal aUpstream As Boolean)
 
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
@@ -915,8 +920,8 @@ Public Module Utility
                     If aUpstream Then
                         If lUpstreamChecked.Contains(lLocationKey) Then
                             Logger.Dbg("SkipDuplicate:" & lLocationKey)
-                        ElseIf aUci.Name.ToLower.Contains("scr") AndAlso _
-                               lConnection.Source.VolId = 229 AndAlso _
+                        ElseIf aUci.Name.ToLower.Contains("scr") AndAlso
+                               lConnection.Source.VolId = 229 AndAlso
                                lConnection.Target.VolId = 516 Then
                             'TODO: figure out a way not to hardcode this!
                             Logger.Dbg("Skip 229 to 516 in SantaClara")
@@ -950,7 +955,7 @@ Public Module Utility
         Return lArea
     End Function
 
-    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries, _
+    Public Function CfsToInches(ByVal aTSerIn As atcTimeseries,
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (12.0# * 24.0# * 3600.0#) / (aArea * 43560.0#)   'cfs days to inches
         Dim lTsMath As atcTimeseriesSource = New atcTimeseriesMath.atcTimeseriesMath
@@ -961,7 +966,7 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries, _
+    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries,
                                 ByVal aArea As Double) As atcTimeseries
         Dim lConversionFactor As Double = (aArea * 43560.0#) / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
         Dim lInterval As Double = aTSerIn.Attributes.GetValue("interval", 1.0)
@@ -974,29 +979,29 @@ Public Module Utility
         Return lTsMath.DataSets(0)
     End Function
 
-    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries, _
-                          ByVal aName As String, _
-                          ByRef aSDateJ As Double, _
-                          ByRef aEDateJ As Double, _
+    Friend Sub CheckDateJ(ByVal aTSer As atcTimeseries,
+                          ByVal aName As String,
+                          ByRef aSDateJ As Double,
+                          ByRef aEDateJ As Double,
                           ByRef aStr As String)
         Dim lDateTmp As Double = aTSer.Dates.Values(0)
         If aSDateJ < lDateTmp Then
-            aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") & _
-                                             "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+            aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") &
+                                             "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") &
                                         " due to " & aName & vbCrLf & vbCrLf
             aSDateJ = lDateTmp
         End If
         lDateTmp = aTSer.Dates.Values(aTSer.numValues)
         If aEDateJ > lDateTmp Then
-            aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") & _
-                                          " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+            aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") &
+                                          " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") &
                                       " due to " & aName & vbCrLf & vbCrLf
             aEDateJ = lDateTmp
         End If
     End Sub
 
-    Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String, _
-                               ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection, _
+    Public Function AreaReport(ByVal aUci As HspfUci, ByVal aRunMade As String,
+                               ByVal aOperationTypes As atcCollection, ByVal aLocations As atcCollection,
                                ByVal aLandUseReport As Boolean, ByVal aReportPath As String) As atcReport.IReport
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine("Area Summary Report")
@@ -1015,8 +1020,8 @@ Public Module Utility
         Return lReport
     End Function
 
-    Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection, _
-                                        ByVal aLocation As String, ByVal aLandUseReport As Boolean, _
+    Private Function AreaReportLocation(ByVal aUci As HspfUci, ByVal aOperationtypes As atcCollection,
+                                        ByVal aLocation As String, ByVal aLandUseReport As Boolean,
                                         ByVal aReportPath As String, ByVal aRunMade As String) As String
         If aLandUseReport Then
             Dim lReport As New atcReport.ReportText
@@ -1025,9 +1030,9 @@ Public Module Utility
             lReport.AppendLine("   Run Made " & aRunMade)
             lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
             lReport.AppendLine("")
-            lReport.AppendLine("Landuse".PadLeft(20) & vbTab & _
-                           "PervArea".PadLeft(12) & vbTab & _
-                           "ImpvArea".PadLeft(12) & vbTab & _
+            lReport.AppendLine("Landuse".PadLeft(20) & vbTab &
+                           "PervArea".PadLeft(12) & vbTab &
+                           "ImpvArea".PadLeft(12) & vbTab &
                            "TotalArea".PadLeft(12))
             Dim lLandUses As atcCollection = LandUses(aUci, aOperationtypes, aLocation)
             Dim lLandUsesCombinePervImpv As atcCollection = LandUsesCombined(lLandUses)
@@ -1046,9 +1051,9 @@ Public Module Utility
                 Dim lLandUseArea As Double = lPervArea + lImprArea
 
 
-                lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab & _
-                               DecimalAlign(lPervArea, , 2, 7) & vbTab & _
-                               DecimalAlign(lImprArea, , 2, 7) & vbTab & _
+                lReport.AppendLine(lLandUsesCombinePervImpv.Keys(lLandUseIndex).ToString.PadLeft(20) & vbTab &
+                               DecimalAlign(lPervArea, , 2, 7) & vbTab &
+                               DecimalAlign(lImprArea, , 2, 7) & vbTab &
                                DecimalAlign(lLandUseArea, , 2, 7))
                 lTotalAreaPerv += lPervArea
                 lTotalAreaImpr += lImprArea
@@ -1057,9 +1062,9 @@ Public Module Utility
             lLandUsesCombinePervImpv.Clear()
             lLandUses.Clear()
             lReport.AppendLine("")
-            lReport.AppendLine("Total".PadLeft(20) & vbTab & _
-                           DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab & _
-                           DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab & _
+            lReport.AppendLine("Total".PadLeft(20) & vbTab &
+                           DecimalAlign(lTotalAreaPerv, , 2, 7) & vbTab &
+                           DecimalAlign(lTotalAreaImpr, , 2, 7) & vbTab &
                            DecimalAlign(lTotalAreaFromLandUses, , 2, 7))
             SaveFileString(aReportPath & SafeFilename("AreaLanduse_" & aLocation & ".txt"), lReport.ToString)
         End If
@@ -1096,9 +1101,9 @@ Public Module Utility
             lStr &= AreaReportLocation(aUci, aOperationtypes, lUpstreamLocation, aLandUseReport, aReportPath, aRunMade)
         Next
         lUpstreamLocations.Clear()
-        lStr &= aLocation.PadRight(8) & vbTab & _
-                DecimalAlign(lTotalArea, , 2, 7) & vbTab & _
-                DecimalAlign(lLocalArea, , 2, 7) & vbTab & _
+        lStr &= aLocation.PadRight(8) & vbTab &
+                DecimalAlign(lTotalArea, , 2, 7) & vbTab &
+                DecimalAlign(lLocalArea, , 2, 7) & vbTab &
                 lUpstreamLocationsString & vbCrLf
         Return lStr
     End Function
@@ -1135,7 +1140,8 @@ Public Module Utility
     End Function
 
     Public Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String,
-                                               ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer) As Double
+                                               ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer,
+                                       Optional ByVal aGQALID As Integer = 0) As Double
         'If aConstituent = "TAM" Then aConstituent = "NH3+NH4"
         Dim lMassLinkFactor As Double = 0.0
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -1164,19 +1170,6 @@ Public Module Utility
 
                 Case "TotalN"
                     Select Case True
-                        Case (aConstituent = "NO3+NO2-N - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NO3+NO2-N - UPPER LAYER OUTFLOW" OrElse
-                                aConstituent = "NO3+NO2-N - GROUNDWATER OUTFLOW" OrElse aConstituent = "NO3-N - TOTAL OUTFLOW") AndAlso
-                                lMassLink.Target.Member.ToString = "NUIF1" And lMassLink.Target.MemSub1 = 1
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-
-                        Case (aConstituent = "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW" OrElse
-                            aConstituent = "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2
-                            lMassLinkFactor = lMassLink.MFact
-                            Return lMassLinkFactor
-                        Case aConstituent = "NH4-N ADS - SEDIMENT ASSOC OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                             lMassLink.Target.MemSub2 = 1 'lMassLink.Target.MemSub1 = 1 AndAlso 
-                            lMassLinkFactor += lMassLink.MFact
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
@@ -1189,9 +1182,34 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (aConstituent = "WASHQS-NH3+NH4" OrElse aConstituent = "SCRQS-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+                            'When dissolved Nh3+NH4 enters into strean as sediment attached.
+
+                        Case aConstituent = "SOQO-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+
+
+                            'When sediment associated NH3+NH4 enters into stream as dissolved
+                        Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                        Case aConstituent = "SOQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor = lMassLink.MFact
+
+                            'When sediment associated NH3+NH4 enters into stream as associated with sediment
+                        Case aConstituent = "WASHQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 1 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent = "SCRQS-NH3+NH4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 1 AndAlso
+                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+
                         Case (aConstituent = "SOQUAL-NO3" OrElse aConstituent = "SOQO-NO3") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
@@ -1204,6 +1222,7 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
+
                         Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
                             aConstituent = "WASHQS-Ref-OrgN" OrElse aConstituent = "SCRQS-Ref-OrgN" OrElse aConstituent = "SOQO-Ref-OrgN" OrElse aConstituent = "SOQUAL-Ref-OrgN" OrElse
                             aConstituent = "WASHQS-lab-OrgN" OrElse aConstituent = "SCRQS-lab-OrgN" OrElse aConstituent = "SOQO-lab-OrgN" OrElse aConstituent = "SOQUAL-lab-OrgN") AndAlso
@@ -1239,6 +1258,20 @@ Public Module Utility
                                 lMassLinkFactor = lMassLink.MFact + BODMFact(aUCI, "AOQUAL-BOD", lMassLink.MassLinkId) * aConversionFactor
                             End If
                             Return lMassLinkFactor
+
+                            'Following are AGCHEM cases
+                        Case (aConstituent = "NO3+NO2-N - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NO3+NO2-N - UPPER LAYER OUTFLOW" OrElse
+                            aConstituent = "NO3+NO2-N - GROUNDWATER OUTFLOW" OrElse aConstituent = "NO3-N - TOTAL OUTFLOW") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" And lMassLink.Target.MemSub1 = 1
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case (aConstituent = "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW" OrElse aConstituent = "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW" OrElse
+                            aConstituent = "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent = "NH4-N ADS - SEDIMENT ASSOC OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
+                                             lMassLink.Target.MemSub2 = 1 'lMassLink.Target.MemSub1 = 1 AndAlso 
+                            lMassLinkFactor += lMassLink.MFact
                         Case aConstituent = "ORGN - TOTAL OUTFLOW" AndAlso lMassLink.Target.Member.ToString = "PKIF" AndAlso lMassLink.Target.MemSub1 = 3
                             If aMultipleIndex = 2 Then
                                 lMassLinkFactor = lMassLink.MFact
@@ -1260,6 +1293,7 @@ Public Module Utility
                             lMassLinkFactor = 1
                             Return lMassLinkFactor
 
+
                     End Select
 
                     '    'Anurag does not remember what specific cases do three following lines address.
@@ -1280,7 +1314,7 @@ Public Module Utility
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
+                            lMassLinkFactor += lMassLink.MFact
                             Return lMassLinkFactor
                         Case aConstituent = "AOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "AOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1289,13 +1323,32 @@ Public Module Utility
                         Case aConstituent = "IOQUAL-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
-                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+                            'if dissolved PO4 enters into stream as sediment attached PO4
+                        Case aConstituent = "SOQO-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
 
-                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
-                            lMassLinkFactor = lMassLink.MFact
+
+                            'If sediment associated PO4 enters into stream as dissolved PO4
+                        Case (aConstituent = "WASHQS-PO4" OrElse aConstituent = "SCRQS-PO4" OrElse aConstituent = "SOQS-PO4") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor += lMassLink.MFact
+                            'Return lMassLinkFactor
+
+                             'If sediment associated PO4 enters into stream as sediment associated
+                        Case aConstituent = "WASHQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SCRQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SOQS-PO4" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "SOQUAL-ORTHO P" OrElse aConstituent = "SOQO-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
                             (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1309,11 +1362,30 @@ Public Module Utility
                                 (lMassLink.Source.Member = "IOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso
-                                    lMassLink.Target.MemSub1 = 4 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+                                'if dissolved PO4 enters into stream as sediment attached PO4
+                        Case aConstituent = "SOQO-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                                (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
                             lMassLinkFactor += lMassLink.MFact
-                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P") AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso
-                                lMassLink.Target.MemSub2 = 2 AndAlso (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+
+
+                            'If sediment associated PO4 enters into stream as dissolved PO4
+                        Case (aConstituent = "WASHQS-ORTHO P" OrElse aConstituent = "SCRQS-ORTHO P" OrElse aConstituent = "SOQS-ORTHO P") AndAlso
+                            lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                            'If sediment associated PO4 enters into stream as sediment associated
+                        Case aConstituent = "WASHQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SCRQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                            (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+
+                        Case aConstituent = "SOQS-ORTHO P" AndAlso lMassLink.Target.Member.ToString = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2 AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
                             lMassLinkFactor += lMassLink.MFact
 
                         Case (aConstituent = "WASHQS-BOD" OrElse aConstituent = "SCRQS-BOD" OrElse aConstituent = "SOQO-BOD" OrElse aConstituent = "SOQUAL-BOD" OrElse
@@ -1494,11 +1566,11 @@ Public Module Utility
                 Case "BOD-Labile"
 
                     Select Case True
-                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS") AndAlso
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS") AndAlso
                             aConstituent = "WASHQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
-                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS") AndAlso
+                        Case (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS") AndAlso
                             aConstituent = "SCRQS-BOD-Labile" AndAlso lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2
                             lMassLinkFactor = lMassLink.MFact
                             Return lMassLinkFactor
@@ -1552,6 +1624,32 @@ Public Module Utility
                                  "SOHT_POHT_IHEAT_1", "IOHT_POHT_IHEAT_1", "AOHT_POHT_IHEAT_1"
                             lMassLinkFactor = lMassLink.MFact
                     End Select
+                Case Else
+
+                    Select Case True
+                        'Need to do it for sediment associated GQUAL
+                        Case aConstituent.Contains("SOQO") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
+                                (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "SOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("IOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "IOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("AOQUAL") AndAlso lMassLink.Target.Member = "IDQAL" AndAlso lMassLink.Target.MemSub1 = aGQALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" OrElse lMassLink.Source.Member = "AOQUAL")
+                            lMassLinkFactor = lMassLink.MFact
+                            Return lMassLinkFactor
+                        Case aConstituent.Contains("WASHQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                                (lMassLink.Source.Member = "POQUAL" Or lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "WASHQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent.Contains("SCRQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                            (lMassLink.Source.Member = "POQUAL" Or lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SCRQS" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                        Case aConstituent.Contains("SOQS") AndAlso lMassLink.Target.Member = "ISQAL" AndAlso lMassLink.Target.MemSub2 = aGQALID AndAlso
+                        (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "SOQS")
+                            lMassLinkFactor += lMassLink.MFact
+                    End Select
             End Select
 
         Next
@@ -1562,9 +1660,9 @@ Public Module Utility
     End Function
     Public Function BODMFact(ByVal aUCI As HspfUci, ByVal aconstituent As String, ByVal aMassLinkID As Integer) As Double
         For Each lMasslink As HspfMassLink In aUCI.MassLinks
-            If lMasslink.MassLinkId = aMassLinkID AndAlso _
-                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso _
-                lMasslink.Target.Member = "OXIF" AndAlso _
+            If lMasslink.MassLinkId = aMassLinkID AndAlso
+                (lMasslink.Source.Member.Substring(0, 2) = "PO" Or lMasslink.Source.Member.Substring(0, 2) = aconstituent.Substring(0, 2)) AndAlso
+                lMasslink.Target.Member = "OXIF" AndAlso
                 lMasslink.Target.MemSub1 = 2 Then
                 Return lMasslink.MFact
 
@@ -1629,7 +1727,7 @@ Public Module Utility
 
     End Function
 
-    Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String) As List(Of ConstituentProperties)
+    Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String, Optional ByVal aGQALID As Integer = 0) As List(Of ConstituentProperties)
         Dim QUALs As New List(Of ConstituentProperties)
         Dim QUALNames As ConstituentProperties
         Dim QUALName As String = ""
@@ -1910,6 +2008,47 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
+            Case "BOD-Labile"
+                Return QUALs
+
+            Case Else
+                QUALNames = New ConstituentProperties
+                QUALNames.ConstNameForEXPPlus = aBalanceType
+                QUALNames.ConstituentNameInUCI = aBalanceType
+                lTableName = "QUAL-PROPS"
+                'If aGQALID > 1 Then lTableName = lTableName & ":" & aGQALID
+                Dim lTempQual As String = ""
+                Dim lUnits As String = ""
+
+                If lOper.TableExists(lTableName) Then
+                    lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
+                    If aBalanceType = lTempQual Then
+                        'found it
+                        lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
+                    End If
+                End If
+                Do While lUnits.Length = 0
+                    For lIndex As Integer = 2 To 10
+                        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
+                            If aBalanceType = lTempQual Then
+                                'found it
+                                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                                Exit For
+                            End If
+                        End If
+                    Next
+                Loop
+
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    QUALNames.ConstituentUnit = lUnits & "/ac"
+                Else
+                    QUALNames.ConstituentUnit = lUnits & "/ha"
+                End If
+
+                QUALNames.ReportType = aBalanceType
+                QUALs.Add(QUALNames)
+                Return QUALs
         End Select
 
 
@@ -1931,7 +2070,8 @@ Public Module Utility
     End Function
 
     Public Function ConstituentList(ByVal aBalanceType As String, Optional ByVal QualityConstituent As String = "",
-                                     Optional ByVal EXPPlusName As String = "", Optional ByVal AgChemConst As Boolean = False) As Dictionary(Of String, String)
+                                     Optional ByVal EXPPlusName As String = "", Optional ByVal AgChemConst As Boolean = False,
+                                    Optional ByVal aOperName As String = "") As Dictionary(Of String, String)
         'Design for AGCHEM Case as well.
         Dim lOutflowDataType As New Dictionary(Of String, String)
         Select Case aBalanceType
@@ -1970,19 +2110,33 @@ Public Module Utility
                 lOutflowDataType.Add("AOHT", "AOHT")
                 lOutflowDataType.Add("TotalOutflow", "TotalOutflow")
 
-            Case Else
+            Case "TotalN", "TotalP"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
-                lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
-                lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
-                lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
-                lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                If aOperName = "PERLND" Then
+                    lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                ElseIf aOperName = "IMPLND" Then
+                    lOutflowDataType.Add("SOQS" & "-" & EXPPlusName, "SOQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                End If
+                lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
+            Case Else
+                'case for GQuals
+                If aOperName = "PERLND" Then
+                    lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SCRQS" & "-" & EXPPlusName, "SCRQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("IOQUAL" & "-" & EXPPlusName, "IOQUAL" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("AOQUAL" & "-" & EXPPlusName, "AOQUAL" & "-" & QualityConstituent)
+                ElseIf aOperName = "IMPLND" Then
+                    lOutflowDataType.Add("SOQS" & "-" & EXPPlusName, "SOQS" & "-" & QualityConstituent)
+                    lOutflowDataType.Add("SOQO" & "-" & EXPPlusName, "SOQO" & "-" & QualityConstituent)
+                End If
                 lOutflowDataType.Add("TotalOutflow" & "-" & EXPPlusName, "TotalOutflow" & "-" & QualityConstituent)
         End Select
-
-
-
-
 
         Return lOutflowDataType
     End Function
@@ -2009,34 +2163,45 @@ Public Module Utility
         Next
         Return aExitNumber
     End Function
-    Public Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
-        Dim aGenerSum As Double = 0
-        Dim aGENERID As Integer = aSource.Source.VolId
-        Dim aGENEROperationisOutputtoWDM As Boolean = False
-        Dim aGENEROperation As HspfOperation = aSource.Source.Opn
-        For Each EXTTarget As HspfConnection In aGENEROperation.Targets
-            If EXTTarget.Target.VolName.Contains("WDM") Then
-                aGENEROperationisOutputtoWDM = True
-                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                Dim lDSN As Integer = EXTTarget.Target.VolId
-                For i As Integer = 0 To aUCI.FilesBlock.Count
-                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                        If lDataSource Is Nothing Then
-                            If atcDataManager.OpenDataSource(lFileName) Then
-                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                            End If
-                        End If
-                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                        aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
 
+    Public Function GQualUnits(ByVal aUCI As HspfUci, ByVal aGQualName As String) As String
+        'given a uci and gqualname, return the units of the gqual
+        Dim lUnits As String = ""
+        'Dim GQALID As Integer = Right(aGQualName, 1)
+        Dim lOper As New HspfOperation
+        For Each Oper As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            If Oper.Tables("ACTIVITY").Parms("GQALFG").Value = "1" Then
+                lOper = Oper
+                'Find First operation with active GQALFG
+                Exit For
+            End If
+        Next
+
+        If lOper IsNot Nothing Then
+            Dim lTableName As String = "GQ-QALDATA"
+            'If GQALID > 1 Then lTableName = lTableName & ":" & GQALID
+            Dim lTempQual As String = ""
+            If lOper.TableExists(lTableName) Then
+                lTempQual = Trim(lOper.Tables(lTableName).Parms("GQID").Value)
+                If aGQualName = lTempQual Then
+                    'found it
+                    lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
+                End If
+            End If
+            'Do While lUnits.Length = 0
+            For lIndex As Integer = 2 To 10
+                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+                        If aGQualName = lTempQual Then
+                        'found it
+                        lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                        Exit For
+                    End If
                     End If
                 Next
-            End If
-        Next EXTTarget
+            'Loop
+        End If
 
-        Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
+        Return lUnits
     End Function
 End Module
