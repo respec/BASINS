@@ -71,69 +71,133 @@ Public Class clsWQDUSColumns
             Return False
         End If
         For I As Integer = 0 To aRecord.Length - 1
-            If aRecord(I).StartsWith("OrganizationIdentifier") Then colOrganizationIdentifier = I
-            If aRecord(I).StartsWith("OrganizationFormalName") Then colOrganizationFormalName = I
-            If aRecord(I).StartsWith("ActivityIdentifier") Then colActivityIdentifier = I
-            If aRecord(I).StartsWith("ActivityTypeCode") Then colActivityTypeCode = I
-            If aRecord(I).StartsWith("ActivityMediaName") Then colActivityMediaName = I
-            If aRecord(I).StartsWith("ActivityMediaSubdivisionName") Then colActivityMediaSubdivisionName = I
-            If aRecord(I).StartsWith("ActivityStartDate") Then colActivityStartDate = I
-            If aRecord(I).StartsWith("ActivityStartTime/Time") Then colActivityStartTime = I
-            If aRecord(I).StartsWith("ActivityStartTime/TimeZoneCode") Then colActivityStartTimeZoneCode = I
-            If aRecord(I).StartsWith("ActivityEndDate") Then colActivityEndDate = I
-            If aRecord(I).StartsWith("ActivityEndTime/Time") Then colActivityEndTime = I
-            If aRecord(I).StartsWith("ActivityEndTime/TimeZoneCode") Then colActivityEndTimeZoneCode = I
-            If aRecord(I).StartsWith("ActivityDepthHeightMeasure/MeasureValue") Then colActivityDepthHeightMeasureValue = I
-            If aRecord(I).StartsWith("ActivityDepthHeightMeasure/MeasureUnitCode") Then colActivityDepthHeightMeasureUnitCode = I
-            If aRecord(I).StartsWith("ActivityDepthAltitudeReferencePointText") Then colActivityDepthAltitudeReferencePointText = I
-            If aRecord(I).StartsWith("ActivityTopDepthHeightMeasure/MeasureValue") Then colActivityTopDepthHeightMeasureValue = I
-            If aRecord(I).StartsWith("ActivityTopDepthHeightMeasure/MeasureUnitCode") Then colActivityTopDepthHeightMeasureUnitCode = I
-            If aRecord(I).StartsWith("ActivityBottomDepthHeightMeasure/MeasureValue") Then colActivityBottomDepthHeightMeasureValue = I
-            If aRecord(I).StartsWith("ActivityBottomDepthHeightMeasure/MeasureUnitCode") Then colActivityBottomDepthHeightMeasureUnitCode = I
-            If aRecord(I).StartsWith("ProjectIdentifier") Then colProjectIdentifier = I
-            If aRecord(I).StartsWith("ActivityConductingOrganizationText") Then colActivityConductingOrganizationText = I
-            If aRecord(I).StartsWith("MonitoringLocationIdentifier") Then colMonitoringLocationIdentifier = I
-            If aRecord(I).StartsWith("ActivityCommentText") Then colActivityCommentText = I
-            If aRecord(I).StartsWith("SampleAquifer") Then colSampleAquifer = I
-            If aRecord(I).StartsWith("HydrologicCondition") Then colHydrologicCondition = I
-            If aRecord(I).StartsWith("HydrologicEvent") Then colHydrologicEvent = I
-            If aRecord(I).StartsWith("SampleCollectionMethod/MethodIdentifier") Then colSampleCollectionMethodIdentifier = I
-            If aRecord(I).StartsWith("SampleCollectionMethod/MethodIdentifierContext") Then colSampleCollectionMethodIdentifierContext = I
-            If aRecord(I).StartsWith("SampleCollectionMethod/MethodName") Then colSampleCollectionMethodName = I
-            If aRecord(I).StartsWith("SampleCollectionEquipmentName") Then colSampleCollectionEquipmentName = I
-            If aRecord(I).StartsWith("ResultDetectionConditionText") Then colResultDetectionConditionText = I
-            If aRecord(I).StartsWith("CharacteristicName") Then colCharacteristicName = I
-            If aRecord(I).StartsWith("ResultSampleFractionText") Then colResultSampleFractionText = I
-            If aRecord(I).StartsWith("ResultMeasureValue") Then colResultMeasureValue = I
-            If aRecord(I).StartsWith("ResultMeasure/MeasureUnitCode") Then colResultMeasureUnitCode = I
-            If aRecord(I).StartsWith("MeasureQualifierCode") Then colMeasureQualifierCode = I
-            If aRecord(I).StartsWith("ResultStatusIdentifier") Then colResultStatusIdentifier = I
-            If aRecord(I).StartsWith("StatisticalBaseCode") Then colStatisticalBaseCode = I
-            If aRecord(I).StartsWith("ResultValueTypeName") Then colResultValueTypeName = I
-            If aRecord(I).StartsWith("ResultWeightBasisText") Then colResultWeightBasisText = I
-            If aRecord(I).StartsWith("ResultTimeBasisText") Then colResultTimeBasisText = I
-            If aRecord(I).StartsWith("ResultTemperatureBasisText") Then colResultTemperatureBasisText = I
-            If aRecord(I).StartsWith("ResultParticleSizeBasisText") Then colResultParticleSizeBasisText = I
-            If aRecord(I).StartsWith("PrecisionValue") Then colPrecisionValue = I
-            If aRecord(I).StartsWith("ResultCommentText") Then colResultCommentText = I
-            If aRecord(I).StartsWith("USGSPCode") Then colUSGSPCode = I
-            If aRecord(I).StartsWith("ResultDepthHeightMeasure/MeasureValue") Then colResultDepthHeightMeasureValue = I
-            If aRecord(I).StartsWith("ResultDepthHeightMeasure/MeasureUnitCode") Then colResultDepthHeightMeasureUnitCode = I
-            If aRecord(I).StartsWith("ResultDepthAltitudeReferencePointText") Then colResultDepthAltitudeReferencePointText = I
-            If aRecord(I).StartsWith("SubjectTaxonomicName") Then colSubjectTaxonomicName = I
-            If aRecord(I).StartsWith("SampleTissueAnatomyName") Then colSampleTissueAnatomyName = I
-            If aRecord(I).StartsWith("ResultAnalyticalMethod/MethodIdentifier") Then colResultAnalyticalMethodIdentifier = I
-            If aRecord(I).StartsWith("ResultAnalyticalMethod/MethodIdentifierContext") Then colResultAnalyticalMethodIdentifierContext = I
-            If aRecord(I).StartsWith("ResultAnalyticalMethod/MethodName") Then colResultAnalyticalMethodName = I
-            If aRecord(I).StartsWith("MethodDescriptionText") Then colMethodDescriptionText = I
-            If aRecord(I).StartsWith("LaboratoryName") Then colLaboratoryName = I
-            If aRecord(I).StartsWith("AnalysisStartDate") Then colAnalysisStartDate = I
-            If aRecord(I).StartsWith("ResultLaboratoryCommentText") Then colResultLaboratoryCommentText = I
-            If aRecord(I).StartsWith("DetectionQuantitationLimitTypeName") Then colDetectionQuantitationLimitTypeName = I
-            If aRecord(I).StartsWith("DetectionQuantitationLimitMeasure/MeasureValue") Then colDetectionQuantitationLimitMeasureValue = I
-            If aRecord(I).StartsWith("DetectionQuantitationLimitMeasure/MeasureUnitCode") Then colDetectionQuantitationLimitMeasureUnitCode = I
-            If aRecord(I).StartsWith("PreparationStartDate") Then colPreparationStartDate = I
-            If aRecord(I).StartsWith("ProviderName") Then colProviderName = I
+            If aRecord(I).StartsWith("OrganizationIdentifier") Then
+                colOrganizationIdentifier = I
+            ElseIf aRecord(I).StartsWith("OrganizationFormalName") Then
+                colOrganizationFormalName = I
+            ElseIf aRecord(I).StartsWith("ActivityIdentifier") Then
+                colActivityIdentifier = I
+            ElseIf aRecord(I).StartsWith("ActivityTypeCode") Then
+                colActivityTypeCode = I
+            ElseIf aRecord(I).StartsWith("ActivityMediaName") Then
+                colActivityMediaName = I
+            ElseIf aRecord(I).StartsWith("ActivityMediaSubdivisionName") Then
+                colActivityMediaSubdivisionName = I
+            ElseIf aRecord(I).StartsWith("ActivityStartDate") Then
+                colActivityStartDate = I
+            ElseIf aRecord(I).StartsWith("ActivityStartTime/TimeZoneCode") Then
+                colActivityStartTimeZoneCode = I
+            ElseIf aRecord(I).StartsWith("ActivityStartTime/Time") Then
+                colActivityStartTime = I
+            ElseIf aRecord(I).StartsWith("ActivityEndDate") Then
+                colActivityEndDate = I
+            ElseIf aRecord(I).StartsWith("ActivityEndTime/TimeZoneCode") Then
+                colActivityEndTimeZoneCode = I
+            ElseIf aRecord(I).StartsWith("ActivityEndTime/Time") Then
+                colActivityEndTime = I
+            ElseIf aRecord(I).StartsWith("ActivityDepthHeightMeasure/MeasureValue") Then
+                colActivityDepthHeightMeasureValue = I
+            ElseIf aRecord(I).StartsWith("ActivityDepthHeightMeasure/MeasureUnitCode") Then
+                colActivityDepthHeightMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("ActivityDepthAltitudeReferencePointText") Then
+                colActivityDepthAltitudeReferencePointText = I
+            ElseIf aRecord(I).StartsWith("ActivityTopDepthHeightMeasure/MeasureValue") Then
+                colActivityTopDepthHeightMeasureValue = I
+            ElseIf aRecord(I).StartsWith("ActivityTopDepthHeightMeasure/MeasureUnitCode") Then
+                colActivityTopDepthHeightMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("ActivityBottomDepthHeightMeasure/MeasureValue") Then
+                colActivityBottomDepthHeightMeasureValue = I
+            ElseIf aRecord(I).StartsWith("ActivityBottomDepthHeightMeasure/MeasureUnitCode") Then
+                colActivityBottomDepthHeightMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("ProjectIdentifier") Then
+                colProjectIdentifier = I
+            ElseIf aRecord(I).StartsWith("ActivityConductingOrganizationText") Then
+                colActivityConductingOrganizationText = I
+            ElseIf aRecord(I).StartsWith("MonitoringLocationIdentifier") Then
+                colMonitoringLocationIdentifier = I
+            ElseIf aRecord(I).StartsWith("ActivityCommentText") Then
+                colActivityCommentText = I
+            ElseIf aRecord(I).StartsWith("SampleAquifer") Then
+                colSampleAquifer = I
+            ElseIf aRecord(I).StartsWith("HydrologicCondition") Then
+                colHydrologicCondition = I
+            ElseIf aRecord(I).StartsWith("HydrologicEvent") Then
+                colHydrologicEvent = I
+            ElseIf aRecord(I).StartsWith("SampleCollectionMethod/MethodIdentifierContext") Then
+                colSampleCollectionMethodIdentifierContext = I
+            ElseIf aRecord(I).StartsWith("SampleCollectionMethod/MethodIdentifier") Then
+                colSampleCollectionMethodIdentifier = I
+            ElseIf aRecord(I).StartsWith("SampleCollectionMethod/MethodName") Then
+                colSampleCollectionMethodName = I
+            ElseIf aRecord(I).StartsWith("SampleCollectionEquipmentName") Then
+                colSampleCollectionEquipmentName = I
+            ElseIf aRecord(I).StartsWith("ResultDetectionConditionText") Then
+                colResultDetectionConditionText = I
+            ElseIf aRecord(I).StartsWith("CharacteristicName") Then
+                colCharacteristicName = I
+            ElseIf aRecord(I).StartsWith("ResultSampleFractionText") Then
+                colResultSampleFractionText = I
+            ElseIf aRecord(I).StartsWith("ResultMeasureValue") Then
+                colResultMeasureValue = I
+            ElseIf aRecord(I).StartsWith("ResultMeasure/MeasureUnitCode") Then
+                colResultMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("MeasureQualifierCode") Then
+                colMeasureQualifierCode = I
+            ElseIf aRecord(I).StartsWith("ResultStatusIdentifier") Then
+                colResultStatusIdentifier = I
+            ElseIf aRecord(I).StartsWith("StatisticalBaseCode") Then
+                colStatisticalBaseCode = I
+            ElseIf aRecord(I).StartsWith("ResultValueTypeName") Then
+                colResultValueTypeName = I
+            ElseIf aRecord(I).StartsWith("ResultWeightBasisText") Then
+                colResultWeightBasisText = I
+            ElseIf aRecord(I).StartsWith("ResultTimeBasisText") Then
+                colResultTimeBasisText = I
+            ElseIf aRecord(I).StartsWith("ResultTemperatureBasisText") Then
+                colResultTemperatureBasisText = I
+            ElseIf aRecord(I).StartsWith("ResultParticleSizeBasisText") Then
+                colResultParticleSizeBasisText = I
+            ElseIf aRecord(I).StartsWith("PrecisionValue") Then
+                colPrecisionValue = I
+            ElseIf aRecord(I).StartsWith("ResultCommentText") Then
+                colResultCommentText = I
+            ElseIf aRecord(I).StartsWith("USGSPCode") Then
+                colUSGSPCode = I
+            ElseIf aRecord(I).StartsWith("ResultDepthHeightMeasure/MeasureValue") Then
+                colResultDepthHeightMeasureValue = I
+            ElseIf aRecord(I).StartsWith("ResultDepthHeightMeasure/MeasureUnitCode") Then
+                colResultDepthHeightMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("ResultDepthAltitudeReferencePointText") Then
+                colResultDepthAltitudeReferencePointText = I
+            ElseIf aRecord(I).StartsWith("SubjectTaxonomicName") Then
+                colSubjectTaxonomicName = I
+            ElseIf aRecord(I).StartsWith("SampleTissueAnatomyName") Then
+                colSampleTissueAnatomyName = I
+            ElseIf aRecord(I).StartsWith("ResultAnalyticalMethod/MethodIdentifierContext") Then
+                colResultAnalyticalMethodIdentifierContext = I
+            ElseIf aRecord(I).StartsWith("ResultAnalyticalMethod/MethodIdentifier") Then
+                colResultAnalyticalMethodIdentifier = I
+            ElseIf aRecord(I).StartsWith("ResultAnalyticalMethod/MethodName") Then
+                colResultAnalyticalMethodName = I
+            ElseIf aRecord(I).StartsWith("MethodDescriptionText") Then
+                colMethodDescriptionText = I
+            ElseIf aRecord(I).StartsWith("LaboratoryName") Then
+                colLaboratoryName = I
+            ElseIf aRecord(I).StartsWith("AnalysisStartDate") Then
+                colAnalysisStartDate = I
+            ElseIf aRecord(I).StartsWith("ResultLaboratoryCommentText") Then
+                colResultLaboratoryCommentText = I
+            ElseIf aRecord(I).StartsWith("DetectionQuantitationLimitTypeName") Then
+                colDetectionQuantitationLimitTypeName = I
+            ElseIf aRecord(I).StartsWith("DetectionQuantitationLimitMeasure/MeasureValue") Then
+                colDetectionQuantitationLimitMeasureValue = I
+            ElseIf aRecord(I).StartsWith("DetectionQuantitationLimitMeasure/MeasureUnitCode") Then
+                colDetectionQuantitationLimitMeasureUnitCode = I
+            ElseIf aRecord(I).StartsWith("PreparationStartDate") Then
+                colPreparationStartDate = I
+            ElseIf aRecord(I).StartsWith("ProviderName") Then
+                colProviderName = I
+            End If
         Next
         Return IsValidColumns()
     End Function
@@ -341,17 +405,20 @@ Public Class clsWQDUSLocations
     Public Locations As New Dictionary(Of String, clsWQDUSLocation)()
     Public ReadOnly Property GetUniqueConstituentList() As List(Of String)
         Get
-            Dim lst As New List(Of String)()
+            Dim lsortedPreferred As New SortedList(Of String, Integer)()
+            Dim lstNonPreferred As New SortedList(Of String, Integer)()
+            Dim lKey As String
             For Each loc As clsWQDUSLocation In Locations.Values
                 For Each cons As clsWQDUSConstituent In loc.Constituents.Values
                     For Each ldata_unit As String In cons.RecordGroup.Keys
-                        If Not lst.Contains(cons.Name & "-" & ldata_unit) Then
-                            lst.Add(cons.Name & "-" & ldata_unit)
+                        lKey = cons.Name & "-" & ldata_unit
+                        If Not lstNonPreferred.ContainsKey(lKey) Then
+                            lstNonPreferred.Add(lKey, 1)
                         End If
                     Next
                 Next
             Next
-            Return lst
+            Return lstNonPreferred.Keys.ToList()
         End Get
     End Property
 
@@ -410,6 +477,7 @@ Public Class clsWQDUSLocation
     Public Sub AddData(ByVal aRecord() As String)
         Dim lname As String = aRecord(clsWQDUSColumns.colCharacteristicName)
         Dim lunit As String = aRecord(clsWQDUSColumns.colResultMeasureUnitCode)
+        Dim lfraction As String = aRecord(clsWQDUSColumns.colResultSampleFractionText)
 
         'For I As Integer = 0 To aRecord.Length - 1
         '    If aRecord(I) = "Nitrate as N" Then
@@ -417,18 +485,23 @@ Public Class clsWQDUSLocation
         '    End If
         'Next
 
+        Dim lcons_key As String = lname
+        If Not String.IsNullOrEmpty(lfraction) Then
+            lcons_key = lname & "-" & lfraction
+        End If
         If Not String.IsNullOrEmpty(lname) AndAlso lname.ToLower() = "nitrate as n" Then
             lname = "Nitrate"
+            lcons_key = lname & "-" & lfraction
             aRecord(clsWQDUSColumns.colCharacteristicName) = lname
             If lunit = "mg/l" Then
                 lunit = "mg/l as N"
                 aRecord(clsWQDUSColumns.colResultMeasureUnitCode) = lunit
             End If
         End If
-        If Not Constituents.ContainsKey(lname) Then
-            Constituents.Add(lname, New clsWQDUSConstituent(lname))
+        If Not Constituents.ContainsKey(lcons_key) Then
+            Constituents.Add(lcons_key, New clsWQDUSConstituent(lcons_key))
         End If
-        Constituents.Item(lname).AddData(aRecord)
+        Constituents.Item(lcons_key).AddData(aRecord)
     End Sub
 End Class
 
@@ -461,6 +534,17 @@ Public Class clsWQDUSConstituent
             Return lst
         End Get
     End Property
+    Public ReadOnly Property SampleFraction(ByVal aUnit As String) As List(Of String)
+        Get
+            Dim list As New List(Of String)()
+            For Each ldp As clsWQDUSDataPoint In RecordGroup.Item(aUnit)
+                If Not String.IsNullOrEmpty(ldp.ResultSampleFractionText) AndAlso Not list.Contains(ldp.ResultSampleFractionText) Then
+                    list.Add(ldp.ResultSampleFractionText)
+                End If
+            Next
+            Return list
+        End Get
+    End Property
     Public Sub New(ByVal aName As String)
         Name = aName
     End Sub
@@ -470,6 +554,8 @@ Public Class clsWQDUSConstituent
         With lDataPoint
             .sDate = aRecord(clsWQDUSColumns.colActivityStartDate)
             .sTime = aRecord(clsWQDUSColumns.colActivityStartTime)
+            .ResultSampleFractionText = aRecord(clsWQDUSColumns.colResultSampleFractionText)
+            .ResultStatusIdentifier = aRecord(clsWQDUSColumns.colResultStatusIdentifier)
             If Not String.IsNullOrEmpty(aRecord(clsWQDUSColumns.colResultMeasureValue)) Then
                 .Value = aRecord(clsWQDUSColumns.colResultMeasureValue)
                 .Unit = aRecord(clsWQDUSColumns.colResultMeasureUnitCode)
@@ -507,6 +593,8 @@ Public Class clsWQDUSDataPoint
     Public Value As String
     Public Unit As String
     Public Attrib As String
+    Public ResultSampleFractionText As String
+    Public ResultStatusIdentifier As String
     Public Resulttype As String
     Public atcDataTime As Double = -1
     Public vbDataTime As DateTime
@@ -518,9 +606,13 @@ Public Class clsWQDUSDataPoint
                 ldates(0) = vbDataTime.Year
                 ldates(1) = vbDataTime.Month
                 ldates(2) = vbDataTime.Day
-                ldates(3) = vbDataTime.Hour
-                ldates(4) = vbDataTime.Minute
-                ldates(5) = vbDataTime.Second
+                If String.IsNullOrEmpty(sTime) OrElse sTime.IndexOf(":") < 0 Then
+                    ldates(3) = 24
+                Else
+                    ldates(3) = vbDataTime.Hour
+                    ldates(4) = vbDataTime.Minute
+                    ldates(5) = vbDataTime.Second
+                End If
             ElseIf DateTime.TryParse(sDate, vbDataTime) Then
                 ldates(0) = vbDataTime.Year
                 ldates(1) = vbDataTime.Month
@@ -532,6 +624,89 @@ Public Class clsWQDUSDataPoint
             Return False
         End Try
         Return True
+    End Function
+End Class
+
+Public Class clsWQDUSPreferred
+    Public Shared WaterQuality As New List(Of String)()
+    Public Shared WaterQualitySpecies As New List(Of String)()
+    Shared Sub New()
+        With WaterQuality
+            .Add("Ammonia-Nitrogen as N")
+            .Add("Biochemical Oxygen Demand")
+            .Add("Carbonaceous biochemical oxygen demand")
+            .Add("Dissolved Oxygen")
+            .Add("Total Suspended Solids")
+            .Add("Temperature, Water")
+            .Add("Chlorophyll a")
+            .Add("Escherichia Coli")
+            .Add("Fecal Coliform")
+            .Add("Flow")
+            .Add("Gage height")
+            .Add("Inorganic Nitrogen (nitrate and nitrite) as N")
+            .Add("Kjeldahl Nitrogen")
+            .Add("Nitrate as N")
+            .Add("Nitrite as N")
+            .Add("Nitrogen, mixed forms (NH3), (NH44), organic, (NO2), and (NO3)")
+            .Add("Organic carbon")
+            .Add("Organic Nitrogen")
+            .Add("Orthophosphate as P")
+            .Add("pH")
+            .Add("Phosphate-phosphorus as P")
+            .Add("Phosphorus")
+            .Add("Stream flow, instantaneous")
+            .Add("Sulfate")
+            .Add("Total Phosphorus, mixed forms")
+        End With
+        With WaterQualitySpecies
+            .Add("Ammonia")
+            .Add("Biochemical Oxygen Demand")
+            .Add("Carbonaceous biochemical oxygen demand")
+            .Add("Dissolved Oxygen")
+            .Add("Total Suspended Solids")
+            .Add("Temperature, Water")
+            .Add("Chlorophyll a")
+            .Add("Escherichia Coli")
+            .Add("Fecal Coliform")
+            .Add("Flow")
+            .Add("Gage height")
+            .Add("Inorganic Nitrogen (nitrate and nitrite)")
+            .Add("Kjeldahl Nitrogen")
+            .Add("Nitrate")
+            .Add("Nitrite")
+            .Add("Nitrogen, mixed forms (NH3), (NH44), organic, (NO2), and (NO3)")
+            .Add("Organic carbon")
+            .Add("Organic Nitrogen")
+            .Add("Orthophosphate")
+            .Add("pH")
+            .Add("Phosphate")
+            .Add("Phosphate-phosphorus")
+            .Add("Phosphorus")
+            .Add("Stream flow, instantaneous")
+            .Add("Sulfate")
+            .Add("Total Phosphorus, mixed forms")
+        End With
+    End Sub
+    Public Shared Function IsPreferredWaterQuality(ByVal aSpecies As String) As Boolean
+        If String.IsNullOrEmpty(aSpecies) Then
+            Return False
+        End If
+        Dim lIsPreferred As Boolean = False
+        For Each species As String In WaterQualitySpecies
+            If aSpecies.ToLower().StartsWith(species.ToLower()) Then
+                If species = "pH" Then
+                    If aSpecies.StartsWith(species) Then
+                        lIsPreferred = True
+                    End If
+                Else
+                    lIsPreferred = True
+                End If
+                If lIsPreferred Then
+                    Exit For
+                End If
+            End If
+        Next
+        Return lIsPreferred
     End Function
 End Class
 

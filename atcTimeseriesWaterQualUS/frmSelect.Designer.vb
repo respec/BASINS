@@ -39,20 +39,22 @@ Partial Class frmSelect
         '
         'lstLocations
         '
-        Me.lstLocations.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lstLocations.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstLocations.FormattingEnabled = True
-        Me.lstLocations.Location = New System.Drawing.Point(6, 19)
+        Me.lstLocations.Location = New System.Drawing.Point(6, 20)
         Me.lstLocations.Name = "lstLocations"
         Me.lstLocations.Size = New System.Drawing.Size(313, 259)
         Me.lstLocations.TabIndex = 0
         '
         'lstConstituents
         '
-        Me.lstConstituents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lstConstituents.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstConstituents.FormattingEnabled = True
-        Me.lstConstituents.Location = New System.Drawing.Point(6, 19)
+        Me.lstConstituents.Location = New System.Drawing.Point(3, 19)
         Me.lstConstituents.Name = "lstConstituents"
         Me.lstConstituents.Size = New System.Drawing.Size(317, 259)
         Me.lstConstituents.TabIndex = 1
@@ -60,7 +62,7 @@ Partial Class frmSelect
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(3, 3)
+        Me.Label1.Location = New System.Drawing.Point(3, 4)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(53, 13)
         Me.Label1.TabIndex = 2
@@ -84,22 +86,23 @@ Partial Class frmSelect
         '
         'spaneMain.Panel1
         '
-        Me.spaneMain.Panel1.Controls.Add(Me.btnClearLoc)
-        Me.spaneMain.Panel1.Controls.Add(Me.lstLocations)
-        Me.spaneMain.Panel1.Controls.Add(Me.Label1)
+        Me.spaneMain.Panel1.Controls.Add(Me.lstConstituents)
+        Me.spaneMain.Panel1.Controls.Add(Me.Label2)
+        Me.spaneMain.Panel1.Controls.Add(Me.btnClearCons)
         '
         'spaneMain.Panel2
         '
+        Me.spaneMain.Panel2.Controls.Add(Me.btnClearLoc)
         Me.spaneMain.Panel2.Controls.Add(Me.txtMsgCons)
-        Me.spaneMain.Panel2.Controls.Add(Me.btnClearCons)
-        Me.spaneMain.Panel2.Controls.Add(Me.lstConstituents)
-        Me.spaneMain.Panel2.Controls.Add(Me.Label2)
+        Me.spaneMain.Panel2.Controls.Add(Me.Label1)
+        Me.spaneMain.Panel2.Controls.Add(Me.lstLocations)
         Me.spaneMain.Size = New System.Drawing.Size(658, 398)
         Me.spaneMain.SplitterDistance = 325
         Me.spaneMain.TabIndex = 4
         '
         'btnClearLoc
         '
+        Me.btnClearLoc.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnClearLoc.Location = New System.Drawing.Point(6, 285)
         Me.btnClearLoc.Name = "btnClearLoc"
         Me.btnClearLoc.Size = New System.Drawing.Size(50, 23)
@@ -122,7 +125,7 @@ Partial Class frmSelect
         '
         'btnClearCons
         '
-        Me.btnClearCons.Location = New System.Drawing.Point(6, 285)
+        Me.btnClearCons.Location = New System.Drawing.Point(6, 282)
         Me.btnClearCons.Name = "btnClearCons"
         Me.btnClearCons.Size = New System.Drawing.Size(50, 23)
         Me.btnClearCons.TabIndex = 4
