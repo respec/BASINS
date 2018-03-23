@@ -46,6 +46,7 @@ Public Class StartUp
         DateTimePicker1.Enabled = lExists
         DateTimePicker2.Enabled = lExists
         chkExpertStats.Enabled = lExists
+        chkMultiSim.Enabled = lExists
         'chkGraphStandard.Enabled = lExists
         chkWaterBalance.Enabled = lExists
         chkAdditionalgraphs.Enabled = lExists
@@ -91,6 +92,23 @@ Public Class StartUp
 
                 DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
                 DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+
+                'The issue with the following code is that it assumes that first operation has the proper active sections.
+
+                'If pUci.OpnBlks("RCHRES").Ids(0).TableExists("ACTIVITY") Then
+                '    Select Case True
+                '        Case pUci.OpnBlks("RCHRES").Ids(0).Tables("ACTIVITY").ParmValue("SDFG") = "1"
+                '            chkSedimentBalance.Enabled = True
+
+                '        Case pUci.OpnBlks("RCHRES").Ids(0).Tables("ACTIVITY").ParmValue("NUFG") = "1"
+                '            chkTotalNitrogen.Enabled = True
+                '            chkTotalPhosphorus.Enabled = True
+                '        Case pUci.OpnBlks("OXRX").Ids(0).Tables("ACTIVITY").ParmValue("OXRX") = "1"
+                '            chkDO.Enabled = True
+                '        Case pUci.OpnBlks("OXRX").Ids(0).Tables("ACTIVITY").ParmValue("HTFG") = "1"
+                '            chkHeat.Enabled = True
+                '    End Select
+                'End If
 
                 'list of available gquals 
                 If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA") Then
