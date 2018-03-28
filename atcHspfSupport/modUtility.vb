@@ -1144,12 +1144,13 @@ Public Module Utility
                                        Optional ByVal aGQALID As Integer = 0) As Double
         'If aConstituent = "TAM" Then aConstituent = "NH3+NH4"
         Dim lMassLinkFactor As Double = 0.0
+        'If aConstituent <> "SOSLD" Then Stop
         For Each lMassLink As HspfMassLink In aUCI.MassLinks
 
             If lMassLink.MassLinkId <> aMassLink Then Continue For
             'If aMassLink = 1 Then Stop
             Select Case aBalanceType
-                Case "Sediment"
+                Case "Sediment", "SED"
                     Select Case aConstituent & "_" & lMassLink.Source.Member.ToString & "_" & lMassLink.Target.Member.ToString
                         Case "WSSD_WSSD_ISED", "WSSD_SOSED_ISED", "SCRSD_SCRSD_ISED", "SCRSD_SOSED_ISED", "SOSLD_SOSLD_ISED"
                             lMassLinkFactor += lMassLink.MFact
@@ -1157,7 +1158,7 @@ Public Module Utility
                             lMassLinkFactor += lMassLink.MFact
                     End Select
 
-                Case "Water"
+                Case "Water", "WAT"
                     'If lMassLink.Source.Member = "SURO" Then Stop
                     If (lMassLink.Source.Member = "PERO" Or lMassLink.Source.Member = aConstituent) AndAlso
                             lMassLink.Target.Member = "IVOL" Then
@@ -2075,7 +2076,7 @@ Public Module Utility
         'Design for AGCHEM Case as well.
         Dim lOutflowDataType As New Dictionary(Of String, String)
         Select Case aBalanceType
-            Case "Water"
+            Case "Water", "WAT"
                 lOutflowDataType.Add("SUPY", "SUPY")
                 lOutflowDataType.Add("IRRAPP6", "IRRAPP6")
                 lOutflowDataType.Add("SURO", "SURO")
@@ -2093,7 +2094,7 @@ Public Module Utility
                 lOutflowDataType.Add("BASET", "BASET")
                 lOutflowDataType.Add("TAET", "TAET")
                 lOutflowDataType.Add("IMPEV", "IMPEV")
-            Case "Sediment"
+            Case "Sediment", "SED"
                 lOutflowDataType.Add("WSSD", "WSSD")
                 lOutflowDataType.Add("SCRSD", "SCRSD")
                 lOutflowDataType.Add("SOSLD", "SOSLD")
@@ -2110,7 +2111,7 @@ Public Module Utility
                 lOutflowDataType.Add("AOHT", "AOHT")
                 lOutflowDataType.Add("TotalOutflow", "TotalOutflow")
 
-            Case "TotalN", "TotalP"
+            Case "TotalN", "TotalP", "TN", "TP"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
                 If aOperName = "PERLND" Then
                     lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)

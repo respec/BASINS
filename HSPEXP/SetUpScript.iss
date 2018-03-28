@@ -36,7 +36,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\HSPEXP+.exe"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\WinHSPFLt\*"; DestDir: "{app}\WinHSPFLt"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\bin\x86\Debug\*.dll"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
-;Source: "C:\Dev\BASINS\BASINS\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
+Source: "C:\Dev\BASINS\BASINS\HSPEXP\*.chm"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 Source: "C:\Dev\BASINS\BASINS\HSPEXP\GraphColors.txt"; DestDir: "{app}"; Permissions: everyone-modify; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversiono" on any shared system files
 

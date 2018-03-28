@@ -478,15 +478,13 @@ Public Class atcFrequencyGridSource
                             Next ' for each lRecurrenceKey As String In pRecurrence.Keys
                             lExpTab.CurrentRecord += 1
                         Else
-                            lRept.Append(SWStatDisclaimer) 'Add Message Here
-                            lRept.AppendLine()
                             lRept.AppendLine("-----------------------SWToolbox Version 1.0------------------------")
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
+                            lRept.AppendLine("03/13/2018           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
-                            lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
-                            lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
+                            lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are used")
+                            lRept.AppendLine("           for these computations. Users are responsible for assessment")
                             lRept.AppendLine("           and interpretation.")
                             lRept.AppendLine()
                             lRept.AppendLine("       Description:  " & lIdentifier)
@@ -601,14 +599,12 @@ Public Class atcFrequencyGridSource
                             lExpTab.Value(14) = DoubleToString(lLogNdayTs.Attributes.GetValue("Standard Deviation", 0), , "0.000") '"   StDev"
                             lExpTab.Value(15) = DoubleToString(lLogNdayTs.Attributes.GetValue("Skew", 0), , "0.000") '"                   Skw"
                         Else
-                            lRept.Append(SWStatDisclaimer) 'Add Message Here
-                            lRept.AppendLine()
                             lRept.AppendLine("Program SWStat         U.S. GEOLOGICAL SURVEY             Seq " & lPageCount.ToString.PadLeft(5, "0"))
                             lRept.AppendLine("Ver. 5.0      Log-Pearson & Pearson Type III Statistics   Run Date / Time")
-                            lRept.AppendLine("11/24/2015           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
+                            lRept.AppendLine("03/13/2018           based on USGS Program A193           " & System.DateTime.Now.ToString("M/d/yyyy h:mm tt"))
                             lRept.AppendLine()
-                            lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are for")
-                            lRept.AppendLine("           preliminary computations. Users are responsible for assessment")
+                            lRept.AppendLine(" Notice -- Log-Pearson Type III or Pearson Type III distributions are used")
+                            lRept.AppendLine("           for these computations. Users are responsible for assessment")
                             lRept.AppendLine("           and interpretation.")
 
 
@@ -735,15 +731,20 @@ Public Class atcFrequencyGridSource
                                         lAdjVal = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & "Adj"), , "0.000", "0.000")
                                     End If
                                     lExpTab.Value(lExpTabFldCtr + 2) = lAdjVal '-Day Low or High
+                                    'K Value (export only), variance of estimate and confidence intervals
+                                    lExpTab.Value(lExpTabFldCtr + 3) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
+                                    lExpTab.Value(lExpTabFldCtr + 4) = "  N/A"
+                                    lExpTab.Value(lExpTabFldCtr + 5) = "  N/A"
+                                    lExpTab.Value(lExpTabFldCtr + 6) = "  N/A"
                                 Else
                                     lExpTab.Value(lExpTabFldCtr + 2) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000")
+                                    'K Value (export only), variance of estimate and confidence intervals
+                                    lExpTab.Value(lExpTabFldCtr + 3) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
+                                    lExpTab.Value(lExpTabFldCtr + 4) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
+                                    lExpTab.Value(lExpTabFldCtr + 5) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
+                                    lExpTab.Value(lExpTabFldCtr + 6) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
                                 End If
 
-                                'K Value (export only), variance of estimate and confidence intervals
-                                lExpTab.Value(lExpTabFldCtr + 3) = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " K Value", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 4) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 5) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000")
-                                lExpTab.Value(lExpTabFldCtr + 6) = "  N/A" 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000")
                                 lExpTabFldCtr += lExpTabFieldNames7.Length
                             Next ' for each lRecurrenceKey As String In pRecurrence.Keys
                         Else
@@ -768,14 +769,18 @@ Public Class atcFrequencyGridSource
                                         lAdjVal = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & "Adj"), , "0.000", "0.000")
                                     End If
                                     lThisRow &= lAdjVal.PadLeft(11)
+                                    'No variance of estimate and confidence intervals under CPA
+                                    lThisRow &= "  N/A".PadLeft(11)
+                                    lThisRow &= "  N/A".PadLeft(11)
+                                    lThisRow &= "  N/A".PadLeft(11)
                                 Else
                                     lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000", "0.000").PadLeft(11)
+                                    'K Value (export only), variance of estimate and confidence intervals
+                                    lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
+                                    lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
+                                    lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
                                 End If
 
-                                'K Value (export only), variance of estimate and confidence intervals
-                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " Variance of Estimate", 0), , "0.000", "0.000").PadLeft(11)
-                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Lower", 0), , "0.000", "0.000").PadLeft(11)
-                                lThisRow &= "  N/A".PadLeft(11) 'DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence & " CI Upper", 0), , "0.000", "0.000").PadLeft(11)
                                 If pHigh Then
                                     lReverseString &= lThisRow & vbCrLf
                                 Else

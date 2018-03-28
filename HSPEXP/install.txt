@@ -1,5 +1,5 @@
 HSPEXP+2.0.0beta
-Date: 03/08/2018
+Date: 03/13/2018
 Features:
 1. Multi Simulation Manager is available that can be used for sensitivity analysis, uncertainty analysis, and scenario analysis.
 2. Reports for additional constituents including Heat, DO, BOD-Labile are also generated.
@@ -14,6 +14,8 @@ Bugs Fixed:
 1. Multiple small bugs fixed. In general, the warning messages do not stop HSPEXP+ calculations. The warning messages are added in the log file.
 2. HSPEXP+ calculations were made more efficient. 
 
+Issues:
+1. The help manual is not updated for the beta version.
 
 HSPEXP+1.40beta7
 Dated: 02/08/2018

@@ -38,7 +38,7 @@ Public Module atcConstituentTables
         Land_Constituent_Monthly_Table.Columns.Remove("Year")
         Select Case aBalanceType
 #Region "Case Water"
-            Case "Water"
+            Case "Water", "WAT"
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     lUnits = "In"
@@ -410,7 +410,7 @@ Public Module atcConstituentTables
 #End Region
 
 #Region "Case Sediment"
-            Case "Sediment"
+            Case "Sediment", "SED"
                 Dim lConversionFactor As Double = 1.0
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     lUnits = "lbs/ac"
@@ -784,6 +784,7 @@ Public Module atcConstituentTables
                         For Each lYear As String In lYears
                             Dim SelectExpression As String = "OpTypeNumber = '" & lOperation & "' And Year = '" & lYear & "'"
                             Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
+                            If foundRows.Length = 0 Then Continue For
                             row = Land_Constituent_Table.NewRow
                             'Logger.Dbg(SelectExpression)
                             row("OpTypeNumber") = foundRows(0)("OpTypeNumber")
@@ -810,6 +811,7 @@ Public Module atcConstituentTables
 
                         Dim SelectExpressionMonthly As String = "OpTypeNumber = '" & lOperation & "'"
                         Dim foundRowsMonthly() As DataRow = Land_Constituent_Monthly_Table.Select(SelectExpressionMonthly)
+                        If foundRowsMonthly.Length = 0 Then Continue For
                         row = Land_Constituent_Monthly_Table.NewRow
 
                         row("OpTypeNumber") = foundRowsMonthly(0)("OpTypeNumber")
