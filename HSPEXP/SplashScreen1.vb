@@ -27,7 +27,7 @@
         '    Version.Text = System.String.Format(Version.Text, My.Application.Info.Version.Major, My.Application.Info.Version.Minor, My.Application.Info.Version.Build, My.Application.Info.Version.Revision)
 
         With My.Application.Info.Version
-            Version.Text = "Version " & .Major & "." & .Minor & " beta1"
+            Version.Text = "Version " & .Major & "." & .Minor & " beta2"
             If .MajorRevision > 0 OrElse .MinorRevision > 0 Then
                 Version.Text &= "." & .MajorRevision & "." & .MinorRevision
             End If

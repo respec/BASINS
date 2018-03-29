@@ -101,6 +101,14 @@ Public Module modGraphBoxWhiskers
             .Add(Color.DodgerBlue)
             .Add(Color.Gold)
             .Add(Color.Indigo)
+            .Add(Color.Aqua)
+            .Add(Color.Black)
+            .Add(Color.BlanchedAlmond)
+            .Add(Color.CornflowerBlue)
+            .Add(Color.DarkOrange)
+            .Add(Color.Gray)
+            .Add(Color.HotPink)
+
         End With
         lGrapher.DataColors = data_colors
 

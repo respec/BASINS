@@ -1,3 +1,9 @@
+HSPEXP+2.0beta2
+Date: 03/28/2018
+
+Bugs Fixed
+1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. That behavior has been fixed.
+
 HSPEXP+2.0beta1
 Date: 03/17/2018
 Features:

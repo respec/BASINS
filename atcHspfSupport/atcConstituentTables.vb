@@ -2451,6 +2451,37 @@ Public Module atcConstituentTables
 
                 Next lSource
 
+            Case "Water"
+                lGENERLoad = 0
+                'If aReach.Id = 157 Then Stop
+                For Each lSource As HspfConnection In aReach.Sources
+                    Dim lGENERSum As Double = 0.0
+                    Dim lMfact As Double = 0.0
+                    If lSource.Source.VolName = "GENER" Then
+                        Dim lGENEROperationisOutputtoWDM As Boolean = False
+                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
+                            lGENERSum = .Item1
+                            lGENEROperationisOutputtoWDM = .Item2
+                        End With
+                        If lSource.MassLink > 0 Then
+                            lGENERSum *= lSource.MFact
+                            For Each lMassLink As HspfMassLink In aUCI.MassLinks
+                                If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "IVOL" Then
+                                    lGENERSum *= lMassLink.MFact
+                                    lGENERLoad += lGENERSum
+                                    Exit For
+                                End If
+                            Next lMassLink
+                        ElseIf lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
+                            lGENERSum *= lSource.MFact
+                            lGENERLoad += lGENERSum
+                        End If
+                        If Not lGENEROperationisOutputtoWDM Then
+                            Logger.Dbg("GENER Loadings Issue: The RCHRES operation " & aReach.Id & " has loadings input for the constituent " & aConstituentName & " from GENER connections in the Network Block. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting.")
+                        End If
+                    End If
+
+                Next lSource
             Case Else
                 lGENERLoad = 0
 
@@ -2653,28 +2684,30 @@ Public Module atcConstituentTables
         Dim aGENERID As Integer = aSource.Source.VolId
         Dim aGENEROperationisOutputtoWDM As Boolean = False
         Dim aGENEROperation As HspfOperation = aSource.Source.Opn
-        For Each EXTTarget As HspfConnection In aGENEROperation.Targets
-            If EXTTarget.Target.VolName.Contains("WDM") Then
-                aGENEROperationisOutputtoWDM = True
-                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                Dim lDSN As Integer = EXTTarget.Target.VolId
-                For i As Integer = 0 To aUCI.FilesBlock.Count
-                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                        If lDataSource Is Nothing Then
-                            If atcDataManager.OpenDataSource(lFileName) Then
-                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        If Not aGENEROperation Is Nothing Then
+            For Each EXTTarget As HspfConnection In aGENEROperation.Targets
+                If EXTTarget.Target.VolName.Contains("WDM") Then
+                    aGENEROperationisOutputtoWDM = True
+                    Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                    Dim lDSN As Integer = EXTTarget.Target.VolId
+                    For i As Integer = 0 To aUCI.FilesBlock.Count
+                        If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
+                            Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                            Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            If lDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lFileName) Then
+                                    lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                End If
                             End If
-                        End If
-                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                        aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+                            Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                            ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                            aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
 
-                    End If
-                Next
-            End If
-        Next EXTTarget
+                        End If
+                    Next
+                End If
+            Next EXTTarget
+        End If
 
         Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
     End Function
