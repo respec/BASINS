@@ -1,17 +1,13 @@
 HSPEXP+2.0beta2
 Date: 03/28/2018
 
-Bugs Fixed
-1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. That behavior has been fixed.
-
-HSPEXP+2.0beta1
-Date: 03/17/2018
 Features:
 1. In Multi Simulation Manager, range of operations can be provided, separated by hyphen (-)
 
 Bugs Fixed
-1. Some interface fixes.
-2. Some reports were having issues, that has been fixed.
+1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. That behavior has been fixed.
+2. Some interface fixes.
+3. Some reports were having issues, that has been fixed.
 
 HSPEXP+2.0.0beta
 Date: 03/13/2018

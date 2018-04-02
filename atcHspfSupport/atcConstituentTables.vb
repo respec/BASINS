@@ -471,6 +471,7 @@ Public Module atcConstituentTables
                             lSeasonalAttributes.SetValue("Mean", 0)
                             Dim lNewSimTSerMonthCalculatedAttributes As New atcDataAttributes
                             If lTsMonthly IsNot Nothing Then
+                                lTsMonthly *= lConversionFactor
                                 lSeasons.SetSeasonalAttributes(lTsMonthly, lSeasonalAttributes, lNewSimTSerMonthCalculatedAttributes)
                             End If
                             row = Land_Constituent_Monthly_Table.NewRow
