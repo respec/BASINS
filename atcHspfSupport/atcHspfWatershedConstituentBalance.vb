@@ -95,7 +95,7 @@ Public Module WatershedConstituentBalance
                                 ElseIf lConstituent = "Baseflow" AndAlso lCurrentGroup = "Evaporation" AndAlso lBaseETIndex = -1 Then
                                     lBaseETIndex = lConstituents.Count + 1
                                 End If
-                            ElseIf aBalanceType = "TotalN" Then
+                            ElseIf aBalanceType = "TN" Then
                                 If lConstituent = "Surface" Then
                                     lConstituent &= "-" & lCurrentOperation.Substring(0, 3)
                                 End If
@@ -344,9 +344,9 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
-                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
-                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case Else
                                                     Dim lPrefix As String = ""
@@ -434,7 +434,7 @@ Public Module WatershedConstituentBalance
                                                         If lConnection.Target.VolName = "RCHRES" Then
                                                             Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                                             Dim aConversionFactor As Double = 0.0
-                                                            If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+                                                            If aBalanceType = "TN" Or aBalanceType = "TP" Then
                                                                 aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                             End If
                                                             lMassLinkID = lConnection.MassLink

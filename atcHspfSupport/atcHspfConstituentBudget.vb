@@ -89,7 +89,7 @@ Public Module ConstituentBudget
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ISED-TOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
-            Case "TotalN"
+            Case "TN"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
@@ -113,7 +113,7 @@ Public Module ConstituentBudget
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
 
-            Case "TotalP"
+            Case "TP"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW"))
@@ -559,7 +559,7 @@ Public Module ConstituentBudget
                     lReport.Append(.ToString)
                 End With
 
-            Case "TotalN"
+            Case "TN"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
@@ -850,7 +850,7 @@ Public Module ConstituentBudget
 
                 End With
 
-            Case "TotalP"
+            Case "TP"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
@@ -1165,7 +1165,7 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then
+        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "Sediment" Then
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)
             Dim lLandusesHeader As String = ""

@@ -118,18 +118,16 @@ Public Module Utility
     Public Function ConstituentsThatNeedMassLink() As Generic.List(Of String)
         Static pConstituentsThatNeedMassLink As Generic.List(Of String) = Nothing
         If pConstituentsThatNeedMassLink Is Nothing Then
-            Dim lConstituentsThatNeedMassLink() As String = _
-                {"WSSD", "SCRSD", "SOSLD", "PERO", "SURO", "IFWO", "AGWO", "NO3+NO2-N - SURFACE LAYER OUTFLOW", _
-                "NO3+NO2-N - UPPER LAYER OUTFLOW", "NO3+NO2-N - GROUNDWATER OUTFLOW", "NO3-N - TOTAL OUTFLOW", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", _
-                "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", _
-                 "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "POQUAL-NH3+NH4", "SOQUAL-NH3+NH4", _
-                 "IOQUAL-NH3+NH4", "AOQUAL-NH3+NH4", "POQUAL-NO3", "SOQUAL-NO3", "AOQUAL-NO3", "IOQUAL-NO3", "WASHQS-BOD", _
-                 "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "POQUAL-BOD", "ORGN - TOTAL OUTFLOW", "NITROGEN - TOTAL OUTFLOW", _
-                "LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "POQUAL-ORTHO P", "SOQUAL-ORTHO P", _
-                 "IOQUAL-ORTHO P", "AOQUAL-ORTHO P", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", _
-                 "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "SDP4A", _
-                "SDORP" _
-                }
+            Dim lConstituentsThatNeedMassLink() As String =
+                {"WSSD", "SCRSD", "SOSLD", "PERO", "SURO", "IFWO", "AGWO", "NO3+NO2-N - SURFACE LAYER OUTFLOW",
+                "NO3+NO2-N - UPPER LAYER OUTFLOW", "NO3+NO2-N - GROUNDWATER OUTFLOW", "NO3-N - TOTAL OUTFLOW", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW",
+                "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW",
+                 "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "POQUAL-NH3+NH4", "SOQUAL-NH3+NH4", "SOQO-NH3+NH4", "WASHQS-NH3+NH4",
+                 "IOQUAL-NH3+NH4", "AOQUAL-NH3+NH4", "POQUAL-NO3", "SOQUAL-NO3", "SOQO-NO3", "WASHQS-NO3""AOQUAL-NO3", "IOQUAL-NO3", "WASHQS-BOD",
+                 "SOQUAL-BOD", "SOQO-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "POQUAL-BOD", "ORGN - TOTAL OUTFLOW", "NITROGEN - TOTAL OUTFLOW",
+                "LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "POQUAL-ORTHO P", "SOQUAL-ORTHO P",
+                 "IOQUAL-ORTHO P", "AOQUAL-ORTHO P", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW",
+                 "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "SDP4A", "SDORP"}
             pConstituentsThatNeedMassLink = New Generic.List(Of String)(lConstituentsThatNeedMassLink)
         End If
         Return pConstituentsThatNeedMassLink
@@ -308,7 +306,7 @@ Public Module Utility
                 End With
 #End Region
 #Region "Case TotalN"
-            Case "TotalN" 'use PQUAL
+            Case "TotalN", "TN" 'use PQUAL
                 With lConstituentsToOutput
                     .Add("P:Header1", "Nitrogen Loss (lb/ac)")
                     .Add("P:Header1a", "  NO3 Loss")
@@ -495,7 +493,7 @@ Public Module Utility
                     Dim headerLabel() As String = {"a", "b", "c", "d"}
                     Dim headerLabelCount As Integer = 0
                     For Each ConstProperty As ConstituentProperties In aConstProperties
-                        If ConstProperty.ConstNameForEXPPlus = "TotalN" Then Continue For
+                        If ConstProperty.ConstNameForEXPPlus = "TN" Then Continue For
                         Select Case ConstProperty.ConstNameForEXPPlus
                             Case "NO3"
                                 .Add("P:Header4", "NO3+NO2 (PQUAL)")
@@ -601,7 +599,7 @@ Public Module Utility
             '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
 #End Region
 #Region "Case TotalP"
-            Case "TotalP"
+            Case "TP"
 
                 With lConstituentsToOutput
                     .Add("P:Header1", "Phosphorus Loss (lb/ac")
@@ -1169,7 +1167,7 @@ Public Module Utility
                         Exit For
                     End If
 
-                Case "TotalN"
+                Case "TN"
                     Select Case True
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1310,7 +1308,7 @@ Public Module Utility
                     'End If
 
 
-                Case "TotalP"
+                Case "TP"
                     'If aConstituent.Contains("SOQUAL") Then Stop
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
@@ -1689,9 +1687,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TotalN" Then
+        If aBalanceType = "TN" Then
             aConversionFactorFromOxygen = CVON
-        ElseIf aBalanceType = "TotalP" Then
+        ElseIf aBalanceType = "TP" Then
             aConversionFactorFromOxygen = CVOP
         End If
 
@@ -1717,9 +1715,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TotalN" Then
+        If aBalanceType = "TN" Then
             aConversionFactorFromBiomass = CVBN
-        ElseIf aBalanceType = "TotalP" Then
+        ElseIf aBalanceType = "TP" Then
             aConversionFactorFromBiomass = CVBP
         End If
 
@@ -1777,7 +1775,7 @@ Public Module Utility
 
                     End If
 
-                Case "TotalN"
+                Case "TN"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                         lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
@@ -1862,7 +1860,7 @@ Public Module Utility
 
                     End If
 
-                Case "TotalP"
+                Case "TP"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
@@ -1981,10 +1979,10 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
-            Case "TotalN"
+            Case "TN"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TotalN"
-                QUALNames.ConstituentNameInUCI = "TotalN"
+                QUALNames.ConstNameForEXPPlus = "TN"
+                QUALNames.ConstituentNameInUCI = "TN"
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
@@ -1997,10 +1995,10 @@ Public Module Utility
                 QUALs.Add(QUALNames)
                 Return QUALs
 
-            Case "TotalP"
+            Case "TP"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TotalP"
-                QUALNames.ConstituentNameInUCI = "TotalP"
+                QUALNames.ConstNameForEXPPlus = "TP"
+                QUALNames.ConstituentNameInUCI = "TP"
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
                 Else
