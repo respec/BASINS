@@ -47,6 +47,7 @@ Public Class StartUp
         DateTimePicker2.Enabled = lExists
         chkExpertStats.Enabled = lExists
         chkMultiSim.Enabled = lExists
+        chkReganGraphs.Enabled = lExists
         'chkGraphStandard.Enabled = lExists
         chkWaterBalance.Enabled = lExists
         chkAdditionalgraphs.Enabled = lExists

@@ -157,7 +157,7 @@ Public Module atcConstituentTables
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
-
+                    Dim lOperationIsConnected As Boolean = False
                     Dim lTSNumber As Integer = 0
                     Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
@@ -191,23 +191,24 @@ Public Module atcConstituentTables
                             lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
                             If lTS Is Nothing Then Continue For
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
-                            If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
-                                For Each lConnection As HspfConnection In lOperation.Targets
-                                    If lConnection.Target.VolName = "RCHRES" Then
-                                        Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
 
+                            For Each lConnection As HspfConnection In lOperation.Targets
+                                If lConnection.Target.VolName = "RCHRES" Then
+                                    lOperationIsConnected = True
+                                    Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                    If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
                                         Dim lMassLinkID As Integer = lConnection.MassLink
                                         If Not lMassLinkID = 0 Then
                                             lMasslinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              aBalanceType, 0, 0)
                                             Exit For
                                         End If
-
                                     End If
-                                Next lConnection
+                                End If
+                            Next lConnection
                                 lMasslinkFactor *= 12 'Converting feet to inches
-                            End If
 
+                            If Not lOperationIsConnected AndAlso ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then Exit For
                         End If
                         lTS *= lMasslinkFactor
                         Dim lTSAttributes As String = lTS.Attributes.GetDefinedValue("Constituent").Value
@@ -309,7 +310,7 @@ Public Module atcConstituentTables
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
-
+                    Dim lOperationIsConnected As Boolean = False
                     Dim lTSNumber As Integer = 0
                     Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
@@ -343,21 +344,21 @@ Public Module atcConstituentTables
                             lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
                             If lTS Is Nothing Then Continue For
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
-                            If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
-                                For Each lConnection As HspfConnection In lOperation.Targets
-                                    If lConnection.Target.VolName = "RCHRES" Then
-                                        Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-
+                            For Each lConnection As HspfConnection In lOperation.Targets
+                                If lConnection.Target.VolName = "RCHRES" Then
+                                    lOperationIsConnected = True
+                                    Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                    If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
                                         Dim lMassLinkID As Integer = lConnection.MassLink
                                         If Not lMassLinkID = 0 Then
                                             lMasslinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              aBalanceType, 0, 0)
                                             Exit For
                                         End If
-
                                     End If
-                                Next lConnection
-                            End If
+                                End If
+                            Next lConnection
+                            If Not lOperationIsConnected AndAlso ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then Exit For
                         End If
                         Dim lTSAttributes As String = lTS.Attributes.GetDefinedValue("Constituent").Value
                         lTSAttributes = SafeSubstring(lTSAttributes, 0, 2)
@@ -454,7 +455,7 @@ Public Module atcConstituentTables
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
-
+                    Dim lOperationIsConnected As Boolean = False
                     Dim lTSNumber As Integer = 0
                     Dim lOutflowDataTypes1 As Dictionary(Of String, String) = ConstituentList(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
@@ -489,23 +490,21 @@ Public Module atcConstituentTables
                             lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
                             If lTS Is Nothing Then Continue For
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
-                            If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
-                                For Each lConnection As HspfConnection In lOperation.Targets
-                                    If lConnection.Target.VolName = "RCHRES" Then
-                                        Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-
+                            For Each lConnection As HspfConnection In lOperation.Targets
+                                If lConnection.Target.VolName = "RCHRES" Then
+                                    lOperationIsConnected = True
+                                    Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                    If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
                                         Dim lMassLinkID As Integer = lConnection.MassLink
                                         If Not lMassLinkID = 0 Then
                                             lMasslinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              aBalanceType, 0, 0)
                                             Exit For
                                         End If
-
                                     End If
-                                Next lConnection
-
-                            End If
-
+                                End If
+                            Next lConnection
+                            If Not lOperationIsConnected AndAlso ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then Exit For
                         End If
 
                         'Logger.Dbg(lTS.Attributes.GetDefinedValue("Constituent").Value)
@@ -641,7 +640,7 @@ Public Module atcConstituentTables
                         (lOperation.Name = "IMPLND" AndAlso lOperation.Tables("ACTIVITY").Parms("IQALFG").Value = "1")) Then Continue For
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
-
+                    Dim lOperationIsConnected As Boolean = False
                     'If lOperation.Tables("ACTIVITY").Parms("PQUALFG").Value = "0" Then Continue For
 
                     lOperationNameNumber.Add(LocationName)
@@ -651,7 +650,7 @@ Public Module atcConstituentTables
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
-
+                    'If lOperation.Id = 319 Then Stop
                     For Each constituent As ConstituentProperties In aConstProperties
                         Dim lMultipleIndex As Integer = 0
                         If constituent.ConstNameForEXPPlus.ToLower.Contains("ref") Then
@@ -705,6 +704,7 @@ Public Module atcConstituentTables
                                 lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                                 For Each lConnection As HspfConnection In lOperation.Targets
                                     If lConnection.Target.VolName = "RCHRES" Then
+                                        lOperationIsConnected = True
                                         Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                         Dim aConversionFactor As Double = 0.0
                                         If aBalanceType = "TN" Or aBalanceType = "TP" Then
@@ -719,6 +719,7 @@ Public Module atcConstituentTables
                                         'End If
                                     End If
                                 Next lConnection
+                                If Not lOperationIsConnected Then Exit For
                             End If
 
                             'If Not lOutflowDataType.StartsWith("TotalOutflow") Then 
@@ -891,7 +892,10 @@ Public Module atcConstituentTables
                     Dim Values As New List(Of Double)
                     If foundRows.Length > 0 Then
                         For Each foundrow As DataRow In foundRows
-                            Values.Add(foundrow("TotalOutflow"))
+                            Try
+                                Values.Add(foundrow("TotalOutflow"))
+                            Catch
+                            End Try
                         Next foundrow
 
                         If Values.Count > 0 Then
@@ -915,7 +919,10 @@ Public Module atcConstituentTables
                         For Each month As String In lMonthNames
                             Dim Values As New List(Of Double)
                             For Each MonthRow As DataRow In foundRows
-                                Values.Add(MonthRow(month))
+                                Try
+                                    Values.Add(MonthRow(month))
+                                Catch
+                                End Try
                             Next
                             If Values.Count > 0 Then
                                 landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
@@ -942,13 +949,18 @@ Public Module atcConstituentTables
         Else
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
             For Each item As String In listLanduses
-                Dim OpType1 As String = item.Split("-")(0)
+                'Dim OpType1 As String = item.Split("-")(0)
+                'If item = "P:CPAB_CONS_NON_NLDAS_" Then Stop
                 Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And Year = 'SumAnnual' And OpDesc ='" & item.Split(":")(1) & "'"
+                'Logger.Dbg(SelectExpression)
                 Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)
                 Dim Values As New List(Of Double)
                 If foundRows.Length > 0 Then
                     For Each foundrow As DataRow In foundRows
-                        Values.Add(foundrow("TotalOutflow"))
+                        Try
+                            Values.Add(foundrow("TotalOutflow"))
+                        Catch
+                        End Try
                     Next foundrow
                     If Values.Count > 0 Then
                         landUseSumAnnualValues.Add(item, Values.ToArray)
@@ -972,7 +984,10 @@ Public Module atcConstituentTables
                         For Each month As String In lMonthNames
                             Dim Values As New List(Of Double)
                             For Each MonthRow As DataRow In foundRows
-                                Values.Add(MonthRow(month))
+                                Try
+                                    Values.Add(MonthRow(month))
+                                Catch
+                                End Try
                             Next
                             landUseSumAnnualValues.Add(Right(month, 3), Values.ToArray)
                         Next

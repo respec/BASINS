@@ -420,6 +420,7 @@ Public Module WatershedConstituentBalance
                                             If lLocationDataGroup.Count > 0 Then
                                                 lSomeLocationHasData = True
                                                 lTempDataSet = lLocationDataGroup.Item(0)
+                                                lTempDataSet = SubsetByDate(lTempDataSet, aSDateJ, aEDateJ, Nothing)
                                                 Dim lOperation As HspfOperation = aUci.OpnBlks(lOperationType).OperFromID(lLocation.Substring(2))
                                                 Dim lMult As Double = 1.0
                                                 Dim lMassLinkID As Integer = 0
@@ -428,7 +429,11 @@ Public Module WatershedConstituentBalance
                                                 Dim lTotalArea As Double = 0.0
                                                 Dim MassLinkExists As Boolean = True
 
-                                                If ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+                                                If lConstituentDataName.ToUpper.Contains("QUAL") OrElse
+                                                     lConstituentDataName.ToUpper.Contains("SOQO") OrElse
+                                                     lConstituentDataName.ToUpper.Contains("WASHQS") OrElse
+                                                     ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+
                                                     For Each lConnection As HspfConnection In lOperation.Targets
 
                                                         If lConnection.Target.VolName = "RCHRES" Then
@@ -446,7 +451,7 @@ Public Module WatershedConstituentBalance
                                                                     ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
                                                                     Dim ConstNameEXP As String = ""
                                                                     For Each constt As ConstituentProperties In aConstProperties
-                                                                        If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                                                        If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
                                                                             ConstNameEXP = constt.ConstNameForEXPPlus
                                                                             If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
                                                                             ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
@@ -464,7 +469,7 @@ Public Module WatershedConstituentBalance
                                                             If lArea = 0 Then
                                                                 lArea = 0.0000000001
                                                             End If
-                                                            If aBalanceType = "Water" Then 'Water is simulated in inches and when it goes to RCHRES, it goes as feet. 
+                                                            If aBalanceType = "Water" OrElse aBalanceType = "WAT" Then 'Water is simulated in inches and when it goes to RCHRES, it goes as feet. 
                                                                 'This factor takes care of that conversion that happened in MASS-LINK
                                                                 lMassLinkFactor *= 12
                                                             End If
@@ -490,7 +495,9 @@ Public Module WatershedConstituentBalance
 
                                                     'Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
                                                     Dim lSeasons As atcSeasonBase
-                                                    If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                                    Dim lDate(5) As Integer
+                                                    J2Date(aSDateJ, lDate)
+                                                    If lDate(1) = 10 Then 'month Oct
                                                         lSeasons = New atcSeasonsWaterYear
                                                     Else
                                                         lSeasons = New atcSeasonsCalendarYear

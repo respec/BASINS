@@ -1391,6 +1391,8 @@ Public Module ConstituentBudget
                         ByRef aReachTotal As Double,
                         ByVal aReporting As Boolean,
                         ByRef aContribPercent As atcCollection,
+                        ByVal aSDateJ As Double,
+                        ByVal aEDateJ As Double,
                         Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing)
 
         Dim lTotalIndex As Integer = 0
@@ -1421,7 +1423,7 @@ Public Module ConstituentBudget
                         Dim lConstituentTotal As Double = 0
                         lTotal = 0
                         For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
-
+                            lTs = SubsetByDate(lTs, aSDateJ, aEDateJ, Nothing)
                             Dim lMassLinkFactor As Double = 0.0
                             If lTs.Attributes.GetDefinedValue("SumAnnual").Value > 0 Then
                                 Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
@@ -1430,7 +1432,7 @@ Public Module ConstituentBudget
                                     ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
                                     Dim ConstNameEXP As String = ""
                                     For Each constt As ConstituentProperties In aConstProperties
-                                        If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                        If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
                                             ConstNameEXP = constt.ConstNameForEXPPlus
                                             If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
                                             ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(0) & "-" & ConstNameEXP
@@ -1569,8 +1571,8 @@ Public Module ConstituentBudget
         Dim lContribPercent As New atcCollection
 
         'If aReach.Id = "148" Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
 
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
@@ -1580,8 +1582,8 @@ Public Module ConstituentBudget
         Next
         aTotalInflow += -UpStreamDiversion
         'If aReach.Id = 102 Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
         'If aReach.Id = 102 Then Stop
 
         'Dim GENERTSinWDM As Boolean = False
