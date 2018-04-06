@@ -1,13 +1,16 @@
-HSPEXP+2.0beta2
-Date: 03/28/2018
+HSPEXP+2.0beta3
+Date: 04/05/2018
 
 Features:
-1. In Multi Simulation Manager, range of operations can be provided, separated by hyphen (-)
+1. In Multi Simulation Manager, range of operations can be provided, separated by hyphen (-).
+2. Draft Manual is now available.
 
 Bugs Fixed
 1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. That behavior has been fixed.
 2. Some interface fixes.
-3. Some reports were having issues, that has been fixed.
+3. Some reports were having issues with analysis date, that has been fixed.
+4. Some reports showed erroneous values when operations didn't have any reach connections. That has been fixed.
+
 
 HSPEXP+2.0.0beta
 Date: 03/13/2018
