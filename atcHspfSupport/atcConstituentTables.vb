@@ -1788,7 +1788,7 @@ Public Module atcConstituentTables
                     For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
                         row = Reach_Budget_Table.NewRow
                         If Not lReach.Name = "RCHRES" Then Continue For
-                        If Not lReach.Tables("ACTIVITY").Parms("HTFG").Value = "1" Then Continue For
+                        If Not lReach.Tables("ACTIVITY").Parms("GQFG").Value = "1" Then Continue For
                         Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
                         'If lReach.Id = 106 Then Stop
                         Dim lTS As New atcTimeseries(Nothing)

@@ -1,15 +1,17 @@
-HSPEXP+2.0beta3
-Date: 04/05/2018
+HSPEXP+2.0beta4
+Date: 04/19/2018
 
 Features:
 1. In Multi Simulation Manager, range of operations can be provided, separated by hyphen (-).
 2. Draft Manual is now available.
 
 Bugs Fixed
-1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. That behavior has been fixed.
+1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. Fixed.
 2. Some interface fixes.
-3. Some reports were having issues with analysis date, that has been fixed.
-4. Some reports showed erroneous values when operations didn't have any reach connections. That has been fixed.
+3. Some reports were having issues with analysis date. Fixed.
+4. Some reports showed erroneous values when operations didn't have any reach connections. Fixed.
+5. Multi Simulation Manager would not output values if it could not calculate GeoMean values. Fixed.
+6. GQUAL Reach reports were not output if heat in reaches was not simulated. Fixed.
 
 
 HSPEXP+2.0.0beta
