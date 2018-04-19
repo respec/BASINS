@@ -2117,6 +2117,8 @@ Public Module atcConstituentTables
                 Case "SAME"
                     If aDelta / 60 = 1 AndAlso aTimeUnit = "TUDay" AndAlso aTStep = 1 Then
                         MultiFactor = 24.0
+                    ElseIf aDelta / 60 = 1 AndAlso aTimeUnit = "TUHour" AndAlso aTStep = 1 Then
+                        MultiFactor = 1
                     End If
             End Select
         End If

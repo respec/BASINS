@@ -12,6 +12,7 @@ Bugs Fixed
 4. Some reports showed erroneous values when operations didn't have any reach connections. Fixed.
 5. Multi Simulation Manager would not output values if it could not calculate GeoMean values. Fixed.
 6. GQUAL Reach reports were not output if heat in reaches was not simulated. Fixed.
+7. If input PS and model timstep were hourly, point sources were not being calculated. Fixed
 
 
 HSPEXP+2.0.0beta
