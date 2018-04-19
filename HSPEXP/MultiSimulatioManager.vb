@@ -596,7 +596,12 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 End If
 
                             Case Else
-                                row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
+                                Try
+                                    row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
+                                Catch ex As Exception
+                                    Logger.Dbg("The " & ColumnName & " could not be calculated for DSN " & WDMDataset)
+                                End Try
+
                         End Select
 
                     Next TableColumn
