@@ -307,6 +307,16 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                                ByRef aParm As ModelParameter,
                                                ByVal aMFactorOrParmValue As Double
                                                )
+        Dim lOperLowerRange As Integer = -1
+        Dim lOperUpperRange As Integer = -1
+        Try
+            lOperLowerRange = CInt(aParm.ParmOperationName.Split("-")(0))
+            lOperUpperRange = CInt(aParm.ParmOperationName.Split("-")(1))
+            Logger.Dbg("Range of operaion is provided")
+        Catch ex As Exception
+            Logger.Dbg("Range of Operations is not provided")
+        End Try
+
         Select Case True
             Case aParm.ParmTable.Contains("MASS-LINK")
                 Dim lMassLinkID As Integer
@@ -412,8 +422,10 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                 Next
 
             Case Else
+
                 For Each lOper As HspfOperation In aUCI.OpnBlks(aParm.ParmOperationType).Ids
                     If (lOper.Id = aParm.ParmOperationNumber OrElse lOper.Description = aParm.ParmOperationName OrElse
+                            (lOper.Id >= lOperLowerRange AndAlso lOper.Id <= lOperUpperRange) OrElse
                             (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
                         Try
                             Dim lTable As HspfTable
@@ -584,7 +596,12 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 End If
 
                             Case Else
-                                row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
+                                Try
+                                    row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
+                                Catch ex As Exception
+                                    Logger.Dbg("The " & ColumnName & " could not be calculated for DSN " & WDMDataset)
+                                End Try
+
                         End Select
 
                     Next TableColumn

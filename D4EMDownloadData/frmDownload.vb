@@ -219,7 +219,8 @@ Public Class frmDownload
                     End If
                     If chkNHDplus2_All.Checked Or chkNHDplus2_Catchment.Checked Or chkNHDplus2_elev_cm.Checked Or chkNHDplus2_hydrography.Checked Then
                         For Each lHuc8 As String In HUC8s()
-                            If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
+                            'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
+                            If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
                                 lProblem = True
                             End If
                         Next

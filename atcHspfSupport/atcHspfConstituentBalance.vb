@@ -105,8 +105,13 @@ Public Module ConstituentBalance
                                         lHaveData = True
 
                                         Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
+                                        lTempDataSet = SubsetByDate(lTempDataSet, aSDateJ, aEDateJ, Nothing)
                                         Dim lSeasons As atcSeasonBase
-                                        If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                        Dim lDate(5) As Integer
+                                        J2Date(aSDateJ, lDate)
+
+
+                                        If lDate(1) = 10 Then 'month Oct
                                             lSeasons = New atcSeasonsWaterYear
                                         Else
                                             lSeasons = New atcSeasonsCalendarYear
@@ -141,9 +146,9 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
-                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
-                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case Else
                                                     Dim lPrefix As String = ""
@@ -191,7 +196,10 @@ Public Module ConstituentBalance
                                         Dim lTotalArea As Double = 0.0
                                         Dim MassLinkExists As Boolean = True
 
-                                        If lConstituentDataName.ToUpper.Contains("QUAL") OrElse ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+                                        If lConstituentDataName.ToUpper.Contains("QUAL") OrElse
+                                                lConstituentDataName.ToUpper.Contains("SOQO") OrElse
+                                                lConstituentDataName.ToUpper.Contains("WASHQS") OrElse
+                                            ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
 
                                             For Each lConnection As HspfConnection In lOperation.Targets
 
@@ -206,7 +214,7 @@ Public Module ConstituentBalance
 
                                                     End If
                                                     Dim aConversionFactor As Double = 0.0
-                                                    If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Then
                                                         aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                     End If
 
@@ -220,7 +228,7 @@ Public Module ConstituentBalance
                                                             ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
                                                             Dim ConstNameEXP As String = ""
                                                             For Each constt As ConstituentProperties In aConstProperties
-                                                                If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                                                If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
                                                                     ConstNameEXP = constt.ConstNameForEXPPlus
                                                                     If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
                                                                     ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
@@ -239,7 +247,7 @@ Public Module ConstituentBalance
                                                     If lArea = 0 Then
                                                         lArea = 0.0000000001
                                                     End If
-                                                    If aBalanceType = "Water" Then
+                                                    If aBalanceType = "Water" OrElse aBalanceType = "WAT" Then
                                                         lMassLinkFactor *= 12
                                                     End If
                                                     lTotalLoad += lArea * lMassLinkFactor
@@ -253,60 +261,60 @@ Public Module ConstituentBalance
                                         End If
 
                                         If lConstituentDataName.ToUpper.Contains("F.COLIFORM") Or lConstituentDataName.ToUpper.StartsWith("BACT") Then 'Assuming that unit of F.Coliform unit is #ORG
-                                            lMult = 1 / 1000000000.0 '10^9
-                                        End If
+                                                lMult = 1 / 1000000000.0 '10^9
+                                            End If
 
-                                        If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
-                                            lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
-                                            lStateVariable = True
-                                        Else
-
-                                            lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
-                                            lStateVariable = False
-                                        End If
-
-                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
-                                        If Not lAttribute Is Nothing Then
-
-                                            If lStateVariable Then 'no value needed for mean column
-                                                .Value(2) = "<NA>".PadLeft(10)
+                                            If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
+                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
+                                                lStateVariable = True
                                             Else
 
-                                                .Value(2) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                                lStateVariable = False
                                             End If
-                                            Dim lFieldIndex As Integer = 3
-                                            For Each lAttribute In lYearlyAttributes
-                                                .Value(lFieldIndex) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
-                                                lFieldIndex += 1
-                                            Next
-                                        Else
-                                            .Value(2) = "Skip-NoData"
-                                        End If
-                                        .CurrentRecord += 1
-                                    ElseIf lConstituentKey.StartsWith("Total") AndAlso
+
+                                            .Value(1) = lConstituentName.PadRight(aFieldWidth)
+                                            If Not lAttribute Is Nothing Then
+
+                                                If lStateVariable Then 'no value needed for mean column
+                                                    .Value(2) = "<NA>".PadLeft(10)
+                                                Else
+
+                                                    .Value(2) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                End If
+                                                Dim lFieldIndex As Integer = 3
+                                                For Each lAttribute In lYearlyAttributes
+                                                    .Value(lFieldIndex) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                    lFieldIndex += 1
+                                                Next
+                                            Else
+                                                .Value(2) = "Skip-NoData"
+                                            End If
+                                            .CurrentRecord += 1
+                                        ElseIf lConstituentKey.StartsWith("Total") AndAlso
                                            lConstituentKey.Length > 5 AndAlso
                                            IsNumeric(lConstituentKey.Substring(5, 1)) Then
-                                        Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
-                                        Dim lCurFieldValues(.NumFields) As Double
-                                        Dim lCurrentRecordSave As Integer = .CurrentRecord
-                                        For lCount As Integer = 1 To lTotalCount
-                                            .CurrentRecord -= 1
-                                            For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                                If IsNumeric(.Value(lFieldPos)) Then
-                                                    lCurFieldValues(lFieldPos) += .Value(lFieldPos)
-                                                Else
-                                                    Logger.Dbg("Why")
-                                                End If
+                                            Dim lTotalCount As Integer = lConstituentKey.Substring(5, 1)
+                                            Dim lCurFieldValues(.NumFields) As Double
+                                            Dim lCurrentRecordSave As Integer = .CurrentRecord
+                                            For lCount As Integer = 1 To lTotalCount
+                                                .CurrentRecord -= 1
+                                                For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                                    If IsNumeric(.Value(lFieldPos)) Then
+                                                        lCurFieldValues(lFieldPos) += .Value(lFieldPos)
+                                                    Else
+                                                        Logger.Dbg("Why")
+                                                    End If
+                                                Next
                                             Next
-                                        Next
-                                        .CurrentRecord = lCurrentRecordSave
-                                        .Value(1) = lConstituentName.PadRight(aFieldWidth)
-                                        For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
-                                            .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
-                                        Next
-                                        .CurrentRecord += 1
-                                    Else
-                                        If lPendingOutput.Length > 0 Then
+                                            .CurrentRecord = lCurrentRecordSave
+                                            .Value(1) = lConstituentName.PadRight(aFieldWidth)
+                                            For lFieldPos As Integer = 2 To lCurFieldValues.GetUpperBound(0)
+                                                .Value(lFieldPos) = DecimalAlign(lCurFieldValues(lFieldPos), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                            Next
+                                            .CurrentRecord += 1
+                                        Else
+                                            If lPendingOutput.Length > 0 Then
                                             lPendingOutput &= vbCr
                                         End If
                                         If lConstituentDataName.StartsWith("Header") Then
