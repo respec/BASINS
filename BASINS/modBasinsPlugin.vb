@@ -23,7 +23,7 @@ Public Module modBasinsPlugin
 #If ProgramName = "USGS GW Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
     Friend Const g_AppNameShort As String = "GW Toolbox"
-    Friend Const g_AppNameLong As String = "USGS GW Toolbox 1.3"
+    Friend Const g_AppNameLong As String = "USGS GW Toolbox 1.3.2"
     Friend Const g_URL_Home As String = "http://water.usgs.gov/ogw/gwtoolbox/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-GW/register.html"
 #ElseIf ProgramName = "USGS SW Toolbox" Then

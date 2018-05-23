@@ -9,7 +9,8 @@ Public Class clsSWSTATPlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis"
+            'Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis"
+            Return "Analysis::" & pTrendName
         End Get
     End Property
 
@@ -196,8 +197,8 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, _
-                                                       atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)", pTrendName, Me.Icon, , , True))
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, _
+        'atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)", pTrendName, Me.Icon, , , True))
     End Sub
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
@@ -211,12 +212,13 @@ Public Class clsSWSTATPlugin
     End Sub
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-        MyBase.ItemClicked(aItemName, aHandled)
+        'MyBase.ItemClicked(aItemName, aHandled)
         If Not aHandled Then
             Select Case aItemName
-                Case atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName
-                    Dim lTimeseriesGroup As atcTimeseriesGroup = _
-                      atcDataManager.UserSelectData("Select Data For Trend Analysis", _
+                'Case atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName
+                Case atcDataManager.AnalysisMenuName & "_Analysis::" & pTrendName
+                    Dim lTimeseriesGroup As atcTimeseriesGroup =
+                      atcDataManager.UserSelectData("Select Data For Trend Analysis",
                                                     Nothing, Nothing, True, True, Me.Icon)
                     If lTimeseriesGroup.Count > 0 Then
                         LoadPlugin("Timeseries::n-day high/low")

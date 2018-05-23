@@ -363,7 +363,7 @@ Friend Class frmAbout
             'lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = " Build Date: June 15, 2018" '& IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             Catch
             End Try
             Try
@@ -377,7 +377,7 @@ Friend Class frmAbout
             End Try
             Try
 #If ProgramName = "USGS GW Toolbox" Then
-
+                Me.Width += 30
 #ElseIf ProgramName = "USGS SW Toolbox" Then
                 Me.Width += 30
 #Else
