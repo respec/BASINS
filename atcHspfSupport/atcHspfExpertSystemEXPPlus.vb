@@ -452,7 +452,7 @@ Public Class atcExpertSystem
             Dim obslTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lSite.DSN(1))) 'Getting the observed data
             obslTSer = SubsetByDate(obslTSer, SDateJ, EDateJ, Nothing)
             obslTSer = Aggregate(obslTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-            If obslTSer.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
+            If obslTSer.Attributes.GetDefinedValue("Count").Value < lNVals Then
                 pFlowOnly = True
             End If
 

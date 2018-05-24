@@ -1728,7 +1728,7 @@ Public Module Utility
 
     Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String, Optional ByVal aGQALID As Integer = 0) As List(Of ConstituentProperties)
         Dim QUALs As New List(Of ConstituentProperties)
-        Dim QUALNames As ConstituentProperties
+        Dim QUALNames As ConstituentProperties = Nothing
         Dim QUALName As String = ""
         Dim QUALUnit As String = ""
         Dim NQUALS As Integer = 0
@@ -1927,6 +1927,11 @@ Public Module Utility
             End Select
 
         Next lML
+        If QUALNames Is Nothing Then
+            Logger.Msg("No appropriate MASS-LINK connections were found for " & aBalanceType & ". The program will quit", vbOKOnly)
+            Return Nothing
+        End If
+
 
         Select Case aBalanceType
             Case "Water"
