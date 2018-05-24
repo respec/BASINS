@@ -485,7 +485,9 @@ Module HSPFOutputReports
                             Case "TN"
                                 lConstituentName = "TN"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("NITR")
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
@@ -495,6 +497,9 @@ Module HSPFOutputReports
                             Case "TP"
                                 lConstituentName = "TP"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("NITR")
                                 lActiveSections.Add("PHOS")
                                 lActiveSections.Add("PQUAL")
@@ -505,6 +510,9 @@ Module HSPFOutputReports
                             Case "BOD-Labile"
                                 lConstituentName = "BOD-Labile"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("OXRX")
@@ -514,6 +522,9 @@ Module HSPFOutputReports
                                 lGQALID = Right(lConstituent, 1)
                                 lConstituentName = SafeSubstring(lConstituent, 0, lConstituent.Length - 2)
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituentName, lGQALID)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
