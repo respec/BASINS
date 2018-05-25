@@ -1054,7 +1054,7 @@ Public Module atcConstituentTables
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "DOXFLUX-TOT"
-                column.Caption = "Total DO Flux (" & lUnits & ")"
+                column.Caption = "Total DO Process Flux (" & lUnits & ")"
                 Reach_Budget_Table.Columns.Add(column)
 
                 column = New DataColumn()
@@ -1090,7 +1090,7 @@ Public Module atcConstituentTables
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "DOXFLUX-BENTHIC"
-                column.Caption = "DO Phytoplankton (" & lUnits & ")"
+                column.Caption = "DO Benthic Algae (" & lUnits & ")"
                 Reach_Budget_Table.Columns.Add(column)
 
                 column = New DataColumn()
