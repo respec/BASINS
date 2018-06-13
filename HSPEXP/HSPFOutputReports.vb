@@ -73,11 +73,11 @@ Module HSPFOutputReports
         End If
 
         If StartUp.chkTotalNitrogen.Checked Then
-            pConstituents.Add("TotalN")
+            pConstituents.Add("TN")
         End If
 
         If StartUp.chkTotalPhosphorus.Checked Then
-            pConstituents.Add("TotalP")
+            pConstituents.Add("TP")
         End If
         If StartUp.chkBODBalance.Checked Then
             pConstituents.Add("BOD-Labile")
@@ -482,19 +482,24 @@ Module HSPFOutputReports
                                 lActiveSections.Add("PWTGAS")
                                 lActiveSections.Add("IWTGAS")
                                 lActiveSections.Add("HTRCH")
-                            Case "TotalN"
+                            Case "TN"
                                 lConstituentName = "TN"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
-
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("NITR")
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("NUTRX")
                                 lActiveSections.Add("PLANK")
 
-                            Case "TotalP"
+                            Case "TP"
                                 lConstituentName = "TP"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("NITR")
                                 lActiveSections.Add("PHOS")
                                 lActiveSections.Add("PQUAL")
@@ -505,6 +510,9 @@ Module HSPFOutputReports
                             Case "BOD-Labile"
                                 lConstituentName = "BOD-Labile"
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("OXRX")
@@ -514,6 +522,9 @@ Module HSPFOutputReports
                                 lGQALID = Right(lConstituent, 1)
                                 lConstituentName = SafeSubstring(lConstituent, 0, lConstituent.Length - 2)
                                 lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituentName, lGQALID)
+                                If lConstProperties Is Nothing Then
+                                    End
+                                End If
                                 lActiveSections.Add("PQUAL")
                                 lActiveSections.Add("IQUAL")
                                 lActiveSections.Add("GQUAL")
@@ -541,7 +552,7 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
 
-                            If lConstituent = "TotalN" OrElse lConstituent = "TotalP" OrElse
+                            If lConstituent = "TN" OrElse lConstituent = "TP" OrElse
                                 lConstituent = "Sediment" OrElse lConstituent = "Water" Then
 
                                 With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, lOperationTypes, pBaseName,

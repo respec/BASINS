@@ -34,10 +34,10 @@ Public Module modBarGraph
             Case "Sediment"
                 lGrapher.Title = "Sediment load allocation for all the sources at " & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
-            Case "TotalP"
+            Case "TP"
                 lGrapher.Title = "Total Phosphorus load allocation for all the sources at " & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
-            Case "TotalN"
+            Case "TN"
                 lGrapher.Title = "Total Nitrogen load allocation for all the sources at " & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
         End Select

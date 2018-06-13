@@ -239,10 +239,11 @@ ErrHand:
                 pRecords.Add(lCurrentLine)
             End If
         Next
-        If NumFields = 0 AndAlso pRecords.Count > 0 Then
+        'only set NumFields and CurrentRecord if existing file is not empty
+        If NumFields = 0 AndAlso pRecords.Count > 1 Then
             NumFields = CountString(pRecords(1), Delimiter) + 1
         End If
-        Me.CurrentRecord = 1
+        If pRecords.Count > 1 Then Me.CurrentRecord = 1
         Return True
     End Function
 

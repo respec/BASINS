@@ -81,7 +81,7 @@ Public Module WatershedSummary
                 lUnits = "tons"
                 lTotalUnits = lUnits
                 lRchresConstituents.Add("ROSED-TOT")
-            Case "TotalN"
+            Case "TN"
                 lAgchemConstituent = "NITROGEN - TOTAL OUTFLOW"
                 'Total N is a combination of NH4, No3, OrganicN
                 lPerlndConstituents.Add("POQUAL-NH3+NH4")
@@ -93,7 +93,7 @@ Public Module WatershedSummary
                 lRchresConstituents.Add("TAM-OUTTOT")
                 lRchresConstituents.Add("NO3-OUTTOT")
                 lRchresConstituents.Add("BODOUTTOT")
-            Case "TotalP"
+            Case "TP"
                 lAgchemConstituent = "POPHOS"
                 'Total P is a combination of PO4 and OrganicP
                 lPerlndConstituents.Add("POQUAL-ORTHO P")
@@ -102,7 +102,7 @@ Public Module WatershedSummary
                 lImplndConstituents.Add("SOQUAL-BOD")
                 lRchresConstituents.Add("PO4-OUTTOT")
                 lRchresConstituents.Add("BODOUTTOT")
-            Case "WaterTemp"
+            Case "Heat"
                 lPerlndConstituents.Add("POHT")
                 lPerlndConstituents.Add("SOHT")
                 lUnits = "btu"
@@ -187,10 +187,10 @@ Public Module WatershedSummary
                                     'might need another multiplier for bod
                                     If aSummaryType = "BOD-Labile" Then
                                         lMult = 0.4
-                                    ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
+                                    ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TN" Then
                                         lMult = 0.069176
                                         'Multiplying 0.048 + 0.05294*.4 to BOD to get Organic N
-                                    ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
+                                    ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TP" Then
                                         lMult = 0.0052304
                                         'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                                     End If
@@ -239,10 +239,10 @@ Public Module WatershedSummary
                             'might need another multiplier for bod
                             If aSummaryType = "BOD-Labile" Then
                                 lMult = 0.4
-                            ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TotalN" Then
+                            ElseIf aSummaryType = "OrganicN" Or aSummaryType = "TN" Then
                                 lMult = 0.069176
                                 'Multiplying 0.048 + 0.05294*.4 to BOD to get Organic N
-                            ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TotalP" Then
+                            ElseIf aSummaryType = "OrganicP" Or aSummaryType = "TP" Then
                                 lMult = 0.0052304
                                 'Multiplying 0.0023 + 0.4*0.007326 to BOD to get Organic P
                             End If

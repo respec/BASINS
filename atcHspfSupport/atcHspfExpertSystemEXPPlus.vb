@@ -9,6 +9,7 @@ Public Class atcExpertSystem
     Public StormsSorted As New Generic.List(Of HexStorm)
     Public Sites As New Generic.List(Of HexSite)
     Public SDateJ As Double, EDateJ As Double
+    Public AdjSDateJ As Double, AdjEDateJ As Double
     Public Name As String
     Public ObservedStorms As New atcCollection
     Public SimulatedStorms As New atcCollection
@@ -324,9 +325,9 @@ Public Class atcExpertSystem
         Return pDataSource
     End Function
 
-    Public Function Report() As String
+    Public Function Report(ByVal aRunMade As String) As String
         CalcStats(pDataSource)
-        Return CalcErrorTerms(pUci)
+        Return CalcErrorTerms(pUci, aRunMade)
     End Function
 
     Public Sub CalcAdvice(ByRef aString As String, ByVal aSiteIndex As Integer) 'Becky added this method to compute & export advice
@@ -445,15 +446,31 @@ Public Class atcExpertSystem
         lTimeStep = 1
         lTimeUnit = 4 'day
         lNVals = timdifJ(SDateJ, EDateJ, lTimeUnit, lTimeStep)
-
+        AdjSDateJ = SDateJ
+        AdjEDateJ = EDateJ
         For lSiteIndex As Integer = 1 To Sites.Count
+            pCountOfMissingData = 0
+            pPercentOfMissingData = 0
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
-            'Looked at observed data before hand to check if there are missing values. If yes, then it is Flow only calculation
+            'Look at the observed data beforehand to check if there are missing values. If yes, then it is Flow only calculation
             Dim obslTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lSite.DSN(1))) 'Getting the observed data
-            obslTSer = SubsetByDate(obslTSer, SDateJ, EDateJ, Nothing)
+            'Finding dates if the observed flow data is shorter than the simulation period. In that case, modify the start and end dates of analysis
+            If obslTSer.Attributes.GetDefinedValue("Start Date").Value > SDateJ Then
+                AdjSDateJ = obslTSer.Attributes.GetDefinedValue("Start Date").Value
+            ElseIf obslTSer.Attributes.GetDefinedValue("End Date").Value < EDateJ Then
+                AdjEDateJ = obslTSer.Attributes.GetDefinedValue("End Date").Value
+            End If
+
+            'Recalculating lNVals as it might have changed in previous lines
+
+            lNVals = timdifJ(AdjSDateJ, AdjEDateJ, lTimeUnit, lTimeStep)
+
+            obslTSer = SubsetByDate(obslTSer, AdjSDateJ, AdjEDateJ, Nothing)
             obslTSer = Aggregate(obslTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-            If obslTSer.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
+            pCountOfMissingData = obslTSer.Attributes.GetDefinedValue("Count Missing").Value
+            If pCountOfMissingData > 0 Then 'The number of values in observed data is less than the number of days in the simulation
                 pFlowOnly = True
+                pPercentOfMissingData = pCountOfMissingData * 100 / lNVals
             End If
 
             If Not pFlowOnly Then
@@ -486,7 +503,7 @@ Public Class atcExpertSystem
                     Stop
                 End If
                 'subset by date to simulation period
-                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
+                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, AdjSDateJ, AdjEDateJ, Nothing)
                 If lNewTSer.numValues < 1 Then
                     Throw New ApplicationException("The data set Number " & lDSN & " has no data in the analysis period. Program will quit.")
                     Stop
@@ -512,44 +529,51 @@ Public Class atcExpertSystem
                 End If
                 Dim lValueCollection As New atcCollection
                 Dim lKeyForValueCollection As Integer = 0
-                If lStatGroup = 1 Or lStatGroup = 2 Then
+                If pCountOfMissingData AndAlso lStatGroup = 1 Then
 
+                    Dim lTestTSer As atcTimeseries = lDailyTSer
                     For i As Integer = 1 To obslTSer.numValues
-                        pCountOfMissingData = obslTSer.Attributes.GetDefinedValue("Count Missing").Value
-                        pPercentOfMissingData = pCountOfMissingData * 100 / obslTSer.Attributes.GetDefinedValue("Count").Value
-                        If Double.IsNaN(obslTSer.Values(i)) Then
-                            pFlowOnly = True
-
-                            If lStatGroup = 1 Then
-                                lDailyTSer.Value(i) = Double.NaN
-                            End If
-                        Else
-
-                            lValueCollection.Increment(lKeyForValueCollection, lDailyTSer.Values(i))
-
-                            lKeyForValueCollection += 1
+                        If Double.IsNaN(obslTSer.Value(i)) Then
+                            lDailyTSer.Value(i) = Double.NaN
                         End If
-
                     Next
 
-
+                    'lDailyTSer.Values = lTestTSer.Values
                 End If
 
-                lValueCollection.SortByValue()
-                For i As Integer = 0 To lValueCollection.Count - 1
-                    lValueCollection.Increment("Sum", lValueCollection(i))
+                'If lStatGroup = 1 Then ' Or lStatGroup = 2 Then
 
-                    If i < lValueCollection.Count * 0.9 Then lValueCollection.Increment("%Sum90", lValueCollection(i))
+                '    For i As Integer = 1 To lDailyTSer.numValues
+                '        If Double.IsNaN(obslTSer.Values(i)) Then
+                '            pFlowOnly = True
+                '            If lStatGroup = 1 Then
+                '                lDailyTSer.Value(i) = -999
+                '            End If
+                '            'Else
+                '            '    lValueCollection.Increment(lKeyForValueCollection, lDailyTSer.Values(i))
+                '            '    lKeyForValueCollection += 1
+                '        End If
 
-                    If i < lValueCollection.Count * 0.75 Then lValueCollection.Increment("%Sum75", lValueCollection(i))
+                '    Next
+                '    'Else
+                '    '    lValueCollection(0) = lDailyTSer.Values()
+                'End If
 
-                    If i < lValueCollection.Count * 0.5 Then lValueCollection.Increment("%Sum50", lValueCollection(i))
+                'lValueCollection.SortByValue()
+                'For i As Integer = 0 To lValueCollection.Count - 1
+                '    lValueCollection.Increment("Sum", lValueCollection(i))
 
-                    If i < lValueCollection.Count * 0.25 Then lValueCollection.Increment("%Sum25", lValueCollection(i))
+                '    If i < lValueCollection.Count * 0.9 Then lValueCollection.Increment("%Sum90", lValueCollection(i))
 
-                    If i < lValueCollection.Count * 0.1 Then lValueCollection.Increment("%Sum10", lValueCollection(i))
+                '    If i < lValueCollection.Count * 0.75 Then lValueCollection.Increment("%Sum75", lValueCollection(i))
 
-                Next
+                '    If i < lValueCollection.Count * 0.5 Then lValueCollection.Increment("%Sum50", lValueCollection(i))
+
+                '    If i < lValueCollection.Count * 0.25 Then lValueCollection.Increment("%Sum25", lValueCollection(i))
+
+                '    If i < lValueCollection.Count * 0.1 Then lValueCollection.Increment("%Sum10", lValueCollection(i))
+
+                'Next
 
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
@@ -565,12 +589,12 @@ Public Class atcExpertSystem
                     pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value 'Becky commented this out and used .GetValue instead
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
-                        pStats(2, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum50") 'lDailyTSer.Attributes.GetValue("%Sum50") '50% low
-                        pStats(3, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum90") '10% high
-                        pStats(11, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum10") '10% low
-                        pStats(12, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("%Sum25") '25% low
-                        pStats(13, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum75") '25% high
-                        pStats(14, lStatGroup, lSiteIndex) = lValueCollection.ItemByKey("Sum") - lValueCollection.ItemByKey("%Sum50") '50% high
+                        pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("%Sum50").Value '50% low
+                        pStats(3, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - lDailyTSer.Attributes.GetDefinedValue("%Sum90").Value '10% high
+                        pStats(11, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("%Sum10").Value '10% low
+                        pStats(12, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("%Sum25").Value '25% low
+                        pStats(13, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - lDailyTSer.Attributes.GetDefinedValue("%Sum75").Value  '25% high
+                        pStats(14, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - lDailyTSer.Attributes.GetDefinedValue("%Sum50").Value  '50% high
 
                         Dim lTmpDate(5) As Integer
                         J2Date(SDateJ, lTmpDate)
@@ -614,20 +638,27 @@ Public Class atcExpertSystem
                         pStats(5, lStatGroup, lSiteIndex) = 0.0# 'storm peaks
                         pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
                         pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
+                        Dim StormNumber As Integer = 0
                         For Each lStorm As HexStorm In Storms
-
-                            If lStorm.SDateJ >= SDateJ And
-                               lStorm.EDateJ <= EDateJ Then 'storm within run span
+                            StormNumber += 1
+                            Logger.Dbg("Working on Storm Number " & StormNumber)
+                            'If StormNumber = 17 Then Stop
+                            If lStorm.SDateJ >= AdjSDateJ AndAlso lStorm.EDateJ <= AdjEDateJ Then 'storm within run span
                                 'TODO: this matches VB6Script results, needs to have indexes checked!
                                 Dim lN1 As Integer, lN2 As Integer
-                                lN1 = timdifJ(SDateJ, lStorm.SDateJ, lTimeUnit, lTimeStep) + 1
-                                lN2 = timdifJ(SDateJ, lStorm.EDateJ, lTimeUnit, lTimeStep)
+                                lN1 = timdifJ(AdjSDateJ, lStorm.SDateJ, lTimeUnit, lTimeStep) + 1
+                                lN2 = timdifJ(AdjSDateJ, lStorm.EDateJ, lTimeUnit, lTimeStep)
                                 Dim SkipStorm As Boolean = False
-                                For i As Integer = lN1 To lN2
-                                    If Double.IsNaN(lValues(i)) Then 'Skip the storm calculation if any of the value in the storm period i Nan
-                                        SkipStorm = True
-                                    End If
-                                Next
+                                If lN2 > lValues.Length Then
+                                    SkipStorm = True
+                                Else
+                                    For i As Integer = lN1 To lN2
+                                        If Double.IsNaN(lValues(i)) Then 'Skip the storm calculation if any of the value in the storm period i Nan
+                                            SkipStorm = True
+                                        End If
+                                    Next
+                                End If
+
                                 If SkipStorm Then Continue For
                                 Dim lNLimit As Integer = lDailyTSer.Values.GetUpperBound(0)
                                 If lN2 <= lNLimit Then
@@ -734,7 +765,7 @@ Public Class atcExpertSystem
         Next lSiteIndex
     End Sub
 
-    Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci) As String
+    Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci, ByVal aRunmade As String) As String
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
             'total volume error
@@ -871,29 +902,48 @@ Public Class atcExpertSystem
 
         Next lSiteIndex
 
-        Dim lStr As String = StatReportAsString(aUci)
+        Dim lStr As String = StatReportAsString(aUci, aRunmade)
         Return lStr
     End Function
 
-    Private Function StatReportAsString(ByVal aUci As atcUCI.HspfUci) As String
+    Private Function StatReportAsString(ByVal aUci As atcUCI.HspfUci, ByVal aRunmade As String) As String
         Dim lStr As String
-        lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
-        lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
-        lStr &= "UCI Edited: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        lStr &= TimeSpanAsString(SDateJ, EDateJ, "Analysis Period: ")
+
+        lStr = "Expert System Statistics for " & aUci.Name & vbCrLf
+        lStr &= "    UCI Edited: " & FileDateTime(aUci.Name) & vbCrLf
+        lStr &= "    Run Made: " & aRunmade & vbCrLf
+        lStr &= TimeSpanAsString(SDateJ, EDateJ, "    HSPEXP+ Analysis Period: ")
+
+
+        Dim lYearCount As Double = YearCount(AdjSDateJ, AdjEDateJ)
+
+
 
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
-            lStr &= "Site: ".PadLeft(15) & lSite.Name & vbCrLf
+
+            If AdjSDateJ > SDateJ OrElse AdjEDateJ < EDateJ Then
+                lStr &= "    The observed flow data is shorter than the Model Simulation or HSPEXP+ Analysis Period." & vbCrLf
+                lStr &= TimeSpanAsString(AdjSDateJ, AdjEDateJ, "    The analysis dates for expert analysis were adjusted to: ") & vbCrLf
+            End If
+
+            lStr &= "    Site: " & lSite.Name & vbCrLf
+
+
             If pPercentOfMissingData > 0 Then
-                lStr &= "The observed data is not continuous in this analysis period. The analysis utilizes " & vbCrLf &
-                  "simulated and observed data only on the days (time periods) when observed data are " & vbCrLf &
-                 "available. Use the results with caution." & vbCrLf
-                lStr &= FormatNumber(pPercentOfMissingData, 1) & "% of observed data is missing." & vbCrLf & vbCrLf
+                lStr &= "    The observed data is not continuous in this analysis period. The analysis utilizes " & vbCrLf &
+                  "    simulated and observed data only on the days (time periods) when observed data are " & vbCrLf &
+                 "    available. Use the results with caution." & vbCrLf
+                lStr &= "    " & FormatNumber(pPercentOfMissingData, 1) & "% of observed data is missing." & vbCrLf & vbCrLf
+
+
+                lYearCount = (AdjEDateJ - AdjSDateJ - pCountOfMissingData) / 365.25
+
+
             End If
             'statistics summary
-            lStr &= StatDetails("Total (" & YearCount(SDateJ, EDateJ) & " year run)", lSiteIndex, 1)
-            lStr &= StatDetails("Annual Average", lSiteIndex, YearCount(SDateJ, EDateJ))
+            lStr &= StatDetails("Total (" & FormatNumber(lYearCount, 1) & " year run)", lSiteIndex, 1)
+            lStr &= StatDetails("Annual Average", lSiteIndex, lYearCount)
 
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
