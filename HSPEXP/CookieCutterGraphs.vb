@@ -298,12 +298,14 @@ Public Module CookieCutterGraphs
                         'Plotting DO Concentrations
                         Dim lTimeseriesGroupDO As New atcTimeseriesGroup
                         Dim lTimeSeriesDO As New atcTimeseries(Nothing)
+                        Dim lTimeSeriesTimeUnit As Integer
                         lTimeSeriesDO = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
-                        If lFoundTheTimeSeriesinWDMFile = False Then
+                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
+                        If lFoundTheTimeSeriesinWDMFile = False OrElse lTimeSeriesTimeUnit < 3 Then
                             lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
                         End If
                         lFoundTheTimeSeriesinWDMFile = False
-                        If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value <= 3 Then
+                        If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMax))
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMin))
 
@@ -330,7 +332,8 @@ Public Module CookieCutterGraphs
                             lMainPane.YAxis.Scale.Max = 20
                             lZgc.SaveIn(lOutputFolder & "DO_Concentration_RCHRES_" & RCHRES.split(":")(1) & ".png")
                             Logger.Dbg("Generated graph " & lOutputFolder & "DO_Concentration_RCHRES_" & RCHRES.split(":")(1) & ".png")
-
+                        Else
+                            Logger.Dbg("The time unit of DO timeseries is daily or greater, so max daily and min daily will not be calculated for RCHRES:" & lRchId)
                         End If
 
                         'Plotting Load Duration Curve

@@ -277,7 +277,7 @@ Module HSPFOutputReports
                             Logger.Dbg(Now & " Calculating run statistics.")
                             lExpertSystem = New HspfSupport.atcExpertSystem(aHspfUci, lExpertSystemFileName, SDateJ, EDateJ)
                             Dim lHydrologyWDMFileName As String = lExpertSystem.ExpertWDMFileName
-                            lStr = lExpertSystem.Report
+                            lStr = lExpertSystem.Report(lRunMade)
 
                             SaveFileString(loutfoldername & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
 

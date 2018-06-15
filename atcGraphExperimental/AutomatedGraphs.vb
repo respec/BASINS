@@ -201,6 +201,22 @@ Public Module AutomatedGraphs
 
                                     End If
 
+                                Case ".filtered"
+                                    lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
+                                                                      .FindData("Constituent", Trim(lGraphDataset(3)))(0)
+                                    lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                                    If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
+                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) &
+                                                " to make " & IO.Path.GetFileName(lOutFileName) & " graph. Moving to next graph!",
+                                               vbOKOnly, "Automated Graph: Time Series Issue")
+                                        lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+
+                                        skipGraph = True
+                                        Exit Do
+
+                                    End If
+
                                 Case ".rdb"
                                     lTimeSeries = lDataSource.DataSets.FindData("ParmCode", Trim(lGraphDataset(2)))(0)
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
