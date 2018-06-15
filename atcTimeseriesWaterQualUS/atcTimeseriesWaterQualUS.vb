@@ -8,7 +8,7 @@ Imports Microsoft.VisualBasic.FileIO.TextFieldParser
 
 Public Class atcTimeseriesWaterQualUS
     Inherits atcTimeseriesSource
-    Private Shared pFilter As String = "WaterQualityData US Files (*.csv)|*.csv;|All Files (*.*)|*.*"
+    Private Shared pFilter As String = "WaterQualityData US Files (*.csv)|*.csv;|Filtered WaterQualityData US Files (*.csv.filtered)|*.csv.filtered;|All Files (*.*)|*.*"
     Private pJulianInterval As Double = 1 'Add one day for daily values to record date at end of interval
     Public RawDataGroup As New clsWQDUSLocations() 'Dictionary(Of String, clsWQDUSLocation)()
     Public SelectAllLocations As Boolean = False
@@ -57,6 +57,7 @@ Public Class atcTimeseriesWaterQualUS
                 Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(Specification))
             Else
                 Try
+                    RawDataGroup.FileName = Specification
                     Dim lTimeStartOpen As Date = Now
                     Logger.Dbg("OpenStartFor " & Specification)
                     Dim CurrentRecord() As String
@@ -108,10 +109,36 @@ Public Class atcTimeseriesWaterQualUS
                     If lDataColumnsValid Then
                         SelectedConstituents.Clear()
                         SelectedLocations.Clear()
-                        Dim lfrm As New frmSelect(RawDataGroup, SelectedLocations, SelectedConstituents)
-                        If lfrm.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                            If SelectedLocations.Count > 0 AndAlso SelectedConstituents.Count > 0 Then
-                                Return BuildTimeseries()
+
+                        'if filename ends with .csv.filtered, don't show form
+                        If IO.Path.GetFileName(Specification).ToLower.EndsWith(".csv.filtered") Then
+                            Dim lSortedList As New SortedList(Of String, Integer)()
+                            For Each loc As String In RawDataGroup.Keys()
+                                lSortedList.Add(loc, 0)
+                            Next
+                            For Each loc As String In lSortedList.Keys
+                                SelectedLocations.Add(loc)
+                            Next
+                            lSortedList.Clear()
+                            For Each cons As String In RawDataGroup.GetUniqueConstituentList()
+                                If Not lSortedList.ContainsKey(cons) Then
+                                    lSortedList.Add(cons, 0)
+                                End If
+                            Next
+                            For Each cons As String In lSortedList.Keys()
+                                SelectedConstituents.Add(cons)
+                            Next
+                            Return BuildTimeseries()
+                        Else
+                            'else show form to select timeseries to include
+                            Dim lfrm As New frmSelect(RawDataGroup, SelectedLocations, SelectedConstituents)
+                            If lfrm.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                                If lfrm.cbxSave.Checked Then
+                                    Me.Specification = Me.Specification & ".filtered"
+                                End If
+                                If SelectedLocations.Count > 0 AndAlso SelectedConstituents.Count > 0 Then
+                                    Return BuildTimeseries()
+                                End If
                             End If
                         End If
                     Else
@@ -139,11 +166,15 @@ Public Class atcTimeseriesWaterQualUS
         Try
             Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
             Dim lTSBuilder As atcTimeseriesBuilder
+            Dim lMaxCount As Integer = RawDataGroup.Values.Count
+            Dim lCount As Integer = 0
             For Each loc As clsWQDUSLocation In RawDataGroup.Values
+                lCount += 1
                 If Not SelectAllLocations AndAlso Not SelectedLocations.Contains(loc.Location) Then
                     Continue For
                 End If
                 For Each cons As clsWQDUSConstituent In loc.Constituents.Values
+                    Logger.Progress(lCount, lMaxCount)
                     For Each lcon_unit As String In cons.RecordGroup.Keys
                         If Not SelectAllConstituents Then
                             If Not SelectedConstituents.Contains(cons.Name & "-" & lcon_unit) Then

@@ -1,9 +1,13 @@
 ﻿Imports System.Windows.Forms
+Imports System.IO
+Imports System.Text
+Imports atcData
 
 Public Class frmSelect
     Private pRawDataGroup As clsWQDUSLocations
     Private pSelectedLocations As List(Of String)
     Private pSelectedConstituents As List(Of String)
+    Private pAllLocationsSelected As Boolean = False
 
     Public Sub New(ByVal aRawDataGroup As clsWQDUSLocations,
                    ByRef aSelectedLocations As List(Of String),
@@ -72,29 +76,31 @@ Public Class frmSelect
         End If
     End Sub
     Private Sub lstLocations_ItemCheck(sender As Object, e As ItemCheckEventArgs) Handles lstLocations.ItemCheck
-        txtMsgCons.Text = ""
-        If e.NewValue = CheckState.Checked Then
-            If Not pSelectedLocations.Contains(lstLocations.SelectedItem.ToString()) Then
-                pSelectedLocations.Add(lstLocations.SelectedItem.ToString())
-            End If
-            Dim loc As clsWQDUSLocation = pRawDataGroup.Item(lstLocations.SelectedItem)
-            Dim cons As List(Of String) = loc.DataKeys()
-            Dim lnalist As New List(Of String)()
-            For Each Item As String In lstConstituents.CheckedItems
-                If Not cons.Contains(Item) Then
-                    lnalist.Add(Item)
+        If Not pAllLocationsSelected Then
+            txtMsgCons.Text = ""
+            If e.NewValue = CheckState.Checked Then
+                If Not pSelectedLocations.Contains(lstLocations.SelectedItem.ToString()) Then
+                    pSelectedLocations.Add(lstLocations.SelectedItem.ToString())
                 End If
-            Next
-            Dim lmsg As String = loc.Location & " has none of the following:" & vbCrLf
-            If lnalist.Count > 0 Then
-                For Each itm As String In lnalist
-                    lmsg &= itm & vbCrLf
+                Dim loc As clsWQDUSLocation = pRawDataGroup.Item(lstLocations.SelectedItem)
+                Dim cons As List(Of String) = loc.DataKeys()
+                Dim lnalist As New List(Of String)()
+                For Each Item As String In lstConstituents.CheckedItems
+                    If Not cons.Contains(Item) Then
+                        lnalist.Add(Item)
+                    End If
                 Next
-                txtMsgCons.Text = lmsg
-            End If
-        Else
-            If pSelectedLocations.Contains(lstLocations.SelectedItem.ToString()) Then
-                pSelectedLocations.Remove(lstLocations.SelectedItem.ToString())
+                Dim lmsg As String = loc.Location & " has none of the following:" & vbCrLf
+                If lnalist.Count > 0 Then
+                    For Each itm As String In lnalist
+                        lmsg &= itm & vbCrLf
+                    Next
+                    txtMsgCons.Text = lmsg
+                End If
+            Else
+                If pSelectedLocations.Contains(lstLocations.SelectedItem.ToString()) Then
+                    pSelectedLocations.Remove(lstLocations.SelectedItem.ToString())
+                End If
             End If
         End If
     End Sub
@@ -109,8 +115,67 @@ Public Class frmSelect
     End Sub
 
     Private Sub btnDoTser_Click(sender As Object, e As EventArgs) Handles btnDoTser.Click
+        If cbxSave.Checked Then
+            SaveSelected()
+        End If
         Me.DialogResult = DialogResult.OK
         Close()
     End Sub
 
+    Private Sub btnSelectAllCons_Click(sender As Object, e As EventArgs) Handles btnSelectAllCons.Click
+        For ind As Integer = 0 To lstConstituents.Items.Count - 1
+            lstConstituents.SelectedItem = lstConstituents.Items(ind)
+            pSelectedConstituents.Add(lstConstituents.Items(ind))
+            lstConstituents.SetItemChecked(ind, True)
+        Next
+    End Sub
+
+    Private Sub btnSelectAllLoc_Click(sender As Object, e As EventArgs) Handles btnSelectAllLoc.Click
+        pAllLocationsSelected = True
+        For ind As Integer = 0 To lstLocations.Items.Count - 1
+            lstLocations.SelectedItem = lstLocations.Items(ind)
+            pSelectedLocations.Add(lstLocations.Items(ind))
+            lstLocations.SetItemChecked(ind, True)
+        Next
+        pAllLocationsSelected = False
+    End Sub
+
+    Private Sub SaveSelected()
+        'open the original file
+        Dim lSB As New StringBuilder
+        Dim lStreamReader As New StreamReader(pRawDataGroup.FileName)
+        Dim lCurrentRecord As String
+        lCurrentRecord = lStreamReader.ReadLine 'first line is header
+        lSB.AppendLine(lCurrentRecord)
+        Do
+            lCurrentRecord = lStreamReader.ReadLine
+            If lCurrentRecord Is Nothing Then
+                Exit Do
+            Else
+                Dim lAppend As Boolean = False
+                For Each lLoc As String In pSelectedLocations
+                    If lCurrentRecord.Contains(lLoc) Then
+                        For Each lCon As String In pSelectedConstituents
+                            Dim lConShort As String = lCon.Remove(lCon.IndexOf("-"))
+                            If lCurrentRecord.Contains(lConShort) Then
+                                lAppend = True
+                                Exit For
+                            End If
+                        Next
+                    End If
+                Next
+                If lAppend Then
+                    lSB.AppendLine(lCurrentRecord)
+                End If
+            End If
+        Loop
+        atcUtility.SaveFileString(pRawDataGroup.FileName & ".filtered", lSB.ToString)
+
+        ''rename file in project
+        'Dim lDataSource As atcTimeseriesWaterQualUS = Nothing
+        'lDataSource = atcDataManager.DataSourceBySpecification(pRawDataGroup.FileName)
+        'If lDataSource IsNot Nothing Then
+        '    lDataSource.Specification = pRawDataGroup.FileName & ".filtered"
+        'End If
+    End Sub
 End Class
