@@ -457,7 +457,8 @@ Public Class atcExpertSystem
             'Finding dates if the observed flow data is shorter than the simulation period. In that case, modify the start and end dates of analysis
             If obslTSer.Attributes.GetDefinedValue("Start Date").Value > SDateJ Then
                 AdjSDateJ = obslTSer.Attributes.GetDefinedValue("Start Date").Value
-            ElseIf obslTSer.Attributes.GetDefinedValue("End Date").Value < EDateJ Then
+            End If
+            If obslTSer.Attributes.GetDefinedValue("End Date").Value < EDateJ Then
                 AdjEDateJ = obslTSer.Attributes.GetDefinedValue("End Date").Value
             End If
 
