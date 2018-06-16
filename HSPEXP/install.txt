@@ -1,102 +1,30 @@
-HSPEXP+2.0beta5
-Date: 05/24/2018
-Bugs Fixed
-1. If observed flow data was of shorter length than the simulated data then expert statistics and annual graphs were not working properly. That issue has been fixed.
+Date: 06/15/2018
+
+HSPEXP+2.0 is a major upgrade to HSPEXP+1.32. The following list of features added and bugs fixed for the version 2.0 includes all added features and fixed bugs in the earlier beta versions. The installer is now signed and it tells the users that the installer has been produced by RESPEC. This will reduce the security warnings.
+
+Features:
+1. Multi-Simulation Manager capability was added that can be used to conduct sensitivity analysis, uncertainty analysis, and scenario analysis.
+2. Regan plots were updated to generate daily max and min DO for all the reaches, if hourly DO data is available in WDM or binary files.
+3. The HSPEXP+ Manual is now available as a pdf file for ease of printing.
+4. Reports for additional constituents including Heat, DO, BOD-Labile are also generated.
+5. Reach Budget reports for N and P constituents are also generated.
+6. Some reports are now generated so that they can be easily filtered in spreadsheet program.
+7. Monthly land loading reports are also generated.
+8. Box-whisker plots of constituent loading by land use and box-whisker plots of monthly constituent loadings are also produced.
+9. If GQUAL is simulated, then land loading and reach budget reports for all the GQUAL constituents are available.
+10. If the observed data in WQX format has been filtered using BASINS, that file can be read by HSPEXP+ to generated automated graphs.
+
+Bugs fixed:
+1. If observed flow data is of shorter length than the simulated data then expert statistics and annual graphs were not working properly. That issue has been fixed.
 2. If MASS-LINK block did not have proper connection for constituents, then HSPEXP+ gave error and quit. Now a more useful error is presented.
 3. While making automated graphs, warnings have been moved to the log file.
-4. Unit of water in runoff were multiplied by 12 mistakenly in one specific report. That has been fixed. 
-
-
-HSPEXP+2.0beta4
-Date: 04/20/2018
-
-Features:
-1. In Multi Simulation Manager, range of operations can be provided, separated by hyphen (-).
-2. Draft Manual is now available.
-
-Bugs Fixed
-1. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. Fixed.
-2. Some interface fixes.
-3. Some reports were having issues with analysis date. Fixed.
-4. Some reports showed erroneous values when operations didn't have any reach connections. Fixed.
-5. Multi Simulation Manager would not output values if it could not calculate GeoMean values. Fixed.
-6. GQUAL Reach reports were not output if heat in reaches was not simulated. Fixed.
-7. If input PS and model timstep were hourly, point sources were not being calculated. Fixed
-8. Ranges for point sources for not working for Multi Simulation Manager.
-
-
-HSPEXP+2.0.0beta
-Date: 03/13/2018
-Features:
-1. Multi Simulation Manager is available that can be used for sensitivity analysis, uncertainty analysis, and scenario analysis.
-2. Reports for additional constituents including Heat, DO, BOD-Labile are also generated.
-3. Reach Budget reports for N and P constituents are also generated.
-4. Some reports are now generated so that they can be easily filtered in spreadhseet program as needed.
-5. Monthly land loading reports are also generated.
-6. Box-whisker plots of constituent loading by land use and box-whisker plots of monthly constituent loadings are also produced.
-7. In the Regan plots, daily maximum and daily minimimum DO concentrations are plotted if hourly DO data is available in the binary files.
-8. If GQUAL is simulated, then land loading and reach budget reports for all the GQUAL constituents are available.
-
-Bugs Fixed:
-1. Multiple small bugs fixed. In general, the warning messages do not stop HSPEXP+ calculations. The warning messages are added in the log file.
-2. HSPEXP+ calculations were made more efficient. 
-
-Issues:
-1. The help manual is not updated for the beta version.
-
-HSPEXP+1.40beta7
-Dated: 02/08/2018
-Features:
-1. Sensitivity and Uncertainty Analysis is named as Multi Simulation Manager.
-2. Multi Simulation Manager can change point source multiplication factors and DSN.
-
-Bugs Fixed:
-1. Multiple bugs fixed, but mainly taken care of the reports with AGCHEM models.
-2. Fixed some older reports as some statistics were not showing.
-
-
-HSPEXP+1.40beta6
-Dated: 01/17/2018
-Features:
-1. Sensitivity/Uncertainty analysis was improved with better error checking and parameter limits.
-2. DO and Heat reports from land surfaces and reach budget reports were added.
-3. Box-Whisker plots were added for DO, Heat, NO3, NH4, PO4, and organic N and P constituents.
-4. Land reports for most constituents were improved so that the vlaues can be easily filtered by the user.
-5. Echo file is opened autimatically if model run does not complete. 
-6. Sensitivity analysis now includes 97.5 and 2.5% percentiles. 
+4. In some cases, if the GENER operation didn't exist, HSPEXP+ crashed. Fixed.
+5. Some reports were having issues with analysis date. Fixed.
+6. If input PS and model timestep were hourly, point sources were not being calculated. Fixed
+7. Multiple small bugs fixed. In general, the warning messages do not stop HSPEXP+ calculations. The warning messages are added in the log file.
 
 
 
-Dated 11/10/2017
-HSPEXP+1.40beta4
-Features:
-1. Improved sensitivity/uncertainty analysis.
-2. This is a pre release version. The text will be polished in proper release.
-
-
-Dated 7/24/2017
-HSPEXP+1.40beta3
-Features:
-1. Outputs are now in 4 decimal places.
-2. 99.9 and 98 percentile values were missing and have been added.
-
-Dated 7/22/2017
-HSPEXP+1.40beta2
-Features:
-1. Exceedance levels are also output.
-2. A bug was fixed for when a simulation doesn't complete, no output is reported.
-
-
-Dated: 7/19/2017
-HSPEXP+1.40beta1
-Features:
-1. HSPEXP+ doesn't report the output when runs do not complete.
-2. HSPEXP+ may also display number of simulations complete.
-
-Dated: 6/1/2017
-HSPEXP+1.40beta
-Features:
-1. This is a test version for adding uncertainty and sensitivity analysis.
 
 Dated: 5/9/2017
 HSPEXP+1.32
