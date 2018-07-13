@@ -1,0 +1,4 @@
+Name: "{group}\WinHSPF3.1";         Filename: "{app}\models\WinHSPF31\bin\WinHSPF.exe"; Components: hspf; WorkingDir: "{app}\data"; 
+Name: "{group}\WinHSPFLt";          Filename: "{app}\models\HSPF\bin\WinHSPFLt.exe";    Components: hspf; WorkingDir: "{app}\data"; 
+Name: "{commondesktop}\WinHSPF3.1"; Filename: "{app}\models\WinHSPF31\bin\WinHSPF.exe"; Components: desktop; WorkingDir: "{app}\data"; MinVersion: 4,4; 
+Name: "{commondesktop}\WinHSPF Light"; Filename: "{app}\models\HSPF\bin\WinHSPFLt.exe"; Components: desktop; WorkingDir: "{app}\data"; 

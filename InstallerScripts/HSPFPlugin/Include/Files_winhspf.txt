@@ -1,0 +1,67 @@
+Source: "models\WinHSPF31\bin\BMP.mdb";                DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\ATCoRend.dbf";           DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\HspfMsg.mdb";            DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\hspfmsg.wdm";            DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\hspfmsg.wdm";            DestDir: "{app}\models\HSPF\bin";              Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\Poltnt_2.prn";           DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\pollutants.txt";         DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\StatusMonitor.exe";      DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\HspfEngineNet.exe";      DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\WinHSPF.exe";            DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\HSPF\bin\WinHspfLt.exe";               DestDir: "{app}\models\HSPF\bin";              Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\StatusMonitor.exe";      DestDir: "{app}\models\HSPF\bin";              Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\MapWinUtility.dll";      DestDir: "{app}\models\HSPF\bin";              Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "bin\Plugins\BASINS\*";           DestDir: "{app}\bin\Plugins\BASINS"; Flags: ignoreversion; Permissions: everyone-modify
+
+;DLLs shared with Plugins\BASINS folder
+Source: "models\WinHSPF31\bin\*.dll";                  DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "system\hass_ent.dll";                         DestDir: "{sys}";                              Flags: sharedfile;    Permissions: everyone-modify; Components: hspf
+Source: "system\Lf90.eer";                             DestDir: "{sys}";                              Flags: sharedfile;    Permissions: everyone-modify; Components: hspf
+Source: "system\lf90wiod.dll";                         DestDir: "{sys}";                              Flags: sharedfile;    Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcControls.dll";          DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcData.dll";              DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcFtableBuilder.dll";   DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcSegmentation.dll";      DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcUCI.dll";               DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcUCIForms.dll";          DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcUtility.dll";           DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+;Source: "models\WinHSPF31\bin\atcWDM.dll";               DestDir: "{app}\models\WinHSPF31\bin";         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "data\tutorial\*";                DestDir: "{app}\data\tutorial";                      Permissions: everyone-modify
+Source: "data\tutorial\CAT\HSPF\*";       DestDir: "{app}\data\tutorial\CAT\HSPF";             Permissions: everyone-modify; Components: hspf
+Source: "data\tutorial\HSPF\*";           DestDir: "{app}\data\tutorial\HSPF";                 Permissions: everyone-modify; Components: hspf
+Source: "data\Climate\*";                 DestDir: "{app}\data\Climate"; Flags: ignoreversion; Permissions: everyone-modify
+Source: "models\HSPF\HSPFParmData\*";     DestDir: "{app}\models\HSPF\HSPFParmData";           Permissions: everyone-modify
+
+Source: "models\WinHSPF31\bin\starter\starter.uci";    DestDir: "{app}\models\WinHSPF31\bin\starter"; Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\starter\pollutants.txt"; DestDir: "{app}\models\WinHSPF31\bin\starter"; Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "models\WinHSPF31\bin\starter\agpractice.txt"; DestDir: "{app}\models\WinHSPF31\bin\starter"; Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+
+Source: "Docs\HSPF.chm";                               DestDir: "{app}\Docs";                         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "Docs\WinHspf31.chm";                          DestDir: "{app}\Docs";                         Flags: ignoreversion; Permissions: everyone-modify; Components: hspf
+Source: "Docs\HSPFChannelLIDControlTool.chm";          DestDir: "{app}\Docs";
+Source: "Docs\*.pdf";                                  DestDir: "{app}\Docs";
+
+;vcfiles
+;Source: "vcfiles\50comupd.exe";          DestDir: {tmp}
+;Source: "vcfiles\gdiplus.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;;Source: "vcfiles\InstMsiA.exe";          DestDir: {tmp}; Flags: deleteafterinstall
+;Source: "vcfiles\mfc71.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\msvcp71.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\msvcr71.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\msvcr71d.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;;Source: "vcfiles\vcredist.msi";          DestDir: {tmp}; Flags: deleteafterinstall
+;;Source: "vcfiles\vcredist_x86_2005.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+;;Source: "vcfiles\vcredist_x86_2008.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+;Source: "vcfiles\DbgHelp.Dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\mfc71.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\asycfilt.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\atla.dll";              DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; DestName: atl.dll; MinVersion: 4, 0
+;Source: "vcfiles\atlu.dll";              DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; DestName: atl.dll; MinVersion: 0, 4
+;Source: "vcfiles\comcat.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+;Source: "vcfiles\mfc42.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+;Source: "vcfiles\mfc42u.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; MinVersion: 0, 4
+;Source: "vcfiles\msvcp60.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\msvcirt.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\msvcrt.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "vcfiles\olepro32.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+;Source: "vcfiles\stdole2.tlb";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
