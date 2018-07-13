@@ -41,7 +41,7 @@ Public Module atcConstituentTables
             Case "Water", "WAT"
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
-                    lUnits = "In"
+                    lUnits = "in"
                 Else
                     lUnits = "mm"
                 End If
@@ -201,19 +201,20 @@ Public Module atcConstituentTables
                                         If Not lMassLinkID = 0 Then
                                             lMasslinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              aBalanceType, 0, 0)
+
                                             Exit For
                                         End If
                                     End If
                                 End If
                             Next lConnection
-                                lMasslinkFactor *= 12 'Converting feet to inches
-
                             If Not lOperationIsConnected AndAlso ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then Exit For
+
                         End If
                         lTS *= lMasslinkFactor
                         Dim lTSAttributes As String = lTS.Attributes.GetDefinedValue("Constituent").Value
 
                         If (lTSAttributes = "SURO" Or lTSAttributes = "IFWO" Or lTSAttributes = "AGWO") Then
+                            If lUnits = "in" Then lTS *= 12
                             If lTotalTS.Dates Is Nothing Then
                                 lTotalTS = lTS + 0
                             Else
@@ -1053,7 +1054,7 @@ Public Module atcConstituentTables
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "DOXFLUX-TOT"
-                column.Caption = "Total DO Flux (" & lUnits & ")"
+                column.Caption = "Total DO Process Flux (" & lUnits & ")"
                 Reach_Budget_Table.Columns.Add(column)
 
                 column = New DataColumn()
@@ -1089,7 +1090,7 @@ Public Module atcConstituentTables
                 column = New DataColumn()
                 column.DataType = Type.GetType("System.Double")
                 column.ColumnName = "DOXFLUX-BENTHIC"
-                column.Caption = "DO Phytoplankton (" & lUnits & ")"
+                column.Caption = "DO Benthic Algae (" & lUnits & ")"
                 Reach_Budget_Table.Columns.Add(column)
 
                 column = New DataColumn()
@@ -2117,6 +2118,8 @@ Public Module atcConstituentTables
                 Case "SAME"
                     If aDelta / 60 = 1 AndAlso aTimeUnit = "TUDay" AndAlso aTStep = 1 Then
                         MultiFactor = 24.0
+                    ElseIf aDelta / 60 = 1 AndAlso aTimeUnit = "TUHour" AndAlso aTStep = 1 Then
+                        MultiFactor = 1
                     End If
             End Select
         End If

@@ -242,6 +242,7 @@ Public Class StartUp
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
             .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
             .Add(New atcWDM.atcDataSourceWDM)
+            .Add(New atcTimeseriesWaterQualUS.atcTimeseriesWaterQualUS)
             '.Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
             '.Add(New atcTimeseriesRDB.atcTimeseriesRDB)
             '.Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)

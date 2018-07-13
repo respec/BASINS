@@ -231,10 +231,13 @@ Public Module Graph
                 For Each lTimeseries As atcTimeseries In lDataGroup
                     lDataGroupYear.Add(SubsetByDate(lTimeseries, lSDateJ, lEDateJ, Nothing))
                 Next
+
                 J2Date(lSDateJ, lDate)
                 If lDate(1) <> 1 OrElse lDate(2) <> 1 Then lDate(0) += 1 'non calendar years label with ending year
-                GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
                 lSDateJ = lEDateJ
+                If lDataGroupYear(0).numValues = 0 Then Continue While
+                GraphTimeseries(lDataGroupYear, lPaneCount, lOutFileBase & "_" & lDate(0), aGraphSaveFormat, aGraphSaveWidth, aGraphSaveHeight, , aMakeLog)
+
             End While
         End If
 

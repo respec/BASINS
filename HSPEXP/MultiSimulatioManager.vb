@@ -361,6 +361,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 If lpointsource.Target.Group = "INFLOW" AndAlso lpointsource.Target.Member = lConnections(0) AndAlso
                                             lpointsource.Target.MemSub1 = lConnections(1) AndAlso lpointsource.Target.MemSub2 = lConnections(2) AndAlso
                                             (lID.Id = aParm.ParmOperationNumber OrElse lID.Description = aParm.ParmOperationName OrElse
+                                            (lID.Id >= lOperLowerRange AndAlso lID.Id <= lOperUpperRange) OrElse
                                             (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
                                     If aParm.ParmMultFactor = 1 Then
                                         lpointsource.MFact = HspfTable.NumFmtRE(lpointsource.MFact * aMFactorOrParmValue, 5)
