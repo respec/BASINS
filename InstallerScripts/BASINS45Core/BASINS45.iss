@@ -13,7 +13,7 @@
 #endif
 
 #define MyAppName "BASINS"
-#define MyAppVerName "4.5.2018.07.01"
+#define MyAppVerName "4.5.2018.08.01"
 #define MyAppPublisher "US EPA and RESPEC"
 #define MyAppURL "http://water.epa.gov/scitech/datait/models/basins/"
 #define MyAppExeName "BASINS.exe"
@@ -307,6 +307,19 @@ begin
 #endif
 end;
 
+function IsDotNET45Detected(): boolean;
+var
+  NetSuccess: boolean;
+  NetRelease: cardinal;
+begin
+  NetSuccess := RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', NetRelease);
+  Result := NetSuccess;
+#ifdef Debug
+  if Result then
+		MsgBox('Found DotNET45', mbInformation, MB_OK);
+#endif
+end;
+
 function IsMsiProductInstalled(const ProductId: string): boolean;
 var
 	queryResult: Integer;
@@ -418,7 +431,7 @@ begin
 	begin
 		if MsgBox('The .Net Framework ' + versionDotNET + ' is required but was not found.' #13#13 'Open the web page for downloading .Net ' + versionDotNET + ' now?', mbConfirmation, MB_YESNO) = idYes	then
 		begin
-			ShellExec('open', 'http://www.microsoft.com/downloads/details.aspx?FamilyID=' + urlFamilyID, '', '', SW_SHOW, ewNoWait, ErrorCode)
+			ShellExec('open', 'http://www.microsoft.com/en-us/downloads/details.aspx?id=' + urlFamilyID, '', '', SW_SHOW, ewNoWait, ErrorCode)
 			Result := MsgBox('Ready to continue MapWindow installation?' #13#13 '(Click Yes after installing .Net Framework ' + versionDotNET + ')', mbConfirmation, MB_YESNO) = idYes;
 		end
 		else
@@ -438,10 +451,11 @@ begin
   //  Result := InstallDotNET('v2.0', 'dotnetfx20.exe', 'dotnetfx_v2.0.exe', '79BC3B77-E02C-4AD3-AACF-A7633F706BA5');
 	//end;
 
-  Result := IsDotNET4Detected();
+  Result := IsDotNET45Detected();
   if not Result then
   begin
-    Result := InstallDotNET('v4', 'dotnetfx4.exe', 'dotnetfx_v4.exe', '9cfb2d51-5ff4-4491-b0e5-b386f32c0992');
+    // Result := InstallDotNET('v4', 'dotnetfx4.exe', 'dotnetfx_v4.exe', '9cfb2d51-5ff4-4491-b0e5-b386f32c0992');
+    Result := InstallDotNET('v45', 'dotNetFx45_Full_setup.exe', 'dotnetfx_v45.exe', '30653');
 	end;
 end;
 
