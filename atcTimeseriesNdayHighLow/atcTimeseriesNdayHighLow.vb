@@ -542,7 +542,17 @@ Public Class atcTimeseriesNdayHighLow
                 End If
 
                 Try
-                    If lNdayTs.numValues < 3 Then
+                    Dim lGoodAnnualValueCount As Integer = 0
+                    For I As Integer = 1 To lNdayTs.numValues
+                        If Double.IsNaN(lNdayTs.Value(I)) OrElse Double.IsInfinity(lNdayTs.Value(I)) Then
+                        Else
+                            lGoodAnnualValueCount += 1
+                        End If
+                        If lGoodAnnualValueCount >= 3 Then
+                            Exit For
+                        End If
+                    Next
+                    If lNdayTs.numValues < 3 OrElse lGoodAnnualValueCount < 3 Then
                         lMsg = "ComputeFreq:NDayTimeseries has less than 3 years. Unable to calculate PearsonType3."
                         lQ = lNaN
                     Else
