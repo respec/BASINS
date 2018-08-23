@@ -300,10 +300,11 @@ Public Module CookieCutterGraphs
                         Dim lTimeSeriesDO As New atcTimeseries(Nothing)
                         Dim lTimeSeriesTimeUnit As Integer
                         lTimeSeriesDO = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
-                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
+
                         If lFoundTheTimeSeriesinWDMFile = False OrElse lTimeSeriesTimeUnit < 3 Then
                             lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
                         End If
+                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
                         lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMax))
