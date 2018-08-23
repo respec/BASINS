@@ -1,0 +1,11 @@
+
+Name: "{commondesktop}\BASINS 4.5";    Filename: "{app}\bin\{#MyAppExeName}";           IconFilename: "{app}\bin\Basins.ico"; WorkingDir:"{app}\bin";  Components: desktop
+Name: "{commondesktop}\WinHSPF Light"; Filename: "{app}\models\HSPF\bin\WinHSPFLt.exe"; IconFilename: "{app}\bin\Basins.ico"; WorkingDir:"{app}\data"; Components: desktop
+
+Name: "{group}\BASINS 4";            Filename: "{app}\bin\{#MyAppExeName}";             IconFilename: "{app}\bin\Basins.ico"; WorkingDir:"{app}\bin"
+Name: "{group}\WinHSPFLt";           Filename: "{app}\models\HSPF\bin\WinHSPFLt.exe";   IconFilename: "{app}\bin\Basins.ico"
+Name: "{group}\BASINS 4 Help";       Filename: "{app}\docs\BASINS4.5.chm"
+Name: "{group}\BASINS 4 Updates";    Filename: "{app}\BASINS_Updates.url";              IconFilename: "{app}\bin\Basins.ico"
+Name: "{group}\BASINS Home Page";    Filename: "{app}\BASINS_Home_Page.url";            IconFilename: "{app}\bin\Basins.ico"
+Name: "{group}\MapWindow Home Page"; Filename: "{app}\MapWindow_Home_Page.url";         IconFilename: "{app}\bin\Basins.ico"
+Name: "{app}\BASINS 4.5";            Filename: "{app}\bin\{#MyAppExeName}"
