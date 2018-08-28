@@ -205,13 +205,13 @@ Public Class atcBasinsPlugIn
 
         pLoadedDataMenu = True
 
-        If g_AppNameShort = "BASINS" Then
-            atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName, "", atcDataManager.LaunchMenuString, atcDataManager.FileMenuName)
-            atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcView3", atcDataManager.LaunchMenuName, "ArcView 3")
-            atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcGIS", atcDataManager.LaunchMenuName, "ArcGIS")
-            atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
-            atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
-        End If
+        'If g_AppNameShort = "BASINS" Then
+        '    atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName, "", atcDataManager.LaunchMenuString, atcDataManager.FileMenuName)
+        '    atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcView3", atcDataManager.LaunchMenuName, "ArcView 3")
+        '    atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_ArcGIS", atcDataManager.LaunchMenuName, "ArcGIS")
+        '    atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_GenScn", atcDataManager.LaunchMenuName, "GenScn")
+        '    atcDataManager.AddMenuIfMissing(atcDataManager.LaunchMenuName & "_WDMUtil", atcDataManager.LaunchMenuName, "WDMUtil")
+        'End If
 
         atcDataManager.LoadPlugin("D4EM Data Download::Main")
 
@@ -240,11 +240,11 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(ShowStatusMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
-        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
-        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcGIS")
-        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_GenScn")
-        g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_WDMUtil")
-        atcDataManager.RemoveMenuIfEmpty(atcDataManager.LaunchMenuName)
+        'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
+        'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcGIS")
+        'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_GenScn")
+        'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_WDMUtil")
+        'atcDataManager.RemoveMenuIfEmpty(atcDataManager.LaunchMenuName)
 
         ShowHelp("CLOSE") 'Close any active Help window
 
@@ -300,47 +300,47 @@ Public Class atcBasinsPlugIn
                 Logger.Status("SHOW")
             Case OurHelpMenuName
                 ShowHelp("")
-            Case atcDataManager.LaunchMenuName & "_ArcView3"
-                'create apr if it does not exist, then open it
-                Dim lAprFileName As String = lProgramFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
-                If Not FileExists(lAprFileName) Then 'build it
-                    Dim lEmptyAprName As String = lProgramFolder & "\etc\buildapr.dat"
-                    If FileExists(lEmptyAprName) Then
-                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
-                        IO.File.Copy(lEmptyAprName, lAprFileName)
-                    Else
-                        Logger.Msg("Unable to locate template apr file buildapr.dat", vbOKOnly, "Launch ArcView Problem")
-                    End If
-                End If
-                Try
-                    Process.Start(lAprFileName)
-                Catch
-                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "Launch ArcView Problem")
-                End Try
-            Case atcDataManager.LaunchMenuName & "_ArcGIS"
-                'create mxd if it does not exist, then open it
-                Dim lMxdFileName As String = lProgramFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
-                If Not FileExists(lMxdFileName) Then 'build it
-                    Dim lEmptyMxdName As String = lProgramFolder & "\etc\buildmxd.dat"
-                    If FileExists(lEmptyMxdName) Then
-                        IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
-                        IO.File.Copy(lEmptyMxdName, lMxdFileName)
-                    Else
-                        Logger.Msg("Unable to locate template mxd file buildmxd.dat", vbOKOnly, "Launch ArcGIS Problem")
-                    End If
-                End If
-                Try
-                    Process.Start(lMxdFileName)
-                Catch
-                    Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "Launch ArcGIS Problem")
-                End Try
+            'Case atcDataManager.LaunchMenuName & "_ArcView3"
+            '    'create apr if it does not exist, then open it
+            '    Dim lAprFileName As String = lProgramFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
+            '    If Not FileExists(lAprFileName) Then 'build it
+            '        Dim lEmptyAprName As String = lProgramFolder & "\etc\buildapr.dat"
+            '        If FileExists(lEmptyAprName) Then
+            '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
+            '            IO.File.Copy(lEmptyAprName, lAprFileName)
+            '        Else
+            '            Logger.Msg("Unable to locate template apr file buildapr.dat", vbOKOnly, "Launch ArcView Problem")
+            '        End If
+            '    End If
+            '    Try
+            '        Process.Start(lAprFileName)
+            '    Catch
+            '        Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "Launch ArcView Problem")
+            '    End Try
+            'Case atcDataManager.LaunchMenuName & "_ArcGIS"
+            '    'create mxd if it does not exist, then open it
+            '    Dim lMxdFileName As String = lProgramFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
+            '    If Not FileExists(lMxdFileName) Then 'build it
+            '        Dim lEmptyMxdName As String = lProgramFolder & "\etc\buildmxd.dat"
+            '        If FileExists(lEmptyMxdName) Then
+            '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
+            '            IO.File.Copy(lEmptyMxdName, lMxdFileName)
+            '        Else
+            '            Logger.Msg("Unable to locate template mxd file buildmxd.dat", vbOKOnly, "Launch ArcGIS Problem")
+            '        End If
+            '    End If
+            '    Try
+            '        Process.Start(lMxdFileName)
+            '    Catch
+            '        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "Launch ArcGIS Problem")
+            '    End Try
             Case Else
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
-                    Select Case aItemName.Substring(atcDataManager.LaunchMenuName.Length + 1).ToLower
-                        Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", lProgramFolder & "\models\HSPF\bin\GenScn.exe")
-                        Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", lProgramFolder & "\models\HSPF\WDMUtil\WDMUtil.exe")
-                    End Select
+                    'Select Case aItemName.Substring(atcDataManager.LaunchMenuName.Length + 1).ToLower
+                    '    Case "genscn" : lExeName = FindFile("Please locate GenScn.exe", lProgramFolder & "\models\HSPF\bin\GenScn.exe")
+                    '    Case "wdmutil" : lExeName = FindFile("Please locate WDMUtil.exe", lProgramFolder & "\models\HSPF\WDMUtil\WDMUtil.exe")
+                    'End Select
                     If FileExists(lExeName) Then
                         Shell("""" & lExeName & """", AppWinStyle.NormalFocus, False)
                         aHandled = True
