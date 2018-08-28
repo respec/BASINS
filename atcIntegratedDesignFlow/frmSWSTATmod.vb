@@ -2752,11 +2752,18 @@ Public Class frmSWSTATmod
         Dim dMyLat As Double
         Dim dMyLong As Double
         Dim dMyStat As Double
+        Dim lDA As Double = Double.NaN
         Dim lTs As atcTimeseries = pDataGroup.FindData("Location", aStationID)(0)
         With lTs.Attributes
             dMyLat = .GetValue("Latitude", Double.NaN)
             dMyLong = .GetValue("Longitude", Double.NaN)
             dMyStat = .GetValue(aStatName, Double.NaN)
+            lDA = .GetValue("Drainage Area", Double.NaN)
+            If Not Double.IsNaN(dMyStat) AndAlso Not Double.IsNaN(lDA) AndAlso Not Math.Abs(lDA - 0) < 0.00001 Then
+                dMyStat /= lDA
+            Else
+                dMyStat = Double.NaN
+            End If
         End With
         If Double.IsNaN(dMyLat) OrElse Double.IsNaN(dMyLong) OrElse Double.IsNaN(dMyStat) Then
             Return "No Data"
@@ -2769,7 +2776,6 @@ Public Class frmSWSTATmod
         Dim lDateArray(6) As Integer
         Dim J As Integer = 0
         Dim lStatValue As Double = Double.NaN
-        Dim lDA As Double = Double.NaN
         For I As Integer = 0 To aDataGroup.Count - 1
             lTs = aDataGroup(I)
             With lTs.Attributes
@@ -4369,8 +4375,8 @@ Public Class frmSWSTATmod
     End Sub
 
     Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
-        Logger.Msg("Outlier Test is under development.", MsgBoxStyle.Exclamation, "Group Outlier Test")
-        Exit Sub
+        'Logger.Msg("Outlier Test is under development.", MsgBoxStyle.Exclamation, "Group Outlier Test")
+        'Exit Sub
         If pDataGroup.Count < 5 Then
             Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Group Outlier Test")
             Exit Sub
