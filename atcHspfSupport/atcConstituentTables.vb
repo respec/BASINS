@@ -7,7 +7,7 @@ Public Module atcConstituentTables
     Public Land_Constituent_Table As DataTable
     Public Reach_Budget_Table As DataTable
 
-    Public Sub LandLoadingReports(ByVal aoutfoldername As String,
+    Public Function LandLoadingReports(ByVal aoutfoldername As String,
                                      ByVal aBinaryData As atcDataSource,
                                      ByVal aUCI As HspfUci,
                                      ByVal aScenario As String,
@@ -15,7 +15,7 @@ Public Module atcConstituentTables
                                      ByVal aBalanceType As String,
                                      ByVal aConstProperties As List(Of ConstituentProperties),
                                   ByVal aSDateJ As Double, ByVal aEDateJ As Double,
-                                  Optional ByVal aGQALID As Integer = 0)
+                                  Optional ByVal aGQALID As Integer = 0) As Data.DataTable
 
         'This Sub prepares a text report for constituents like TN and TP.
         Dim lReport As New atcReport.ReportText
@@ -942,10 +942,7 @@ Public Module atcConstituentTables
                     End If
                 Next item
 
-
             Next
-
-
 
         Else
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
@@ -975,7 +972,6 @@ Public Module atcConstituentTables
                 CreateGraph_BoxAndWhisker(lDataForBoxWhiskerPlot, aoutfoldername & aBalanceType & "_BoxWhisker.png")
                 landUseSumAnnualValues.Clear()
 
-
                 lDataForBoxWhiskerPlot.Constituent = aBalanceType
                 For Each item As String In listLanduses
                     Dim OpType1 As String = item.Split("-")(0)
@@ -1004,9 +1000,9 @@ Public Module atcConstituentTables
             End If
 
         End If
+        Return Land_Constituent_Table
 
-
-    End Sub
+    End Function
 
     Public Sub ReachBudgetReports(ByVal aoutfoldername As String,
                                      ByVal aBinaryData As atcDataSource,

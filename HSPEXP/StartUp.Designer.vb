@@ -62,6 +62,7 @@ Partial Class StartUp
         Me.chkWaterBalance = New System.Windows.Forms.CheckBox()
         Me.chkSedimentBalance = New System.Windows.Forms.CheckBox()
         Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
+        Me.chkModelQAQC = New System.Windows.Forms.CheckBox()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -149,7 +150,7 @@ Partial Class StartUp
         Me.chkAreaReports.AutoSize = True
         Me.chkAreaReports.Enabled = False
         Me.chkAreaReports.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkAreaReports.Location = New System.Drawing.Point(22, 104)
+        Me.chkAreaReports.Location = New System.Drawing.Point(247, 109)
         Me.chkAreaReports.Name = "chkAreaReports"
         Me.chkAreaReports.Size = New System.Drawing.Size(143, 17)
         Me.chkAreaReports.TabIndex = 4
@@ -162,7 +163,7 @@ Partial Class StartUp
         Me.chkRunHSPF.AutoSize = True
         Me.chkRunHSPF.Enabled = False
         Me.chkRunHSPF.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkRunHSPF.Location = New System.Drawing.Point(22, 81)
+        Me.chkRunHSPF.Location = New System.Drawing.Point(21, 81)
         Me.chkRunHSPF.Name = "chkRunHSPF"
         Me.chkRunHSPF.Size = New System.Drawing.Size(77, 17)
         Me.chkRunHSPF.TabIndex = 3
@@ -507,6 +508,19 @@ Partial Class StartUp
         Me.chkTotalNitrogen.Text = "Total Nitrogen"
         Me.chkTotalNitrogen.UseVisualStyleBackColor = True
         '
+        'chkModelQAQC
+        '
+        Me.chkModelQAQC.AutoSize = True
+        Me.chkModelQAQC.Enabled = False
+        Me.chkModelQAQC.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.chkModelQAQC.Location = New System.Drawing.Point(21, 104)
+        Me.chkModelQAQC.Name = "chkModelQAQC"
+        Me.chkModelQAQC.Size = New System.Drawing.Size(93, 17)
+        Me.chkModelQAQC.TabIndex = 49
+        Me.chkModelQAQC.Text = "Model QA/QC"
+        Me.ttHSPEXP.SetToolTip(Me.chkModelQAQC, "Compute reports of watershed area based on the SCHEMATIC BLOCK.")
+        Me.chkModelQAQC.UseVisualStyleBackColor = True
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
@@ -514,6 +528,7 @@ Partial Class StartUp
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
         Me.ClientSize = New System.Drawing.Size(493, 634)
+        Me.Controls.Add(Me.chkModelQAQC)
         Me.Controls.Add(Me.chkMultiSim)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.Plotting)
@@ -586,4 +601,5 @@ Partial Class StartUp
     Friend WithEvents chkGQUAL6 As CheckBox
     Friend WithEvents chkGQUAL5 As CheckBox
     Friend WithEvents chkGQUAL4 As CheckBox
+    Friend WithEvents chkModelQAQC As CheckBox
 End Class

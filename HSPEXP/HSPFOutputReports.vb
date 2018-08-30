@@ -6,6 +6,8 @@ Imports atcUCI
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports System.Collections.Specialized
 Imports System.IO 'added by Becky to get directory exists function
+Imports System.Xml
+Imports System.Data
 
 Module HSPFOutputReports
     Private pTestPath As String
@@ -23,6 +25,7 @@ Module HSPFOutputReports
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
     Friend pHSPFExe As String '= FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
+    Private pModelQAQC As Boolean = False
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
     Private MultiSimulation As Boolean = False
@@ -54,6 +57,8 @@ Module HSPFOutputReports
         pGraphSaveFormat = ".png"
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
+        pModelQAQC = StartUp.chkModelQAQC.Checked
+
 
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
@@ -130,6 +135,11 @@ Module HSPFOutputReports
         Logger.Status("Run characteristics read", True)
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aMapWin"></param>
+    ''' <param name="aHspfUci"></param>
     Public Sub ScriptMain(ByRef aMapWin As Object, ByVal aHspfUci As atcUCI.HspfUci)
         Initialize()
         ChDriveDir(pTestPath)
@@ -227,7 +237,32 @@ Module HSPFOutputReports
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
+#Region "Start QA/QC Report"
 
+                Dim QAQCReportFile As New Text.StringBuilder
+
+                'QAQCReportFile = My.Computer.FileSystem.OpenTextFileWriter(loutfoldername & "\ModelQAQCReport.htm", False)
+                If pModelQAQC Then
+                    QAQCReportFile.AppendLine("<html>")
+                    QAQCReportFile.AppendLine(GeneralModelInfo(aHspfUci))
+                    QAQCReportFile.AppendLine(HSPFParmValues(aHspfUci, lRunMade))
+
+                    'Area Report should become part of QAQC report now
+                    Dim alocations As New atcCollection
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                        Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
+                        If lDownstreamReachID = 0 Then
+                            alocations.Add("R:" & lRCHRES.Id)
+                        End If
+                    Next
+
+                    'Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+
+                End If
+
+#End Region
+
+#Region "AutomatedGraph and Regan Graph Generation"
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try
@@ -241,21 +276,23 @@ Module HSPFOutputReports
                 If StartUp.chkReganGraphs.Checked Then
                     ReganGraphs(aHspfUci, SDateJ, EDateJ, loutfoldername)
                 End If
+
+#End Region
 #Region "Area Report Generation"
-                If pMakeAreaReports Then
-                    Dim alocations As New atcCollection
-                    For Each lRCHRES As HspfOperation In aHspfUci.OpnSeqBlock.Opns
-                        If lRCHRES.Name = "RCHRES" Then
-                            alocations.Add("R:" & lRCHRES.Id)
-                        End If
-                    Next
-                    Logger.Status(Now & " Producing Area Reports.", True)
-                    Logger.Dbg(Now & " Producing land use and area reports")
-                    'Now the area reports are generated for all the reaches in the UCI file.
-                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
-                    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
-                    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
-                End If
+                'If pMakeAreaReports Then
+                '    Dim alocations As New atcCollection
+                '    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+
+                '        alocations.Add("R:" & lRCHRES.Id)
+
+                '    Next
+                '    Logger.Status(Now & " Producing Area Reports.", True)
+                '    Logger.Dbg(Now & " Producing land use and area reports")
+                '    'Now the area reports are generated for all the reaches in the UCI file.
+                '    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+                '    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+                '    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
+                'End If
 #End Region
 
 #Region "Hydrology Calibration"
@@ -532,7 +569,7 @@ Module HSPFOutputReports
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
-                       
+
                         If lScenarioResults.DataSets.Count = 0 Then
                             For Each activeSection As String In lActiveSections
                                 lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Section", activeSection))
@@ -546,7 +583,12 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            If pModelQAQC Then
+                                QAQCReportFile.AppendLine("<h2>" & lConstituent & " Balance Analysis</h2>")
+                                QAQCReportFile.AppendLine(LoadingRateComparison(lConstituentName, LandLoadingReportForConstituents))
+                            End If
+
                             ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
                             Logger.Status(Now & " Generating Reports for " & lConstituent)
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
@@ -639,7 +681,15 @@ Module HSPFOutputReports
 
                 End If
 #End Region
+                If pModelQAQC Then
+                    QAQCReportFile.AppendLine("</html>")
+                    'Try
+                    File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
+                    'Catch
+                    'If file is open give warning and then close its
 
+                    'End Try
+                End If
                 Logger.Status(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
 
@@ -647,12 +697,14 @@ Module HSPFOutputReports
 
                 Logger.Dbg(Now & " HSPEXP+ Complete")
                 Logger.Msg("HSPEXP+ is complete")
+
                 OpenFile(loutfoldername)
             End Using
         Catch ex As Exception
             'Skip to the end if Cancel was chosen in felu            
 
             Logger.Msg(ex.ToString, MsgBoxStyle.Critical, "HSPEXP+ did not complete successfully.")
+
 
         End Try
 
@@ -664,7 +716,312 @@ Module HSPFOutputReports
     End Sub
 
 
+    ''' <summary>
+    ''' This function looks at each parameter limit in the XML list of parameters and compares them to the values in the UCI file. If the values are not within the 
+    ''' limits, it is mentioned in the report.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <param name="aRunMade"></param>
+    ''' <returns></returns>
+    Private Function HSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
+        Dim HSPFParmTable As XmlDocument = New XmlDocument()
+        'Dim xmlFileIsThere As Boolean = FileExists(FindFile("", "HSPFParmValues.xml"))
+        Dim TableName As String = ""
+        Dim ParameterName As String = ""
+        Dim MaxValue As Double = 0
+        Dim MinValue As Double = 0
+        Dim OperationType As String = ""
+        Dim ParameterInfo As String = ""
+
+        HSPFParmTable.LoadXml(My.Resources.HSPFParmValues) '    (Resources.IResourceReader("HSPFParmValues.xml")) '(FindFile("", "HSPFParmValues.xml"))
+        ParameterInfo &= "<h2>Model Parameter Value Analysis</h2>"
+        Dim ParameterLimitIssue As String = "<ul>"
+
+        Dim nodes As XmlNodeList = HSPFParmTable.DocumentElement.SelectNodes("Parm")
+
+        For Each node As XmlNode In nodes
+            OperationType = node.SelectSingleNode("OPNTYPE").InnerText
+            TableName = node.SelectSingleNode("TABLE").InnerText
+            ParameterName = node.SelectSingleNode("ParameterName").InnerText
+            MaxValue = node.SelectSingleNode("Max").InnerText
+            MinValue = node.SelectSingleNode("Min").InnerText
+            Dim lMessageCountPerParameter As Integer = 0
+            For Each loperation As HspfOperation In aUCI.OpnBlks(OperationType).Ids
+                For Each lTable As HspfTable In loperation.Tables
+                    If lTable.Name = TableName Then
+
+                        For Each parm As HspfParm In lTable.Parms
+                            Dim lprintLine As Boolean = False
+
+                            If parm.Name = ParameterName Then
+                                If parm.Value > MaxValue OrElse parm.Value < MinValue Then
+                                    ParameterLimitIssue = "<li>The value of parameter " & parm.Name & " in the Table " & TableName & " for " &
+                                OperationType & loperation.Id & " (" & parm.Value & ") is outside the typical limit of " & MinValue & " - " & MaxValue & ".</li>" & vbCrLf
+                                    lprintLine = True
+                                End If
+                            End If
+                            If lprintLine = True Then
+                                lMessageCountPerParameter += 1
+                                If lMessageCountPerParameter > 5 Then
+                                    ParameterInfo &= "<p>There have been five instances of parameter " & parm.Name &
+                                                         " in the table " & TableName & " outside of limits. It will not be listed anymore.</p>" & vbCrLf
+                                Else
+                                    ParameterInfo &= ParameterLimitIssue
+                                End If
+                            Else
+
+                            End If
+                        Next parm
+                    End If
+                Next lTable
+            Next loperation
+        Next
+        ParameterInfo &= "</ul>"
+        Return ParameterInfo
+    End Function
+    ''' <summary>
+    ''' This function outputs heading of the QA/QC report and some general information.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <returns></returns>
+    Private Function GeneralModelInfo(ByVal aUCI As HspfUci) As String
+        Dim GeneralModelInfoText As String = ""
+        GeneralModelInfoText = "<h1>HSPF Model QA QC Report.</h1>" & vbCrLf
+        GeneralModelInfoText &= "<p>The model file name is " & aUCI.Name.ToString & "."
+
+        GeneralModelInfoText &= "The model simulation period spans from " & aUCI.GlobalBlock.SDate(0) & "/" & aUCI.GlobalBlock.SDate(1) & "/" & aUCI.GlobalBlock.SDate(2) &
+             " to " & aUCI.GlobalBlock.EDate(0) & "/" & aUCI.GlobalBlock.EDate(1) & "/" & aUCI.GlobalBlock.EDate(2) & ".</p>" & vbCrLf
 
 
 
+        Return GeneralModelInfoText
+    End Function
+    ''' <summary>
+    ''' This function outputs area report of terminal reaches and model calibration reaches.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <returns></returns>
+    Private Function ModelAreaReport(ByVal aUCI As HspfUci) As String
+        Dim ModelAreaReportTable As String = ""
+        Dim alocations As New atcCollection
+        For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
+            If lDownstreamReachID = 0 Then
+                alocations.Add("R:" & lRCHRES.Id)
+            End If
+        Next
+        'Need to add calibration reaches
+
+
+        Return ModelAreaReportTable
+    End Function
+    Private Function LoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable) As String
+        Dim LoadingRateComments As New Text.StringBuilder
+        Dim newColumn As DataColumn
+        newColumn = New DataColumn()
+        newColumn.DataType = Type.GetType("System.String")
+        newColumn.ColumnName = "genLandUse"
+        newColumn.Caption = "Generalized Land Use"
+        aLandLoadingConstReport.Columns.Add(newColumn)
+        Dim UCILandUse As String = ""
+        Dim ListofLandUsesInUCI As New List(Of String)
+        'Dim SelectExpressionSumAnnual As String = "OpTypeNumber Like 'P:%' And Year = 'SumAnnual'"
+        'Dim foundRows() As DataRow = aLandLoadingConstReport.Select(SelectExpressionSumAnnual)
+        For Each row As DataRow In aLandLoadingConstReport.Rows
+            UCILandUse = row("OpDesc")
+            row("genLandUse") = FindGeneralLandUse(UCILandUse)
+            If Not ListofLandUsesInUCI.Contains(row("genLandUse")) And Not row("genLandUse") = "Unknown" Then
+                ListofLandUsesInUCI.Add(row("genLandUse"))
+            End If
+        Next
+        Dim lSelectExpression As String = ""
+
+        LoadingRateComments.AppendLine("<p>Following non-typical behaviours were noticed in the model.</p>")
+        LoadingRateComments.AppendLine("<ul>")
+        Dim IsWetlandALanduse As Boolean = False
+        If ListofLandUsesInUCI.Contains("Wetland") Then IsWetlandALanduse = True
+        For Each landuse As String In ListofLandUsesInUCI
+            Select Case aConstituentName
+                Case "WAT"
+                    LoadingRateComments.AppendLine(CheckIrrigation(landuse, aLandLoadingConstReport))
+                    LoadingRateComments.AppendLine(CheckETIssues(landuse, aLandLoadingConstReport, ListofLandUsesInUCI, IsWetlandALanduse))
+                    LoadingRateComments.AppendLine(CheckRunoff(landuse, aLandLoadingConstReport, ListofLandUsesInUCI))
+                Case "TN"
+                Case "SED"
+
+
+            End Select
+
+        Next
+        LoadingRateComments.AppendLine("</ul>")
+        Return LoadingRateComments.ToString
+    End Function
+    ''' <summary>
+    ''' This Function takes the UCI Landuse and finds a corresponding general land use based on a CSV file.
+    ''' </summary>
+    ''' <param name="aUCILandUse"></param>
+    ''' <returns></returns>
+    Private Function FindGeneralLandUse(ByVal aUCILandUse As String) As String
+        Dim GeneralLandUse As String = "Unknown"
+        If aUCILandUse.ToLower.Contains("forest") Then
+            GeneralLandUse = "Forest"
+            Return GeneralLandUse
+        ElseIf aUCILandUse.ToLower.Contains("crop") OrElse aUCILandUse.ToLower.Contains("agric") Then
+            GeneralLandUse = "Ag/Other"
+            Return GeneralLandUse
+        ElseIf aUCILandUse.ToLower.Contains("urban") Then
+            GeneralLandUse = "Urban"
+            Return GeneralLandUse
+        End If
+        Using strReader As New IO.StringReader(My.Resources.LandUseNames_Mappings)
+            Using MyReader As New FileIO.TextFieldParser(strReader)
+                MyReader.TextFieldType = FileIO.FieldType.Delimited
+                MyReader.SetDelimiters(",")
+                Dim CurrentRow As String()
+                While Not MyReader.EndOfData
+                    CurrentRow = MyReader.ReadFields
+                    If CurrentRow(0) = aUCILandUse Then
+                        Return CurrentRow(1)
+                    End If
+                End While
+            End Using
+        End Using
+        Return GeneralLandUse
+    End Function
+    Private Function CheckIrrigation(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable) As String
+        If aLanduse = "Ag/Other" Then Return ""
+        Dim IrrigationStatement As String = ""
+        Dim IrrigationApp As Double = 0.0
+        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Try
+            IrrigationApp = aLandLoadingConstReport.Compute("AVG(IRRAPP6)", lSelectExpression)
+        Catch
+
+        End Try
+        If IrrigationApp > 0 Then
+            Return "<li>" & aLanduse & " land use has irrigation application.</li>" & vbCrLf
+        Else
+            Return ""
+        End If
+
+    End Function
+
+    Private Function CheckRunoff(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable, ByVal aListofLandUsesinUCI As List(Of String)) As String
+        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim TotalOutFlow As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression)
+        Dim TotalSurfaceRunoff As Double = aLandLoadingConstReport.Compute("AVG(SURO)", lSelectExpression)
+        Dim TotalBaseFlow As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+        Dim CheckRunoffStatement As New Text.StringBuilder
+        If TotalSurfaceRunoff > TotalBaseFlow Then
+            CheckRunoffStatement.AppendLine("<li>Surface runoff is greater than baseflow for " & aLanduse & ".</li>")
+        End If
+
+        Select Case aLanduse
+            Case "Forest"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" Then Continue For
+                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                    Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                    Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                    Select Case True
+                        Case landuse2 = "Wetland" AndAlso TotalOutflow2 > TotalOutFlow
+                            CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than Forest.</li>")
+                        Case landuse2 <> "Wetland" AndAlso TotalOutflow2 < TotalOutFlow
+                            CheckRunoffStatement.AppendLine("<li>Forest has greater total outflow than " & landuse2 & ".</li>")
+                        Case landuse2 = "Wetland" AndAlso TotalSurfaceRunoff2 > TotalSurfaceRunoff
+                            CheckRunoffStatement.AppendLine("<li>Wetland has greater surface runoff than Forest.</li>")
+                        Case landuse2 <> "Wetland" AndAlso TotalSurfaceRunoff2 < TotalSurfaceRunoff
+                            CheckRunoffStatement.AppendLine("<li>Forest has greater surface runoff than " & landuse2 & ".</li>")
+                    End Select
+                Next
+
+            Case "Wetland"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" Then Continue For
+                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                    Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                    Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                    If TotalOutFlow > TotalOutflow2 Then
+                        CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than " & landuse2 & ".</li>")
+                    End If
+                Next
+        End Select
+        CheckRunoffStatement.AppendLine("</ul>")
+        Return CheckRunoffStatement.ToString
+    End Function
+
+    Private Function CheckETIssues(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable,
+                                   ByVal aListofLandUsesinUCI As List(Of String),
+                                   ByVal WetlandLUExists As Boolean) As String
+        Dim CheckETIssuesStatement As New Text.StringBuilder
+        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim TotalET As Double = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
+        Dim PotET As Double = aLandLoadingConstReport.Compute("AVG(PET)", lSelectExpression)
+        Dim InterceptionET As Double = aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression)
+        Dim UpperZoneET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression)
+        Dim LowerZoneET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression)
+        Dim GroundWaterET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression)
+        Dim BaseflowET As Double = aLandLoadingConstReport.Compute("AVG(BASET)", lSelectExpression)
+
+        If aLanduse <> "Wetland" AndAlso WetlandLUExists AndAlso GroundWaterET > 0 Then
+            CheckETIssuesStatement.AppendLine("<li>Groundwater is being lost through evapotranspiration in " & aLanduse & " even though there is a separate Wetland land use.</li>")
+        End If
+
+        Select Case True
+
+            Case aLanduse = "Forest"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" Then Continue For
+                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    'Comparing Total ET
+                    If landuse2 = "Wetland" AndAlso TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                        CheckETIssuesStatement.AppendLine("<li>Forest has more ET than Wetland.</li>")
+                    ElseIf landuse2 <> "Wetland" AndAlso TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Forest.</li>")
+                    End If
+                    'Comparing Interception ET loss
+                    If landuse2 <> "Wetland" AndAlso InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Forest.</li>")
+                    End If
+                Next landuse2
+
+
+            Case aLanduse = "Wetland"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" Then Continue For
+                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    If TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Wetland.</li>")
+                    End If
+                    If InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Wetland.</li>")
+                    End If
+
+
+
+                Next landuse2
+        End Select
+
+
+        CheckETIssuesStatement.AppendLine("</ul>")
+
+        Return CheckETIssuesStatement.ToString
+
+    End Function
+    Private Function CheckTotalSedimentErosion(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable) As String
+        Dim CheckTotalSedErosion As String = ""
+
+
+
+
+
+
+        Return CheckTotalSedErosion
+    End Function
 End Module
+
+
+
+
