@@ -162,7 +162,7 @@ Public Class frmDownload
             lGroups.Add(grpNWISStations)
             lGroups.Add(grpNWIS)
             lGroups.Add(grpUSGS_Seamless)
-            lGroups.Add(grpSTORET)
+            'lGroups.Add(grpSTORET)
             lGroups.Add(grpNLDAS)
         End If
 
