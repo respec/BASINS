@@ -61,7 +61,8 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to &lt;DocumentElement&gt;
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        '''&lt;ParameterRanges&gt;
         '''  &lt;Parm&gt;
         '''    &lt;ParmID&gt;1&lt;/ParmID&gt;
         '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
@@ -75,14 +76,13 @@ Namespace My.Resources
         '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
         '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
         '''    &lt;ParameterName&gt;INFILT&lt;/ParameterName&gt;
-        '''    &lt;Min&gt;0.001&lt;/Min&gt;
-        '''    &lt;Max&gt;5&lt;/Max&gt;
+        '''    &lt;Min&gt;0.01&lt;/Min&gt;
+        '''    &lt;Max&gt;0.25&lt;/Max&gt;
         '''  &lt;/Parm&gt;
         '''  &lt;Parm&gt;
         '''    &lt;ParmID&gt;3&lt;/ParmID&gt;
         '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;SLSU [rest of string was truncated]&quot;;.
+        '''    &lt;TABLE&gt;P [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HSPFParmValues() As String
             Get
@@ -115,6 +115,61 @@ Namespace My.Resources
         Friend ReadOnly Property LandUseNames_Mappings() As String
             Get
                 Return ResourceManager.GetString("LandUseNames_Mappings", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        '''&lt;LoadingRates&gt;
+        '''  &lt;Nutrient type=&quot;SED&quot;&gt;
+        '''    &lt;Landuse name=&quot;Forest&quot;&gt;
+        '''        &lt;Min&gt;100&lt;/Min&gt;
+        '''        &lt;Max&gt;300&lt;/Max&gt;
+        '''    &lt;/Landuse&gt;
+        '''    &lt;Landuse name=&quot;Pasture&quot;&gt;
+        '''        &lt;Min&gt;400&lt;/Min&gt;
+        '''        &lt;Max&gt;2000&lt;/Max&gt;
+        '''    &lt;/Landuse&gt;
+        '''    &lt;Landuse name=&quot;Urban&quot;&gt;
+        '''        &lt;Min&gt;300&lt;/Min&gt;
+        '''        &lt;Max&gt;1000&lt;/Max&gt;
+        '''    &lt;/Landuse&gt;
+        '''    &lt;Landuse name=&quot;Ag/Other&quot;&gt;
+        '''        &lt;Min&gt;200&lt;/Min&gt;
+        '''        &lt;Max&gt;3000&lt;/Max&gt;
+        '''    &lt;/Landuse&gt;
+        '''    &lt;Landuse name=&quot;Wetland&quot;&gt;
+        '''        &lt;Min&gt;0&lt;/Min&gt;
+        '''   [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property LoadingRates() As String
+            Get
+                Return ResourceManager.GetString("LoadingRates", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        '''&lt;MONTHLYTABLE&gt;
+        '''  &lt;Parm&gt;
+        '''    &lt;ParmTable&gt;SNOW-PARM1&lt;/ParmTable&gt;
+        '''    &lt;ParmName&gt;KMELT&lt;/ParmName&gt;
+        '''    &lt;FlagTable&gt;SNOW-FLAGS&lt;/FlagTable&gt;
+        '''    &lt;FlagName&gt;VKMFG&lt;/FlagName&gt;
+        '''    &lt;MonTable&gt;MON-MELT-FRAC&lt;/MonTable&gt;
+        '''    &lt;MonParmName&gt;KMELTM&lt;/MonParmName&gt;
+        '''  &lt;/Parm&gt;
+        '''  &lt;Parm&gt;
+        '''    &lt;ParmTable&gt;PWAT-PARM4&lt;/ParmTable&gt;
+        '''    &lt;ParmName&gt;CEPSC&lt;/ParmName&gt;
+        '''    &lt;FlagTable&gt;PWAT-PARM1&lt;/FlagTable&gt;
+        '''    &lt;FlagName&gt;VCSFG&lt;/FlagName&gt;
+        '''    &lt;MonTable&gt;MON-INTERCEP&lt;/MonTable&gt;
+        '''    &lt;MonParmName&gt;CEPSCM [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property MonthlyParmForMonthlyParm() As String
+            Get
+                Return ResourceManager.GetString("MonthlyParmForMonthlyParm", resourceCulture)
             End Get
         End Property
     End Module

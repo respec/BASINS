@@ -59,53 +59,5 @@ Namespace My.Resources
                 resourceCulture = value
             End Set
         End Property
-        
-        '''<summary>
-        '''  Looks up a localized string similar to &lt;DocumentElement&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;1&lt;/ParmID&gt;
-        '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;LZSN&lt;/ParameterName&gt;
-        '''    &lt;Min&gt;3&lt;/Min&gt;
-        '''    &lt;Max&gt;8&lt;/Max&gt;
-        '''  &lt;/Parm&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;2&lt;/ParmID&gt;
-        '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;INFILT&lt;/ParameterName&gt;
-        '''    &lt;Min&gt;0.001&lt;/Min&gt;
-        '''    &lt;Max&gt;5&lt;/Max&gt;
-        '''  &lt;/Parm&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;3&lt;/ParmID&gt;
-        '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;SLSU [rest of string was truncated]&quot;;.
-        '''</summary>
-        Friend ReadOnly Property HSPFParmValues() As String
-            Get
-                Return ResourceManager.GetString("HSPFParmValues", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized string similar to PERLND Names 
-        '''base_PERLND_ParameterList.txt,Forest South HSG-lo,Forest
-        '''base_PERLND_ParameterList.txt,Forest South HSG-hi,Forest
-        '''base_PERLND_ParameterList.txt,Forest North HSG-lo,Forest
-        '''base_PERLND_ParameterList.txt,Forest North HSG-hi,Forest
-        '''base_PERLND_ParameterList.txt,PastureHay S HSG-lo,Pasture
-        '''base_PERLND_ParameterList.txt,PastureHay S HSG-hi,Pasture
-        '''base_PERLND_ParameterList.txt,PastureHay N HSG-lo,Pasture
-        '''base_PERLND_ParameterList.txt,PastureHay N HSG-hi,Pasture
-        '''base_PERLND_ParameterList.txt [rest of string was truncated]&quot;;.
-        '''</summary>
-        Friend ReadOnly Property LandUseNames_AM() As String
-            Get
-                Return ResourceManager.GetString("LandUseNames_AM", resourceCulture)
-            End Get
-        End Property
     End Module
 End Namespace
