@@ -64,25 +64,22 @@ Namespace My.Resources
         '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         '''&lt;ParameterRanges&gt;
         '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;1&lt;/ParmID&gt;
+        '''    &lt;PARMID&gt;1&lt;/PARMID&gt;
         '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;LZSN&lt;/ParameterName&gt;
-        '''    &lt;Min&gt;3&lt;/Min&gt;
-        '''    &lt;Max&gt;8&lt;/Max&gt;
+        '''    &lt;TABLE&gt;ACTIVITY&lt;/TABLE&gt;
+        '''    &lt;ParameterName&gt;AIRTFG&lt;/ParameterName&gt;
+        '''    &lt;ACTIVITYFLAG&gt;&lt;/ACTIVITYFLAG&gt;
+        '''    &lt;ConstituentName&gt;&lt;/ConstituentName&gt;
+        '''    &lt;IsMonthlyPossible&gt;&lt;/IsMonthlyPossible&gt;
+        '''    &lt;Min&gt;0&lt;/Min&gt;
+        '''    &lt;Max&gt;1&lt;/Max&gt;
+        '''    &lt;Typical&gt;1&lt;/Typical&gt;
+        '''    &lt;FlagTable&gt;&lt;/FlagTable&gt;
+        '''    &lt;FlagParm&gt;&lt;/FlagParm&gt;
+        '''    &lt;MonthlyParmTable&gt;&lt;/MonthlyParmTable&gt;
+        '''    &lt;Notes&gt;&lt;/Notes&gt;
         '''  &lt;/Parm&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;2&lt;/ParmID&gt;
-        '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;PWAT-PARM2&lt;/TABLE&gt;
-        '''    &lt;ParameterName&gt;INFILT&lt;/ParameterName&gt;
-        '''    &lt;Min&gt;0.01&lt;/Min&gt;
-        '''    &lt;Max&gt;0.25&lt;/Max&gt;
-        '''  &lt;/Parm&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmID&gt;3&lt;/ParmID&gt;
-        '''    &lt;OPNTYPE&gt;PERLND&lt;/OPNTYPE&gt;
-        '''    &lt;TABLE&gt;P [rest of string was truncated]&quot;;.
+        '''   [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HSPFParmValues() As String
             Get
@@ -115,6 +112,27 @@ Namespace My.Resources
         Friend ReadOnly Property LandUseNames_Mappings() As String
             Get
                 Return ResourceManager.GetString("LandUseNames_Mappings", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        '''&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+        '''&lt;xsl:template match=&quot;/&quot;&gt;
+        '''&lt;html&gt;
+        '''&lt;body&gt;
+        '''  &lt;h2&gt;Model Parameter Information&lt;/h2&gt;
+        '''  &lt;table border=&quot;1&quot;&gt;
+        '''    &lt;tr bgcolor=&quot;#9acd32&quot;&gt;
+        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Type&lt;/th&gt;
+        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Number&lt;/th&gt;
+        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Name&lt;/th&gt;
+        '''      &lt;th style=&quot;text-align:center&quot;&gt;Parameter Table&lt;/th&gt;
+        '''      &lt;th style=&quot;text-align: [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property LimitViolatingParameterTemplate() As String
+            Get
+                Return ResourceManager.GetString("LimitViolatingParameterTemplate", resourceCulture)
             End Get
         End Property
         

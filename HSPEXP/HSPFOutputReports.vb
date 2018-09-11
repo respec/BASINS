@@ -245,11 +245,27 @@ Module HSPFOutputReports
                 If pModelQAQC Then
                     QAQCReportFile.AppendLine("<html>")
                     QAQCReportFile.AppendLine("<head>")
-                    QAQCReportFile.AppendLine("<style>")
-                    QAQCReportFile.AppendLine("  table, th, td {")
-                    QAQCReportFile.AppendLine("  border:1px solid black;")
-                    QAQCReportFile.AppendLine("  }")
-                    QAQCReportFile.AppendLine("</style>")
+                    QAQCReportFile.AppendLine("<style>
+                                                  table, th {
+                                                  border:2px solid #DEDFE0;
+                                                  border-collapse:collapse;
+                                                  border-top-color: #ef3e32;
+                                                  border-bottom-color: #ef3e32;
+                                                  font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px;}
+                                                  td {
+                                                  border:2px solid #DEDFE0;
+                                                  border-collapse:collapse;
+                                                  font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px;}
+                                                    
+                                                  h1 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; color: black; text-transform: uppercase;} 
+                                                  h2 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 18px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; color: #ef3e32;text-transform: uppercase;} } 
+                                                  h3 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } 
+                                                  p { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } 
+                                                  li { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; }
+                                                  blockquote { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } 
+                                                  pre { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
+                                                </style>")
+
                     QAQCReportFile.AppendLine("</head>")
                     QAQCReportFile.AppendLine("<body>")
                     QAQCReportFile.AppendLine(GeneralModelInfo(aHspfUci, lRunMade))
@@ -701,18 +717,10 @@ Module HSPFOutputReports
                 If pModelQAQC Then
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
-                    'Try
                     File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
-                    'Catch
-                    'If file is open give warning and then close its
-
-                    'End Try
                 End If
                 Logger.Status(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
-
-                'pProgressBar.pbProgress.Increment(39)
-
                 Logger.Dbg(Now & " HSPEXP+ Complete")
                 Logger.Msg("HSPEXP+ is complete")
 
@@ -720,20 +728,12 @@ Module HSPFOutputReports
             End Using
         Catch ex As Exception
             'Skip to the end if Cancel was chosen in felu            
-
             Logger.Msg(ex.ToString, MsgBoxStyle.Critical, "HSPEXP+ did not complete successfully.")
-
-
         End Try
-
         Logger.Status("")
         atcDataManager.Clear()
         StartUp.Show()
-        'Call Application.Exit()
-
     End Sub
-
-
     ''' <summary>
     ''' This function looks at each parameter limit in the XML list of parameters and compares them to the values in the UCI file. If the values are not within the 
     ''' limits, it is mentioned in the report.
@@ -743,7 +743,6 @@ Module HSPFOutputReports
     ''' <returns></returns>
     Private Function CheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
         Dim HSPFParmTable As XmlDocument = New XmlDocument()
-        'Dim xmlFileIsThere As Boolean = FileExists(FindFile("", "HSPFParmValues.xml"))
         Dim TableName As String = ""
         Dim ParameterName As String
         Dim MaxValue As Double = 0
@@ -753,10 +752,68 @@ Module HSPFOutputReports
         Dim lTotalParmIssues As Integer = 0
         HSPFParmTable.LoadXml(My.Resources.HSPFParmValues) '    
         ParameterInfo.AppendLine("<h2>Model Parameter Value Analysis</h2>")
-        'ParameterInfo.AppendLine("<h3>Following issues were noted with the model parameter values.</h3>")
-        ParameterInfo.Append("<ul>")
 
         Dim nodes As XmlNodeList = HSPFParmTable.DocumentElement.SelectNodes("Parm")
+        Dim lParameterViolationTable As DataTable
+        lParameterViolationTable = New DataTable("ModelParameterInfo")
+        Dim lColumn As DataColumn
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_TYPE"
+        lColumn.Caption = "Operation Type"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_NUM"
+        lColumn.Caption = "Operation Number"
+        lColumn.DataType = Type.GetType("System.Int16")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_INFO"
+        lColumn.Caption = "Operation Information"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PARM_Table"
+        lColumn.Caption = "Parameter Table"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PARM_Name"
+        lColumn.Caption = "Parameter Name"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "ConstName"
+        lColumn.Caption = "Constituent Name"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+
+        lColumn.ColumnName = "ModelValue"
+        lColumn.Caption = "Model Value"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TypicalMin"
+        lColumn.Caption = "Typical Min"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TypicalMax"
+        lColumn.Caption = "Typical Max"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        Dim lrow As DataRow
 
         For Each node As XmlNode In nodes
             OperationType = node.SelectSingleNode("OPNTYPE").InnerText
@@ -767,14 +824,30 @@ Module HSPFOutputReports
                 IsMonthlyValuePossible = CInt(node.SelectSingleNode("IsMonthlyPossible").InnerText)
             Catch
             End Try
+            Dim lActivityFlag As String = ""
+
+            lActivityFlag = node.SelectSingleNode("ACTIVITYFLAG").InnerText
+
+            If lActivityFlag.Length = 0 Then Continue For
+
             Dim MonthlyFlagTable As String = node.SelectSingleNode("FlagTable").InnerText
             Dim MonthlyFlagParm As String = node.SelectSingleNode("FlagParm").InnerText
             Dim MonthlyParmTable As String = node.SelectSingleNode("MonthlyParmTable").InnerText
             Dim lQualConstituentName As String = ""
             Logger.Dbg("Looking at Table " & TableName & "Parameter " & ParameterName)
             lQualConstituentName = node.SelectSingleNode("ConstituentName").InnerText
+            Dim lQUALID As Integer = 0
             If lQualConstituentName.Length > 0 Then
-                Continue For 'Not dealing with quality constituents right now
+                Select Case lQualConstituentName
+                    Case "NH3+NH4"
+                        lQUALID = 1
+                    Case "NO3"
+                        lQUALID = 2
+                    Case "ORTHO P"
+                        lQUALID = 3
+                    Case "BOD"
+                        lQUALID = 4
+                End Select
             End If
 
             Try
@@ -786,55 +859,140 @@ Module HSPFOutputReports
 
             Dim lMessageCountPerParameter As Integer = 0
             For Each loperation As HspfOperation In aUCI.OpnBlks(OperationType).Ids
-                Dim FlagValue As Integer = 0
+                'Looping through each operation for a specific parameter 
+                Dim lActivityFlagValue As Integer = 0
+                lActivityFlagValue = loperation.Tables("ACTIVITY").Parms(lActivityFlag).Value
+                If lActivityFlagValue = 0 Then Continue For
+                Dim lMonthlyFlagValue As Integer = 0
                 If IsMonthlyValuePossible = 1 Then
                     Try
-                        FlagValue = loperation.Tables(MonthlyFlagTable).Parms(MonthlyFlagParm).Value
+                        lMonthlyFlagValue = loperation.Tables(MonthlyFlagTable).Parms(MonthlyFlagParm).Value
                     Catch
-                        FlagValue = 0
+                        lMonthlyFlagValue = 0
                     End Try
                 End If
-                If FlagValue = 1 Then
-                    'Logger.Dbg("Looking at Monthly Parm Table" & MonthlyParmTable)
-                    If MonthlyParmTable = "MON-LGTP2" And loperation.Tables("PSTEMP-PARM1").Parms("TSOPFG").Value = 1 Then
-                        Exit For
-                    End If
+                Try
 
-                    For Each MonthlyParm As HspfParm In loperation.Tables(MonthlyParmTable).Parms
-                            If MonthlyParm.Value < MinValue OrElse MonthlyParm.Value > MaxValue Then
-                                lTotalParmIssues += 1
-                                ParameterInfo.AppendLine("<li>" & MonthlyParm.Name & " in the Table " & TableName & " for " &
-                                OperationType & loperation.Id & " <b>(" & MonthlyParm.Value & ")</b> is outside the typical limit of <b>" & MinValue & " - " & MaxValue & "</b>.</li>")
-                                'lprintLine = True
+
+                    If lQUALID = 0 Then
+                        If lMonthlyFlagValue = 0 Then
+                            Dim lParmValue As Double = loperation.Tables(TableName).Parms(ParameterName).Value
+                            If lParmValue > MaxValue OrElse lParmValue < MinValue Then
+                                lrow = lParameterViolationTable.NewRow
+                                lrow("OPN_TYPE") = OperationType
+                                lrow("OPN_NUM") = loperation.Id
+                                lrow("OPN_INFO") = loperation.Description
+                                lrow("PARM_TABLE") = TableName
+                                lrow("PARM_NAME") = ParameterName
+                                lrow("ConstName") = ""
+                                lrow("ModelValue") = lParmValue
+                                lrow("TypicalMin") = MinValue
+                                lrow("TypicalMax") = MaxValue
+                                lParameterViolationTable.Rows.Add(lrow)
                             End If
-                        Next
-                        Continue For
+                        Else
+                            If MonthlyParmTable = "MON-LGTP2" AndAlso loperation.Tables("PSTEMP-PARM1").Parms("TSOPFG").Value = 1 Then
+                                Exit For
+                            End If
+
+                            For Each MonthlyParm As HspfParm In loperation.Tables(MonthlyParmTable).Parms
+                                If MonthlyParm.Value < MinValue OrElse MonthlyParm.Value > MaxValue Then
+                                    lrow = lParameterViolationTable.NewRow
+                                    lrow("OPN_TYPE") = OperationType
+                                    lrow("OPN_NUM") = loperation.Id
+                                    lrow("OPN_INFO") = loperation.Description
+                                    lrow("PARM_TABLE") = MonthlyParmTable
+                                    lrow("PARM_NAME") = MonthlyParm.Name
+                                    lrow("ConstName") = ""
+                                    lrow("ModelValue") = MonthlyParm.Value
+                                    lrow("TypicalMin") = MinValue
+                                    lrow("TypicalMax") = MaxValue
+                                    lParameterViolationTable.Rows.Add(lrow)
+                                End If
+                            Next
+
+                        End If
+
+                    Else
+                        Dim lTempTABLEName As String = TableName
+                        If lQUALID > 1 Then lTempTABLEName = TableName & ":" & lQUALID
+                        If lMonthlyFlagValue = 0 Then
+                            Dim lParmValue As Double = loperation.Tables(lTempTABLEName).Parms(ParameterName).Value
+                            If lParmValue > MaxValue OrElse lParmValue < MinValue Then
+                                lrow = lParameterViolationTable.NewRow
+                                lrow("OPN_TYPE") = OperationType
+                                lrow("OPN_NUM") = loperation.Id
+                                lrow("OPN_INFO") = loperation.Description
+                                lrow("PARM_TABLE") = lTempTABLEName
+                                lrow("PARM_NAME") = ParameterName
+                                lrow("ConstName") = ""
+                                lrow("ModelValue") = lParmValue
+                                lrow("TypicalMin") = MinValue
+                                lrow("TypicalMax") = MaxValue
+                                lParameterViolationTable.Rows.Add(lrow)
+                            End If
+                        Else
+                            Dim lTempMonthlyTable As String = MonthlyParmTable
+                            If lQUALID > 1 Then lTempMonthlyTable = MonthlyParmTable & ":" & lQUALID
+                            For Each MonthlyParm As HspfParm In loperation.Tables(lTempMonthlyTable).Parms
+                                If MonthlyParm.Value < MinValue OrElse MonthlyParm.Value > MaxValue Then
+                                    'lMonthlyParmCount += 1
+                                    lrow = lParameterViolationTable.NewRow
+                                    lrow("OPN_TYPE") = OperationType
+                                    lrow("OPN_NUM") = loperation.Id
+                                    lrow("OPN_INFO") = loperation.Description
+                                    lrow("PARM_TABLE") = lTempMonthlyTable
+                                    lrow("PARM_NAME") = MonthlyParm.Name
+                                    lrow("ConstName") = lQualConstituentName
+                                    lrow("ModelValue") = MonthlyParm.Value
+                                    lrow("TypicalMin") = MinValue
+                                    lrow("TypicalMax") = MaxValue
+                                    lParameterViolationTable.Rows.Add(lrow)
+                                End If
+                            Next
+
+                        End If
 
                     End If
-                    Try
-                    If loperation.Tables(TableName).Parms(ParameterName).Value > MaxValue OrElse
-                    loperation.Tables(TableName).Parms(ParameterName).Value < MinValue Then
-                        lTotalParmIssues += 1
-                        ParameterInfo.AppendLine("<li>" & ParameterName & " in the Table " & TableName & " for " &
-                    OperationType & loperation.Id & " <b>(" & loperation.Tables(TableName).Parms(ParameterName).Value &
-                    ")</b> is outside the typical limit of <b>" & MinValue & " - " & MaxValue & "</b>.</li>")
-                    End If
-                Catch
+                Catch ex As Exception
 
                 End Try
-                If lTotalParmIssues > 4 Then
-                    ParameterInfo.AppendLine("<p>Five instances of the typical limit excursions of this parameter for this operation has been noticed. 
-                                                These messages for this parameter will not be repeated.</p>")
-                End If
-
             Next loperation
 
         Next
-        ParameterInfo.Append("</ul>")
-        If lTotalParmIssues = 0 Then
-            ParameterInfo.AppendLine("<h3>No parameter issues were encountered in the model.</h3>")
+
+        If lParameterViolationTable.Rows.Count = 0 Then
+
+            ParameterInfo.AppendLine("<p>All the tested parameters are within the typical range.</p>")
+
         End If
+        If lParameterViolationTable.Rows.Count > 0 And lParameterViolationTable.Rows.Count <= 10 Then
+
+            ParameterInfo.AppendLine("<p>Following parameters were beyond the typical range.")
+            ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable))
+
+        End If
+        If lParameterViolationTable.Rows.Count > 10 Then
+            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterTableTemplate.xsl"))
+            lXSLFile.Write(My.Resources.LimitViolatingParameterTemplate)
+            lXSLFile.Close()
+            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterReport.xml"))
+            lParameterInfo.WriteLine("<?xml version=""1.0"" encoding=""UTF-8""?>")
+            lParameterInfo.WriteLine("<?xml-stylesheet version=""1.0"" type=""text/xsl"" href=""ParameterTableTemplate.xsl""?>")
+            lParameterViolationTable.WriteXml(lParameterInfo, XmlWriteMode.IgnoreSchema)
+            lParameterInfo.Close()
+
+            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. First 10 cases are listed below and all the 
+                                        range violations are listed in a <a href=./ParameterReport.xml>separate xml table.</a></p>")
+
+            ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable, 10))
+        End If
+
+
         Return ParameterInfo.ToString
+
+
+
     End Function
     ''' <summary>
     ''' This function outputs heading of the QA/QC report and some general information.
@@ -864,8 +1022,8 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("<h2>General Model Information</h2>")
         GeneralModelInfoText.AppendLine("<table>")
         GeneralModelInfoText.AppendLine("  <tr>")
-        GeneralModelInfoText.AppendLine("    <td>Model File Name</td>")
-        GeneralModelInfoText.AppendLine("    <td align=center>" & aUCI.Name & "</td>")
+        GeneralModelInfoText.AppendLine("    <th align=left>Model File Name</th>")
+        GeneralModelInfoText.AppendLine("    <th align=center>" & aUCI.Name & "</th>")
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Model Span</td>")
@@ -991,19 +1149,19 @@ Module HSPFOutputReports
         Select Case aConstituentName
             Case "WAT"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on annual runoff from each land use.</p>")
-                OverAllComments.AppendLine("<img src=Reports_" & aDateString & "/WAT_BoxWhisker.png alt=Annual runoff from each land use. style=width:></img>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
             Case "SED"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on sediment loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=Reports_" & aDateString & "/SED_BoxWhisker.png alt=Sediment loading from each land use.></img>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
             Case "TN"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total nitrogen loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=Reports_" & aDateString & "/TN_BoxWhisker.png alt=Total nitrogen loading from each land use.></img>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
             Case "TP"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total phosphorus loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=Reports_" & aDateString & "/TP_BoxWhisker.png alt=Total phosphorus loading from each land use.></img>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
             Case "BOD-Labile"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png alt=Total BOD-Labile loading from each land use.></img>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
         End Select
 
 
@@ -1248,7 +1406,7 @@ Module HSPFOutputReports
         Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, aConstituentName)
         If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
             CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
-                                                "</b> is outside the typical limit of <b>" & Format(LoadingRate(0), "0.00") & " - " &
+                                                "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
                 Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
         End If
 
@@ -1348,6 +1506,56 @@ Module HSPFOutputReports
 
 
 
+    End Function
+    Private Function ConvertToHtmlFile(ByVal myTable As DataTable, ByVal Optional NumberOfRows As Integer = 0) As String
+        Dim myHtmlFile As String = ""
+        Dim myBuilder As New Text.StringBuilder
+        Dim ColumnCounter As Integer = 0
+        If myTable Is Nothing Then
+            Throw New System.ArgumentNullException("myTable")
+        Else
+            myBuilder.AppendLine("<table style = width:100%>")
+            myBuilder.AppendLine("<tr>")
+            For Each myColumn As DataColumn In myTable.Columns
+                ColumnCounter += 1
+                If ColumnCounter = 1 Then
+                    myBuilder.Append("<th align=""left"">")
+                Else
+                    myBuilder.Append("<th>")
+                End If
+                myBuilder.Append(myColumn.Caption)
+                myBuilder.AppendLine("</th>")
+            Next
+            myBuilder.AppendLine("</tr>")
+
+            Dim MyRowCounter As Integer = 0
+            ColumnCounter = 0
+            For Each myRow As DataRow In myTable.Rows
+                MyRowCounter += 1
+                myBuilder.AppendLine("<tr>")
+                For Each myColumn As DataColumn In myTable.Columns
+                    ColumnCounter += 1
+                    If ColumnCounter = 1 Then
+                        myBuilder.Append("<td align=""left"">")
+                    Else
+                        myBuilder.Append("<td align=""center"">")
+                    End If
+
+                    myBuilder.Append(myRow(myColumn.ColumnName).ToString())
+                    myBuilder.AppendLine("</td>")
+                Next
+                ColumnCounter = 0
+                If NumberOfRows <> 0 AndAlso MyRowCounter = NumberOfRows Then Exit For
+            Next
+            myBuilder.AppendLine("</tr>")
+
+        End If
+
+        'Close tags. 
+        myBuilder.AppendLine("</table>")
+
+        myHtmlFile = myBuilder.ToString()
+        Return myHtmlFile
     End Function
 End Module
 
