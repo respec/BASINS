@@ -204,7 +204,6 @@ atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON15.vbproj.FileListAbsolute.txt
 *.suo
 *.cache
 *.force
-*.xml
 *.FIL
 *.exe
 *.config
@@ -217,7 +216,6 @@ Application.Designer.vb
 Resources.Designer.vb
 Resources.resx
 *.pdb
-*.xml
 *.dll
 *.resources
 *.manifest

@@ -258,7 +258,7 @@ Module HSPFOutputReports
                                                   font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px;}
                                                     
                                                   h1 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; color: black; text-transform: uppercase;} 
-                                                  h2 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 18px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; color: #ef3e32;text-transform: uppercase;} } 
+                                                  h2 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 18px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; color: #ef3e32;text-transform: uppercase;} 
                                                   h3 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } 
                                                   p { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } 
                                                   li { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; }
@@ -303,20 +303,20 @@ Module HSPFOutputReports
 
 #End Region
 #Region "Area Report Generation"
-                'If pMakeAreaReports Then
-                '    Dim alocations As New atcCollection
-                '    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                If pMakeAreaReports Then
+                    Dim alocations As New atcCollection
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
 
-                '        alocations.Add("R:" & lRCHRES.Id)
+                        alocations.Add("R:" & lRCHRES.Id)
 
-                '    Next
-                '    Logger.Status(Now & " Producing Area Reports.", True)
-                '    Logger.Dbg(Now & " Producing land use and area reports")
-                '    'Now the area reports are generated for all the reaches in the UCI file.
-                '    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
-                '    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
-                '    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
-                'End If
+                    Next
+                    Logger.Status(Now & " Producing Area Reports.", True)
+                    Logger.Dbg(Now & " Producing land use and area reports")
+                    'Now the area reports are generated for all the reaches in the UCI file.
+                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+                    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+                    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
+                End If
 #End Region
 
 #Region "Hydrology Calibration"
@@ -1009,6 +1009,9 @@ Module HSPFOutputReports
                                         lead to hydrologic and water quality complexities that do not conform to the judgments that 
                                         are embedded in this module.  Furthermore, the set of aspects for which checks have been 
                                         included is not all-inclusive.</p>")
+        GeneralModelInfoText.AppendLine("<p>This module also assumes that first four water quality constituents simulated on the land are  
+                                        ammonia (NH3+NH4), nitrate as nitrogen (NO3), orthophosphorus as phosphorus (ORTHO P), and biochemical 
+                                        oxygen demand (BOD) in the order that they are listed here with the QUALID as it is listed in the parenthesis.</p>")
         GeneralModelInfoText.AppendLine("<h2>How to use the QA/QC Report</h2>")
         GeneralModelInfoText.AppendLine("<p>The sequence of messages that are contained in the QA/QC Report for any UCI and its 
                                         resulting output will flag aspects of the model input and output that are considered 
@@ -1041,7 +1044,7 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>HSPEXP+ Version </td>")
-        GeneralModelInfoText.AppendLine("    <td align=center>2.0</td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>3.0 beta</td>")
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
@@ -1096,9 +1099,16 @@ Module HSPFOutputReports
         aLandLoadingConstReport.Columns.Add(newColumn)
         Dim UCILandUse As String = ""
         Dim ListofLandUsesInUCI As New List(Of String)
+        Dim OpTypeNumber As String = ""
         For Each row As DataRow In aLandLoadingConstReport.Rows
             UCILandUse = row("OpDesc")
+            OpTypeNumber = row("OpTypeNumber")
+            If OpTypeNumber.StartsWith("I:") Then
+                row("genLandUse") = "Impervious"
+                Continue For
+            End If
             row("genLandUse") = FindGeneralLandUse(UCILandUse)
+
             If Not ListofLandUsesInUCI.Contains(row("genLandUse")) And Not row("genLandUse") = "Unknown" Then
                 ListofLandUsesInUCI.Add(row("genLandUse"))
             End If
@@ -1136,7 +1146,7 @@ Module HSPFOutputReports
 
 
         If aConstituentName = "BOD-Labile" Then
-            OverAllComments.AppendLine("BOD-Labile only includes labile fraction of total organic that enters the RCHRES as OXIF 2 Member of Group INFLOW.")
+            OverAllComments.AppendLine("<p>BOD-Labile only includes labile fraction of total organic that enters the RCHRES as OXIF 2 Member of Group INFLOW.</p>")
         End If
 
         If LoadingRateComments.Length > 0 Then
@@ -1175,29 +1185,27 @@ Module HSPFOutputReports
     ''' <returns></returns>
     Private Function FindGeneralLandUse(ByVal aUCILandUse As String) As String
         Dim GeneralLandUse As String = "Unknown"
+
         If aUCILandUse.ToLower.Contains("forest") Then
             GeneralLandUse = "Forest"
             Return GeneralLandUse
         ElseIf aUCILandUse.ToLower.Contains("crop") OrElse aUCILandUse.ToLower.Contains("agric") Then
             GeneralLandUse = "Ag/Other"
             Return GeneralLandUse
-        ElseIf aUCILandUse.ToLower.Contains("urban") Then
+        ElseIf aUCILandUse.ToLower.Contains("urban") OrElse aUCILandUse.ToLower.Contains("develop") Then
             GeneralLandUse = "Urban"
             Return GeneralLandUse
         End If
-        Using strReader As New IO.StringReader(My.Resources.LandUseNames_Mappings)
-            Using MyReader As New FileIO.TextFieldParser(strReader)
-                MyReader.TextFieldType = FileIO.FieldType.Delimited
-                MyReader.SetDelimiters(",")
-                Dim CurrentRow As String()
-                While Not MyReader.EndOfData
-                    CurrentRow = MyReader.ReadFields
-                    If CurrentRow(0) = aUCILandUse Then
-                        Return CurrentRow(1)
-                    End If
-                End While
-            End Using
-        End Using
+
+        Dim LanduseMappings As XmlDocument = New XmlDocument
+        LanduseMappings.LoadXml(My.Resources.LandUseNames_Mappings)
+        Dim nodes As XmlNodeList = LanduseMappings.DocumentElement.SelectNodes("landusename")
+        For Each node As XmlNode In nodes
+            If node.SelectSingleNode("UCILandUse").InnerText = aUCILandUse Then
+                Return node.SelectSingleNode("GeneralLandUse").InnerText
+            End If
+        Next
+
         Return GeneralLandUse
     End Function
     Private Function CheckIrrigation(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable) As String
@@ -1230,10 +1238,15 @@ Module HSPFOutputReports
         Dim TotalOutFlow As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression)
         Dim TotalSurfaceRunoff As Double = aLandLoadingConstReport.Compute("AVG(SURO)", lSelectExpression)
         Dim TotalBaseFlow As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+        Dim TotalLZET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+        Dim TotalUZET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+        Dim TotalAGWET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
         Dim CheckRunoffStatement As New Text.StringBuilder
         If TotalSurfaceRunoff > TotalBaseFlow Then
             CheckRunoffStatement.AppendLine("<li>Surface runoff is greater than baseflow for " & aLanduse & ".</li>")
         End If
+
+
 
         Select Case aLanduse
             Case "Forest"
@@ -1266,6 +1279,15 @@ Module HSPFOutputReports
                         CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than " & landuse2 & ".</li>")
                     End If
                 Next
+
+            Case "Impervious"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                    If TotalOutFlow < TotalOutflow2 Then
+                        CheckRunoffStatement.AppendLine("<li>" & landuse2 & " has greater outflow than impervious areas.</li>")
+                    End If
+                Next
         End Select
 
         Return CheckRunoffStatement.ToString
@@ -1295,6 +1317,11 @@ Module HSPFOutputReports
         If aLanduse <> "Wetland" AndAlso WetlandLUExists AndAlso GroundWaterET > 0 Then
             CheckETIssuesStatement.AppendLine("<li>Groundwater is being lost through evapotranspiration in " & aLanduse & " even though there is a separate Wetland land use.</li>")
         End If
+
+        If UpperZoneET > LowerZoneET Then
+            CheckETIssuesStatement.AppendLine("<li>Eaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
+        End If
+
 
         Select Case aLanduse
 
@@ -1380,10 +1407,16 @@ Module HSPFOutputReports
                         CheckTotalSedErosion.AppendLine("<li>Wetland has greater sediment runoff than " & landuse2 & ".</li>")
                     End If
                 Next
+
+            Case "Impervious"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
+                    If TotalSedRunoff2 > TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Impervious area has greater sediment runoff than " & landuse2 & ".</li>")
+                    End If
+                Next
         End Select
-
-
-
         Return CheckTotalSedErosion.ToString
     End Function
     ''' <summary>

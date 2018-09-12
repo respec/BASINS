@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<LoadingRates>
+  <Nutrient type="SED">
+    <Landuse name="Forest">
+        <Min>100</Min>
+        <Max>300</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>400</Min>
+        <Max>2000</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>300</Min>
+        <Max>1000</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>200</Min>
+        <Max>3000</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0</Min>
+        <Max>200</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>100</Min>
+        <Max>500</Max>
+    </Landuse>
+  </Nutrient>
+  <Nutrient type="NO3">
+    <Landuse name="Forest">
+        <Min>1</Min>
+        <Max>5</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>1</Min>
+        <Max>15</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>3</Min>
+        <Max>10</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>10</Min>
+        <Max>30</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0</Min>
+        <Max>5</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>2</Min>
+        <Max>5</Max>
+    </Landuse>
+  </Nutrient>
+  <Nutrient type="TAM">
+    <Landuse name="Forest">
+        <Min>0.1</Min>
+        <Max>1.0</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>0.2</Min>
+        <Max>1.5</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>0.2</Min>
+        <Max>20</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>0.5</Min>
+        <Max>2.0</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0.1</Min>
+        <Max>1.0</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>0.5</Min>
+        <Max>1.5</Max>
+    </Landuse>
+  </Nutrient>
+  <Nutrient type="TN">
+    <Landuse name="Forest">
+        <Min>2</Min>
+        <Max>8</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>2</Min>
+        <Max>25</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>5</Min>
+        <Max>15</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>10</Min>
+        <Max>50</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>2</Min>
+        <Max>8</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>3</Min>
+        <Max>10</Max>
+    </Landuse>
+  </Nutrient>
+  <Nutrient type="PO4">
+    <Landuse name="Forest">
+        <Min>0.02</Min>
+        <Max>0.10</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>0.2</Min>
+        <Max>2.0</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>0.1</Min>
+        <Max>1.0</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>0.3</Min>
+        <Max>2.0</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0.02</Min>
+        <Max>0.10</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>0.2</Min>
+        <Max>0.7</Max>
+    </Landuse>
+  </Nutrient>  
+  <Nutrient type="TP">
+    <Landuse name="Forest">
+        <Min>0.05</Min>
+        <Max>0.50</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>0.5</Min>
+        <Max>2.5</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>0.3</Min>
+        <Max>1.5</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>0.5</Min>
+        <Max>3.0</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0.05</Min>
+        <Max>0.50</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>0.3</Min>
+        <Max>1.0</Max>
+    </Landuse>
+  </Nutrient>  
+  <Nutrient type="BOD-Labile">
+    <Landuse name="Forest">
+        <Min>0.8</Min>
+        <Max>8.0</Max>
+    </Landuse>
+    <Landuse name="Pasture">
+        <Min>2.0</Min>
+        <Max>28</Max>
+    </Landuse>
+    <Landuse name="Urban">
+        <Min>2.0</Min>
+        <Max>6.0</Max>
+    </Landuse>
+    <Landuse name="Ag/Other">
+        <Min>4.0</Min>
+        <Max>12.0</Max>
+    </Landuse>
+    <Landuse name="Wetland">
+        <Min>0.8</Min>
+        <Max>8.0</Max>
+    </Landuse>
+    <Landuse name="Impervious">
+        <Min>1.2</Min>
+        <Max>8.0</Max>
+    </Landuse>
+  </Nutrient>  
+
+</LoadingRates>

@@ -88,26 +88,22 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to UCILandUse,GeneralLandUse
-        '''Forest South HSG-lo,Forest
-        '''Forest South HSG-hi,Forest
-        '''Forest North HSG-lo,Forest
-        '''Forest North HSG-hi,Forest
-        '''PastureHay S HSG-lo,Pasture
-        '''PastureHay S HSG-hi,Pasture
-        '''PastureHay N HSG-lo,Pasture
-        '''PastureHay N HSG-hi,Pasture
-        '''Row Crops,Ag/Other
-        '''Farmsteads,Ag/Other
-        '''Urban/rec Grass,Urban
-        '''Wetland/water,Wetland
-        '''LowDensity Resident,Urban
-        '''HighDensity Resident,Urban
-        '''Comm/Indust/Trans,Urban
-        '''Landslide/Sediment,Unknown
-        '''Harbor Brook basin,Unknown
-        '''Otisco Lake basin,Unknown
-        '''FOREST, [rest of string was truncated]&quot;;.
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        '''&lt;landusemapping&gt;
+        '''  &lt;landusename&gt;
+        '''    &lt;UCILandUse&gt;Forest South HSG-lo&lt;/UCILandUse&gt;
+        '''    &lt;GeneralLandUse&gt;Forest&lt;/GeneralLandUse&gt;
+        '''  &lt;/landusename&gt;
+        '''  &lt;landusename&gt;
+        '''    &lt;UCILandUse&gt;Forest South HSG-hi&lt;/UCILandUse&gt;
+        '''    &lt;GeneralLandUse&gt;Forest&lt;/GeneralLandUse&gt;
+        '''  &lt;/landusename&gt;
+        '''  &lt;landusename&gt;
+        '''    &lt;UCILandUse&gt;Forest North HSG-lo&lt;/UCILandUse&gt;
+        '''    &lt;GeneralLandUse&gt;Forest&lt;/GeneralLandUse&gt;
+        '''  &lt;/landusename&gt;
+        '''  &lt;landusename&gt;
+        '''    &lt;UCILandUse&gt;Forest North HSG-hi&lt;/UCILandUse [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property LandUseNames_Mappings() As String
             Get
@@ -118,17 +114,20 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
         '''&lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
-        '''&lt;xsl:template match=&quot;/&quot;&gt;
-        '''&lt;html&gt;
-        '''&lt;body&gt;
-        '''  &lt;h2&gt;Model Parameter Information&lt;/h2&gt;
-        '''  &lt;table border=&quot;1&quot;&gt;
-        '''    &lt;tr bgcolor=&quot;#9acd32&quot;&gt;
-        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Type&lt;/th&gt;
-        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Number&lt;/th&gt;
-        '''      &lt;th style=&quot;text-align:center&quot;&gt;Operation Name&lt;/th&gt;
-        '''      &lt;th style=&quot;text-align:center&quot;&gt;Parameter Table&lt;/th&gt;
-        '''      &lt;th style=&quot;text-align: [rest of string was truncated]&quot;;.
+        '''  &lt;xsl:template match=&quot;/&quot;&gt;
+        '''    &lt;html&gt;
+        '''      &lt;head&gt;
+        '''        &lt;style&gt;
+        '''          table, th{
+        '''          border:2px solid #DEDFE0;
+        '''          border-collapse:collapse;
+        '''          border-top-color: #ef3e32;
+        '''          border-bottom-color: #ef3e32;
+        '''          font-family: &quot;Arial Narrow&quot;, Arial, sans-serif; font-size: 14px;
+        '''          }
+        '''          td{
+        '''          border:2px solid #DEDFE0;
+        '''     [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property LimitViolatingParameterTemplate() As String
             Get

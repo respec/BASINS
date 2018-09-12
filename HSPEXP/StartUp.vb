@@ -262,7 +262,7 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP200_Manual.pdf")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP20_Manual.pdf")
     End Sub
 
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged

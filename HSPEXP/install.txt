@@ -1,3 +1,12 @@
+Date: 09/12/2018
+HSPEXP+3.0beta is the development version for the next version of HSPEXP+.
+Features:
+1. This version includes Model QA/QC report. The model QA/QC report is under development and it must be used with extreme caution.
+
+Bugs Fixed:
+1. The expert statistic calculated the years of simulation as an integer. This skewed calculations for models with very small model span. That has been fixed.
+2. The location of help file was not coded properly in the previous version. That has been fixed.
+
 Date: 06/15/2018
 
 HSPEXP+2.0 is a major upgrade to HSPEXP+1.32. The following list of features added and bugs fixed for the version 2.0 includes all added features and fixed bugs in the earlier beta versions. The installer is now signed and it tells the users that the installer has been produced by RESPEC. This will reduce the security warnings.
