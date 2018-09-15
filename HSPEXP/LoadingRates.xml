@@ -9,6 +9,10 @@
         <Min>400</Min>
         <Max>2000</Max>
     </Landuse>
+    <Landuse name="Grassland">
+        <Min>400</Min>
+        <Max>2000</Max>
+    </Landuse>
     <Landuse name="Urban">
         <Min>300</Min>
         <Max>1000</Max>
@@ -35,6 +39,11 @@
         <Min>1</Min>
         <Max>15</Max>
     </Landuse>
+    <Landuse name="Grassland">
+        <Min>1</Min>
+        <Max>15</Max>
+    </Landuse>
+    
     <Landuse name="Urban">
         <Min>3</Min>
         <Max>10</Max>
@@ -61,6 +70,11 @@
         <Min>0.2</Min>
         <Max>1.5</Max>
     </Landuse>
+    <Landuse name="Grassland">
+        <Min>0.2</Min>
+        <Max>1.5</Max>
+    </Landuse>
+    
     <Landuse name="Urban">
         <Min>0.2</Min>
         <Max>20</Max>
@@ -84,6 +98,10 @@
         <Max>8</Max>
     </Landuse>
     <Landuse name="Pasture">
+        <Min>2</Min>
+        <Max>25</Max>
+    </Landuse>
+    <Landuse name="Grassland">
         <Min>2</Min>
         <Max>25</Max>
     </Landuse>
@@ -113,6 +131,10 @@
         <Min>0.2</Min>
         <Max>2.0</Max>
     </Landuse>
+    <Landuse name="Grassland">
+        <Min>0.2</Min>
+        <Max>2.0</Max>
+    </Landuse>
     <Landuse name="Urban">
         <Min>0.1</Min>
         <Max>1.0</Max>
@@ -136,6 +158,10 @@
         <Max>0.50</Max>
     </Landuse>
     <Landuse name="Pasture">
+        <Min>0.5</Min>
+        <Max>2.5</Max>
+    </Landuse>
+    <Landuse name="Grassland">
         <Min>0.5</Min>
         <Max>2.5</Max>
     </Landuse>
@@ -165,6 +191,11 @@
         <Min>2.0</Min>
         <Max>28</Max>
     </Landuse>
+      <Landuse name="Grassland">
+        <Min>2.0</Min>
+        <Max>28</Max>
+    </Landuse>
+    
     <Landuse name="Urban">
         <Min>2.0</Min>
         <Max>6.0</Max>

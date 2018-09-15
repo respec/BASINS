@@ -35,13 +35,13 @@
           </tr>
           <xsl:for-each select="DocumentElement/ModelParameterInfo">
             <tr>
-              <td>
+              <td style="text-align:left">
                 <xsl:value-of select="OPN_TYPE"/>
               </td>
               <td style="text-align:center">
                 <xsl:value-of select="OPN_NUM"/>
               </td>
-              <td style="text-align:center">
+              <td style="text-align:left">
                 <xsl:value-of select="OPN_INFO"/>
               </td>
               <td style="text-align:center">

@@ -164,30 +164,5 @@ Namespace My.Resources
                 Return ResourceManager.GetString("LoadingRates", resourceCulture)
             End Get
         End Property
-        
-        '''<summary>
-        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-        '''&lt;MONTHLYTABLE&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmTable&gt;SNOW-PARM1&lt;/ParmTable&gt;
-        '''    &lt;ParmName&gt;KMELT&lt;/ParmName&gt;
-        '''    &lt;FlagTable&gt;SNOW-FLAGS&lt;/FlagTable&gt;
-        '''    &lt;FlagName&gt;VKMFG&lt;/FlagName&gt;
-        '''    &lt;MonTable&gt;MON-MELT-FRAC&lt;/MonTable&gt;
-        '''    &lt;MonParmName&gt;KMELTM&lt;/MonParmName&gt;
-        '''  &lt;/Parm&gt;
-        '''  &lt;Parm&gt;
-        '''    &lt;ParmTable&gt;PWAT-PARM4&lt;/ParmTable&gt;
-        '''    &lt;ParmName&gt;CEPSC&lt;/ParmName&gt;
-        '''    &lt;FlagTable&gt;PWAT-PARM1&lt;/FlagTable&gt;
-        '''    &lt;FlagName&gt;VCSFG&lt;/FlagName&gt;
-        '''    &lt;MonTable&gt;MON-INTERCEP&lt;/MonTable&gt;
-        '''    &lt;MonParmName&gt;CEPSCM [rest of string was truncated]&quot;;.
-        '''</summary>
-        Friend ReadOnly Property MonthlyParmForMonthlyParm() As String
-            Get
-                Return ResourceManager.GetString("MonthlyParmForMonthlyParm", resourceCulture)
-            End Get
-        End Property
     End Module
 End Namespace

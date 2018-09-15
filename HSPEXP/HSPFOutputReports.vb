@@ -615,11 +615,6 @@ Module HSPFOutputReports
 
                             ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
                             If pModelQAQC Then
-                                Dim lSimSpan As Double = aHspfUci.GlobalBlock.EdateJ - aHspfUci.GlobalBlock.SDateJ
-                                QAQCReportFile.AppendLine("<h2>" & lConstituent & " Reach Storage Analysis</h2>")
-                                If lSimSpan < 1827 Then
-                                    QAQCReportFile.AppendLine("<p>The time span of simulation is shorter than 5 years. The long term trend analysis may not be accurate.</p>")
-                                End If
                                 QAQCReportFile.AppendLine(VerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                             End If
 
@@ -790,7 +785,7 @@ Module HSPFOutputReports
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "ConstName"
-        lColumn.Caption = "Constituent Name"
+        lColumn.Caption = "Comment/Name"
         lColumn.DataType = Type.GetType("System.String")
         lParameterViolationTable.Columns.Add(lColumn)
 
@@ -819,10 +814,12 @@ Module HSPFOutputReports
             OperationType = node.SelectSingleNode("OPNTYPE").InnerText
             TableName = node.SelectSingleNode("TABLE").InnerText
             ParameterName = node.SelectSingleNode("ParameterName").InnerText
-            Dim IsMonthlyValuePossible As Integer = 0
+            'If ParameterName = "TAUCS" Then Stop
+            Dim IsMonthlyValuePossible As Integer
             Try
                 IsMonthlyValuePossible = CInt(node.SelectSingleNode("IsMonthlyPossible").InnerText)
             Catch
+                IsMonthlyValuePossible = 0
             End Try
             Dim lActivityFlag As String = ""
 
@@ -838,7 +835,7 @@ Module HSPFOutputReports
             lQualConstituentName = node.SelectSingleNode("ConstituentName").InnerText
             Dim lQUALID As Integer = 0
             If lQualConstituentName.Length > 0 Then
-                Select Case lQualConstituentName
+                Select Case lQualConstituentName 'Can look for QUALID fronm the UCI file also.
                     Case "NH3+NH4"
                         lQUALID = 1
                     Case "NO3"
@@ -872,19 +869,26 @@ Module HSPFOutputReports
                     End Try
                 End If
                 Try
-
-
                     If lQUALID = 0 Then
                         If lMonthlyFlagValue = 0 Then
                             Dim lParmValue As Double = loperation.Tables(TableName).Parms(ParameterName).Value
-                            If lParmValue > MaxValue OrElse lParmValue < MinValue Then
+                            Dim lComment As String = ""
+                            'If ParameterName = "TAUCD" Then Stop
+                            If ParameterName = "TAUCD" AndAlso loperation.Tables(TableName).Parms("TAUCS").Value < lParmValue Then
+                                lComment = "TAUCD is greater than TAUCS."
+                            End If
+                            If (ParameterName = "TAUCS" OrElse ParameterName = "TAUCD") AndAlso TableName = "SILT-CLAY-PM" AndAlso
+                                    loperation.Tables("SILT-CLAY-PM:2").Parms(ParameterName).Value > lParmValue Then
+                                lComment &= ParameterName & " for clay is greater than " & ParameterName & " for silt."
+                            End If
+                            If lParmValue > MaxValue OrElse lParmValue < MinValue OrElse lComment.Length > 0 Then
                                 lrow = lParameterViolationTable.NewRow
                                 lrow("OPN_TYPE") = OperationType
                                 lrow("OPN_NUM") = loperation.Id
                                 lrow("OPN_INFO") = loperation.Description
                                 lrow("PARM_TABLE") = TableName
                                 lrow("PARM_NAME") = ParameterName
-                                lrow("ConstName") = ""
+                                lrow("ConstName") = lComment
                                 lrow("ModelValue") = lParmValue
                                 lrow("TypicalMin") = MinValue
                                 lrow("TypicalMax") = MaxValue
@@ -925,7 +929,7 @@ Module HSPFOutputReports
                                 lrow("OPN_INFO") = loperation.Description
                                 lrow("PARM_TABLE") = lTempTABLEName
                                 lrow("PARM_NAME") = ParameterName
-                                lrow("ConstName") = ""
+                                lrow("ConstName") = lQualConstituentName
                                 lrow("ModelValue") = lParmValue
                                 lrow("TypicalMin") = MinValue
                                 lrow("TypicalMax") = MaxValue
@@ -1048,8 +1052,10 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
-        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values, Water"
-
+        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values"
+        If pConstituents.Contains("Water") Then
+            QAQCAnalysis &= ", Water"
+        End If
         If pConstituents.Contains("Sediment") Then
             QAQCAnalysis &= ", Sediment"
         End If
@@ -1105,6 +1111,9 @@ Module HSPFOutputReports
             OpTypeNumber = row("OpTypeNumber")
             If OpTypeNumber.StartsWith("I:") Then
                 row("genLandUse") = "Impervious"
+                If Not ListofLandUsesInUCI.Contains(row("genLandUse")) And Not row("genLandUse") = "Unknown" Then
+                    ListofLandUsesInUCI.Add(row("genLandUse"))
+                End If
                 Continue For
             End If
             row("genLandUse") = FindGeneralLandUse(UCILandUse)
@@ -1209,10 +1218,10 @@ Module HSPFOutputReports
         Return GeneralLandUse
     End Function
     Private Function CheckIrrigation(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable) As String
-        If aLanduse = "Ag/Other" Then Return String.Empty
+        If aLanduse = "Ag/Other" OrElse aLanduse = "Impervious" Then Return String.Empty
         Dim IrrigationStatement As String = String.Empty
         Dim IrrigationApp As Double = 0.0
-        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Try
             IrrigationApp = aLandLoadingConstReport.Compute("AVG(IRRAPP6)", lSelectExpression)
         Catch
@@ -1234,61 +1243,65 @@ Module HSPFOutputReports
     ''' <param name="aListofLandUsesinUCI"></param>
     ''' <returns></returns>
     Private Function CheckRunoff(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable, ByVal aListofLandUsesinUCI As List(Of String)) As String
-        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Dim TotalOutFlow As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression)
         Dim TotalSurfaceRunoff As Double = aLandLoadingConstReport.Compute("AVG(SURO)", lSelectExpression)
-        Dim TotalBaseFlow As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
-        Dim TotalLZET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
-        Dim TotalUZET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
-        Dim TotalAGWET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
         Dim CheckRunoffStatement As New Text.StringBuilder
-        If TotalSurfaceRunoff > TotalBaseFlow Then
-            CheckRunoffStatement.AppendLine("<li>Surface runoff is greater than baseflow for " & aLanduse & ".</li>")
+        If aLanduse = "Impervious" Then
+            For Each landuse2 As String In aListofLandUsesinUCI
+                If landuse2 = "Impervious" Then Continue For
+                Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                If TotalOutflow2 > TotalOutFlow Then
+                    CheckRunoffStatement.AppendLine("<li>" & landuse2 & " has greater runoff than Impervious area.</li>")
+                End If
+            Next
+        Else
+            Dim TotalBaseFlow As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalLZET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalUZET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalAGWET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+
+            If TotalSurfaceRunoff > TotalBaseFlow Then
+                CheckRunoffStatement.AppendLine("<li>Surface runoff is greater than baseflow for " & aLanduse & ".</li>")
+            End If
+
+            Select Case aLanduse
+                Case "Forest"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                        Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                        Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                        Select Case True
+                            Case landuse2 = "Wetland" AndAlso TotalOutflow2 > TotalOutFlow
+                                CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than Forest.</li>")
+                            Case landuse2 <> "Wetland" AndAlso TotalOutflow2 < TotalOutFlow
+                                CheckRunoffStatement.AppendLine("<li>Forest has greater total outflow than " & landuse2 & ".</li>")
+                            Case landuse2 = "Wetland" AndAlso TotalSurfaceRunoff2 > TotalSurfaceRunoff
+                                CheckRunoffStatement.AppendLine("<li>Wetland has greater surface runoff than Forest.</li>")
+                            Case landuse2 <> "Wetland" AndAlso TotalSurfaceRunoff2 < TotalSurfaceRunoff
+                                CheckRunoffStatement.AppendLine("<li>Forest has greater surface runoff than " & landuse2 & ".</li>")
+                        End Select
+                    Next
+
+                Case "Wetland"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                        Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                        Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                        If TotalOutFlow > TotalOutflow2 Then
+                            CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than " & landuse2 & ".</li>")
+                        End If
+                    Next
+
+            End Select
         End If
 
 
-
-        Select Case aLanduse
-            Case "Forest"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" Then Continue For
-                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
-                    Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
-                    Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
-                    Select Case True
-                        Case landuse2 = "Wetland" AndAlso TotalOutflow2 > TotalOutFlow
-                            CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than Forest.</li>")
-                        Case landuse2 <> "Wetland" AndAlso TotalOutflow2 < TotalOutFlow
-                            CheckRunoffStatement.AppendLine("<li>Forest has greater total outflow than " & landuse2 & ".</li>")
-                        Case landuse2 = "Wetland" AndAlso TotalSurfaceRunoff2 > TotalSurfaceRunoff
-                            CheckRunoffStatement.AppendLine("<li>Wetland has greater surface runoff than Forest.</li>")
-                        Case landuse2 <> "Wetland" AndAlso TotalSurfaceRunoff2 < TotalSurfaceRunoff
-                            CheckRunoffStatement.AppendLine("<li>Forest has greater surface runoff than " & landuse2 & ".</li>")
-                    End Select
-                Next
-
-            Case "Wetland"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" Then Continue For
-                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
-                    Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
-                    Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
-                    If TotalOutFlow > TotalOutflow2 Then
-                        CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than " & landuse2 & ".</li>")
-                    End If
-                Next
-
-            Case "Impervious"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    Dim SelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
-                    If TotalOutFlow < TotalOutflow2 Then
-                        CheckRunoffStatement.AppendLine("<li>" & landuse2 & " has greater outflow than impervious areas.</li>")
-                    End If
-                Next
-        End Select
 
         Return CheckRunoffStatement.ToString
     End Function
@@ -1305,55 +1318,72 @@ Module HSPFOutputReports
                                    ByVal aListofLandUsesinUCI As List(Of String),
                                    ByVal WetlandLUExists As Boolean) As String
         Dim CheckETIssuesStatement As New Text.StringBuilder
-        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
-        Dim TotalET As Double = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
-        Dim PotET As Double = aLandLoadingConstReport.Compute("AVG(PET)", lSelectExpression)
-        Dim InterceptionET As Double = aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression)
-        Dim UpperZoneET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression)
-        Dim LowerZoneET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression)
-        Dim GroundWaterET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression)
-        Dim BaseflowET As Double = aLandLoadingConstReport.Compute("AVG(BASET)", lSelectExpression)
+        Dim lSelectExpression As String = ""
+        Dim TotalET As Double = 0
+        If aLanduse = "Impervious" Then
+            lSelectExpression = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+            TotalET = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
+            For Each landuse2 As String In aListofLandUsesinUCI
+                If landuse2 = "Impervious" Then Continue For
+                Dim lSelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                If TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                    CheckETIssuesStatement.AppendLine("<li>Impervious areas have greater ET loss than " & landuse2 & ".</li>")
+                End If
+            Next
 
-        If aLanduse <> "Wetland" AndAlso WetlandLUExists AndAlso GroundWaterET > 0 Then
-            CheckETIssuesStatement.AppendLine("<li>Groundwater is being lost through evapotranspiration in " & aLanduse & " even though there is a separate Wetland land use.</li>")
+        Else
+            lSelectExpression = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+            TotalET = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
+            Dim PotET As Double = aLandLoadingConstReport.Compute("AVG(PET)", lSelectExpression)
+
+            Dim InterceptionET As Double = aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression)
+            Dim UpperZoneET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression)
+            Dim LowerZoneET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression)
+            Dim GroundWaterET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression)
+            Dim BaseflowET As Double = aLandLoadingConstReport.Compute("AVG(BASET)", lSelectExpression)
+
+            If aLanduse <> "Wetland" AndAlso WetlandLUExists AndAlso GroundWaterET > 0 Then
+                CheckETIssuesStatement.AppendLine("<li>Groundwater is being lost through evapotranspiration in " & aLanduse & " even though there is a separate Wetland land use.</li>")
+            End If
+
+            If UpperZoneET > LowerZoneET Then
+                CheckETIssuesStatement.AppendLine("<li>Eaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
+            End If
+
+
+            Select Case aLanduse
+
+                Case "Forest"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        'Comparing Total ET
+                        If landuse2 = "Wetland" AndAlso TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>Forest has more ET than Wetland.</li>")
+                        ElseIf landuse2 <> "Wetland" AndAlso TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Forest.</li>")
+                        End If
+                        'Comparing Interception ET loss
+                        If landuse2 <> "Wetland" AndAlso InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Forest.</li>")
+                        End If
+                    Next landuse2
+
+
+                Case "Wetland"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        If TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Wetland.</li>")
+                        End If
+                        If InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Wetland.</li>")
+                        End If
+                    Next landuse2
+            End Select
         End If
 
-        If UpperZoneET > LowerZoneET Then
-            CheckETIssuesStatement.AppendLine("<li>Eaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
-        End If
-
-
-        Select Case aLanduse
-
-            Case "Forest"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" Then Continue For
-                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    'Comparing Total ET
-                    If landuse2 = "Wetland" AndAlso TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
-                        CheckETIssuesStatement.AppendLine("<li>Forest has more ET than Wetland.</li>")
-                    ElseIf landuse2 <> "Wetland" AndAlso TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
-                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Forest.</li>")
-                    End If
-                    'Comparing Interception ET loss
-                    If landuse2 <> "Wetland" AndAlso InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
-                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Forest.</li>")
-                    End If
-                Next landuse2
-
-
-            Case "Wetland"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" Then Continue For
-                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    If TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
-                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Wetland.</li>")
-                    End If
-                    If InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
-                        CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Wetland.</li>")
-                    End If
-                Next landuse2
-        End Select
         Return CheckETIssuesStatement.ToString
 
     End Function
@@ -1368,7 +1398,7 @@ Module HSPFOutputReports
                                                ByVal aLandLoadingConstReport As DataTable) As String
         Dim lUnits As String = " lb/ac/yr"
         Dim CheckTotalSedErosion As New Text.StringBuilder
-        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Dim TotalSedRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) 'Need to convert sediment erosion rate to lbs/ac
         Dim TotalGullyErosion As Double = 0
         Try
@@ -1385,11 +1415,21 @@ Module HSPFOutputReports
             CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
                                             LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
         End If
-        Select Case aLanduse
-            Case "Forest"
 
+        Select Case aLanduse
+            Case "Impervious"
                 For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" Then Continue For
+                    If landuse2 = "Impervious" Then Continue For
+                    Dim lSelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
+                    If TotalSedRunoff2 > TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Impervious area has greater sediment runoff than " & landuse2 & ".</li>")
+                    End If
+                Next
+
+            Case "Forest"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
                     Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
                     Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
                     If landuse2 = "Wetland" AndAlso TotalSedRunoff2 > TotalSedRunoff Then
@@ -1400,20 +1440,11 @@ Module HSPFOutputReports
                 Next
             Case "Wetland"
                 For Each landuse2 As String In aListofLandUsesinUCI
-                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" Then Continue For
+                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
                     Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
                     Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
                     If TotalSedRunoff2 < TotalSedRunoff Then
                         CheckTotalSedErosion.AppendLine("<li>Wetland has greater sediment runoff than " & landuse2 & ".</li>")
-                    End If
-                Next
-
-            Case "Impervious"
-                For Each landuse2 As String In aListofLandUsesinUCI
-                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
-                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
-                    If TotalSedRunoff2 > TotalSedRunoff Then
-                        CheckTotalSedErosion.AppendLine("<li>Impervious area has greater sediment runoff than " & landuse2 & ".</li>")
                     End If
                 Next
         End Select
@@ -1431,7 +1462,7 @@ Module HSPFOutputReports
                                                ByVal aLandLoadingConstReport As DataTable) As String
         Dim CheckNutrientLoadingText As New Text.StringBuilder
         Dim lUnits As String = " lb/ac/yr"
-        Dim lSelectExpression As String = "OpTypeNumber Like 'P:%' And ConstNameEXP = '" & aConstituentName &
+        Dim lSelectExpression As String = "ConstNameEXP = '" & aConstituentName &
                                             "' AND genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Dim lconversionfactor As Double = 1.0
         'If aConstituentName = "SED" Then lconversionfactor = 2000
@@ -1457,68 +1488,116 @@ Module HSPFOutputReports
 
         Return MinMaxRange
     End Function
-    Private Function CheckIfMonthlyFlagisOn(ByVal aTableParm As String, ByVal aParmName As String, Optional ByVal aConst As String = "") As IList(Of String)
-        Dim MonthlyFlagisOn As New List(Of String)
-        'Based on the aTableParm and aParmName locate the relevant TableName and Parametervalue that describes if the monthly flag is on
-        Dim MonthlyParmName As XmlDocument = New XmlDocument
-        MonthlyParmName.LoadXml(My.Resources.MonthlyParmForMonthlyParm)
+    'Private Function CheckIfMonthlyFlagisOn(ByVal aTableParm As String, ByVal aParmName As String, Optional ByVal aConst As String = "") As IList(Of String)
+    '    Dim MonthlyFlagisOn As New List(Of String)
+    '    'Based on the aTableParm and aParmName locate the relevant TableName and Parametervalue that describes if the monthly flag is on
+    '    Dim MonthlyParmName As XmlDocument = New XmlDocument
+    '    MonthlyParmName.LoadXml(My.Resources.MonthlyParmForMonthlyParm)
 
-        Dim SelectStarementFromXML As String = "/MONTHLYTABLE/Parm"
-        Dim nodes As XmlNodeList = MonthlyParmName.DocumentElement.SelectNodes(SelectStarementFromXML)
-        For Each node As XmlNode In nodes
-            If aTableParm = node.SelectSingleNode("ParmTable").InnerText AndAlso aParmName = node.SelectSingleNode("ParmName").InnerText Then
-                Dim FLAGTable As String = node.SelectSingleNode("FlagTable").InnerText
-                Dim FLAGParm As String = node.SelectSingleNode("FlagName").InnerText
+    '    Dim SelectStarementFromXML As String = "/MONTHLYTABLE/Parm"
+    '    Dim nodes As XmlNodeList = MonthlyParmName.DocumentElement.SelectNodes(SelectStarementFromXML)
+    '    For Each node As XmlNode In nodes
+    '        If aTableParm = node.SelectSingleNode("ParmTable").InnerText AndAlso aParmName = node.SelectSingleNode("ParmName").InnerText Then
+    '            Dim FLAGTable As String = node.SelectSingleNode("FlagTable").InnerText
+    '            Dim FLAGParm As String = node.SelectSingleNode("FlagName").InnerText
 
-            End If
+    '        End If
 
-        Next
+    '    Next
 
-        Return MonthlyFlagisOn
-    End Function
+    '    Return MonthlyFlagisOn
+    'End Function
 
     Private Function VerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
         Dim StorageTrend As New Text.StringBuilder
         Dim OverAllStorageTrend As New Text.StringBuilder
+        Dim lSimSpan As Double = aUCI.GlobalBlock.EdateJ - aUCI.GlobalBlock.SDateJ
         Dim lNumberOfTrendIssues As Integer = 0
         Logger.Dbg("Constituent Storage Analysis for " & aConstituent)
         Dim lListOfStorageVariables As New List(Of String)
         Select Case aConstituent
             Case "WAT"
-                lListOfStorageVariables.Add("VOL")
+                lListOfStorageVariables.Add("R:VOL")
+                OverAllStorageTrend.AppendLine("<h2>Reach water volume analysis</h2>")
             Case "TN"
-                lListOfStorageVariables.Add("TAM-STORDIS")
-                lListOfStorageVariables.Add("NO3-STOR")
-                lListOfStorageVariables.Add("N-TOT-CONC")
+                lListOfStorageVariables.Add("R:NO3-STOR")
+                lListOfStorageVariables.Add("R:TAM-STOR")
+                lListOfStorageVariables.Add("R:N-TOT-CONC")
+                lListOfStorageVariables.Add("P:SQO-NO3")
+                lListOfStorageVariables.Add("P:SQO-NH3+NH4")
+                lListOfStorageVariables.Add("I:SQO-NO3")
+                lListOfStorageVariables.Add("I:SQO-NH3+NH4")
+                OverAllStorageTrend.AppendLine("<h2>Nitrate, ammonia, and total nitogen storage and concentration analysis</h2>")
             Case "TP"
-                lListOfStorageVariables.Add("PO4-STORDIS")
-                lListOfStorageVariables.Add("P-TOT-CONC")
+                lListOfStorageVariables.Add("R:PO4-STOR")
+                lListOfStorageVariables.Add("R:P-TOT-CONC")
+                lListOfStorageVariables.Add("P:SQO-ORTHO P")
+                lListOfStorageVariables.Add("I:SQO-ORTHO P")
+                OverAllStorageTrend.AppendLine("<h2>Orthophosphorus and total phosphorus storage and concentration analysis</h2>")
             Case "SED"
-                lListOfStorageVariables.Add("RSED-BED-TOT")
+                lListOfStorageVariables.Add("R:BEDDEP")
+                lListOfStorageVariables.Add("P:DETS")
+                lListOfStorageVariables.Add("I:SLDS")
+                OverAllStorageTrend.AppendLine("<h2>Reach Bed Depth and sediment storage analysis</h2>")
             Case "BOD-Labile"
-                Return String.Empty
+                lListOfStorageVariables.Add("P:SQO-BOD")
+                lListOfStorageVariables.Add("I:SQO-BOD")
+                OverAllStorageTrend.AppendLine("<h2>BOD-labile storage analysis</h2>")
         End Select
+        If lSimSpan < 1827 Then
+            OverAllStorageTrend.AppendLine("<p>The time span of simulation is shorter than 5 years. The long term trend analysis may not be accurate.</p>")
+        End If
         StorageTrend.AppendLine("<ul>")
-        For Each lReachOperation As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
-            Dim lLocationName As String = "R:" & lReachOperation.Id
+        For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
+            Dim lLocationName As String = ""
+            Select Case lOperation.Name
+                Case "PERLND"
+                    lLocationName = "P:" & lOperation.Id
+                Case "IMPLND"
+                    lLocationName = "I:" & lOperation.Id
+                Case "RCHRES"
+                    lLocationName = "R:" & lOperation.Id
+                Case Else
+                    Continue For
+            End Select
+
             For Each StorageVariable As String In lListOfStorageVariables
-                Logger.Dbg("Reach ID= " & lReachOperation.Id & ", Storage Variable = " & StorageVariable)
+                If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
+                StorageVariable = StorageVariable.Split(":")(1)
+                Logger.Dbg("Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
                 Dim lSlope As Double = 0
                 Dim lIntercept As Double = 0
                 Dim lRCoeff As Double = 0
                 Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
+                If lStorageTimeSeries Is Nothing Then Continue For
                 Dim lTempTimeSeries As New atcTimeseries(Nothing)
                 lTempTimeSeries = lStorageTimeSeries.Clone
                 For i As Integer = 0 To lStorageTimeSeries.numValues
                     lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
                 Next
+                Dim lArgs As New atcDataAttributes()
+                Dim lTSerAverage As Double = 0
+                Dim lTSerStdev As Double = 0
+                Try
+                    lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
+                    lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
+                Catch
+                    StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
 
+                    Continue For
+                End Try
+                lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                lArgs.SetValue("Number", lTSerAverage)
+                lStorageTimeSeries = DoMath("subtract", lArgs)
+                lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                lArgs.SetValue("Number", lTSerStdev)
+                lStorageTimeSeries = DoMath("divide", lArgs)
                 'Now find the slope of this timeseries
                 FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
-                If lSlope > 0.01 Then
+                If lSlope > 0.002 Then
                     StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
                     lNumberOfTrendIssues += 1
-                ElseIf lSlope < -0.01 Then
+                ElseIf lSlope < -0.002 Then
                     StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
                     lNumberOfTrendIssues += 1
                 End If
@@ -1532,12 +1611,12 @@ Module HSPFOutputReports
         If lNumberOfTrendIssues > 0 Then
             OverAllStorageTrend.AppendLine("<p>Following non-typical long term trend issues were noticed in the model.</p>")
             OverAllStorageTrend.Append(StorageTrend)
-            Return OverAllStorageTrend.ToString
+
         Else
-            Return String.Empty
+            OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
 
-
+        Return OverAllStorageTrend.ToString
 
     End Function
     Private Function ConvertToHtmlFile(ByVal myTable As DataTable, ByVal Optional NumberOfRows As Integer = 0) As String
@@ -1551,7 +1630,7 @@ Module HSPFOutputReports
             myBuilder.AppendLine("<tr>")
             For Each myColumn As DataColumn In myTable.Columns
                 ColumnCounter += 1
-                If ColumnCounter = 1 Then
+                If ColumnCounter = 1 Or ColumnCounter = 3 Then
                     myBuilder.Append("<th align=""left"">")
                 Else
                     myBuilder.Append("<th>")
@@ -1568,7 +1647,7 @@ Module HSPFOutputReports
                 myBuilder.AppendLine("<tr>")
                 For Each myColumn As DataColumn In myTable.Columns
                     ColumnCounter += 1
-                    If ColumnCounter = 1 Then
+                    If ColumnCounter = 1 Or ColumnCounter = 3 Then
                         myBuilder.Append("<td align=""left"">")
                     Else
                         myBuilder.Append("<td align=""center"">")
