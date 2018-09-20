@@ -1669,6 +1669,38 @@ Module HSPFOutputReports
         myHtmlFile = myBuilder.ToString()
         Return myHtmlFile
     End Function
+    Private Function CheckDiurnalPattern(ByVal aBinaryData As atcDataSource, ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+        Dim lDiurnalPattern As New Text.StringBuilder
+        Dim lFoundTheTS As Boolean = False
+        Dim lGroupName As String = ""
+        Dim lMemberName As String = ""
+        Dim lMemSub1 As Integer = 0
+        Dim lMemSub2 As Integer = 0
+        Select Case aConstituent
+            Case "DO"
+                lGroupName = "OXRX"
+                lMemberName = "DOX"
+                lMemSub1 = 1
+                lMemSub2 = 1
+            Case "Water Temperature"
+                lGroupName = "OXRX"
+                lMemberName = "DOX"
+                lMemSub1 = 1
+                lMemSub2 = 1
+        End Select
+        For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+
+            LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS)
+
+
+
+        Next
+
+
+
+
+        Return lDiurnalPattern.ToString
+    End Function
 End Module
 
 

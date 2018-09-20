@@ -1497,6 +1497,18 @@ Public Module atcConstituentTables
 
                         column = New DataColumn()
                         column.DataType = Type.GetType("System.Double")
+                        column.ColumnName = lReachConstituent & "-ADSDES-TOT"
+                        column.Caption = "Total " & lReachConstituent & " Adsorption/Desorption (" & lUnits & ")"
+                        Reach_Budget_Table.Columns.Add(column)
+
+                        column = New DataColumn()
+                        column.DataType = Type.GetType("System.Double")
+                        column.ColumnName = lReachConstituent & "-SCOURDEP-TOT"
+                        column.Caption = "Total " & lReachConstituent & " Scour/Deposition (" & lUnits & ")"
+                        Reach_Budget_Table.Columns.Add(column)
+
+                        column = New DataColumn()
+                        column.DataType = Type.GetType("System.Double")
                         column.ColumnName = lReachConstituent & "-ATMDEPTOT"
                         column.Caption = "Total " & lReachConstituent & " Atmospheric Deposition (" & lUnits & ")"
                         Reach_Budget_Table.Columns.Add(column)
@@ -1552,36 +1564,40 @@ Public Module atcConstituentTables
                             Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each columnValue As DataColumn In Reach_Budget_Table.Columns
-                                Dim ColumnName As String = columnValue.ColumnName
-                                Select Case ColumnName
-                                    Case "OpTypeNumber"
-                                        row(ColumnName) = LocationName
-                                    Case "OpDesc"
-                                        row(ColumnName) = lReach.Description
-                                    Case "NPSLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
-                                    Case "PSLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
-                                    Case "GENERLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
-                                    Case "Diversion"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
-                                    Case "MassBalance"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
-                                    Case "UpstreamIn"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
-                                    Case lReachConstituent & "-INTOT"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lTotalIn, 10)
-                                    Case lReachConstituent & "-PROCFLUX-TOT"
-                                        row(ColumnName) = lProcFluxTot
-                                    Case lReachConstituent & "-OUTTOT"
-                                        row(ColumnName) = lOutflow
-                                    Case Else
-                                        If aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName).Count > 0 Then
-                                            row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
-                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                        End If
-                                End Select
+                                Try
+                                    Dim ColumnName As String = columnValue.ColumnName
+                                    Select Case ColumnName
+                                        Case "OpTypeNumber"
+                                            row(ColumnName) = LocationName
+                                        Case "OpDesc"
+                                            row(ColumnName) = lReach.Description
+                                        Case "NPSLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                                        Case "PSLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
+                                        Case "GENERLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
+                                        Case "Diversion"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                                        Case "MassBalance"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                                        Case "UpstreamIn"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                                        Case lReachConstituent & "-INTOT"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lTotalIn, 10)
+                                        Case lReachConstituent & "-PROCFLUX-TOT"
+                                            row(ColumnName) = lProcFluxTot
+                                        Case lReachConstituent & "-OUTTOT"
+                                            row(ColumnName) = lOutflow
+                                        Case Else
+                                            If aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName).Count > 0 Then
+                                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                              aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                                            End If
+                                    End Select
+                                Catch
+                                End Try
+
                             Next columnValue
 
                             Reach_Budget_Table.Rows.Add(row)
@@ -1640,6 +1656,18 @@ Public Module atcConstituentTables
 
                         column = New DataColumn()
                         column.DataType = Type.GetType("System.Double")
+                        column.ColumnName = lReachConstituent & "-ADSDES-TOT"
+                        column.Caption = "Total " & lReachConstituent & " Adsorption/Desorption (" & lUnits & ")"
+                        Reach_Budget_Table.Columns.Add(column)
+
+                        column = New DataColumn()
+                        column.DataType = Type.GetType("System.Double")
+                        column.ColumnName = lReachConstituent & "-SCOURDEP-TOT"
+                        column.Caption = "Total " & lReachConstituent & " Scour/Deposition (" & lUnits & ")"
+                        Reach_Budget_Table.Columns.Add(column)
+
+                        column = New DataColumn()
+                        column.DataType = Type.GetType("System.Double")
                         column.ColumnName = lReachConstituent & "-ATMDEPTOT"
                         column.Caption = "Total " & lReachConstituent & " Atmospheric Deposition (" & lUnits & ")"
                         Reach_Budget_Table.Columns.Add(column)
@@ -1678,28 +1706,31 @@ Public Module atcConstituentTables
                             Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each columnValue As DataColumn In Reach_Budget_Table.Columns
-                                Dim ColumnName As String = columnValue.ColumnName
-                                Select Case ColumnName
-                                    Case "OpTypeNumber"
-                                        row(ColumnName) = LocationName
-                                    Case "OpDesc"
-                                        row(ColumnName) = lReach.Description
-                                    Case "NPSLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
-                                    Case "PSLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
-                                    Case "GENERLoad"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
-                                    Case "Diversion"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
-                                    Case "MassBalance"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
-                                    Case "UpstreamIn"
-                                        row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
-                                    Case Else
-                                        row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
-                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                End Select
+                                Try
+                                    Dim ColumnName As String = columnValue.ColumnName
+                                    Select Case ColumnName
+                                        Case "OpTypeNumber"
+                                            row(ColumnName) = LocationName
+                                        Case "OpDesc"
+                                            row(ColumnName) = lReach.Description
+                                        Case "NPSLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lNPSLoad, 10)
+                                        Case "PSLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lPSLoad, 10)
+                                        Case "GENERLoad"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lGENERLoad, 10)
+                                        Case "Diversion"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lDiversion, 10)
+                                        Case "MassBalance"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lMassBalance, 10)
+                                        Case "UpstreamIn"
+                                            row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
+                                        Case Else
+                                            row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                             aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
+                                    End Select
+                                Catch
+                                End Try
                             Next columnValue
 
                             Reach_Budget_Table.Rows.Add(row)
