@@ -713,13 +713,13 @@ Public Module Utility
 
                             Case "Ref-OrgP"
                                 .Add("I:Header11", "RefOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
-                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
+                                .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
 
                             Case "lab-OrgP"
                                 .Add("I:Header12", "LabileOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
+                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
 
                         End Select
 
