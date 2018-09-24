@@ -147,6 +147,7 @@
 /HSPEXP/pest13/doc
 /HSPEXP/pest13
 /HSPEXP/.vs/config
+/HSPEXP/bin
 /atcUSGSBaseflow/obj/x86/Debug
 /Doc/HSPEXP/Introduction/respec_black.jpg
 /Doc/HSPEXP/log
@@ -204,7 +205,6 @@ atcGraphFromJSON/obj/x86/Debug/atcGraphFromJSON15.vbproj.FileListAbsolute.txt
 *.suo
 *.cache
 *.force
-*.xml
 *.FIL
 *.exe
 *.config
@@ -217,7 +217,6 @@ Application.Designer.vb
 Resources.Designer.vb
 Resources.resx
 *.pdb
-*.xml
 *.dll
 *.resources
 *.manifest

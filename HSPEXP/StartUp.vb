@@ -42,6 +42,7 @@ Public Class StartUp
         Dim lExists As Boolean = IO.File.Exists(cmbUCIPath.Text)
         'cmbUCIPath.Visible = lExists
         chkRunHSPF.Enabled = lExists
+        chkModelQAQC.Enabled = lExists
         chkAreaReports.Enabled = lExists
         DateTimePicker1.Enabled = lExists
         DateTimePicker2.Enabled = lExists
@@ -261,7 +262,7 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP200_Manual.pdf")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP20_Manual.pdf")
     End Sub
 
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged
@@ -357,5 +358,74 @@ Public Class StartUp
 
     Private Sub cmbUCIPath_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.SelectedIndexChanged
 
+    End Sub
+
+    Private Sub chkModelQAQC_CheckedChanged(sender As Object, e As EventArgs) Handles chkModelQAQC.CheckedChanged
+        If chkModelQAQC.Checked = True Then
+            chkMultiSim.Enabled = False
+            chkMultiSim.Checked = False
+            chkRunHSPF.Enabled = False
+            'chkRunHSPF.Checked = True
+            chkAreaReports.Enabled = False
+            chkAreaReports.Checked = False
+            chkExpertStats.Enabled = False
+            chkExpertStats.Checked = False
+            chkReganGraphs.Checked = False
+            chkReganGraphs.Enabled = False
+            chkAdditionalgraphs.Enabled = False
+            chkAdditionalgraphs.Checked = False
+            'chkBODBalance.Enabled = False
+            chkBODBalance.Checked = False
+            chkGQUAL1.Checked = False
+            chkGQUAL1.Enabled = False
+            'chkTotalNitrogen.Enabled = False
+            chkTotalNitrogen.Checked = False
+            'chkTotalPhosphorus.Enabled = False
+            chkTotalPhosphorus.Checked = False
+            chkWaterBalance.Checked = True
+            'chkWaterBalance.Enabled = False
+            chkSedimentBalance.Checked = False
+            'chkSedimentBalance.Enabled = False
+            chkDO.Checked = False
+            chkDO.Enabled = False
+            chkHeat.Checked = False
+            chkHeat.Enabled = False
+            chkGQUAL1.Checked = False
+            chkGQUAL2.Checked = False
+            chkGQUAL3.Checked = False
+            chkGQUAL4.Checked = False
+            chkGQUAL5.Checked = False
+            chkGQUAL6.Checked = False
+            chkGQUAL7.Checked = False
+            chkGQUAL1.Enabled = False
+            chkGQUAL2.Enabled = False
+            chkGQUAL3.Enabled = False
+            chkGQUAL4.Enabled = False
+            chkGQUAL5.Enabled = False
+            chkGQUAL6.Enabled = False
+            chkGQUAL7.Enabled = False
+            txtRCH.Enabled = False
+
+        Else
+            chkRunHSPF.Enabled = True
+            chkAreaReports.Enabled = True
+            chkExpertStats.Enabled = True
+            chkReganGraphs.Enabled = True
+            chkAdditionalgraphs.Enabled = True
+            chkBODBalance.Enabled = True
+            chkTotalNitrogen.Enabled = True
+            chkTotalPhosphorus.Enabled = True
+            chkWaterBalance.Enabled = True
+            chkSedimentBalance.Enabled = True
+            chkDO.Enabled = True
+            chkHeat.Enabled = True
+            chkGQUAL1.Enabled = True
+            chkGQUAL2.Enabled = True
+            chkGQUAL3.Enabled = True
+            chkGQUAL4.Enabled = True
+            chkGQUAL5.Enabled = True
+            chkGQUAL6.Enabled = True
+            chkGQUAL7.Enabled = True
+        End If
     End Sub
 End Class

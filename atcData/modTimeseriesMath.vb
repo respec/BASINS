@@ -1468,35 +1468,42 @@ Finished:
             aNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
         End If
 
-        If (lSumX > 0.0 AndAlso lSumY > 0.0 AndAlso lGoodCount > 0) Then 'go ahead and compute
-            lAvgX = lSumX / lGoodCount
-            lAvgY = lSumY / lGoodCount
+        If (lGoodCount > 0) Then 'go ahead and compute lSumX > 0.0 AndAlso lSumY > 0.0 AndAlso 
+            Try 'Added Try Catch for linear regression for cases when timeseries has only 0 values.
+                lAvgX = lSumX / lGoodCount
+                lAvgY = lSumY / lGoodCount
 
-            Dim lSum3 As Double = 0.0
-            Dim lSum4 As Double = 0.0
-            For lIndex As Integer = 1 To aTSerX.numValues
-                lValX = aTSerX.Value(lIndex)
-                lValY = aTSerY.Value(lIndex)
-                If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
-                    lSum3 += (lValX - lAvgX) * (lValY - lAvgY)
-                    lSum4 += (lValY - lAvgY) * (lValY - lAvgY)
-                End If
-            Next lIndex
-            aACoef = lSum3 / lSum4
-            aBCoef = lAvgX - (aACoef * lAvgY)
+                Dim lSum3 As Double = 0.0
+                Dim lSum4 As Double = 0.0
+                For lIndex As Integer = 1 To aTSerX.numValues
+                    lValX = aTSerX.Value(lIndex)
+                    lValY = aTSerY.Value(lIndex)
+                    If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
+                        lSum3 += (lValX - lAvgX) * (lValY - lAvgY)
+                        lSum4 += (lValY - lAvgY) * (lValY - lAvgY)
+                    End If
+                Next lIndex
+                aACoef = lSum3 / lSum4
+                aBCoef = lAvgX - (aACoef * lAvgY)
 
-            Dim lSum5 As Double = 0
-            Dim lSum6 As Double = 0
-            For lIndex As Integer = 1 To aTSerX.numValues
-                lValX = aTSerX.Value(lIndex)
-                lValY = aTSerY.Value(lIndex)
-                If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
-                    lSum5 += ((aACoef * lValY + aBCoef - lAvgX) * (aACoef * lValY) + aBCoef - lAvgX)
-                    lSum6 += (lValX - lAvgX) * (lValX - lAvgX)
-                End If
-            Next lIndex
-            aRSquare = lSum5 / lSum6
-            aRSquare = ComputeR(aTSerX, aTSerY) ^ 2
+                Dim lSum5 As Double = 0
+                Dim lSum6 As Double = 0
+                For lIndex As Integer = 1 To aTSerX.numValues
+                    lValX = aTSerX.Value(lIndex)
+                    lValY = aTSerY.Value(lIndex)
+                    If Not Double.IsNaN(lValX) AndAlso Not Double.IsNaN(lValY) Then
+                        lSum5 += ((aACoef * lValY + aBCoef - lAvgX) * (aACoef * lValY) + aBCoef - lAvgX)
+                        lSum6 += (lValX - lAvgX) * (lValX - lAvgX)
+                    End If
+                Next lIndex
+                aRSquare = lSum5 / lSum6
+                aRSquare = ComputeR(aTSerX, aTSerY) ^ 2
+            Catch ex As Exception 'Should I add a statement saying that linear regression could not be calculated?
+                aACoef = GetNaN()
+                aBCoef = GetNaN()
+                aRSquare = GetNaN()
+            End Try
+
         Else 'regression doesnt make sense, return NaN
             aACoef = GetNaN()
             aBCoef = GetNaN()

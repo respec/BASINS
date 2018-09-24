@@ -560,14 +560,16 @@ Public Module Utility
 
 
                     .Add("R:Header13", "Total NH3 as N")
-                    .Add("R:TAM-INTOT", "  Total NH3 Inflow")
-                    .Add("R:TAM-INDIS", "  Dissolved NH3 inflow")
+                    .Add("R:TAM-INTOT", "  Total Ammonia Inflow")
+                    .Add("R:TAM-INDIS", "  Dissolved TAM inflow")
                     .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
-                    .Add("R:TAM-PROCFLUX-TOT", "  NH3 Process Fluxes")
+                    .Add("R:TAM-PROCFLUX-TOT", "  TAM Process Fluxes")
+                    .Add("R:TAM-ADSDES-TOT", "  TAM Adsorption/Desorption")
+                    .Add("R:TAM-SCOURDEP-TOT", "  TAM Scour/Deposition")
                     .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
-                    .Add("R:TAM-OUTTOT", "  Total NH3 Outflow")
-                    .Add("R:TAM-OUTDIS", "  Dissolved NH3 Outflow")
-                    .Add("R:TAM-OUTPART-TOT", "  Particulate NH3 Outflow")
+                    .Add("R:TAM-OUTTOT", "  Total TAM Outflow")
+                    .Add("R:TAM-OUTDIS", "  Dissolved TAM Outflow")
+                    .Add("R:TAM-OUTPART-TOT", "  Particulate TAM Outflow")
 
                     .Add("R:Header14", "Refractory-N")
                     .Add("R:N-REFORG-IN", "  Refr-N Inflow")
@@ -713,13 +715,13 @@ Public Module Utility
 
                             Case "Ref-OrgP"
                                 .Add("I:Header11", "RefOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
-                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
+                                .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
 
                             Case "lab-OrgP"
                                 .Add("I:Header12", "LabileOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
+                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
 
                         End Select
 
@@ -730,6 +732,8 @@ Public Module Utility
                     .Add("R:PO4-INDIS", "  Dissolved PO4 Inflow")
                     .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
                     .Add("R:PO4-PROCFLUX-TOT", "  PO4 Process Fluxes")
+                    .Add("R:PO4-ADSDES-TOT", "  PO4 Adsorption/Desorption")
+                    .Add("R:PO4-SCOURDEP-TOT", "  PO4 Scour/Deposition")
                     .Add("R:PO4-OUTTOT", "  Total PO4 Outflow")
                     .Add("R:PO4-ATMDEPTOT", " Atmospheric PO4 Deposition")
                     .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")

@@ -41,8 +41,7 @@ Public Module CookieCutterGraphs
         Dim lLocations As New atcCollection
         Dim lScenarioResults As New atcDataSource
 
-        Dim lWDMDataSource As atcDataSource
-
+        Dim lWDMDataSource As New atcDataSource
 
         For i As Integer = 0 To aHSPFUCI.FilesBlock.Count
             If aHSPFUCI.FilesBlock.Value(i).Typ = "BINO" Then
@@ -80,7 +79,7 @@ Public Module CookieCutterGraphs
                         Dim lTimeSeries As atcTimeseries = Nothing
                         Dim lFoundTheTimeSeriesinWDMFile As Boolean = False
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "PLANK", "BALCLA", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "BALCLA", 4, 1, lFoundTheTimeSeriesinWDMFile)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             'Reading the required time series from Binary file and resetting the flag to false
@@ -97,7 +96,7 @@ Public Module CookieCutterGraphs
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "PLANK", "PHYCLA", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "PHYCLA", 1, 1, lFoundTheTimeSeriesinWDMFile)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PHYCLA")(0)
@@ -112,7 +111,7 @@ Public Module CookieCutterGraphs
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "NUTRX", "DNUST", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 4, 1, lFoundTheTimeSeriesinWDMFile)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PO4-CONCDIS")(0)
 
@@ -127,7 +126,7 @@ Public Module CookieCutterGraphs
                                 lTimeseriesGroup.Add(lTimeSeries)
                             End If
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "NUTRX", "DNUST", 2, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 2, 1, lFoundTheTimeSeriesinWDMFile)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "TAM-CONCDIS")(0)
                         End If
@@ -141,7 +140,7 @@ Public Module CookieCutterGraphs
                                 lTimeseriesGroup.Add(lTimeSeries)
                             End If
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "NUTRX", "DNUST", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "NO3-CONCDIS")(0)
                         End If
@@ -215,7 +214,7 @@ Public Module CookieCutterGraphs
 #Region "Plotting TSS Curve"
 
                             lTimeseriesGroup = New atcTimeseriesGroup
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "HYDR", "RO", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "RO", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "RO")(0)
                         End If
@@ -229,7 +228,7 @@ Public Module CookieCutterGraphs
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
 
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "SEDTRN", "SSED", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "SSED", 4, 1, lFoundTheTimeSeriesinWDMFile)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "SSED-TOT")(0)
@@ -244,7 +243,7 @@ Public Module CookieCutterGraphs
                                 lTimeSeries.Attributes.SetValue("YAxis", "Left")
                                 lTimeseriesGroup.Add(lTimeSeries)
                             End If
-                        lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "SEDTRN", "BEDDEP", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "BEDDEP", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BEDDEP")(0)
                         End If
@@ -299,11 +298,12 @@ Public Module CookieCutterGraphs
                         Dim lTimeseriesGroupDO As New atcTimeseriesGroup
                         Dim lTimeSeriesDO As New atcTimeseries(Nothing)
                         Dim lTimeSeriesTimeUnit As Integer
-                        lTimeSeriesDO = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
-                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
+                        lTimeSeriesDO = LocateTheTimeSeries(aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
+
                         If lFoundTheTimeSeriesinWDMFile = False OrElse lTimeSeriesTimeUnit < 3 Then
                             lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
                         End If
+                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
                         lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMax))
@@ -403,7 +403,7 @@ Public Module CookieCutterGraphs
 
 
                                 lTimeseriesGroup = New atcTimeseriesGroup
-                            lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "HYDR", "IVOL", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                            lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "IVOL", 1, 1, lFoundTheTimeSeriesinWDMFile)
                             If lFoundTheTimeSeriesinWDMFile = False Then
                                 lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
                             End If
@@ -417,7 +417,7 @@ Public Module CookieCutterGraphs
                                     lTimeseriesGroup.Add(lTimeSeries)
                                 End If
                             End If
-                            lTimeSeries = LocateTheTimeSeries(lDataSource, aHSPFUCI, lRchId, "PLANK", "TPKIF", 5, 1, lFoundTheTimeSeriesinWDMFile)
+                            lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "TPKIF", 5, 1, lFoundTheTimeSeriesinWDMFile)
                             If lFoundTheTimeSeriesinWDMFile = False Then
                                 lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
                             End If
@@ -459,7 +459,7 @@ Public Module CookieCutterGraphs
                                 Logger.Dbg("Generated graph " & lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
                             End If
 
-                            End If
+                        End If
 
 
 
@@ -481,10 +481,11 @@ Public Module CookieCutterGraphs
         'Dim lRCH As HspfOperation
 
     End Sub
-    Private Function LocateTheTimeSeries(ByRef aDataSource As atcDataSource, ByVal aHSPFUCI As HspfUci,
+    Friend Function LocateTheTimeSeries(ByVal aHSPFUCI As HspfUci,
                                          ByVal aRCHId As Integer, ByVal aGroupName As String,
                                          ByVal aMemberName As String, ByVal aMemSub1 As Integer,
-                                         ByVal aMemSub2 As Integer, ByRef aFoundTheTS As Boolean)
+                                         ByVal aMemSub2 As Integer, ByRef aFoundTheTS As Boolean) As atcTimeseries
+        Dim lDataSource As New atcDataSource
         Dim aTimeSeries As atcTimeseries = Nothing
         aFoundTheTS = False
         Dim lDataID As Integer = 0
@@ -497,10 +498,10 @@ Public Module CookieCutterGraphs
                 For i As Integer = 0 To aHSPFUCI.FilesBlock.Count
                     If aHSPFUCI.FilesBlock.Value(i).Typ = lconnection.Target.VolName Then
                         Dim lFileName As String = AbsolutePath(aHSPFUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                        aDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                        If aDataSource Is Nothing Then
+                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                        If lDataSource Is Nothing Then
                             If atcDataManager.OpenDataSource(lFileName) Then
-                                aDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
                             End If
                         End If
                         Exit For
@@ -511,7 +512,7 @@ Public Module CookieCutterGraphs
             End If
         Next lconnection
         If lDataID > 0 Then
-            aTimeSeries = aDataSource.DataSets.FindData("ID", lDataID)(0)
+            aTimeSeries = lDataSource.DataSets.FindData("ID", lDataID)(0)
             aFoundTheTS = True
         End If
 

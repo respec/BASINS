@@ -916,7 +916,7 @@ Public Class atcExpertSystem
         lStr &= TimeSpanAsString(SDateJ, EDateJ, "    HSPEXP+ Analysis Period: ")
 
 
-        Dim lYearCount As Double = YearCount(AdjSDateJ, AdjEDateJ)
+        Dim lYearCount As Double = (AdjEDateJ - AdjSDateJ) / 365.25 'YearCount(AdjSDateJ, AdjEDateJ)
 
 
 

@@ -6,6 +6,8 @@ Imports atcUCI
 Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapwindow.org/svnroot/MapWindow4Dev/Bin/
 Imports System.Collections.Specialized
 Imports System.IO 'added by Becky to get directory exists function
+Imports System.Xml
+Imports System.Data
 
 Module HSPFOutputReports
     Private pTestPath As String
@@ -23,6 +25,7 @@ Module HSPFOutputReports
     Private pMakeAreaReports As Boolean 'flag to indicate user wants subwatershed & land use reports created
     Friend pHSPFExe As String '= FindFile("Please locate WinHspfLt.exe", IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly.Location), "WinHSPFLt", "WinHspfLt.exe"))
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
+    Private pModelQAQC As Boolean = False
     Private SDateJ, EDateJ As Double
     Private loutfoldername As String
     Private MultiSimulation As Boolean = False
@@ -54,6 +57,8 @@ Module HSPFOutputReports
         pGraphSaveFormat = ".png"
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
+        pModelQAQC = StartUp.chkModelQAQC.Checked
+
 
         pRunUci = StartUp.chkRunHSPF.Checked
         pMakeAreaReports = StartUp.chkAreaReports.Checked
@@ -130,6 +135,11 @@ Module HSPFOutputReports
         Logger.Status("Run characteristics read", True)
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aMapWin"></param>
+    ''' <param name="aHspfUci"></param>
     Public Sub ScriptMain(ByRef aMapWin As Object, ByVal aHspfUci As atcUCI.HspfUci)
         Initialize()
         ChDriveDir(pTestPath)
@@ -227,7 +237,56 @@ Module HSPFOutputReports
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
 
+#Region "Start QA/QC Report"
 
+                Dim QAQCReportFile As New Text.StringBuilder
+
+                'QAQCReportFile = My.Computer.FileSystem.OpenTextFileWriter(loutfoldername & "\ModelQAQCReport.htm", False)
+                If pModelQAQC Then
+                    QAQCReportFile.AppendLine("<html>")
+                    QAQCReportFile.AppendLine("<head>")
+                    QAQCReportFile.AppendLine("<style>
+                                                  table, th {
+                                                  border:2px solid #DEDFE0;
+                                                  border-collapse:collapse;
+                                                  border-top-color: #ef3e32;
+                                                  border-bottom-color: #ef3e32;
+                                                  font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px;}
+                                                  td {
+                                                  border:2px solid #DEDFE0;
+                                                  border-collapse:collapse;
+                                                  font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px;}
+                                                    
+                                                  h1 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; color: black; text-transform: uppercase;} 
+                                                  h2 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 18px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; color: #ef3e32;text-transform: uppercase;} 
+                                                  h3 { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } 
+                                                  p { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } 
+                                                  li { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; }
+                                                  blockquote { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } 
+                                                  pre { font-family: ""Arial Narrow"", Arial, sans-serif; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
+                                                </style>")
+
+                    QAQCReportFile.AppendLine("</head>")
+                    QAQCReportFile.AppendLine("<body>")
+                    QAQCReportFile.AppendLine(GeneralModelInfo(aHspfUci, lRunMade))
+                    QAQCReportFile.AppendLine(CheckHSPFParmValues(aHspfUci, lRunMade))
+
+                    'Area Report should become part of QAQC report now
+                    Dim alocations As New atcCollection
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                        Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
+                        If lDownstreamReachID = 0 Then
+                            alocations.Add("R:" & lRCHRES.Id)
+                        End If
+                    Next
+
+                    'Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+
+                End If
+
+#End Region
+
+#Region "AutomatedGraph and Regan Graph Generation"
 
                 If StartUp.chkAdditionalgraphs.Checked Then
                     Try
@@ -241,13 +300,15 @@ Module HSPFOutputReports
                 If StartUp.chkReganGraphs.Checked Then
                     ReganGraphs(aHspfUci, SDateJ, EDateJ, loutfoldername)
                 End If
+
+#End Region
 #Region "Area Report Generation"
                 If pMakeAreaReports Then
                     Dim alocations As New atcCollection
-                    For Each lRCHRES As HspfOperation In aHspfUci.OpnSeqBlock.Opns
-                        If lRCHRES.Name = "RCHRES" Then
-                            alocations.Add("R:" & lRCHRES.Id)
-                        End If
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+
+                        alocations.Add("R:" & lRCHRES.Id)
+
                     Next
                     Logger.Status(Now & " Producing Area Reports.", True)
                     Logger.Dbg(Now & " Producing land use and area reports")
@@ -532,7 +593,7 @@ Module HSPFOutputReports
                         End Select
 
                         Dim lScenarioResults As New atcDataSource
-                       
+
                         If lScenarioResults.DataSets.Count = 0 Then
                             For Each activeSection As String In lActiveSections
                                 lScenarioResults.DataSets.Add(atcDataManager.DataSets.FindData("Section", activeSection))
@@ -546,8 +607,17 @@ Module HSPFOutputReports
                             lReportCons = Nothing
                             Dim lOutFileName As String = ""
 
-                            LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            If pModelQAQC Then
+                                QAQCReportFile.AppendLine("<h2>" & lConstituent & " Loading Rate Analysis</h2>")
+                                QAQCReportFile.AppendLine(LoadingRateComparison(lConstituentName, LandLoadingReportForConstituents, lDateString))
+                            End If
+
                             ReachBudgetReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+                            If pModelQAQC Then
+                                QAQCReportFile.AppendLine(VerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
+                            End If
+
                             Logger.Status(Now & " Generating Reports for " & lConstituent)
                             Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                             lReportCons = Nothing
@@ -639,32 +709,1000 @@ Module HSPFOutputReports
 
                 End If
 #End Region
-
+                If pModelQAQC Then
+                    QAQCReportFile.AppendLine("</body>")
+                    QAQCReportFile.AppendLine("</html>")
+                    File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
+                End If
                 Logger.Status(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
-
-                'pProgressBar.pbProgress.Increment(39)
-
                 Logger.Dbg(Now & " HSPEXP+ Complete")
                 Logger.Msg("HSPEXP+ is complete")
+
                 OpenFile(loutfoldername)
             End Using
         Catch ex As Exception
             'Skip to the end if Cancel was chosen in felu            
-
             Logger.Msg(ex.ToString, MsgBoxStyle.Critical, "HSPEXP+ did not complete successfully.")
-
         End Try
-
         Logger.Status("")
         atcDataManager.Clear()
         StartUp.Show()
-        'Call Application.Exit()
-
     End Sub
+    ''' <summary>
+    ''' This function looks at each parameter limit in the XML list of parameters and compares them to the values in the UCI file. If the values are not within the 
+    ''' limits, it is mentioned in the report.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <param name="aRunMade"></param>
+    ''' <returns></returns>
+    Private Function CheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
+        Dim HSPFParmTable As XmlDocument = New XmlDocument()
+        Dim TableName As String = ""
+        Dim ParameterName As String
+        Dim MaxValue As Double = 0
+        Dim MinValue As Double = 0
+        Dim OperationType As String = ""
+        Dim ParameterInfo As New Text.StringBuilder
+        Dim lTotalParmIssues As Integer = 0
+        HSPFParmTable.LoadXml(My.Resources.HSPFParmValues) '    
+        ParameterInfo.AppendLine("<h2>Model Parameter Value Analysis</h2>")
+
+        Dim nodes As XmlNodeList = HSPFParmTable.DocumentElement.SelectNodes("Parm")
+        Dim lParameterViolationTable As DataTable
+        lParameterViolationTable = New DataTable("ModelParameterInfo")
+        Dim lColumn As DataColumn
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_TYPE"
+        lColumn.Caption = "Operation Type"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_NUM"
+        lColumn.Caption = "Operation Number"
+        lColumn.DataType = Type.GetType("System.Int16")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "OPN_INFO"
+        lColumn.Caption = "Operation Information"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PARM_Table"
+        lColumn.Caption = "Parameter Table"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PARM_Name"
+        lColumn.Caption = "Parameter Name"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "ConstName"
+        lColumn.Caption = "Comment/Name"
+        lColumn.DataType = Type.GetType("System.String")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+
+        lColumn.ColumnName = "ModelValue"
+        lColumn.Caption = "Model Value"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TypicalMin"
+        lColumn.Caption = "Typical Min"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TypicalMax"
+        lColumn.Caption = "Typical Max"
+        lColumn.DataType = Type.GetType("System.Double")
+        lParameterViolationTable.Columns.Add(lColumn)
+
+        Dim lrow As DataRow
+
+        For Each node As XmlNode In nodes
+            OperationType = node.SelectSingleNode("OPNTYPE").InnerText
+            TableName = node.SelectSingleNode("TABLE").InnerText
+            ParameterName = node.SelectSingleNode("ParameterName").InnerText
+            'If ParameterName = "TAUCS" Then Stop
+            Dim IsMonthlyValuePossible As Integer
+            Try
+                IsMonthlyValuePossible = CInt(node.SelectSingleNode("IsMonthlyPossible").InnerText)
+            Catch
+                IsMonthlyValuePossible = 0
+            End Try
+            Dim lActivityFlag As String = ""
+
+            lActivityFlag = node.SelectSingleNode("ACTIVITYFLAG").InnerText
+
+            If lActivityFlag.Length = 0 Then Continue For
+
+            Dim MonthlyFlagTable As String = node.SelectSingleNode("FlagTable").InnerText
+            Dim MonthlyFlagParm As String = node.SelectSingleNode("FlagParm").InnerText
+            Dim MonthlyParmTable As String = node.SelectSingleNode("MonthlyParmTable").InnerText
+            Dim lQualConstituentName As String = ""
+            Logger.Dbg("Looking at Table " & TableName & "Parameter " & ParameterName)
+            lQualConstituentName = node.SelectSingleNode("ConstituentName").InnerText
+            Dim lQUALID As Integer = 0
+            If lQualConstituentName.Length > 0 Then
+                Select Case lQualConstituentName 'Can look for QUALID fronm the UCI file also.
+                    Case "NH3+NH4"
+                        lQUALID = 1
+                    Case "NO3"
+                        lQUALID = 2
+                    Case "ORTHO P"
+                        lQUALID = 3
+                    Case "BOD"
+                        lQUALID = 4
+                End Select
+            End If
+
+            Try
+                MaxValue = CDbl(node.SelectSingleNode("Max").InnerText)
+                MinValue = CDbl(node.SelectSingleNode("Min").InnerText)
+            Catch
+                Continue For
+            End Try
+
+            Dim lMessageCountPerParameter As Integer = 0
+            For Each loperation As HspfOperation In aUCI.OpnBlks(OperationType).Ids
+                'Looping through each operation for a specific parameter 
+                Dim lActivityFlagValue As Integer = 0
+                lActivityFlagValue = loperation.Tables("ACTIVITY").Parms(lActivityFlag).Value
+                If lActivityFlagValue = 0 Then Continue For
+                Dim lMonthlyFlagValue As Integer = 0
+                If IsMonthlyValuePossible = 1 Then
+                    Try
+                        lMonthlyFlagValue = loperation.Tables(MonthlyFlagTable).Parms(MonthlyFlagParm).Value
+                    Catch
+                        lMonthlyFlagValue = 0
+                    End Try
+                End If
+                Try
+                    If lQUALID = 0 Then
+                        If lMonthlyFlagValue = 0 Then
+                            Dim lParmValue As Double = loperation.Tables(TableName).Parms(ParameterName).Value
+                            Dim lComment As String = ""
+                            'If ParameterName = "TAUCD" Then Stop
+                            If ParameterName = "TAUCD" AndAlso loperation.Tables(TableName).Parms("TAUCS").Value < lParmValue Then
+                                lComment = "TAUCD is greater than TAUCS."
+                            End If
+                            If (ParameterName = "TAUCS" OrElse ParameterName = "TAUCD") AndAlso TableName = "SILT-CLAY-PM" AndAlso
+                                    loperation.Tables("SILT-CLAY-PM:2").Parms(ParameterName).Value > lParmValue Then
+                                lComment &= ParameterName & " for clay is greater than " & ParameterName & " for silt."
+                            End If
+                            If lParmValue > MaxValue OrElse lParmValue < MinValue OrElse lComment.Length > 0 Then
+                                lrow = lParameterViolationTable.NewRow
+                                lrow("OPN_TYPE") = OperationType
+                                lrow("OPN_NUM") = loperation.Id
+                                lrow("OPN_INFO") = loperation.Description
+                                lrow("PARM_TABLE") = TableName
+                                lrow("PARM_NAME") = ParameterName
+                                lrow("ConstName") = lComment
+                                lrow("ModelValue") = lParmValue
+                                lrow("TypicalMin") = MinValue
+                                lrow("TypicalMax") = MaxValue
+                                lParameterViolationTable.Rows.Add(lrow)
+                            End If
+                        Else
+                            If MonthlyParmTable = "MON-LGTP2" AndAlso loperation.Tables("PSTEMP-PARM1").Parms("TSOPFG").Value = 1 Then
+                                Exit For
+                            End If
+
+                            For Each MonthlyParm As HspfParm In loperation.Tables(MonthlyParmTable).Parms
+                                If MonthlyParm.Value < MinValue OrElse MonthlyParm.Value > MaxValue Then
+                                    lrow = lParameterViolationTable.NewRow
+                                    lrow("OPN_TYPE") = OperationType
+                                    lrow("OPN_NUM") = loperation.Id
+                                    lrow("OPN_INFO") = loperation.Description
+                                    lrow("PARM_TABLE") = MonthlyParmTable
+                                    lrow("PARM_NAME") = MonthlyParm.Name
+                                    lrow("ConstName") = ""
+                                    lrow("ModelValue") = MonthlyParm.Value
+                                    lrow("TypicalMin") = MinValue
+                                    lrow("TypicalMax") = MaxValue
+                                    lParameterViolationTable.Rows.Add(lrow)
+                                End If
+                            Next
+
+                        End If
+
+                    Else
+                        Dim lTempTABLEName As String = TableName
+                        If lQUALID > 1 Then lTempTABLEName = TableName & ":" & lQUALID
+                        If lMonthlyFlagValue = 0 Then
+                            Dim lParmValue As Double = loperation.Tables(lTempTABLEName).Parms(ParameterName).Value
+                            If lParmValue > MaxValue OrElse lParmValue < MinValue Then
+                                lrow = lParameterViolationTable.NewRow
+                                lrow("OPN_TYPE") = OperationType
+                                lrow("OPN_NUM") = loperation.Id
+                                lrow("OPN_INFO") = loperation.Description
+                                lrow("PARM_TABLE") = lTempTABLEName
+                                lrow("PARM_NAME") = ParameterName
+                                lrow("ConstName") = lQualConstituentName
+                                lrow("ModelValue") = lParmValue
+                                lrow("TypicalMin") = MinValue
+                                lrow("TypicalMax") = MaxValue
+                                lParameterViolationTable.Rows.Add(lrow)
+                            End If
+                        Else
+                            Dim lTempMonthlyTable As String = MonthlyParmTable
+                            If lQUALID > 1 Then lTempMonthlyTable = MonthlyParmTable & ":" & lQUALID
+                            For Each MonthlyParm As HspfParm In loperation.Tables(lTempMonthlyTable).Parms
+                                If MonthlyParm.Value < MinValue OrElse MonthlyParm.Value > MaxValue Then
+                                    'lMonthlyParmCount += 1
+                                    lrow = lParameterViolationTable.NewRow
+                                    lrow("OPN_TYPE") = OperationType
+                                    lrow("OPN_NUM") = loperation.Id
+                                    lrow("OPN_INFO") = loperation.Description
+                                    lrow("PARM_TABLE") = lTempMonthlyTable
+                                    lrow("PARM_NAME") = MonthlyParm.Name
+                                    lrow("ConstName") = lQualConstituentName
+                                    lrow("ModelValue") = MonthlyParm.Value
+                                    lrow("TypicalMin") = MinValue
+                                    lrow("TypicalMax") = MaxValue
+                                    lParameterViolationTable.Rows.Add(lrow)
+                                End If
+                            Next
+
+                        End If
+
+                    End If
+                Catch ex As Exception
+
+                End Try
+            Next loperation
+
+        Next
+
+        If lParameterViolationTable.Rows.Count = 0 Then
+
+            ParameterInfo.AppendLine("<p>All the tested parameters are within the typical range.</p>")
+
+        End If
+        If lParameterViolationTable.Rows.Count > 0 And lParameterViolationTable.Rows.Count <= 10 Then
+
+            ParameterInfo.AppendLine("<p>Following parameters were beyond the typical range.")
+            ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable))
+
+        End If
+        If lParameterViolationTable.Rows.Count > 10 Then
+            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterTableTemplate.xsl"))
+            lXSLFile.Write(My.Resources.LimitViolatingParameterTemplate)
+            lXSLFile.Close()
+            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterReport.xml"))
+            lParameterInfo.WriteLine("<?xml version=""1.0"" encoding=""UTF-8""?>")
+            lParameterInfo.WriteLine("<?xml-stylesheet version=""1.0"" type=""text/xsl"" href=""ParameterTableTemplate.xsl""?>")
+            lParameterViolationTable.WriteXml(lParameterInfo, XmlWriteMode.IgnoreSchema)
+            lParameterInfo.Close()
+
+            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. First 10 cases are listed below and all the 
+                                        range violations are listed in a <a href=./ParameterReport.xml>separate xml table.</a></p>")
+
+            ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable, 10))
+        End If
+
+
+        Return ParameterInfo.ToString
+
+
+
+    End Function
+    ''' <summary>
+    ''' This function outputs heading of the QA/QC report and some general information.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <returns></returns>
+    Private Function GeneralModelInfo(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String
+        Dim GeneralModelInfoText As New Text.StringBuilder
+        GeneralModelInfoText.AppendLine("<h1>HSPF Model QA QC Report</h1>")
+        GeneralModelInfoText.AppendLine("<h2>Disclaimer</h2>")
+        GeneralModelInfoText.AppendLine("<p>The QA/QC module assumes that the model is run in English Units and the units of nutrients 
+                                        are in lbs. This report provides a set of checks for HSPF hydrology and water quality models 
+                                        that are based on generalized professional judgment.  Unique settings and conditions can 
+                                        lead to hydrologic and water quality complexities that do not conform to the judgments that 
+                                        are embedded in this module.  Furthermore, the set of aspects for which checks have been 
+                                        included is not all-inclusive.</p>")
+        GeneralModelInfoText.AppendLine("<p>This module also assumes that first four water quality constituents simulated on the land are  
+                                        ammonia (NH3+NH4), nitrate as nitrogen (NO3), orthophosphorus as phosphorus (ORTHO P), and biochemical 
+                                        oxygen demand (BOD) in the order that they are listed here with the QUALID as it is listed in the parenthesis.</p>")
+        GeneralModelInfoText.AppendLine("<h2>How to use the QA/QC Report</h2>")
+        GeneralModelInfoText.AppendLine("<p>The sequence of messages that are contained in the QA/QC Report for any UCI and its 
+                                        resulting output will flag aspects of the model input and output that are considered 
+                                        nontypical, thereby providing the modeler with a checklist of items that warrant either
+                                        re-affirmation or modification, either by refining aspects of the model input or 
+                                        undertaking additional calibration. </p>")
+        GeneralModelInfoText.AppendLine("<p>Iterative use of the QA/QC module should result in decreasing the number of instances 
+                                        of nontypical designations or results.  The aspects that remain flagged in a model run 
+                                        that is considered a final calibration will document nuances of the model that should be 
+                                        explained in the modeling application report. </p>")
+        GeneralModelInfoText.AppendLine("<h2>General Model Information</h2>")
+        GeneralModelInfoText.AppendLine("<table>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <th align=left>Model File Name</th>")
+        GeneralModelInfoText.AppendLine("    <th align=center>" & aUCI.Name & "</th>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <td>Model Span</td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>" & aUCI.GlobalBlock.SDate(0) & "/" & aUCI.GlobalBlock.SDate(1) & "/" & aUCI.GlobalBlock.SDate(2) & " - " &
+                                         aUCI.GlobalBlock.EDate(0) & "/" & aUCI.GlobalBlock.EDate(1) & "/" & aUCI.GlobalBlock.EDate(2) & "</td>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <td>Model Last Run time </td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>" & aRunMade & "</td>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <td>QA QC Report generated on </td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>" & DateTime.Now & "</td>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <td>HSPEXP+ Version </td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>3.0 beta</td>")
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("  <tr>")
+        GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
+        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values"
+        If pConstituents.Contains("Water") Then
+            QAQCAnalysis &= ", Water"
+        End If
+        If pConstituents.Contains("Sediment") Then
+            QAQCAnalysis &= ", Sediment"
+        End If
+        If pConstituents.Contains("TN") Then
+            QAQCAnalysis &= ", Total Nitrogen"
+        End If
+        If pConstituents.Contains("TP") Then
+            QAQCAnalysis &= ", Total Phosphorus"
+        End If
+        If pConstituents.Contains("BOD-Labile") Then
+            QAQCAnalysis &= ", BOD-Labile"
+        End If
+        QAQCAnalysis &= "</td>"
+        GeneralModelInfoText.AppendLine(QAQCAnalysis)
+        GeneralModelInfoText.AppendLine("  </tr>")
+        GeneralModelInfoText.AppendLine("</table>")
+        Return GeneralModelInfoText.ToString
+    End Function
+    ''' <summary>
+    ''' This function outputs area report of terminal reaches and model calibration reaches.
+    ''' </summary>
+    ''' <param name="aUCI"></param>
+    ''' <returns></returns>
+    Private Function ModelAreaReport(ByVal aUCI As HspfUci) As String
+        Dim ModelAreaReportTable As String = ""
+        Dim alocations As New atcCollection
+        For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
+            If lDownstreamReachID = 0 Then
+                alocations.Add("R:" & lRCHRES.Id)
+            End If
+        Next
+        'Need to add calibration reaches
+
+
+        Return ModelAreaReportTable
+    End Function
+    Private Function LoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
+                                           ByVal aDateString As String) As String
+        Dim OverAllComments As New Text.StringBuilder
+        Dim LoadingRateComments As New Text.StringBuilder
+        Dim newColumn As DataColumn
+        newColumn = New DataColumn()
+        newColumn.DataType = Type.GetType("System.String")
+        newColumn.ColumnName = "genLandUse"
+        newColumn.Caption = "Generalized Land Use"
+        aLandLoadingConstReport.Columns.Add(newColumn)
+        Dim UCILandUse As String = ""
+        Dim ListofLandUsesInUCI As New List(Of String)
+        Dim OpTypeNumber As String = ""
+        For Each row As DataRow In aLandLoadingConstReport.Rows
+            UCILandUse = row("OpDesc")
+            OpTypeNumber = row("OpTypeNumber")
+            If OpTypeNumber.StartsWith("I:") Then
+                row("genLandUse") = "Impervious"
+                If Not ListofLandUsesInUCI.Contains(row("genLandUse")) And Not row("genLandUse") = "Unknown" Then
+                    ListofLandUsesInUCI.Add(row("genLandUse"))
+                End If
+                Continue For
+            End If
+            row("genLandUse") = FindGeneralLandUse(UCILandUse)
+
+            If Not ListofLandUsesInUCI.Contains(row("genLandUse")) And Not row("genLandUse") = "Unknown" Then
+                ListofLandUsesInUCI.Add(row("genLandUse"))
+            End If
+        Next
+        Dim lSelectExpression As String = ""
+
+        'LoadingRateComments.AppendLine("<ul>")
+        Dim IsWetlandALanduse As Boolean = False
+        If ListofLandUsesInUCI.Contains("Wetland") Then IsWetlandALanduse = True
+
+        For Each landuse As String In ListofLandUsesInUCI
+            Dim TextFromFunction As String = String.Empty
+            Select Case aConstituentName
+                Case "WAT"
+                    TextFromFunction = CheckIrrigation(landuse, aLandLoadingConstReport)
+                    TextFromFunction &= CheckETIssues(landuse, aLandLoadingConstReport, ListofLandUsesInUCI, IsWetlandALanduse)
+                    TextFromFunction &= CheckRunoff(landuse, aLandLoadingConstReport, ListofLandUsesInUCI)
+                Case "TN"
+                    TextFromFunction &= CheckNutrientLoading(landuse, "NO3", ListofLandUsesInUCI, aLandLoadingConstReport)
+                    TextFromFunction &= CheckNutrientLoading(landuse, "TAM", ListofLandUsesInUCI, aLandLoadingConstReport)
+                    TextFromFunction &= CheckNutrientLoading(landuse, "TN", ListofLandUsesInUCI, aLandLoadingConstReport)
+                Case "TP"
+                    TextFromFunction &= CheckNutrientLoading(landuse, "PO4", ListofLandUsesInUCI, aLandLoadingConstReport)
+                    TextFromFunction &= CheckNutrientLoading(landuse, "TP", ListofLandUsesInUCI, aLandLoadingConstReport)
+                Case "BOD-Labile"
+                    TextFromFunction &= CheckNutrientLoading(landuse, "BOD-Labile", ListofLandUsesInUCI, aLandLoadingConstReport)
+                Case "SED"
+                    TextFromFunction &= CheckTotalSedimentErosion(landuse, ListofLandUsesInUCI, aLandLoadingConstReport)
+
+            End Select
+            If TextFromFunction.Length > 0 Then
+                LoadingRateComments.AppendLine(TextFromFunction)
+            End If
+        Next
+
+
+        If aConstituentName = "BOD-Labile" Then
+            OverAllComments.AppendLine("<p>BOD-Labile only includes labile fraction of total organic that enters the RCHRES as OXIF 2 Member of Group INFLOW.</p>")
+        End If
+
+        If LoadingRateComments.Length > 0 Then
+            OverAllComments.AppendLine("<h3>Non-typical behaviors that were noticed in the model.</h3>")
+            OverAllComments.AppendLine("<ul>")
+            OverAllComments.Append(LoadingRateComments)
+            OverAllComments.AppendLine("</ul>")
+        End If
+
+        Select Case aConstituentName
+            Case "WAT"
+                OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on annual runoff from each land use.</p>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
+            Case "SED"
+                OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on sediment loading rate from each land use.</p>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
+            Case "TN"
+                OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total nitrogen loading rate from each land use.</p>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
+            Case "TP"
+                OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total phosphorus loading rate from each land use.</p>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
+            Case "BOD-Labile"
+                OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
+                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
+        End Select
+
+
+
+        Return OverAllComments.ToString
+    End Function
+    ''' <summary>
+    ''' This Function takes the UCI Landuse and finds a corresponding general land use based on a CSV file.
+    ''' </summary>
+    ''' <param name="aUCILandUse"></param>
+    ''' <returns></returns>
+    Private Function FindGeneralLandUse(ByVal aUCILandUse As String) As String
+        Dim GeneralLandUse As String = "Unknown"
+
+        If aUCILandUse.ToLower.Contains("forest") Then
+            GeneralLandUse = "Forest"
+            Return GeneralLandUse
+        ElseIf aUCILandUse.ToLower.Contains("crop") OrElse aUCILandUse.ToLower.Contains("agric") Then
+            GeneralLandUse = "Ag/Other"
+            Return GeneralLandUse
+        ElseIf aUCILandUse.ToLower.Contains("urban") OrElse aUCILandUse.ToLower.Contains("develop") Then
+            GeneralLandUse = "Urban"
+            Return GeneralLandUse
+        End If
+
+        Dim LanduseMappings As XmlDocument = New XmlDocument
+        LanduseMappings.LoadXml(My.Resources.LandUseNames_Mappings)
+        Dim nodes As XmlNodeList = LanduseMappings.DocumentElement.SelectNodes("landusename")
+        For Each node As XmlNode In nodes
+            If node.SelectSingleNode("UCILandUse").InnerText = aUCILandUse Then
+                Return node.SelectSingleNode("GeneralLandUse").InnerText
+            End If
+        Next
+
+        Return GeneralLandUse
+    End Function
+    Private Function CheckIrrigation(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable) As String
+        If aLanduse = "Ag/Other" OrElse aLanduse = "Impervious" Then Return String.Empty
+        Dim IrrigationStatement As String = String.Empty
+        Dim IrrigationApp As Double = 0.0
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Try
+            IrrigationApp = aLandLoadingConstReport.Compute("AVG(IRRAPP6)", lSelectExpression)
+        Catch
+
+        End Try
+        If IrrigationApp > 0 Then
+            Return "<li>" & aLanduse & " land use has irrigation application.</li>"
+        Else
+            Return String.Empty
+        End If
+
+    End Function
+
+    ''' <summary>
+    ''' This function checks if the simulated runoff among land uses is inconsistent
+    ''' </summary>
+    ''' <param name="aLanduse"></param>
+    ''' <param name="aLandLoadingConstReport"></param>
+    ''' <param name="aListofLandUsesinUCI"></param>
+    ''' <returns></returns>
+    Private Function CheckRunoff(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable, ByVal aListofLandUsesinUCI As List(Of String)) As String
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim TotalOutFlow As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression)
+        Dim TotalSurfaceRunoff As Double = aLandLoadingConstReport.Compute("AVG(SURO)", lSelectExpression)
+        Dim CheckRunoffStatement As New Text.StringBuilder
+        If aLanduse = "Impervious" Then
+            For Each landuse2 As String In aListofLandUsesinUCI
+                If landuse2 = "Impervious" Then Continue For
+                Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                If TotalOutflow2 > TotalOutFlow Then
+                    CheckRunoffStatement.AppendLine("<li>" & landuse2 & " has greater runoff than Impervious area.</li>")
+                End If
+            Next
+        Else
+            Dim TotalBaseFlow As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalLZET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalUZET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+            Dim TotalAGWET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression) + aLandLoadingConstReport.Compute("AVG(AGWO)", lSelectExpression)
+
+            If TotalSurfaceRunoff > TotalBaseFlow Then
+                CheckRunoffStatement.AppendLine("<li>Surface runoff is greater than baseflow for " & aLanduse & ".</li>")
+            End If
+
+            Select Case aLanduse
+                Case "Forest"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                        Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                        Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                        Select Case True
+                            Case landuse2 = "Wetland" AndAlso TotalOutflow2 > TotalOutFlow
+                                CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than Forest.</li>")
+                            Case landuse2 <> "Wetland" AndAlso TotalOutflow2 < TotalOutFlow
+                                CheckRunoffStatement.AppendLine("<li>Forest has greater total outflow than " & landuse2 & ".</li>")
+                            Case landuse2 = "Wetland" AndAlso TotalSurfaceRunoff2 > TotalSurfaceRunoff
+                                CheckRunoffStatement.AppendLine("<li>Wetland has greater surface runoff than Forest.</li>")
+                            Case landuse2 <> "Wetland" AndAlso TotalSurfaceRunoff2 < TotalSurfaceRunoff
+                                CheckRunoffStatement.AppendLine("<li>Forest has greater surface runoff than " & landuse2 & ".</li>")
+                        End Select
+                    Next
+
+                Case "Wetland"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim SelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        Dim TotalOutflow2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", SelectExpression2)
+                        Dim TotalSurfaceRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(SURO)", SelectExpression2)
+                        Dim TotalBaseFlow2 As Double = aLandLoadingConstReport.Compute("AVG(IFWO)", SelectExpression2) + aLandLoadingConstReport.Compute("AVG(AGWO)", SelectExpression2)
+                        If TotalOutFlow > TotalOutflow2 Then
+                            CheckRunoffStatement.AppendLine("<li>Wetland has greater total outflow than " & landuse2 & ".</li>")
+                        End If
+                    Next
+
+            End Select
+        End If
+
+
+
+        Return CheckRunoffStatement.ToString
+    End Function
+
+    ''' <summary>
+    ''' This function checks if simulated ET is inconsistent among the land uses.
+    ''' </summary>
+    ''' <param name="aLanduse"></param>
+    ''' <param name="aLandLoadingConstReport"></param>
+    ''' <param name="aListofLandUsesinUCI"></param>
+    ''' <param name="WetlandLUExists"></param>
+    ''' <returns></returns>
+    Private Function CheckETIssues(ByVal aLanduse As String, ByVal aLandLoadingConstReport As DataTable,
+                                   ByVal aListofLandUsesinUCI As List(Of String),
+                                   ByVal WetlandLUExists As Boolean) As String
+        Dim CheckETIssuesStatement As New Text.StringBuilder
+        Dim lSelectExpression As String = ""
+        Dim TotalET As Double = 0
+        If aLanduse = "Impervious" Then
+            lSelectExpression = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+            TotalET = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
+            For Each landuse2 As String In aListofLandUsesinUCI
+                If landuse2 = "Impervious" Then Continue For
+                Dim lSelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                If TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                    CheckETIssuesStatement.AppendLine("<li>Impervious areas have greater ET loss than " & landuse2 & ".</li>")
+                End If
+            Next
+
+        Else
+            lSelectExpression = "OpTypeNumber Like 'P:%' And genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+            TotalET = aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression)
+            Dim PotET As Double = aLandLoadingConstReport.Compute("AVG(PET)", lSelectExpression)
+
+            Dim InterceptionET As Double = aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression)
+            Dim UpperZoneET As Double = aLandLoadingConstReport.Compute("AVG(UZET)", lSelectExpression)
+            Dim LowerZoneET As Double = aLandLoadingConstReport.Compute("AVG(LZET)", lSelectExpression)
+            Dim GroundWaterET As Double = aLandLoadingConstReport.Compute("AVG(AGWET)", lSelectExpression)
+            Dim BaseflowET As Double = aLandLoadingConstReport.Compute("AVG(BASET)", lSelectExpression)
+
+            If aLanduse <> "Wetland" AndAlso WetlandLUExists AndAlso GroundWaterET > 0 Then
+                CheckETIssuesStatement.AppendLine("<li>Groundwater is being lost through evapotranspiration in " & aLanduse & " even though there is a separate Wetland land use.</li>")
+            End If
+
+            If UpperZoneET > LowerZoneET Then
+                CheckETIssuesStatement.AppendLine("<li>Eaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
+            End If
+
+
+            Select Case aLanduse
+
+                Case "Forest"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        'Comparing Total ET
+                        If landuse2 = "Wetland" AndAlso TotalET > aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>Forest has more ET than Wetland.</li>")
+                        ElseIf landuse2 <> "Wetland" AndAlso TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Forest.</li>")
+                        End If
+                        'Comparing Interception ET loss
+                        If landuse2 <> "Wetland" AndAlso InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Forest.</li>")
+                        End If
+                    Next landuse2
+
+
+                Case "Wetland"
+                    For Each landuse2 As String In aListofLandUsesinUCI
+                        If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
+                        Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                        If TotalET < aLandLoadingConstReport.Compute("AVG(TAET)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more ET than Wetland.</li>")
+                        End If
+                        If InterceptionET < aLandLoadingConstReport.Compute("AVG(CEPE)", lSelectExpression2) Then
+                            CheckETIssuesStatement.AppendLine("<li>" & landuse2 & " has more interception loss than Wetland.</li>")
+                        End If
+                    Next landuse2
+            End Select
+        End If
+
+        Return CheckETIssuesStatement.ToString
+
+    End Function
+    ''' <summary>
+    ''' This function checks if simulated sediment outflow is inconsistent among land uses.
+    ''' </summary>
+    ''' <param name="aLanduse"></param>
+    ''' <param name="aListofLandUsesinUCI"></param>
+    ''' <param name="aLandLoadingConstReport"></param>
+    ''' <returns></returns>
+    Private Function CheckTotalSedimentErosion(ByVal aLanduse As String, ByVal aListofLandUsesinUCI As List(Of String),
+                                               ByVal aLandLoadingConstReport As DataTable) As String
+        Dim lUnits As String = " lb/ac/yr"
+        Dim CheckTotalSedErosion As New Text.StringBuilder
+        Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim TotalSedRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) 'Need to convert sediment erosion rate to lbs/ac
+        Dim TotalGullyErosion As Double = 0
+        Try
+            TotalGullyErosion = aLandLoadingConstReport.Compute("AVG(SCRSD)", lSelectExpression)
+        Catch ex As Exception
+
+        End Try
+        If TotalGullyErosion > 0 And aLanduse <> "Forest" Then
+            CheckTotalSedErosion.AppendLine("<li>Gully erosion is being simulated on " & aLanduse & ".</li>")
+        End If
+
+        Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, "SED")
+        If TotalSedRunoff > LoadingRate(1) OrElse TotalSedRunoff < LoadingRate(0) Then
+            CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
+                                            LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+        End If
+
+        Select Case aLanduse
+            Case "Impervious"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Impervious" Then Continue For
+                    Dim lSelectExpression2 As String = "genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
+                    If TotalSedRunoff2 > TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Impervious area has greater sediment runoff than " & landuse2 & ".</li>")
+                    End If
+                Next
+
+            Case "Forest"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" OrElse landuse2 = "Impervious" Then Continue For
+                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
+                    If landuse2 = "Wetland" AndAlso TotalSedRunoff2 > TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Wetland has greater sediment runoff than Forest.</li>")
+                    ElseIf landuse2 <> "Wetland" AndAlso TotalSedRunoff2 < TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Forest has greater sediment runoff than " & landuse2 & ".</li>")
+                    End If
+                Next
+            Case "Wetland"
+                For Each landuse2 As String In aListofLandUsesinUCI
+                    If landuse2 = "Forest" OrElse landuse2 = "Wetland" OrElse landuse2 = "Impervious" Then Continue For
+                    Dim lSelectExpression2 As String = "OpTypeNumber Like 'P:%' And genLandUse = '" & landuse2 & "' And Year = 'SumAnnual'"
+                    Dim TotalSedRunoff2 As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression2)
+                    If TotalSedRunoff2 < TotalSedRunoff Then
+                        CheckTotalSedErosion.AppendLine("<li>Wetland has greater sediment runoff than " & landuse2 & ".</li>")
+                    End If
+                Next
+        End Select
+        Return CheckTotalSedErosion.ToString
+    End Function
+    ''' <summary>
+    ''' Calculating Nutrient Loading Rate Range for all landuses 
+    ''' </summary>
+    ''' <param name="aLanduse"></param>
+    ''' <param name="aConstituentName"></param>
+    ''' <param name="aListofLandUsesinUCI"></param>
+    ''' <param name="aLandLoadingConstReport"></param>
+    ''' <returns></returns>
+    Private Function CheckNutrientLoading(ByVal aLanduse As String, ByVal aConstituentName As String, ByVal aListofLandUsesinUCI As List(Of String),
+                                               ByVal aLandLoadingConstReport As DataTable) As String
+        Dim CheckNutrientLoadingText As New Text.StringBuilder
+        Dim lUnits As String = " lb/ac/yr"
+        Dim lSelectExpression As String = "ConstNameEXP = '" & aConstituentName &
+                                            "' AND genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
+        Dim lconversionfactor As Double = 1.0
+        'If aConstituentName = "SED" Then lconversionfactor = 2000
+        Dim TotalRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) * lconversionfactor 'Need to convert sediment erosion rate to lbs/ac
+        Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, aConstituentName)
+        If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
+            CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
+                                                "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
+                Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
+        End If
+
+        Return CheckNutrientLoadingText.ToString
+    End Function
+    Private Function GetMinMaxLoadingRates(ByVal aLanduse As String, ByVal aConstituent As String) As List(Of Double)
+        Dim MinMaxRange As New List(Of Double)
+        Dim LoadingRateRange As XmlDocument = New XmlDocument()
+        LoadingRateRange.LoadXml(My.Resources.LoadingRates) '    
+        Dim SelectStatementFromXML As String = "/LoadingRates/Nutrient[@type='" & aConstituent & "']/Landuse[@name='" & aLanduse & "']"
+        Dim nodes As XmlNodeList = LoadingRateRange.DocumentElement.SelectNodes(SelectStatementFromXML)
+
+        MinMaxRange.Add(nodes(0).SelectSingleNode("Min").InnerText)
+        MinMaxRange.Add(nodes(0).SelectSingleNode("Max").InnerText)
+
+        Return MinMaxRange
+    End Function
+    'Private Function CheckIfMonthlyFlagisOn(ByVal aTableParm As String, ByVal aParmName As String, Optional ByVal aConst As String = "") As IList(Of String)
+    '    Dim MonthlyFlagisOn As New List(Of String)
+    '    'Based on the aTableParm and aParmName locate the relevant TableName and Parametervalue that describes if the monthly flag is on
+    '    Dim MonthlyParmName As XmlDocument = New XmlDocument
+    '    MonthlyParmName.LoadXml(My.Resources.MonthlyParmForMonthlyParm)
+
+    '    Dim SelectStarementFromXML As String = "/MONTHLYTABLE/Parm"
+    '    Dim nodes As XmlNodeList = MonthlyParmName.DocumentElement.SelectNodes(SelectStarementFromXML)
+    '    For Each node As XmlNode In nodes
+    '        If aTableParm = node.SelectSingleNode("ParmTable").InnerText AndAlso aParmName = node.SelectSingleNode("ParmName").InnerText Then
+    '            Dim FLAGTable As String = node.SelectSingleNode("FlagTable").InnerText
+    '            Dim FLAGParm As String = node.SelectSingleNode("FlagName").InnerText
+
+    '        End If
+
+    '    Next
+
+    '    Return MonthlyFlagisOn
+    'End Function
+
+    Private Function VerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
+        Dim StorageTrend As New Text.StringBuilder
+        Dim OverAllStorageTrend As New Text.StringBuilder
+        Dim lSimSpan As Double = aUCI.GlobalBlock.EdateJ - aUCI.GlobalBlock.SDateJ
+        Dim lNumberOfTrendIssues As Integer = 0
+        Logger.Dbg("Constituent Storage Analysis for " & aConstituent)
+        Dim lListOfStorageVariables As New List(Of String)
+        Select Case aConstituent
+            Case "WAT"
+                lListOfStorageVariables.Add("R:VOL")
+                OverAllStorageTrend.AppendLine("<h2>Reach water volume analysis</h2>")
+            Case "TN"
+                lListOfStorageVariables.Add("R:NO3-STOR")
+                lListOfStorageVariables.Add("R:TAM-STOR")
+                lListOfStorageVariables.Add("R:N-TOT-CONC")
+                lListOfStorageVariables.Add("P:SQO-NO3")
+                lListOfStorageVariables.Add("P:SQO-NH3+NH4")
+                lListOfStorageVariables.Add("I:SQO-NO3")
+                lListOfStorageVariables.Add("I:SQO-NH3+NH4")
+                OverAllStorageTrend.AppendLine("<h2>Nitrate, ammonia, and total nitogen storage and concentration analysis</h2>")
+            Case "TP"
+                lListOfStorageVariables.Add("R:PO4-STOR")
+                lListOfStorageVariables.Add("R:P-TOT-CONC")
+                lListOfStorageVariables.Add("P:SQO-ORTHO P")
+                lListOfStorageVariables.Add("I:SQO-ORTHO P")
+                OverAllStorageTrend.AppendLine("<h2>Orthophosphorus and total phosphorus storage and concentration analysis</h2>")
+            Case "SED"
+                lListOfStorageVariables.Add("R:BEDDEP")
+                lListOfStorageVariables.Add("P:DETS")
+                lListOfStorageVariables.Add("I:SLDS")
+                OverAllStorageTrend.AppendLine("<h2>Reach Bed Depth and sediment storage analysis</h2>")
+            Case "BOD-Labile"
+                lListOfStorageVariables.Add("P:SQO-BOD")
+                lListOfStorageVariables.Add("I:SQO-BOD")
+                OverAllStorageTrend.AppendLine("<h2>BOD-labile storage analysis</h2>")
+        End Select
+        If lSimSpan < 1827 Then
+            OverAllStorageTrend.AppendLine("<p>The time span of simulation is shorter than 5 years. The long term trend analysis may not be accurate.</p>")
+        End If
+        StorageTrend.AppendLine("<ul>")
+        For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
+            Dim lLocationName As String = ""
+            Select Case lOperation.Name
+                Case "PERLND"
+                    lLocationName = "P:" & lOperation.Id
+                Case "IMPLND"
+                    lLocationName = "I:" & lOperation.Id
+                Case "RCHRES"
+                    lLocationName = "R:" & lOperation.Id
+                Case Else
+                    Continue For
+            End Select
+
+            For Each StorageVariable As String In lListOfStorageVariables
+                If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
+                StorageVariable = StorageVariable.Split(":")(1)
+                Logger.Dbg("Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+                Dim lSlope As Double = 0
+                Dim lIntercept As Double = 0
+                Dim lRCoeff As Double = 0
+                Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
+                If lStorageTimeSeries Is Nothing Then Continue For
+                Dim lTempTimeSeries As New atcTimeseries(Nothing)
+                lTempTimeSeries = lStorageTimeSeries.Clone
+                For i As Integer = 0 To lStorageTimeSeries.numValues
+                    lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
+                Next
+                Dim lArgs As New atcDataAttributes()
+                Dim lTSerAverage As Double = 0
+                Dim lTSerStdev As Double = 0
+                Try
+                    lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
+                    lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
+                Catch
+                    StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+
+                    Continue For
+                End Try
+                lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                lArgs.SetValue("Number", lTSerAverage)
+                lStorageTimeSeries = DoMath("subtract", lArgs)
+                lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                lArgs.SetValue("Number", lTSerStdev)
+                lStorageTimeSeries = DoMath("divide", lArgs)
+                'Now find the slope of this timeseries
+                FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
+                If lSlope > 0.002 Then
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
+                    lNumberOfTrendIssues += 1
+                ElseIf lSlope < -0.002 Then
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
+                    lNumberOfTrendIssues += 1
+                End If
+
+                'Stop
+
+            Next
+        Next
+        StorageTrend.AppendLine("</ul>")
+
+        If lNumberOfTrendIssues > 0 Then
+            OverAllStorageTrend.AppendLine("<p>Following non-typical long term trend issues were noticed in the model.</p>")
+            OverAllStorageTrend.Append(StorageTrend)
+
+        Else
+            OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
+        End If
+
+        Return OverAllStorageTrend.ToString
+
+    End Function
+    Private Function ConvertToHtmlFile(ByVal myTable As DataTable, ByVal Optional NumberOfRows As Integer = 0) As String
+        Dim myHtmlFile As String = ""
+        Dim myBuilder As New Text.StringBuilder
+        Dim ColumnCounter As Integer = 0
+        If myTable Is Nothing Then
+            Throw New System.ArgumentNullException("myTable")
+        Else
+            myBuilder.AppendLine("<table style = width:100%>")
+            myBuilder.AppendLine("<tr>")
+            For Each myColumn As DataColumn In myTable.Columns
+                ColumnCounter += 1
+                If ColumnCounter = 1 Or ColumnCounter = 3 Then
+                    myBuilder.Append("<th align=""left"">")
+                Else
+                    myBuilder.Append("<th>")
+                End If
+                myBuilder.Append(myColumn.Caption)
+                myBuilder.AppendLine("</th>")
+            Next
+            myBuilder.AppendLine("</tr>")
+
+            Dim MyRowCounter As Integer = 0
+            ColumnCounter = 0
+            For Each myRow As DataRow In myTable.Rows
+                MyRowCounter += 1
+                myBuilder.AppendLine("<tr>")
+                For Each myColumn As DataColumn In myTable.Columns
+                    ColumnCounter += 1
+                    If ColumnCounter = 1 Or ColumnCounter = 3 Then
+                        myBuilder.Append("<td align=""left"">")
+                    Else
+                        myBuilder.Append("<td align=""center"">")
+                    End If
+
+                    myBuilder.Append(myRow(myColumn.ColumnName).ToString())
+                    myBuilder.AppendLine("</td>")
+                Next
+                ColumnCounter = 0
+                If NumberOfRows <> 0 AndAlso MyRowCounter = NumberOfRows Then Exit For
+            Next
+            myBuilder.AppendLine("</tr>")
+
+        End If
+
+        'Close tags. 
+        myBuilder.AppendLine("</table>")
+
+        myHtmlFile = myBuilder.ToString()
+        Return myHtmlFile
+    End Function
+    Private Function CheckDiurnalPattern(ByVal aBinaryData As atcDataSource, ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+        Dim lDiurnalPattern As New Text.StringBuilder
+        Dim lFoundTheTS As Boolean = False
+        Dim lGroupName As String = ""
+        Dim lMemberName As String = ""
+        Dim lMemSub1 As Integer = 0
+        Dim lMemSub2 As Integer = 0
+        Select Case aConstituent
+            Case "DO"
+                lGroupName = "OXRX"
+                lMemberName = "DOX"
+                lMemSub1 = 1
+                lMemSub2 = 1
+            Case "Water Temperature"
+                lGroupName = "OXRX"
+                lMemberName = "DOX"
+                lMemSub1 = 1
+                lMemSub2 = 1
+        End Select
+        For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+
+            LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS)
+
+
+
+        Next
 
 
 
 
-
+        Return lDiurnalPattern.ToString
+    End Function
 End Module
+
+
+
+
