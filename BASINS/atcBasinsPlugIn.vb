@@ -150,7 +150,7 @@ Public Class atcBasinsPlugIn
             End If
         End If
 
-        CheckForUpdates(True)
+        'CheckForUpdates(True)
 
         atcDataManager.LoadPlugin("Timeseries::Statistics")
 
@@ -178,15 +178,15 @@ Public Class atcBasinsPlugIn
             Case "SW Toolbox"
             Case "GW Toolbox"
             Case Else ' BASINS 
-                atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
+                'atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
         End Select
 
         g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
-        atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, TopHelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
+        'atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, TopHelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
         atcDataManager.AddMenuIfMissing(ShowStatusMenuName, TopHelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
-        atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, TopHelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
+        'atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, TopHelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
 
         Dim lMenuItem As MapWindow.Interfaces.MenuItem
         For Each lDataDir As String In g_BasinsDataDirs
@@ -235,10 +235,10 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(ProjectsMenuName)
         g_MapWin.Menus.Remove(OurHelpMenuName)
         g_MapWin.Menus.Remove(ProgramWebPageMenuName)
-        g_MapWin.Menus.Remove(RegisterMenuName)
-        g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
+        'g_MapWin.Menus.Remove(RegisterMenuName)
+        'g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
         g_MapWin.Menus.Remove(ShowStatusMenuName)
-        g_MapWin.Menus.Remove(SendFeedbackMenuName)
+        'g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
         'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcView3")
         'g_MapWin.Menus.Remove(atcDataManager.LaunchMenuName & "_ArcGIS")
