@@ -19,20 +19,23 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuFileExportResults As System.Windows.Forms.MenuItem
     Friend WithEvents lblNote As System.Windows.Forms.Label
     Private pReturns() As Double
+    Private pConditions As atcDataAttributes
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-                   ByVal aHigh As Boolean, _
-                   ByVal aNday() As Double, _
-                   ByVal aReturns() As Double, _
-                   Optional ByVal aShowForm As Boolean = True)
+    Public Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup,
+                   ByVal aHigh As Boolean,
+                   ByVal aNday() As Double,
+                   ByVal aReturns() As Double,
+                   Optional ByVal aShowForm As Boolean = True,
+                   Optional ByVal aConditions As atcDataAttributes = Nothing)
         MyBase.New()
         pInitializing = True
         Me.Visible = False
         pDataGroup = aDataGroup
         pNday = aNday
         pReturns = aReturns
+        pConditions = aConditions
 
         InitializeComponent() 'required by Windows Form Designer
 
@@ -260,7 +263,7 @@ Friend Class frmDisplayFrequencyGrid
     Private Sub PopulateGrid()
         If Not pInitializing Then
             Dim lContinue As Boolean = True
-            pSource = New atcFrequencyGridSource(pDataGroup, pNday, pReturns)
+            pSource = New atcFrequencyGridSource(pDataGroup, pNday, pReturns, pConditions)
             'If pSource.Columns < 3 Then
             '    lContinue = UserSpecifyAttributes()
             '    If lContinue Then
