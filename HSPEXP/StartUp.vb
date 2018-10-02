@@ -60,9 +60,10 @@ Public Class StartUp
         chkHeat.Enabled = lExists
         txtRCH.Enabled = lExists
         lblRCH.Enabled = lExists
-        lblOutReach2.Enabled = lExists
         pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
+        chkBathtub.Enabled = lExists
+        chkWASP.Enabled = lExists
         chkGQUAL1.Visible = False
         chkGQUAL2.Visible = False
         chkGQUAL3.Visible = False
@@ -190,23 +191,19 @@ Public Class StartUp
             chkGQUAL4.Checked OrElse
             chkGQUAL5.Checked OrElse
             chkGQUAL6.Checked OrElse
-            chkGQUAL7.Checked Then
-
+            chkGQUAL7.Checked OrElse
+            chkBathtub.Checked OrElse
+            chkWASP.Checked Then
             lblRCH.Enabled = True
-            lblOutReach2.Enabled = True
             txtRCH.Enabled = True
             pnlHighlight.Enabled = True
         Else
             lblRCH.Enabled = False
-            lblOutReach2.Enabled = False
             txtRCH.Enabled = False
             pnlHighlight.Enabled = False
         End If
 
     End Sub
-
-
-
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -236,7 +233,6 @@ Public Class StartUp
         Logger.Dbg(Now & " Attempting to open hspfmsg.wdm")
         pHspfMsg = New atcUCI.HspfMsg
         pHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename) 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
-
 
         atcData.atcDataManager.Clear()
         With atcData.atcDataManager.DataPlugins
@@ -307,6 +303,8 @@ Public Class StartUp
             chkGQUAL5.Enabled = False
             chkGQUAL6.Enabled = False
             chkGQUAL7.Enabled = False
+            chkBathtub.Enabled = False
+            chkWASP.Enabled = False
             txtRCH.Enabled = False
 
         Else
@@ -329,6 +327,8 @@ Public Class StartUp
             chkGQUAL5.Enabled = True
             chkGQUAL6.Enabled = True
             chkGQUAL7.Enabled = True
+            chkWASP.Enabled = True
+            chkBathtub.Enabled = True
         End If
 
 
@@ -405,6 +405,8 @@ Public Class StartUp
             chkGQUAL6.Enabled = False
             chkGQUAL7.Enabled = False
             txtRCH.Enabled = False
+            chkWASP.Enabled = False
+            chkBathtub.Enabled = False
 
         Else
             chkRunHSPF.Enabled = True
@@ -427,5 +429,25 @@ Public Class StartUp
             chkGQUAL6.Enabled = True
             chkGQUAL7.Enabled = True
         End If
+    End Sub
+
+    Private Sub lblOutReach2_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub txtRCH_TextChanged(sender As Object, e As EventArgs) Handles txtRCH.TextChanged
+
+    End Sub
+
+    Private Sub lblRCH_Click(sender As Object, e As EventArgs) Handles lblRCH.Click
+
+    End Sub
+
+    Private Sub pnlHighlight_Paint(sender As Object, e As PaintEventArgs) Handles pnlHighlight.Paint
+
+    End Sub
+
+    Private Sub chkAreaReports_CheckedChanged(sender As Object, e As EventArgs) Handles chkAreaReports.CheckedChanged
+
     End Sub
 End Class
