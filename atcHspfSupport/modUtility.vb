@@ -2,6 +2,7 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 Imports atcUCI
+Imports System.Data
 
 Public Module Utility
     Public Class ConstituentProperties
@@ -2207,18 +2208,92 @@ Public Module Utility
             End If
             'Do While lUnits.Length = 0
             For lIndex As Integer = 2 To 10
-                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
-                        If aGQualName = lTempQual Then
+                If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                    lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+                    If aGQualName = lTempQual Then
                         'found it
                         lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
                         Exit For
                     End If
-                    End If
-                Next
+                End If
+            Next
             'Loop
         End If
 
         Return lUnits
     End Function
+
+
+    Public Function AreaReportInTableFormat(ByVal aUCI As HspfUci, ByVal aOperationTypes As atcCollection, ByVal aLocation As String) As DataTable
+
+        Dim lAreaTable As DataTable
+        lAreaTable = New DataTable("ModelAreaTable")
+        Dim lColumn As DataColumn
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Landuse"
+        lColumn.Caption = "Landuse Category"
+        lColumn.DataType = Type.GetType("System.String")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PervArea"
+        lColumn.Caption = "Pervious Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "ImpervArea"
+        lColumn.Caption = "Impervious Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TotalArea"
+        lColumn.Caption = "Total Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        Dim lRow As DataRow
+
+        Dim lContributingLandUseAreas As atcCollection = ContributingLandUseAreas(aUCI, aOperationTypes, aLocation)
+
+        Dim lTotalAreaFromLandUses As Double = 0
+        Dim lTotalAreaPerv As Double = 0.0
+        Dim lTotalAreaImpr As Double = 0.0
+        For lLandUseIndex As Integer = 0 To lContributingLandUseAreas.Count - 1
+            Dim lLandUseAreaString As String = lContributingLandUseAreas.Item(lLandUseIndex)
+            Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
+            Dim lPervArea As Double = 0
+            If lLandUseAreaString.Length > 0 Then
+                lPervArea = lLandUseAreaString
+            End If
+
+            Dim lLandUseArea As Double = lPervArea + lImprArea
+
+            lRow = lAreaTable.NewRow
+            lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString.PadLeft(20)
+            lRow("PervArea") = DecimalAlign(lPervArea, , 2, 7)
+            lRow("ImpervArea") = DecimalAlign(lImprArea, , 2, 7)
+            lRow("TotalArea") = DecimalAlign(lLandUseArea, , 2, 7)
+            lAreaTable.Rows.Add(lRow)
+
+            lTotalAreaPerv += lPervArea
+            lTotalAreaImpr += lImprArea
+            lTotalAreaFromLandUses += lLandUseArea
+        Next
+        lContributingLandUseAreas.Clear()
+
+        lRow = lAreaTable.NewRow
+        lAreaTable.Rows.Add(lRow)
+
+        lRow = lAreaTable.NewRow
+        lRow("Landuse") = "Total"
+        lRow("PervArea") = DecimalAlign(lTotalAreaPerv, , 2, 7)
+        lRow("ImpervArea") = DecimalAlign(lTotalAreaImpr, , 2, 7)
+        lRow("TotalArea") = DecimalAlign(lTotalAreaFromLandUses, , 2, 7)
+        lAreaTable.Rows.Add(lRow)
+        Return lAreaTable
+    End Function
+
 End Module
