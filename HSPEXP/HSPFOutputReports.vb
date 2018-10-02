@@ -31,6 +31,8 @@ Module HSPFOutputReports
     Private MultiSimulation As Boolean = False
     Private pListModelParameters As Boolean = False
     Private ASDate, AEDate As Date
+    Private pBATHTUB As Boolean = True
+    Private pWASP As Boolean = True
 
     Private Sub Initialize()
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
@@ -58,6 +60,8 @@ Module HSPFOutputReports
         pGraphSaveWidth = 1300
         pGraphSaveHeight = 768
         pModelQAQC = StartUp.chkModelQAQC.Checked
+        pBATHTUB = StartUp.chkBathtub.Checked
+        pWASP = StartUp.chkWASP.Checked
 
 
         pRunUci = StartUp.chkRunHSPF.Checked
@@ -236,6 +240,9 @@ Module HSPFOutputReports
                 Directory.CreateDirectory(loutfoldername)
                 File.Copy(pTestPath & pBaseName & ".uci", loutfoldername & pBaseName & ".uci", overwrite:=True)
                 'A folder name is given that has the basename and the time when the run was made.
+
+
+
 
 #Region "Start QA/QC Report"
 
@@ -494,14 +501,15 @@ Module HSPFOutputReports
                 End If
 #End Region
 
+
+
+
+
+
 #Region "Water Quality"
-                If pConstituents.Count > 0 Then
-                    'Dim lHspfBinDataSource As New atcDataSource
+                If pConstituents.Count > 0 OrElse pBATHTUB Then
                     Dim lOpenHspfBinDataSource As New atcDataSource
-
                     Logger.Dbg(Now & " Opening the binary output files.")
-
-                    'Dim lLocations As New atcCollection
                     For i As Integer = 0 To aHspfUci.FilesBlock.Count
                         If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
                             Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
@@ -513,6 +521,32 @@ Module HSPFOutputReports
                             End If
                         End If
                     Next i
+
+#Region "Reading data from HBN Files for BATHTUB"
+                    If pBATHTUB Then
+                        If pOutputLocations.Count > 0 Then
+                            Dim lBATHTUBDataSource As New atcDataSource
+                            For Each location As String In pOutputLocations
+                                lBATHTUBDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", location))
+                                Dim locationID As Integer = location.Substring(2)
+                                Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(locationID)
+                                For Each lSource As HspfConnection In lRCHRESOperation.Sources
+                                    If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
+
+                                        Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
+                                        lBATHTUBDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
+
+
+                                    End If
+                                Next
+
+                                BATHTUBInputFile(aHspfUci, lBATHTUBDataSource, SDateJ, EDateJ, locationID, pTestPath)
+                            Next
+                        Else
+                        End If
+                    End If
+
+#End Region
 
                     For Each lConstituent As String In pConstituents
                         Dim lConstProperties As New List(Of ConstituentProperties)
@@ -608,6 +642,7 @@ Module HSPFOutputReports
                             Dim lOutFileName As String = ""
 
                             Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(loutfoldername, lScenarioResults, aHspfUci, pBaseName, lRunMade, lConstituentName, lConstProperties, SDateJ, EDateJ, lGQALID)
+
                             If pModelQAQC Then
                                 QAQCReportFile.AppendLine("<h2>" & lConstituent & " Loading Rate Analysis</h2>")
                                 QAQCReportFile.AppendLine(LoadingRateComparison(lConstituentName, LandLoadingReportForConstituents, lDateString))
@@ -964,8 +999,19 @@ Module HSPFOutputReports
             Next loperation
 
         Next
+        Dim lReachesWithAdsDepoIssue As Integer = 0
+        For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            If lRCHRES.Tables("ACTIVITY").Parms("NUTFG").Value = 1 AndAlso (lRCHRES.Tables("NUT-FLAGS").Parms("ADNHFG").Value = 0 OrElse
+                lRCHRES.Tables("NUT-FLAGS").Parms("ADPOFG").Value = 0) Then
+                lReachesWithAdsDepoIssue += 1
+                If lReachesWithAdsDepoIssue > 1 Then
+                    ParameterInfo.AppendLine("<p>At least one reach simulates nutrients but the adsoprtion and desorption from bed sediment is not simulated.</p>")
+                    Exit For
+                End If
+            End If
+        Next
 
-        If lParameterViolationTable.Rows.Count = 0 Then
+        If lParameterViolationTable.Rows.Count = 0 AndAlso lReachesWithAdsDepoIssue = 0 Then
 
             ParameterInfo.AppendLine("<p>All the tested parameters are within the typical range.</p>")
 
@@ -992,11 +1038,7 @@ Module HSPFOutputReports
             ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable, 10))
         End If
 
-
         Return ParameterInfo.ToString
-
-
-
     End Function
     ''' <summary>
     ''' This function outputs heading of the QA/QC report and some general information.
@@ -1347,7 +1389,7 @@ Module HSPFOutputReports
             End If
 
             If UpperZoneET > LowerZoneET Then
-                CheckETIssuesStatement.AppendLine("<li>Eaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
+                CheckETIssuesStatement.AppendLine("<li>Evaporation from upper zone is greater than evaporation from lower zone for " & aLanduse & ".</li>")
             End If
 
 
@@ -1578,14 +1620,17 @@ Module HSPFOutputReports
                 Dim lArgs As New atcDataAttributes()
                 Dim lTSerAverage As Double = 0
                 Dim lTSerStdev As Double = 0
+                Dim lCoeffVariation As Double = 0
                 Try
                     lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
                     lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
+                    lCoeffVariation = lTSerStdev / lTSerAverage
                 Catch
                     StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
 
                     Continue For
                 End Try
+                If lCoeffVariation < 0.1 Then Continue For
                 lArgs.SetValue("Timeseries", lStorageTimeSeries)
                 lArgs.SetValue("Number", lTSerAverage)
                 lStorageTimeSeries = DoMath("subtract", lArgs)
@@ -1595,10 +1640,10 @@ Module HSPFOutputReports
                 'Now find the slope of this timeseries
                 FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
                 If lSlope > 0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing. Slope = " & lSlope & "</li>")
                     lNumberOfTrendIssues += 1
                 ElseIf lSlope < -0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing. Slope = " & lSlope & "</li>")
                     lNumberOfTrendIssues += 1
                 End If
 
@@ -1669,6 +1714,13 @@ Module HSPFOutputReports
         myHtmlFile = myBuilder.ToString()
         Return myHtmlFile
     End Function
+    ''' <summary>
+    ''' This function checks the diurnal pattern of the hourly time series. 
+    ''' </summary>
+    ''' <param name="aBinaryData"></param>
+    ''' <param name="aUCI"></param>
+    ''' <param name="aConstituent"></param>
+    ''' <returns></returns>
     Private Function CheckDiurnalPattern(ByVal aBinaryData As atcDataSource, ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
         Dim lDiurnalPattern As New Text.StringBuilder
         Dim lFoundTheTS As Boolean = False
@@ -1676,23 +1728,37 @@ Module HSPFOutputReports
         Dim lMemberName As String = ""
         Dim lMemSub1 As Integer = 0
         Dim lMemSub2 As Integer = 0
+        Dim lConstituent As String = ""
         Select Case aConstituent
             Case "DO"
                 lGroupName = "OXRX"
                 lMemberName = "DOX"
                 lMemSub1 = 1
                 lMemSub2 = 1
+                lConstituent = "DOXCONC"
             Case "Water Temperature"
                 lGroupName = "OXRX"
                 lMemberName = "DOX"
                 lMemSub1 = 1
                 lMemSub2 = 1
+                lConstituent = "TW"
         End Select
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
 
-            LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS)
+            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
+                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            End If
+            If lTS Is Nothing Then
+                lTS = aBinaryData.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
+            End If
+            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
+                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            End If
+            If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
+                'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
 
-
+            End If
 
         Next
 
@@ -1700,6 +1766,9 @@ Module HSPFOutputReports
 
 
         Return lDiurnalPattern.ToString
+    End Function
+    Private Function CheckIfAdsDesIsSimulated() As String
+
     End Function
 End Module
 
