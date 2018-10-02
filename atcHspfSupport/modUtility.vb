@@ -1141,6 +1141,15 @@ Public Module Utility
         Return lLUCombined
     End Function
 
+    'given a uci and an outlet location (like R:930), return a collection of contributing areas 
+    Public Function ContributingLandUseAreas(ByVal aUci As HspfUci,
+                                             ByVal aOperationTypes As atcCollection,
+                                             ByVal aOutletLocation As String) As atcCollection
+        Dim lLandUses As atcCollection = LandUses(aUci, aOperationTypes, aOutletLocation)
+        Dim lLandUsesCombinePervImpv As atcCollection = LandUsesCombined(lLandUses)
+        Return lLandUsesCombinePervImpv
+    End Function
+
     Public Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String,
                                                ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer,
                                        Optional ByVal aGQALID As Integer = 0) As Double

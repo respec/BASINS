@@ -279,8 +279,9 @@ Module HSPFOutputReports
                             alocations.Add("R:" & lRCHRES.Id)
                         End If
                     Next
+                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
 
-                    'Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+                    QAQCReportFile.AppendLine(ModelAreaReport(aHspfUci, lOperationTypes))
 
                 End If
 
@@ -1074,25 +1075,163 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("</table>")
         Return GeneralModelInfoText.ToString
     End Function
+
     ''' <summary>
     ''' This function outputs area report of terminal reaches and model calibration reaches.
     ''' </summary>
     ''' <param name="aUCI"></param>
+    ''' <param name="aOperationTypes"></param>
     ''' <returns></returns>
-    Private Function ModelAreaReport(ByVal aUCI As HspfUci) As String
+    Private Function ModelAreaReport(ByVal aUCI As HspfUci, ByVal aOperationTypes As atcCollection) As String
         Dim ModelAreaReportTable As String = ""
-        Dim alocations As New atcCollection
+        Dim lOutletLocations As New atcCollection
+        Dim lCalibrationLocations As New atcCollection
+        Dim lLocationsToOutput As New atcCollection
+
+        'First add calibration reaches by looking at contents of expert system .exs files
+        Dim lExpertSystemFileNames As New NameValueCollection
+        AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
+        Dim lExpertSystem As HspfSupport.atcExpertSystem
+        For Each lExpertSystemFileName As String In lExpertSystemFileNames
+            Try
+                lExpertSystem = New HspfSupport.atcExpertSystem(aUCI, lExpertSystemFileName, SDateJ, EDateJ)
+                For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                    Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
+                    If lSiteNam.StartsWith("RCH:") Then
+                        If IsInteger(lSiteNam.Substring(4)) Then
+                            lSiteNam = "R:" & lSiteNam.Substring(4)
+                            lCalibrationLocations.Add(lSiteNam)
+                            lLocationsToOutput.Add(lSiteNam)
+                        End If
+                    ElseIf lSiteNam.StartsWith("RCH") Then
+                        If IsInteger(lSiteNam.Substring(3)) Then
+                            lSiteNam = "R:" & lSiteNam.Substring(3)
+                            lCalibrationLocations.Add(lSiteNam)
+                            lLocationsToOutput.Add(lSiteNam)
+                        End If
+                    ElseIf lSiteNam.StartsWith("R:") Then
+                        If IsInteger(lSiteNam.Substring(2)) Then
+                            lSiteNam = "R:" & lSiteNam.Substring(2)
+                            lCalibrationLocations.Add(lSiteNam)
+                            lLocationsToOutput.Add(lSiteNam)
+                        End If
+                    ElseIf lSiteNam.StartsWith("R") Then
+                        If IsInteger(lSiteNam.Substring(1)) Then
+                            lSiteNam = "R:" & lSiteNam.Substring(1)
+                            lCalibrationLocations.Add(lSiteNam)
+                            lLocationsToOutput.Add(lSiteNam)
+                        End If
+                    End If
+                Next
+            Catch
+            End Try
+        Next
+
+        'Then add outlet reaches
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
             If lDownstreamReachID = 0 Then
-                alocations.Add("R:" & lRCHRES.Id)
+                lOutletLocations.Add("R:" & lRCHRES.Id)
+                lLocationsToOutput.Add("R:" & lRCHRES.Id)
             End If
         Next
-        'Need to add calibration reaches
 
+        Dim AreaInfo As New Text.StringBuilder
+        AreaInfo.AppendLine("<h2>Model Area Table</h2>")
+        If lCalibrationLocations.Count > 0 Then
+            AreaInfo.AppendLine("<p>" & lCalibrationLocations.Count & " Calibration Locations and " & lOutletLocations.Count & " Outlet Locations")
+        Else
+            If lOutletLocations.Count = 1 Then
+                AreaInfo.AppendLine("<p>One Outlet Location")
+            Else
+                AreaInfo.AppendLine("<p>" & lOutletLocations.Count & " Outlet Locations")
+            End If
+        End If
+
+        For Each lLocation In lLocationsToOutput
+            AreaInfo.AppendLine("<p>")
+            If lCalibrationLocations.Contains(lLocation) Then
+                AreaInfo.AppendLine("<p>Calibration Location " & lLocation)
+            Else
+                AreaInfo.AppendLine("<p>Outlet Location " & lLocation)
+            End If
+
+            Dim lAreaTable As DataTable
+            lAreaTable = New DataTable("ModelAreaTable")
+            Dim lColumn As DataColumn
+
+            lColumn = New DataColumn()
+            lColumn.ColumnName = "Landuse"
+            lColumn.Caption = "Landuse Category"
+            lColumn.DataType = Type.GetType("System.String")
+            lAreaTable.Columns.Add(lColumn)
+
+            lColumn = New DataColumn()
+            lColumn.ColumnName = "PervArea"
+            lColumn.Caption = "Pervious Area (ac)"
+            lColumn.DataType = Type.GetType("System.Double")
+            lAreaTable.Columns.Add(lColumn)
+
+            lColumn = New DataColumn()
+            lColumn.ColumnName = "ImpervArea"
+            lColumn.Caption = "Impervious Area (ac)"
+            lColumn.DataType = Type.GetType("System.Double")
+            lAreaTable.Columns.Add(lColumn)
+
+            lColumn = New DataColumn()
+            lColumn.ColumnName = "TotalArea"
+            lColumn.Caption = "Total Area (ac)"
+            lColumn.DataType = Type.GetType("System.Double")
+            lAreaTable.Columns.Add(lColumn)
+
+            Dim lRow As DataRow
+
+            Dim lContributingLandUseAreas As atcCollection = ContributingLandUseAreas(aUCI, aOperationTypes, lLocation)
+
+            Dim lTotalAreaFromLandUses As Double = 0
+            Dim lTotalAreaPerv As Double = 0.0
+            Dim lTotalAreaImpr As Double = 0.0
+            For lLandUseIndex As Integer = 0 To lContributingLandUseAreas.Count - 1
+                Dim lLandUseAreaString As String = lContributingLandUseAreas.Item(lLandUseIndex)
+                Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
+                Dim lPervArea As Double = 0
+                If lLandUseAreaString.Length > 0 Then
+                    lPervArea = lLandUseAreaString
+                End If
+
+                Dim lLandUseArea As Double = lPervArea + lImprArea
+
+                lRow = lAreaTable.NewRow
+                lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString.PadLeft(20)
+                lRow("PervArea") = DecimalAlign(lPervArea, , 2, 7)
+                lRow("ImpervArea") = DecimalAlign(lImprArea, , 2, 7)
+                lRow("TotalArea") = DecimalAlign(lLandUseArea, , 2, 7)
+                lAreaTable.Rows.Add(lRow)
+
+                lTotalAreaPerv += lPervArea
+                lTotalAreaImpr += lImprArea
+                lTotalAreaFromLandUses += lLandUseArea
+            Next
+            lContributingLandUseAreas.Clear()
+
+            lRow = lAreaTable.NewRow
+            lAreaTable.Rows.Add(lRow)
+
+            lRow = lAreaTable.NewRow
+            lRow("Landuse") = "Total".PadLeft(20)
+            lRow("PervArea") = DecimalAlign(lTotalAreaPerv, , 2, 7)
+            lRow("ImpervArea") = DecimalAlign(lTotalAreaImpr, , 2, 7)
+            lRow("TotalArea") = DecimalAlign(lTotalAreaFromLandUses, , 2, 7)
+            lAreaTable.Rows.Add(lRow)
+
+            AreaInfo.Append(ConvertToHtmlFile(lAreaTable))
+        Next
+
+        ModelAreaReportTable = AreaInfo.ToString
 
         Return ModelAreaReportTable
     End Function
+
     Private Function LoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
                                            ByVal aDateString As String) As String
         Dim OverAllComments As New Text.StringBuilder
