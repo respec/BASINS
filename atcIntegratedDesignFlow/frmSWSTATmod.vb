@@ -2414,7 +2414,22 @@ Public Class frmSWSTATmod
     Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double, Optional ByVal aNDays() As Double = Nothing, Optional aDataGroup As atcTimeseriesGroup = Nothing)
         ClearAttributes()
         SeasonsYearsFromForm() 'setup all inputs from form
+        Dim lArgs As atcDataAttributes = SetOperationConditions(aOperationName, aReturnPeriods, aNDays, aDataGroup)
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        lCalculator.Open(aOperationName, lArgs)
+        lCalculator.DataSets.Clear()
+    End Sub
+
+    ''' <summary>
+    ''' This routine isolates the construction of operation conditions based on user form selections
+    ''' hence, it is to be used AFTER ClearAttributes(), SeasonsYearsFromForm() tandem calls
+    ''' </summary>
+    ''' <param name="aOperationName"></param>
+    ''' <param name="aReturnPeriods"></param>
+    ''' <param name="aNDays"></param>
+    ''' <param name="aDataGroup"></param>
+    ''' <returns></returns>
+    Private Function SetOperationConditions(ByVal aOperationName As String, ByVal aReturnPeriods() As Double, Optional ByVal aNDays() As Double = Nothing, Optional aDataGroup As atcTimeseriesGroup = Nothing) As atcDataAttributes
         For Each lTs As atcTimeseries In pDataGroup
             lTs.Attributes.SetValueIfMissing("CalcEMA", True)
         Next
@@ -2437,10 +2452,8 @@ Public Class frmSWSTATmod
         If pYearEndDay > 0 Then lArgs.SetValue("EndDay", pYearEndDay)
         If pFirstYear > 0 Then lArgs.SetValue("FirstYear", pFirstYear)
         If pLastYear > 0 Then lArgs.SetValue("LastYear", pLastYear)
-
-        lCalculator.Open(aOperationName, lArgs)
-        lCalculator.DataSets.Clear()
-    End Sub
+        Return lArgs
+    End Function
 
     Private Function SaveSettingsBatch() As String
         Dim lMsg As String = ""
@@ -3251,14 +3264,16 @@ Public Class frmSWSTATmod
             CalculateBatch() 'setting params for batch run
         Else
             Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-            'Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
-
+            ClearAttributes()
+            SeasonsYearsFromForm() 'setup all inputs from form
+            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
             Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),
-                                                         aReturns:=ListToArray(lstRecurrence))
+                                                         aReturns:=ListToArray(lstRecurrence),
+                                                         aShowForm:=True,
+                                                         aConditions:=lAttrs)
 
-            SeasonsYearsFromForm()
 
             lFreqForm.SWSTATformmod = Me
 
