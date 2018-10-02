@@ -29,8 +29,14 @@ Public Module modBasinsPlugin
 #ElseIf ProgramName = "USGS SW Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-SW" 'For preferences in registry
     Friend Const g_AppNameShort As String = "SW Toolbox"
-    Friend Const g_AppNameLong As String = "USGS SW Toolbox 1.0.2"
+    Friend Const g_AppNameLong As String = "USGS SW Toolbox 1.0.3"
     Friend Const g_URL_Home As String = "https://water.usgs.gov/osw/swtoolbox/"
+    Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
+#ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
+    Public Const g_AppNameRegistry As String = "USGS-Hydro" 'For preferences in registry
+    Friend Const g_AppNameShort As String = "Hydro Toolbox"
+    Friend Const g_AppNameLong As String = "USGS Hydro Toolbox 1.0.0"
+    Friend Const g_URL_Home As String = "https://water.usgs.gov/ogw/gwtoolbox/"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
     Public Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
