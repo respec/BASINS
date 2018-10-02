@@ -1181,12 +1181,12 @@ Module HSPFOutputReports
         Dim AreaInfo As New Text.StringBuilder
         AreaInfo.AppendLine("<h2>Model Area Table</h2>")
         If lCalibrationLocations.Count > 0 Then
-            AreaInfo.AppendLine("<p>" & lCalibrationLocations.Count & " Calibration Locations and " & lOutletLocations.Count & " Outlet Locations")
+            AreaInfo.AppendLine("<p>" & lCalibrationLocations.Count & " Calibration Locations and " & lOutletLocations.Count & " Outlet Locations</p>")
         Else
             If lOutletLocations.Count = 1 Then
-                AreaInfo.AppendLine("<p>One Outlet Location")
+                AreaInfo.AppendLine("<p>One Outlet Location</p>")
             Else
-                AreaInfo.AppendLine("<p>" & lOutletLocations.Count & " Outlet Locations")
+                AreaInfo.AppendLine("<p>" & lOutletLocations.Count & " Outlet Locations</p>")
             End If
         End If
 
@@ -1198,73 +1198,7 @@ Module HSPFOutputReports
                 AreaInfo.AppendLine("<p>Outlet Location " & lLocation)
             End If
 
-            Dim lAreaTable As DataTable
-            lAreaTable = New DataTable("ModelAreaTable")
-            Dim lColumn As DataColumn
-
-            lColumn = New DataColumn()
-            lColumn.ColumnName = "Landuse"
-            lColumn.Caption = "Landuse Category"
-            lColumn.DataType = Type.GetType("System.String")
-            lAreaTable.Columns.Add(lColumn)
-
-            lColumn = New DataColumn()
-            lColumn.ColumnName = "PervArea"
-            lColumn.Caption = "Pervious Area (ac)"
-            lColumn.DataType = Type.GetType("System.Double")
-            lAreaTable.Columns.Add(lColumn)
-
-            lColumn = New DataColumn()
-            lColumn.ColumnName = "ImpervArea"
-            lColumn.Caption = "Impervious Area (ac)"
-            lColumn.DataType = Type.GetType("System.Double")
-            lAreaTable.Columns.Add(lColumn)
-
-            lColumn = New DataColumn()
-            lColumn.ColumnName = "TotalArea"
-            lColumn.Caption = "Total Area (ac)"
-            lColumn.DataType = Type.GetType("System.Double")
-            lAreaTable.Columns.Add(lColumn)
-
-            Dim lRow As DataRow
-
-            Dim lContributingLandUseAreas As atcCollection = ContributingLandUseAreas(aUCI, aOperationTypes, lLocation)
-
-            Dim lTotalAreaFromLandUses As Double = 0
-            Dim lTotalAreaPerv As Double = 0.0
-            Dim lTotalAreaImpr As Double = 0.0
-            For lLandUseIndex As Integer = 0 To lContributingLandUseAreas.Count - 1
-                Dim lLandUseAreaString As String = lContributingLandUseAreas.Item(lLandUseIndex)
-                Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
-                Dim lPervArea As Double = 0
-                If lLandUseAreaString.Length > 0 Then
-                    lPervArea = lLandUseAreaString
-                End If
-
-                Dim lLandUseArea As Double = lPervArea + lImprArea
-
-                lRow = lAreaTable.NewRow
-                lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString.PadLeft(20)
-                lRow("PervArea") = DecimalAlign(lPervArea, , 2, 7)
-                lRow("ImpervArea") = DecimalAlign(lImprArea, , 2, 7)
-                lRow("TotalArea") = DecimalAlign(lLandUseArea, , 2, 7)
-                lAreaTable.Rows.Add(lRow)
-
-                lTotalAreaPerv += lPervArea
-                lTotalAreaImpr += lImprArea
-                lTotalAreaFromLandUses += lLandUseArea
-            Next
-            lContributingLandUseAreas.Clear()
-
-            lRow = lAreaTable.NewRow
-            lAreaTable.Rows.Add(lRow)
-
-            lRow = lAreaTable.NewRow
-            lRow("Landuse") = "Total".PadLeft(20)
-            lRow("PervArea") = DecimalAlign(lTotalAreaPerv, , 2, 7)
-            lRow("ImpervArea") = DecimalAlign(lTotalAreaImpr, , 2, 7)
-            lRow("TotalArea") = DecimalAlign(lTotalAreaFromLandUses, , 2, 7)
-            lAreaTable.Rows.Add(lRow)
+            Dim lAreaTable As DataTable = AreaReportInTableFormat(aUCI, aOperationTypes, lLocation)
 
             AreaInfo.Append(ConvertToHtmlFile(lAreaTable))
         Next
