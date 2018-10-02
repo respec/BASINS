@@ -947,8 +947,6 @@ Public Module atcConstituentTables
         Else
             lDataForBoxWhiskerPlot.Constituent = aBalanceType
             For Each item As String In listLanduses
-                'Dim OpType1 As String = item.Split("-")(0)
-                'If item = "P:CPAB_CONS_NON_NLDAS_" Then Stop
                 Dim SelectExpression As String = "OpTypeNumber Like '" & item.Split(":")(0) & "%' And Year = 'SumAnnual' And OpDesc ='" & item.Split(":")(1) & "'"
                 'Logger.Dbg(SelectExpression)
                 Dim foundRows() As DataRow = Land_Constituent_Table.Select(SelectExpression)

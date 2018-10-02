@@ -279,7 +279,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>10000</Max>
+    <Max>7000</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -309,7 +309,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>1.1</Min>
-    <Max>1.5</Max>
+    <Max>2.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -339,7 +339,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>0.5</Max>
+    <Max>0.25</Max>
     <FlagTable>SNOW-FLAGS</FlagTable>
     <FlagParm>VKMFG</FlagParm>
     <MonthlyParmTable>MON-MELT-FAC</MonthlyParmTable>
@@ -429,7 +429,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.005</Min>
-    <Max>0.5</Max>
+    <Max>0.2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -533,7 +533,7 @@
     <ACTIVITYFLAG>SNOWFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0</Min>
+    <Min>28</Min>
     <Max>32</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -549,7 +549,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>5</Max>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -714,7 +714,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -789,7 +789,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>0</Max>
+    <Max>5</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -863,7 +863,7 @@
     <ACTIVITYFLAG>PWATFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>1.00E-03</Min>
+    <Min>0.001</Min>
     <Max>0.3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -938,12 +938,12 @@
     <ACTIVITYFLAG>PWATFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>2</Min>
-    <Max>2</Max>
+    <Min>1</Min>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Typical limits from technote6</Notes>
+    <Notes>Possible limits from technote6</Notes>
   </Parm>
   <Parm>
     <PARMID>64</PARMID>
@@ -953,12 +953,12 @@
     <ACTIVITYFLAG>PWATFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>2</Min>
-    <Max>2</Max>
+    <Min>1</Min>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Typical limits from technote6</Notes>
+    <Notes>Possible limits from technote6</Notes>
   </Parm>
   <Parm>
     <PARMID>65</PARMID>
@@ -969,11 +969,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>0.2</Max>
+    <Max>0.5</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Typical limits from technote6</Notes>
+    <Notes>Possible limits from technote6</Notes>
   </Parm>
   <Parm>
     <PARMID>66</PARMID>
@@ -1028,7 +1028,7 @@
     <ACTIVITYFLAG>PWATFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
-    <Min>0.05</Min>
+    <Min>0.10</Min>
     <Max>2</Max>
     <FlagTable>PWAT-PARM1</FlagTable>
     <FlagParm>VUZFG</FlagParm>
@@ -1253,7 +1253,7 @@
     <ACTIVITYFLAG>SEDFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0</Min>
+    <Min>0.001</Min>
     <Max>1</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -1479,7 +1479,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>22</Min>
-    <Max>70</Max>
+    <Max>60</Max>
     <FlagTable>PSTEMP-PARM1</FlagTable>
     <FlagParm>SLTVFG</FlagParm>
     <MonthlyParmTable>MON-ASLT</MonthlyParmTable>
@@ -1689,7 +1689,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>10000</Max>
+    <Max>7000</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -1899,7 +1899,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>1</Min>
-    <Max>9</Max>
+    <Max>10</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -2169,7 +2169,7 @@
     <ConstituentName>NH3+NH4</ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0.0005</Min>
-    <Max>3.5</Max>
+    <Max>1.5</Max>
     <FlagTable>QUAL-PROPS</FlagTable>
     <FlagParm>VIQCFG</FlagParm>
     <MonthlyParmTable>MON-IFLW-CONC</MonthlyParmTable>
@@ -2184,7 +2184,7 @@
     <ConstituentName>NH3+NH4</ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0.0005</Min>
-    <Max>2</Max>
+    <Max>1.5</Max>
     <FlagTable>QUAL-PROPS</FlagTable>
     <FlagParm>VAQCFG</FlagParm>
     <MonthlyParmTable>MON-GRND-CONC</MonthlyParmTable>
@@ -2319,7 +2319,7 @@
     <ConstituentName>ORTHO P</ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>0.38</Max>
+    <Max>0.5</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -2739,7 +2739,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>10000</Max>
+    <Max>7000</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -2769,7 +2769,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>1.1</Min>
-    <Max>1.5</Max>
+    <Max>2.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -2799,7 +2799,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>0.5</Max>
+    <Max>0.25</Max>
     <FlagTable>SNOW-FLAGS</FlagTable>
     <FlagParm>VKMFG</FlagParm>
     <MonthlyParmTable>MON-MELT-FAC</MonthlyParmTable>
@@ -2889,7 +2889,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.005</Min>
-    <Max>0.5</Max>
+    <Max>0.2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -2993,7 +2993,7 @@
     <ACTIVITYFLAG>SNOWFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0</Min>
+    <Min>28</Min>
     <Max>32</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -3009,7 +3009,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>8</Max>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -3174,7 +3174,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>0.3</Max>
+    <Max>0.5</Max>
     <FlagTable>IWAT-PARM1</FlagTable>
     <FlagParm>VNNFG</FlagParm>
     <MonthlyParmTable>MON-RETN</MonthlyParmTable>
@@ -3429,7 +3429,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>10000</Max>
+    <Max>7000</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -3488,7 +3488,7 @@
     <ACTIVITYFLAG>IWGFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>4</Min>
+    <Min>3</Min>
     <Max>15</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -3594,7 +3594,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>2</Max>
+    <Max>1</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -4194,7 +4194,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>5</Max>
+    <Max>10</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -4209,7 +4209,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>100</Max>
+    <Max>300</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -4254,11 +4254,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.01</Min>
-    <Max>0.02</Max>
+    <Max>0.2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Typical Limits from Technote 6</Notes>
+    <Notes>Expanded Limits from Technote 6</Notes>
   </Parm>
   <Parm>
     <PARMID>285</PARMID>
@@ -4404,7 +4404,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>10000</Max>
+    <Max>7000</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -4538,12 +4538,12 @@
     <ACTIVITYFLAG>HTFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>1.4</Min>
-    <Max>1.42</Max>
+    <Min>1.0</Min>
+    <Max>2.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>MPCA Technote</Notes>
+    <Notes>Expanded from MPCA Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>304</PARMID>
@@ -4778,7 +4778,7 @@
     <ACTIVITYFLAG>SEDFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0.001</Min>
+    <Min>0.01</Min>
     <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -4809,7 +4809,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.000005</Min>
-    <Max>0.004</Max>
+    <Max>0.00025</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -4868,7 +4868,7 @@
     <ACTIVITYFLAG>SEDFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0.001</Min>
+    <Min>0.01</Min>
     <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -5048,7 +5048,7 @@
     <ACTIVITYFLAG>OXFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>1.115</Min>
+    <Min>1.15</Min>
     <Max>2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -5288,7 +5288,7 @@
     <ACTIVITYFLAG>OXFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>2</Min>
+    <Min>10</Min>
     <Max>16</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
@@ -5308,7 +5308,7 @@
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Flags</Notes>
+    <Notes>Flags. Named as NH3FG in MPCA technote.</Notes>
   </Parm>
   <Parm>
     <PARMID>351</PARMID>
@@ -5514,11 +5514,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Flags</Notes>
+    <Notes>Expanded from MPCA Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>365</PARMID>
@@ -5529,11 +5529,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Flags</Notes>
+    <Notes>Expanded from MPCA Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>366</PARMID>
@@ -5544,11 +5544,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.1</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Exapnded from MPCA Technote</Notes>
+    <Notes>Expanded from MPCA Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>367</PARMID>
@@ -5559,11 +5559,11 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.1</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Exapnded from MPCA Technote</Notes>
+    <Notes>Expanded from MPCA Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>368</PARMID>
@@ -5964,7 +5964,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -5979,7 +5979,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.6</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -5994,7 +5994,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6009,7 +6009,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.2</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6024,7 +6024,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>0.6</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6039,7 +6039,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0</Min>
-    <Max>1</Max>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6188,12 +6188,12 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min></Min>
-    <Max></Max>
+    <Min>0</Min>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Should not be checked</Notes>
+    <Notes></Notes>
   </Parm>
   <Parm>
     <PARMID>410</PARMID>
@@ -6203,12 +6203,12 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min></Min>
-    <Max></Max>
+    <Min>1</Min>
+    <Max>3</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Should not be checked</Notes>
+    <Notes></Notes>
   </Parm>
   <Parm>
     <PARMID>411</PARMID>
@@ -6218,12 +6218,12 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min></Min>
-    <Max></Max>
+    <Min>0</Min>
+    <Max>1</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Should not be checked</Notes>
+    <Notes></Notes>
   </Parm>
   <Parm>
     <PARMID>412</PARMID>
@@ -6249,7 +6249,7 @@
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
     <Min>0.6</Min>
-    <Max>0.68</Max>
+    <Max>0.70</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6338,8 +6338,8 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>1</Min>
-    <Max>1</Max>
+    <Min>0.2</Min>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6353,8 +6353,8 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0.000001</Min>
-    <Max>0.033</Max>
+    <Min>0.01</Min>
+    <Max>0.36</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6368,8 +6368,8 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min>0.025</Min>
-    <Max>0.045</Max>
+    <Min>0.001</Min>
+    <Max>1.0</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
@@ -6953,12 +6953,12 @@
     <ACTIVITYFLAG>PLKFG</ACTIVITYFLAG>
     <ConstituentName></ConstituentName>
     <IsMonthlyPossible></IsMonthlyPossible>
-    <Min></Min>
-    <Max></Max>
+    <Min>0.15</Min>
+    <Max>0.97</Max>
     <FlagTable></FlagTable>
     <FlagParm></FlagParm>
     <MonthlyParmTable></MonthlyParmTable>
-    <Notes>Not checking</Notes>
+    <Notes>Confusing limits in Technote</Notes>
   </Parm>
   <Parm>
     <PARMID>461</PARMID>
