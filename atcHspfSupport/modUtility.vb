@@ -835,7 +835,7 @@ Public Module Utility
         Dim lOperations As atcCollection
         For lOperationIndex As Integer = 0 To aUci.OpnSeqBlock.Opns.Count - 1
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
-            If lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND" OrElse lOperation.Name = "RCHRES" Then
+            If aOperationTypes.Contains(lOperation.Name) Then
                 Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                 If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
 
@@ -918,7 +918,7 @@ Public Module Utility
                     End If
 
 
-                ElseIf lSourceVolName = "RCHRES" Then
+                ElseIf lSourceVolName = "RCHRES" Or lSourceVolName = "BMPRAC" Then
                     If aUpstream Then
                         If lUpstreamChecked.Contains(lLocationKey) Then
                             Logger.Dbg("SkipDuplicate:" & lLocationKey)
