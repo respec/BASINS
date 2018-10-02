@@ -18,10 +18,11 @@
     <OptionStrict>Off</OptionStrict>
     <OptionInfer>On</OptionInfer>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ManifestCertificateThumbprint>09D795A226B4F3306CA9273566E1C1FDC927EED8</ManifestCertificateThumbprint>
-    <ManifestKeyFile>HSPEXP_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestCertificateThumbprint>6DCAED43A6BEA72E5C93E0DDF9FB3781D95D5E02</ManifestCertificateThumbprint>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
     <GenerateManifests>false</GenerateManifests>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
     <ApplicationIcon>Basins.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <SignAssembly>false</SignAssembly>
@@ -100,6 +101,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Plugins\BASINS\atcReport.dll</HintPath>
     </Reference>
+    <Reference Include="atcTimeseriesWaterQualUS">
+      <HintPath>..\bin\Plugins\BASINS\atcTimeseriesWaterQualUS.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -134,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="BATHTUB.vb" />
     <Compile Include="CookieCutterGraphs.vb" />
     <Compile Include="HelpForm.Designer.vb">
       <DependentUpon>HelpForm.vb</DependentUpon>
@@ -204,9 +209,21 @@
     <Content Include="GraphColors.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="HSPEXP+.chm">
+    <EmbeddedResource Include="LandUseNames_Mappings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HSPFParmValues.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LimitViolatingParameterTemplate.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadingRates.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="HSPEXP_TemporaryKey.pfx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -312,6 +329,26 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <PublishFile Include="HSPEXP+.chm">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="HSPFParmValues.xml">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
     <PublishFile Include="MapWinUtility">
       <Visible>False</Visible>
       <Group>
