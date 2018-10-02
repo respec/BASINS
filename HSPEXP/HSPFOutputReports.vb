@@ -197,6 +197,7 @@ Module HSPFOutputReports
                 lOperationTypes.Add("P:", "PERLND")
                 lOperationTypes.Add("I:", "IMPLND")
                 lOperationTypes.Add("R:", "RCHRES")
+                lOperationTypes.Add("B:", "BMPRAC")
 
                 Dim lStr As String = ""
                 Dim lRunMade As String = ""
@@ -1189,6 +1190,8 @@ Module HSPFOutputReports
                 AreaInfo.AppendLine("<p>" & lOutletLocations.Count & " Outlet Locations</p>")
             End If
         End If
+
+        'lLocationsToOutput.Add("R:1")   'for debug
 
         For Each lLocation In lLocationsToOutput
             AreaInfo.AppendLine("<p>")
