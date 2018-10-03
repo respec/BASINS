@@ -30,7 +30,6 @@ Partial Class StartUp
         Me.lblRCH = New System.Windows.Forms.Label()
         Me.txtRCH = New System.Windows.Forms.TextBox()
         Me.cmdEnd = New System.Windows.Forms.Button()
-        Me.chkAreaReports = New System.Windows.Forms.CheckBox()
         Me.chkRunHSPF = New System.Windows.Forms.CheckBox()
         Me.pnlHighlight = New System.Windows.Forms.Panel()
         Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox()
@@ -63,8 +62,8 @@ Partial Class StartUp
         Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
         Me.chkModelQAQC = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.chkBathtub = New System.Windows.Forms.CheckBox()
         Me.chkWASP = New System.Windows.Forms.CheckBox()
+        Me.chkBathtub = New System.Windows.Forms.CheckBox()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -136,19 +135,6 @@ Partial Class StartUp
         Me.cmdEnd.TabIndex = 21
         Me.cmdEnd.Text = "End"
         Me.cmdEnd.UseVisualStyleBackColor = True
-        '
-        'chkAreaReports
-        '
-        Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Enabled = False
-        Me.chkAreaReports.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkAreaReports.Location = New System.Drawing.Point(276, 191)
-        Me.chkAreaReports.Name = "chkAreaReports"
-        Me.chkAreaReports.Size = New System.Drawing.Size(143, 17)
-        Me.chkAreaReports.TabIndex = 4
-        Me.chkAreaReports.Text = "Watershed Area Reports"
-        Me.ttHSPEXP.SetToolTip(Me.chkAreaReports, "Compute reports of watershed area based on the SCHEMATIC BLOCK.")
-        Me.chkAreaReports.UseVisualStyleBackColor = True
         '
         'chkRunHSPF
         '
@@ -525,17 +511,6 @@ Partial Class StartUp
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Receiving Water Model"
         '
-        'chkBathtub
-        '
-        Me.chkBathtub.AutoSize = True
-        Me.chkBathtub.Enabled = False
-        Me.chkBathtub.Location = New System.Drawing.Point(18, 24)
-        Me.chkBathtub.Name = "chkBathtub"
-        Me.chkBathtub.Size = New System.Drawing.Size(77, 17)
-        Me.chkBathtub.TabIndex = 0
-        Me.chkBathtub.Text = "BATHTUB"
-        Me.chkBathtub.UseVisualStyleBackColor = True
-        '
         'chkWASP
         '
         Me.chkWASP.AutoSize = True
@@ -546,6 +521,17 @@ Partial Class StartUp
         Me.chkWASP.TabIndex = 1
         Me.chkWASP.Text = "WASP"
         Me.chkWASP.UseVisualStyleBackColor = True
+        '
+        'chkBathtub
+        '
+        Me.chkBathtub.AutoSize = True
+        Me.chkBathtub.Enabled = False
+        Me.chkBathtub.Location = New System.Drawing.Point(18, 24)
+        Me.chkBathtub.Name = "chkBathtub"
+        Me.chkBathtub.Size = New System.Drawing.Size(77, 17)
+        Me.chkBathtub.TabIndex = 0
+        Me.chkBathtub.Text = "BATHTUB"
+        Me.chkBathtub.UseVisualStyleBackColor = True
         '
         'StartUp
         '
@@ -567,7 +553,6 @@ Partial Class StartUp
         Me.Controls.Add(Me.btn_help)
         Me.Controls.Add(Me.chkRunHSPF)
         Me.Controls.Add(Me.pnlHighlight)
-        Me.Controls.Add(Me.chkAreaReports)
         Me.Controls.Add(Me.cmdEnd)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmdBrowse)
@@ -597,7 +582,6 @@ Partial Class StartUp
     Friend WithEvents lblRCH As System.Windows.Forms.Label
     Friend WithEvents txtRCH As System.Windows.Forms.TextBox
     Friend WithEvents cmdEnd As System.Windows.Forms.Button
-    Friend WithEvents chkAreaReports As System.Windows.Forms.CheckBox
     Friend WithEvents chkRunHSPF As System.Windows.Forms.CheckBox
     Friend WithEvents pnlHighlight As System.Windows.Forms.Panel
     Friend WithEvents chkAdditionalgraphs As System.Windows.Forms.CheckBox

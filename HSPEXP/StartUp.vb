@@ -43,7 +43,7 @@ Public Class StartUp
         'cmbUCIPath.Visible = lExists
         chkRunHSPF.Enabled = lExists
         chkModelQAQC.Enabled = lExists
-        chkAreaReports.Enabled = lExists
+        'chkAreaReports.Enabled = lExists
         DateTimePicker1.Enabled = lExists
         DateTimePicker2.Enabled = lExists
         chkExpertStats.Enabled = lExists
@@ -265,8 +265,8 @@ Public Class StartUp
         If chkMultiSim.Checked = True Then
             chkRunHSPF.Enabled = False
             chkRunHSPF.Checked = False
-            chkAreaReports.Enabled = False
-            chkAreaReports.Checked = False
+            'chkAreaReports.Enabled = False
+            'chkAreaReports.Checked = False
             chkExpertStats.Enabled = False
             chkExpertStats.Checked = False
             chkReganGraphs.Checked = False
@@ -309,7 +309,7 @@ Public Class StartUp
 
         Else
             chkRunHSPF.Enabled = True
-            chkAreaReports.Enabled = True
+            'chkAreaReports.Enabled = True
             chkExpertStats.Enabled = True
             chkReganGraphs.Enabled = True
             chkAdditionalgraphs.Enabled = True
@@ -366,8 +366,8 @@ Public Class StartUp
             chkMultiSim.Checked = False
             chkRunHSPF.Enabled = False
             'chkRunHSPF.Checked = True
-            chkAreaReports.Enabled = False
-            chkAreaReports.Checked = False
+            'chkAreaReports.Enabled = False
+            'chkAreaReports.Checked = False
             chkExpertStats.Enabled = False
             chkExpertStats.Checked = False
             chkReganGraphs.Checked = False
@@ -410,7 +410,7 @@ Public Class StartUp
 
         Else
             chkRunHSPF.Enabled = True
-            chkAreaReports.Enabled = True
+            'chkAreaReports.Enabled = True
             chkExpertStats.Enabled = True
             chkReganGraphs.Enabled = True
             chkAdditionalgraphs.Enabled = True
@@ -447,7 +447,7 @@ Public Class StartUp
 
     End Sub
 
-    Private Sub chkAreaReports_CheckedChanged(sender As Object, e As EventArgs) Handles chkAreaReports.CheckedChanged
+    Private Sub chkAreaReports_CheckedChanged(sender As Object, e As EventArgs)
 
     End Sub
 End Class
