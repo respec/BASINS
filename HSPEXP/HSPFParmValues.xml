@@ -2334,7 +2334,7 @@
     <ConstituentName>ORTHO P</ConstituentName>
     <IsMonthlyPossible>1</IsMonthlyPossible>
     <Min>0</Min>
-    <Max>13</Max>
+    <Max>6</Max>
     <FlagTable>QUAL-PROPS</FlagTable>
     <FlagParm>VPFWFG</FlagParm>
     <MonthlyParmTable>MON-POTFW</MonthlyParmTable>

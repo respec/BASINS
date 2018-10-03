@@ -278,7 +278,7 @@ Module BATHTUB
                 lAverage = lInorgN.Attributes.GetDefinedValue("Mean").Value * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lInorgN.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""INORGANIC P""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
+                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""INORGANIC N""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""LandUses"",0,0,0,0,0,0,0,0")
             End If
         Next
@@ -373,7 +373,7 @@ Module BATHTUB
             End If
         Next
         Dim lakeshedAreaKm2 As Double = lNPSTable.Compute("SUM(Area_km2)", "")
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""LakeShed"",1,2," & Format(lakeshedAreaKm2, "0.00") & "," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00") & ",0")
+        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""LakeShed"",1,2," & Format(lakeshedAreaKm2, "0.00") & ",0,0,0") ' & Format(lAverage, "0.00") & "," & Format(lCov, "0.00") & ",0")
         BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""CONSERVATIVE SUBST."",0,0")
         BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL P"",0,0")
         BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL N"",0,0")
@@ -421,6 +421,11 @@ Module BATHTUB
 
         BATHTUBInputFile.AppendLine("""Notes""")
         BATHTUBInputFile.AppendLine("Write Whatever you Want!!!")
+        For i As Integer = 0 To 8
+            BATHTUBInputFile.AppendLine()
+        Next
+
+
 
         File.WriteAllText(aOutputfolder & "BATHTUB_" & aReachId & ".btb", BATHTUBInputFile.ToString)
 

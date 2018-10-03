@@ -65,7 +65,7 @@ Module HSPFOutputReports
 
 
         pRunUci = StartUp.chkRunHSPF.Checked
-        pMakeAreaReports = StartUp.chkAreaReports.Checked
+        'pMakeAreaReports = StartUp.chkAreaReports.Checked
 
         Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(StartUp.cmbUCIPath.Text)
         Logger.Status("Beginning analysis of " & lTestName, True)
@@ -279,17 +279,16 @@ Module HSPFOutputReports
                     QAQCReportFile.AppendLine(GeneralModelInfo(aHspfUci, lRunMade))
                     QAQCReportFile.AppendLine(CheckHSPFParmValues(aHspfUci, lRunMade))
 
-                    'Area Report should become part of QAQC report now
-                    Dim alocations As New atcCollection
-                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
-                        Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
-                        If lDownstreamReachID = 0 Then
-                            alocations.Add("R:" & lRCHRES.Id)
-                        End If
-                    Next
-                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+                    'Dim alocations As New atcCollection
+                    'For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                    '    Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
+                    '    If lDownstreamReachID = 0 Then
+                    '        alocations.Add("R:" & lRCHRES.Id)
+                    '    End If
+                    'Next
+                    'Dim lReport As atcReport.ReportText = AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
 
-                    QAQCReportFile.AppendLine(ModelAreaReport(aHspfUci, lOperationTypes))
+
 
                 End If
 
@@ -312,20 +311,21 @@ Module HSPFOutputReports
 
 #End Region
 #Region "Area Report Generation"
-                If pMakeAreaReports Then
-                    Dim alocations As New atcCollection
-                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                'Area reporting is included in QA/QC Reports
+                'If pMakeAreaReports Then
+                '    Dim alocations As New atcCollection
+                '    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
 
-                        alocations.Add("R:" & lRCHRES.Id)
+                '        alocations.Add("R:" & lRCHRES.Id)
 
-                    Next
-                    Logger.Status(Now & " Producing Area Reports.", True)
-                    Logger.Dbg(Now & " Producing land use and area reports")
-                    'Now the area reports are generated for all the reaches in the UCI file.
-                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
-                    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
-                    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
-                End If
+                '    Next
+                '    Logger.Status(Now & " Producing Area Reports.", True)
+                '    Logger.Dbg(Now & " Producing land use and area reports")
+                '    'Now the area reports are generated for all the reaches in the UCI file.
+                '    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, alocations, True, loutfoldername & "/AreaReports/")
+                '    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+                '    SaveFileString(loutfoldername & "/AreaReports/AreaReport.txt", lReport.ToString)
+                'End If
 #End Region
 
 #Region "Hydrology Calibration"
@@ -503,11 +503,6 @@ Module HSPFOutputReports
                 End If
 #End Region
 
-
-
-
-
-
 #Region "Water Quality"
                 If pConstituents.Count > 0 OrElse pBATHTUB Then
                     Dim lOpenHspfBinDataSource As New atcDataSource
@@ -534,20 +529,15 @@ Module HSPFOutputReports
                                 Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(locationID)
                                 For Each lSource As HspfConnection In lRCHRESOperation.Sources
                                     If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
-
                                         Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
                                         lBATHTUBDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
-
-
                                     End If
                                 Next
-
                                 BATHTUBInputFile(aHspfUci, lBATHTUBDataSource, SDateJ, EDateJ, locationID, pTestPath)
                             Next
                         Else
                         End If
                     End If
-
 #End Region
 
                     For Each lConstituent As String In pConstituents
@@ -747,9 +737,11 @@ Module HSPFOutputReports
                 End If
 #End Region
                 If pModelQAQC Then
+                    QAQCReportFile.AppendLine(ModelAreaReport(aHspfUci, lOperationTypes))
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
                     File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
+
                 End If
                 Logger.Status(Now & " Output Written to " & loutfoldername)
                 Logger.Dbg("Reports Written in " & loutfoldername)
@@ -1716,15 +1708,12 @@ Module HSPFOutputReports
                 'Now find the slope of this timeseries
                 FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
                 If lSlope > 0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing. Slope = " & lSlope & "</li>")
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
                     lNumberOfTrendIssues += 1
                 ElseIf lSlope < -0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing. Slope = " & lSlope & "</li>")
+                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
                     lNumberOfTrendIssues += 1
                 End If
-
-                'Stop
-
             Next
         Next
         StorageTrend.AppendLine("</ul>")
@@ -1732,13 +1721,11 @@ Module HSPFOutputReports
         If lNumberOfTrendIssues > 0 Then
             OverAllStorageTrend.AppendLine("<p>Following non-typical long term trend issues were noticed in the model.</p>")
             OverAllStorageTrend.Append(StorageTrend)
-
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
 
         Return OverAllStorageTrend.ToString
-
     End Function
     Private Function ConvertToHtmlFile(ByVal myTable As DataTable, ByVal Optional NumberOfRows As Integer = 0) As String
         Dim myHtmlFile As String = ""
@@ -1747,12 +1734,12 @@ Module HSPFOutputReports
         If myTable Is Nothing Then
             Throw New System.ArgumentNullException("myTable")
         Else
-            myBuilder.AppendLine("<table style = width:100%>")
+            myBuilder.AppendLine("<table>")
             myBuilder.AppendLine("<tr>")
             For Each myColumn As DataColumn In myTable.Columns
                 ColumnCounter += 1
-                If ColumnCounter = 1 Or ColumnCounter = 3 Then
-                    myBuilder.Append("<th align=""left"">")
+                If ColumnCounter = 1 Then
+                    myBuilder.Append("<th align = ""left"">")
                 Else
                     myBuilder.Append("<th>")
                 End If
@@ -1768,8 +1755,8 @@ Module HSPFOutputReports
                 myBuilder.AppendLine("<tr>")
                 For Each myColumn As DataColumn In myTable.Columns
                     ColumnCounter += 1
-                    If ColumnCounter = 1 Or ColumnCounter = 3 Then
-                        myBuilder.Append("<td align=""left"">")
+                    If ColumnCounter = 1 Then
+                        myBuilder.Append("<td align = ""left"">")
                     Else
                         myBuilder.Append("<td align=""center"">")
                     End If
@@ -1844,7 +1831,7 @@ Module HSPFOutputReports
         Return lDiurnalPattern.ToString
     End Function
     Private Function CheckIfAdsDesIsSimulated() As String
-
+        Return ""
     End Function
 End Module
 

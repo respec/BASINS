@@ -2272,7 +2272,7 @@ Public Module Utility
             Dim lLandUseArea As Double = lPervArea + lImprArea
 
             lRow = lAreaTable.NewRow
-            lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString.PadLeft(20)
+            lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString
             lRow("PervArea") = DecimalAlign(lPervArea, , 2, 7)
             lRow("ImpervArea") = DecimalAlign(lImprArea, , 2, 7)
             lRow("TotalArea") = DecimalAlign(lLandUseArea, , 2, 7)
