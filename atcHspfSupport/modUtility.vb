@@ -894,19 +894,20 @@ Public Module Utility
                                          ByVal aLocation As String,
                                          ByVal aOperationTypes As atcCollection,
                                          ByRef aLocations As atcCollection)
-        LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True)
+        Dim lUpstreamChecked As New atcCollection
+        LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True, lUpstreamChecked)
     End Sub
 
     Public Sub LocationAreaCalc(ByVal aUci As HspfUci,
                                 ByVal aLocation As String,
                                 ByVal aOperationTypes As atcCollection,
                                 ByRef aLocations As atcCollection,
-                                ByVal aUpstream As Boolean)
+                                ByVal aUpstream As Boolean,
+                                ByRef aUpstreamChecked As atcCollection)
 
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
         Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).OperFromID(aLocation.Substring(2))
         If Not lOperation Is Nothing Then
-            Dim lUpstreamChecked As New atcCollection
             For Each lConnection As HspfConnection In lOperation.Sources
                 Dim lSourceVolName As String = lConnection.Source.VolName
                 Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
@@ -920,7 +921,7 @@ Public Module Utility
 
                 ElseIf lSourceVolName = "RCHRES" Or lSourceVolName = "BMPRAC" Then
                     If aUpstream Then
-                        If lUpstreamChecked.Contains(lLocationKey) Then
+                        If aUpstreamChecked.Contains(lLocationKey) Then
                             Logger.Dbg("SkipDuplicate:" & lLocationKey)
                         ElseIf aUci.Name.ToLower.Contains("scr") AndAlso
                                lConnection.Source.VolId = 229 AndAlso
@@ -928,8 +929,8 @@ Public Module Utility
                             'TODO: figure out a way not to hardcode this!
                             Logger.Dbg("Skip 229 to 516 in SantaClara")
                         Else
-                            LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
-                            lUpstreamChecked.Add(lLocationKey)
+                            LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True, aUpstreamChecked)
+                            aUpstreamChecked.Add(lLocationKey)
                         End If
                     Else
                         aLocations.Add(lLocationKey, 0)
@@ -1083,7 +1084,8 @@ Public Module Utility
         Dim lUpstreamLocations As New atcCollection
         Dim lUpstreamLocationsString As String = ""
         Dim lLocalArea As Double = 0.0
-        LocationAreaCalc(aUci, aLocation, aOperationtypes, lLocations, False)
+        Dim lUpstreamChecked As New atcCollection
+        LocationAreaCalc(aUci, aLocation, aOperationtypes, lLocations, False, lUpstreamChecked)
         For lIndex As Integer = 0 To lLocations.Count - 1
             lLocalArea += lLocations.Item(lIndex)
             If lLocations.Item(lIndex) < 0.00001 Then
