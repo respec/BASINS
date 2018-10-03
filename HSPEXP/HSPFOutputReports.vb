@@ -1896,7 +1896,22 @@ Module HSPFOutputReports
             End If
             If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
                 'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
-
+                Dim lSeasonMorning As New atcSeasonsHour
+                'hours ending 1am - 4am
+                lSeasonMorning.SeasonSelected(0) = True
+                lSeasonMorning.SeasonSelected(1) = True
+                lSeasonMorning.SeasonSelected(2) = True
+                lSeasonMorning.SeasonSelected(3) = True
+                Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lTS, Nothing)(0)
+                Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                Dim lSeasonAfternoon As New atcSeasonsHour
+                'hours ending 1pm - 4pm
+                lSeasonAfternoon.SeasonSelected(12) = True
+                lSeasonAfternoon.SeasonSelected(13) = True
+                lSeasonAfternoon.SeasonSelected(14) = True
+                lSeasonAfternoon.SeasonSelected(15) = True
+                lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
+                Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
             End If
 
         Next
