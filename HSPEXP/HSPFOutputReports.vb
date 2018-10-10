@@ -1806,6 +1806,30 @@ Module HSPFOutputReports
                 lMemSub2 = 1
                 lConstituent = "TW"
         End Select
+        lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table - " & lConstituent & "</h2>")
+        Dim lDiurnalTable As DataTable
+        lDiurnalTable = New DataTable("DiurnalPatternTable")
+        Dim lColumn As DataColumn
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Reach"
+        lColumn.Caption = "Reach Name"
+        lColumn.DataType = Type.GetType("System.String")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Morning"
+        lColumn.Caption = "Morning (12am - 4am)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Afternoon"
+        lColumn.Caption = "Morning (12pm - 4pm)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+        Dim lRow As DataRow
+
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
 
@@ -1836,12 +1860,16 @@ Module HSPFOutputReports
                 lSeasonAfternoon.SeasonSelected(15) = True
                 lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
                 Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                lRow = lDiurnalTable.NewRow
+                lRow("Reach") = lRCHRES.Id
+                lRow("Morning") = DecimalAlign(lMorningMean, , 2, 7)
+                lRow("Afternoon") = DecimalAlign(lAfternoonMean, , 2, 7)
+                lDiurnalTable.Rows.Add(lRow)
             End If
 
         Next
 
-
-
+        lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
 
         Return lDiurnalPattern.ToString
     End Function
