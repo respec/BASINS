@@ -133,7 +133,7 @@ Partial Class StartUp
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 21
-        Me.cmdEnd.Text = "End"
+        Me.cmdEnd.Text = "Close"
         Me.cmdEnd.UseVisualStyleBackColor = True
         '
         'chkRunHSPF
