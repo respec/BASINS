@@ -540,6 +540,26 @@ Module HSPFOutputReports
                     End If
 #End Region
 
+#Region "WASP Setup"
+                    If pWASP Then
+                        If pOutputLocations.Count > 0 Then
+                            Dim lWASPDataSource As New atcDataSource
+                            For Each lLocation As String In pOutputLocations
+                                lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lLocation))
+                                Dim lLocationID As Integer = lLocation.Substring(2)
+                                Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
+                                For Each lSource As HspfConnection In lRCHRESOperation.Sources
+                                    If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
+                                        Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
+                                        lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
+                                    End If
+                                Next
+                                WASPInputFile(aHspfUci, lWASPDataSource, SDateJ, EDateJ, lLocationID, pTestPath)
+                            Next
+                        End If
+                    End If
+#End Region
+
                     For Each lConstituent As String In pConstituents
                         Dim lConstProperties As New List(Of ConstituentProperties)
                         Logger.Dbg("------ Begin summary for " & lConstituent & " -----------------")
