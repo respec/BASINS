@@ -14,7 +14,7 @@ Public Class StartUp
             UciChanged()
         End If
         If pUci IsNot Nothing AndAlso IO.File.Exists(pUci.Name) Then
-            ScriptMain(Nothing, pUci)
+            Main(Nothing, pUci)
         Else
             Logger.Msg("The UCI file " & cmbUCIPath.Text & " does not exist", MsgBoxStyle.Critical, "HSPEXP+")
         End If
