@@ -208,14 +208,36 @@ Module HSPFOutputReports
                 Directory.CreateDirectory(pOutFolderName)
                 File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
 
+                'read binary output files for later use in wq reports, qa reports, or receiving models 
+                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Or pModelQAQC Then
+                    Dim lOpenHspfBinDataSource As New atcDataSource
+                    Logger.Dbg(Now & " Opening the binary output files.")
+                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
+                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                            If lOpenHspfBinDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                End If
+                            End If
+                        End If
+                    Next i
+                End If
+
                 'Start QA/QC Report
                 Dim QAQCReportFile As New Text.StringBuilder
                 If pModelQAQC Then
+                    Logger.Status("Beginning the QAQC Report")
                     QAQCReportFile.AppendLine("<html>")
                     QAQCReportFile.AppendLine(QAReportStyle())
                     QAQCReportFile.AppendLine("<body>")
                     QAQCReportFile.AppendLine(QAGeneralModelInfo(aHspfUci, lRunMade))
+                    QAQCReportFile.AppendLine(QAModelAreaReport(aHspfUci, lOperationTypes))
                     QAQCReportFile.AppendLine(QACheckHSPFParmValues(aHspfUci, lRunMade))
+                    QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "DO"))
+                    QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "Water Temperature"))
+                    'note that qa reports for loading rate, land use comparison, and storage are done in the wq section
                 End If
 
                 'Do automated graphs
@@ -236,23 +258,6 @@ Module HSPFOutputReports
                 'Do Expert System Stats
                 If pExpertSystemStats Then
                     DoExpertSystemStats(aHspfUci, lRunMade)
-                End If
-
-                'read binary output files for use in wq reports or receiving models 
-                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Then
-                    Dim lOpenHspfBinDataSource As New atcDataSource
-                    Logger.Dbg(Now & " Opening the binary output files.")
-                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
-                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
-                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                            If lOpenHspfBinDataSource Is Nothing Then
-                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                End If
-                            End If
-                        End If
-                    Next i
                 End If
 
                 'Write input file for BATHTUB
@@ -300,8 +305,6 @@ Module HSPFOutputReports
                 End If
 
                 If pModelQAQC Then
-                    'Do Area Report
-                    QAQCReportFile.AppendLine(QAModelAreaReport(aHspfUci, lOperationTypes))
                     'Close out the QA report
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
@@ -590,6 +593,10 @@ Module HSPFOutputReports
                 lReportCons = Nothing
                 Dim lOutFileName As String = ""
 
+                Logger.Status(Now & " Generating Reports for " & lConstituent)
+                Logger.Dbg(Now & " Generating Reports for " & lConstituent)
+
+                'LandLoadingReports generates a text file report as well as the info needed for the QA report
                 Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
@@ -597,13 +604,13 @@ Module HSPFOutputReports
                     aQAQCReportFile.AppendLine(QALoadingRateComparison(lConstituentName, LandLoadingReportForConstituents, aDateString))
                 End If
 
+                'ReachBudgetReports generates a text file report only
                 ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+
                 If pModelQAQC Then
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                 End If
 
-                Logger.Status(Now & " Generating Reports for " & lConstituent)
-                Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                 lReportCons = Nothing
 
                 If lConstituent = "TN" OrElse lConstituent = "TP" OrElse
@@ -764,6 +771,7 @@ Module HSPFOutputReports
     ''' <param name="aRunMade"></param>
     ''' <returns></returns>
     Private Function QACheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
+        Logger.Status("Creating the QAQC Model Parameter Report")
         Dim HSPFParmTable As XmlDocument = New XmlDocument()
         Dim TableName As String = ""
         Dim ParameterName As String
@@ -1122,6 +1130,7 @@ Module HSPFOutputReports
         Dim lCalibrationLocations As New atcCollection
         Dim lLocationsToOutput As New atcCollection
 
+        Logger.Status("Creating the QAQC Model Area Report")
         'First add calibration reaches by looking at contents of expert system .exs files
         Dim lExpertSystemFileNames As New NameValueCollection
         AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
@@ -1204,6 +1213,7 @@ Module HSPFOutputReports
 
     Private Function QALoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
                                            ByVal aDateString As String) As String
+        Logger.Status("Creating the QAQC Loading Rate Comparison Report")
         Dim OverAllComments As New Text.StringBuilder
         Dim LoadingRateComments As New Text.StringBuilder
         Dim newColumn As DataColumn
@@ -1619,6 +1629,7 @@ Module HSPFOutputReports
     'End Function
 
     Private Function QAVerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
+        Logger.Status("Creating the QAQC Storage Trend Report")
         Dim StorageTrend As New Text.StringBuilder
         Dim OverAllStorageTrend As New Text.StringBuilder
         Dim lSimSpan As Double = aUCI.GlobalBlock.EdateJ - aUCI.GlobalBlock.SDateJ
@@ -1785,7 +1796,8 @@ Module HSPFOutputReports
     ''' <param name="aUCI"></param>
     ''' <param name="aConstituent"></param>
     ''' <returns></returns>
-    Private Function QACheckDiurnalPattern(ByVal aBinaryData As atcDataSource, ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+    Private Function QACheckDiurnalPattern(ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+        Logger.Status("Creating the QAQC Diurnal Pattern Report")
         Dim lDiurnalPattern As New Text.StringBuilder
         Dim lFoundTheTS As Boolean = False
         Dim lGroupName As String = ""
@@ -1834,43 +1846,54 @@ Module HSPFOutputReports
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
 
-            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
-                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then 'This means that timeseries is hourly or minute
+                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+                End If
             End If
             If lTS Is Nothing Then
-                lTS = aBinaryData.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
+                lTS = atcDataManager.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
             End If
-            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
-                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then 'This means that timeseries is hourly or minute
+                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+                End If
             End If
-            If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
-                'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
-                Dim lSeasonMorning As New atcSeasonsHour
-                'hours ending 1am - 4am
-                lSeasonMorning.SeasonSelected(0) = True
-                lSeasonMorning.SeasonSelected(1) = True
-                lSeasonMorning.SeasonSelected(2) = True
-                lSeasonMorning.SeasonSelected(3) = True
-                Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lTS, Nothing)(0)
-                Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                Dim lSeasonAfternoon As New atcSeasonsHour
-                'hours ending 1pm - 4pm
-                lSeasonAfternoon.SeasonSelected(12) = True
-                lSeasonAfternoon.SeasonSelected(13) = True
-                lSeasonAfternoon.SeasonSelected(14) = True
-                lSeasonAfternoon.SeasonSelected(15) = True
-                lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
-                Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                lRow = lDiurnalTable.NewRow
-                lRow("Reach") = lRCHRES.Id
-                lRow("Morning") = DecimalAlign(lMorningMean, , 2, 7)
-                lRow("Afternoon") = DecimalAlign(lAfternoonMean, , 2, 7)
-                lDiurnalTable.Rows.Add(lRow)
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
+                    'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
+                    Dim lSeasonMorning As New atcSeasonsHour
+                    'hours ending 1am - 4am
+                    lSeasonMorning.SeasonSelected(0) = True
+                    lSeasonMorning.SeasonSelected(1) = True
+                    lSeasonMorning.SeasonSelected(2) = True
+                    lSeasonMorning.SeasonSelected(3) = True
+                    Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lTS, Nothing)(0)
+                    Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                    Dim lSeasonAfternoon As New atcSeasonsHour
+                    'hours ending 1pm - 4pm
+                    lSeasonAfternoon.SeasonSelected(12) = True
+                    lSeasonAfternoon.SeasonSelected(13) = True
+                    lSeasonAfternoon.SeasonSelected(14) = True
+                    lSeasonAfternoon.SeasonSelected(15) = True
+                    lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
+                    Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                    lRow = lDiurnalTable.NewRow
+                    lRow("Reach") = lRCHRES.Id
+                    lRow("Morning") = DecimalAlign(lMorningMean, , 2, 7)
+                    lRow("Afternoon") = DecimalAlign(lAfternoonMean, , 2, 7)
+                    lDiurnalTable.Rows.Add(lRow)
+                End If
+            Else
+                Logger.Dbg("No timeseries found for " & aConstituent)
             End If
-
         Next
 
-        lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
+        If lDiurnalTable.Rows.Count > 0 Then
+            lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
+        Else
+            lDiurnalPattern.AppendLine("<p>No hourly timeseries available for " & aConstituent & "</p>")
+        End If
 
         Return lDiurnalPattern.ToString
     End Function
