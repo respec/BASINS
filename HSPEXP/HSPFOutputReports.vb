@@ -301,11 +301,13 @@ Module HSPFOutputReports
 
                 ' Do Water Quality Reports
                 If pConstituents.Count > 0 Then
+                    'includes qa reports for loading rate, land use comparison, and storage 
                     DoWaterQualityReports(aHspfUci, lRunMade, lDateString, lOperationTypes, QAQCReportFile)
                 End If
 
                 If pModelQAQC Then
                     'Close out the QA report
+                    Logger.Status("Closing the QAQC Report")
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
                     File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
@@ -605,7 +607,9 @@ Module HSPFOutputReports
                 End If
 
                 'ReachBudgetReports generates a text file report only
-                ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                If Not pModelQAQC Then
+                    ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                End If
 
                 If pModelQAQC Then
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
@@ -613,8 +617,8 @@ Module HSPFOutputReports
 
                 lReportCons = Nothing
 
-                If lConstituent = "TN" OrElse lConstituent = "TP" OrElse
-                    lConstituent = "Sediment" OrElse lConstituent = "Water" Then
+                If (lConstituent = "TN" Or lConstituent = "TP" Or
+                    lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
                     With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
                                                           lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties)
@@ -849,6 +853,7 @@ Module HSPFOutputReports
             OperationType = node.SelectSingleNode("OPNTYPE").InnerText
             TableName = node.SelectSingleNode("TABLE").InnerText
             ParameterName = node.SelectSingleNode("ParameterName").InnerText
+            Logger.Status("Creating the QAQC Model Parameter Report -- Examining Table " & TableName)
             'If ParameterName = "TAUCS" Then Stop
             Dim IsMonthlyValuePossible As Integer
             Try
@@ -999,6 +1004,8 @@ Module HSPFOutputReports
             Next loperation
 
         Next
+        Logger.Status("Creating the QAQC Model Parameter Report")
+
         Dim lReachesWithAdsDepoIssue As Integer = 0
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             If lRCHRES.Tables("ACTIVITY").Parms("NUTFG").Value = 1 AndAlso (lRCHRES.Tables("NUT-FLAGS").Parms("ADNHFG").Value = 0 OrElse
@@ -1095,7 +1102,7 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
-        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values, Area"
+        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values, Area, Diurnal Patterns"
         If pConstituents.Contains("Water") Then
             QAQCAnalysis &= ", Water"
         End If
@@ -1681,6 +1688,7 @@ Module HSPFOutputReports
                 Case Else
                     Continue For
             End Select
+            Logger.Status("Creating the QAQC Storage Trend Report for " & aConstituent & " in " & lLocationName)
 
             For Each StorageVariable As String In lListOfStorageVariables
                 If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
