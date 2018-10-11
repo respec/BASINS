@@ -153,6 +153,7 @@ Public Module atcConstituentTables
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
+                    Logger.Status("Generating Reports for Water from " & LocationName)
                     Logger.Dbg(LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
@@ -308,6 +309,7 @@ Public Module atcConstituentTables
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
+                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
@@ -453,6 +455,7 @@ Public Module atcConstituentTables
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
+                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
@@ -641,6 +644,7 @@ Public Module atcConstituentTables
                         (lOperation.Name = "IMPLND" AndAlso lOperation.Tables("ACTIVITY").Parms("IQALFG").Value = "1")) Then Continue For
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
                     Dim lOperationIsConnected As Boolean = False
                     'If lOperation.Tables("ACTIVITY").Parms("PQUALFG").Value = "0" Then Continue For
 
