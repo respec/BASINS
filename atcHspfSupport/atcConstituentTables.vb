@@ -495,9 +495,9 @@ Public Module atcConstituentTables
                             If lTS Is Nothing Then Continue For
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                             For Each lConnection As HspfConnection In lOperation.Targets
-                                If lConnection.Target.VolName = "RCHRES" Then
+                                If lConnection.Target.VolName = "RCHRES" Or lConnection.Target.VolName = "BMPRAC" Then
                                     lOperationIsConnected = True
-                                    Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                    Dim aReach As HspfOperation = aUCI.OpnBlks(lConnection.Target.VolName).OperFromID(lConnection.Target.VolId)
                                     If ConstituentsThatNeedMassLink.Contains(lOutflowDataType) Then
                                         Dim lMassLinkID As Integer = lConnection.MassLink
                                         If Not lMassLinkID = 0 Then

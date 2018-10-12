@@ -78,6 +78,7 @@ Public Class StartUp
         chkGQUAL5.Enabled = False
         chkGQUAL6.Enabled = False
         chkGQUAL7.Enabled = False
+        chkModelQAQC.Checked = False
 
 
         Dim lUCI As String = cmbUCIPath.Text
