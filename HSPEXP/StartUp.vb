@@ -78,6 +78,7 @@ Public Class StartUp
         chkGQUAL5.Enabled = False
         chkGQUAL6.Enabled = False
         chkGQUAL7.Enabled = False
+        chkModelQAQC.Checked = False
 
 
         Dim lUCI As String = cmbUCIPath.Text
@@ -428,6 +429,9 @@ Public Class StartUp
             chkGQUAL5.Enabled = True
             chkGQUAL6.Enabled = True
             chkGQUAL7.Enabled = True
+            chkWASP.Enabled = True
+            chkBathtub.Enabled = True
+            chkMultiSim.Enabled = True
             GroupBox2.Text = "Constituent Balance Reports"
         End If
     End Sub

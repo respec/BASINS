@@ -10,6 +10,38 @@ Public Module modBaseflowUtil
     Public OutputDir As String
     Private pUADepth As Double = 0.03719
 
+    Public Sub Main(ByVal args As String())
+        For Each arg As String In args
+            'Console.WriteLine(arg)
+            DoBatch(arg)
+            Exit For
+        Next
+    End Sub
+
+    Private Function DoBatch(ByVal txtSpecFile As String) As Boolean
+        Dim pBatchConfig As New clsBatchBFSpec()
+        If Not pBatchConfig.SpecFilename = txtSpecFile AndAlso IO.File.Exists(txtSpecFile) Then
+            pBatchConfig.SpecFilename = txtSpecFile
+        Else
+            Return False
+        End If
+        pBatchConfig.Clear()
+        'Application.DoEvents()
+        'pBatchConfig.DoBatch()
+        Try
+            pBatchConfig.PopulateScenarios()
+            pBatchConfig.DoBatchIntermittent()
+            Return True
+        Catch ex As Exception
+            If ex.Message = "User Canceled" Then
+                Logger.Dbg("Batch run canceled.", MsgBoxStyle.Information, "Batch Run")
+            Else
+                Logger.Dbg(ex.Message & vbCrLf & ex.StackTrace, MsgBoxStyle.Information, "Batch Run")
+            End If
+            Return False
+        End Try
+    End Function
+
     ''' <summary>
     '''set methods
     '''Args.SetValue("Methods", pMethods)

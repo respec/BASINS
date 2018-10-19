@@ -42,6 +42,8 @@ Public Class clsUSGSBaseflowPlugin
             'End If
             Dim lgisLayerFound As Boolean = False
             Dim lstnSelected As Integer = 0
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
                 If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
@@ -51,18 +53,25 @@ Public Class clsUSGSBaseflowPlugin
                     Exit For
                 End If
             Next
+#End If
             Dim lContinueWithNoStns As Boolean = False
             Dim lContAction As String = ""
             If lgisLayerFound Then
                 If lstnSelected = 0 Then
+#If GISProvider = "DotSpatial" Then
+#Else
                     lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+#End If
                     If lContAction = "No" Then
                         Return Nothing
                     Else
                         lContinueWithNoStns = True
                     End If
                 ElseIf lstnSelected < 2 Then
+#If GISProvider = "DotSpatial" Then
+#Else
                     Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
+#End If
                 End If
             Else
                 lContAction = Logger.MsgCustomOwned("Could not find stream gage station layer: NWIS Daily Discharge Stations." & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
@@ -73,6 +82,8 @@ Public Class clsUSGSBaseflowPlugin
                 End If
             End If
             Dim lSelectedStationIDs As New atcCollection()
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lShp As New MapWinGIS.Shapefile()
             If lgisLayerFound AndAlso lShp.Open(lMapLayer.FileName, Nothing) Then
                 Dim lFieldIndex As Integer = -99
@@ -105,6 +116,7 @@ Public Class clsUSGSBaseflowPlugin
                     End If
                 Next
             End If
+#End If
             If lSelectedStationIDs.Count > 0 OrElse lContinueWithNoStns Then
                 If lSelectedStationIDs.Count > 0 Then
                     Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
@@ -171,15 +183,21 @@ Public Class clsUSGSBaseflowPlugin
         End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
+#End If
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
         Try
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
             pMapWin.Plugins.StartPlugin(lKey)
+#End If
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
