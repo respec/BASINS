@@ -1813,6 +1813,7 @@ Module HSPFOutputReports
         Dim lMemSub1 As Integer = 0
         Dim lMemSub2 As Integer = 0
         Dim lConstituent As String = ""
+        Dim lHeaderLabel As String = ""
         Select Case aConstituent
             Case "DO"
                 lGroupName = "OXRX"
@@ -1820,66 +1821,84 @@ Module HSPFOutputReports
                 lMemSub1 = 1
                 lMemSub2 = 1
                 lConstituent = "DOXCONC"
+                lHeaderLabel = "DO (mg/l)"
             Case "Water Temperature"
                 lGroupName = "HTRCH" '"OXRX"
                 lMemberName = "TW" '"DOX"
                 lMemSub1 = 1
                 lMemSub2 = 1
                 lConstituent = "TW"
-            Case "CHLA"
-                lGroupName = "PLANK"
-                lMemberName = "TBENAL"
-                lMemSub1 = 2
-                lMemSub2 = 1
-                lConstituent = "CHLA"
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    lHeaderLabel = "Water Temperature (Deg F)"
+                Else
+                    lHeaderLabel = "Water Temperature (Deg C)"
+                End If
+                'Case "CHLA"
+                '    lGroupName = "PLANK"
+                '    lMemberName = "TBENAL"
+                '    lMemSub1 = 2
+                '    lMemSub2 = 1
+                '    lConstituent = "CHLA"
         End Select
-        lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table - " & lConstituent & "</h2>")
+        lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table (May - Sept) - " & lHeaderLabel & "</h2>")
         Dim lDiurnalTable As DataTable
         lDiurnalTable = New DataTable("DiurnalPatternTable")
         Dim lColumn As DataColumn
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "Reach"
-        lColumn.Caption = "Reach Name"
+        lColumn.Caption = "Reach"
         lColumn.DataType = Type.GetType("System.String")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "MorningMean"
-        lColumn.Caption = "Mean" & vbCrLf & "Morning (12am - 4am)"
+        lColumn.Caption = "Mean - All<br>Morning Hours (12am - 8am)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "AfternoonMean"
-        lColumn.Caption = "Mean" & vbCrLf & "Morning (12pm - 4pm)"
+        lColumn.Caption = "Mean - All<br>Afternoon Hours (12pm - 8pm)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "MorningMin"
-        lColumn.Caption = "Minimum" & vbCrLf & "Morning (12am - 4am)"
+        lColumn.Caption = "Mean - Daily Min<br>Morning Hours (12am - 8am)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "AfternoonMin"
-        lColumn.Caption = "Minimum" & vbCrLf & "Morning (12pm - 4pm)"
+        lColumn.Caption = "Mean - Daily Min<br>Afternoon Hours (12pm - 8pm)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "MorningMax"
-        lColumn.Caption = "Maximum" & vbCrLf & "Morning (12am - 4am)"
+        lColumn.Caption = "Mean - Daily Max<br>Morning Hours (12am - 8am)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "AfternoonMax"
-        lColumn.Caption = "Maximum" & vbCrLf & "Morning (12pm - 4pm)"
+        lColumn.Caption = "Mean - Daily Max<br>Afternoon Hours  (12pm - 8pm)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AnomalyCount"
+        lColumn.Caption = "Daily Anomaly<sup>*</sup><br>Count"
+        lColumn.DataType = Type.GetType("System.Int64")
+        lDiurnalTable.Columns.Add(lColumn)
         Dim lRow As DataRow
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AnomalyPercent"
+        lColumn.Caption = "Daily Anomaly<br>Percent"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
 
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
@@ -1893,12 +1912,19 @@ Module HSPFOutputReports
                 lTS = atcDataManager.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
             End If
             If Not lTS Is Nothing Then
-                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then 'This means that timeseries is hourly or minute
-                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
+                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'timeseries is shorter than hour, then aggregate it to hourly
                 End If
             End If
             If Not lTS Is Nothing Then
-                If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value = 3 Then 'Getting to this loop only if timestep is hourly
+                    Dim lSeasonSummer As New atcSeasonsMonth
+                    lSeasonSummer.SeasonSelected(5) = True
+                    lSeasonSummer.SeasonSelected(6) = True
+                    lSeasonSummer.SeasonSelected(7) = True
+                    lSeasonSummer.SeasonSelected(8) = True
+                    lSeasonSummer.SeasonSelected(9) = True
+                    Dim lSummerTimeseries As atcTimeseries = lSeasonSummer.SplitBySelected(lTS, Nothing)(0)
                     'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
                     Dim lSeasonMorning As New atcSeasonsHour
                     'hours ending 1am - 4am
@@ -1906,20 +1932,32 @@ Module HSPFOutputReports
                     lSeasonMorning.SeasonSelected(1) = True
                     lSeasonMorning.SeasonSelected(2) = True
                     lSeasonMorning.SeasonSelected(3) = True
-                    Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lTS, Nothing)(0)
+                    lSeasonMorning.SeasonSelected(4) = True
+                    lSeasonMorning.SeasonSelected(5) = True
+                    lSeasonMorning.SeasonSelected(6) = True
+                    lSeasonMorning.SeasonSelected(7) = True
+                    Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lSummerTimeseries, Nothing)(0)
+                    Dim lMorningDailyMax As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                    Dim lMorningDailyMin As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
                     Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                    Dim lMorningMin As Double = lSeasonTimeseries.Attributes.GetValue("Min")
-                    Dim lMorningMax As Double = lSeasonTimeseries.Attributes.GetValue("Max")
+                    Dim lMorningMin As Double = lMorningDailyMin.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Min")
+                    Dim lMorningMax As Double = lMorningDailyMax.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Max")
                     Dim lSeasonAfternoon As New atcSeasonsHour
                     'hours ending 1pm - 4pm
                     lSeasonAfternoon.SeasonSelected(12) = True
                     lSeasonAfternoon.SeasonSelected(13) = True
                     lSeasonAfternoon.SeasonSelected(14) = True
                     lSeasonAfternoon.SeasonSelected(15) = True
-                    lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
+                    lSeasonAfternoon.SeasonSelected(16) = True
+                    lSeasonAfternoon.SeasonSelected(17) = True
+                    lSeasonAfternoon.SeasonSelected(18) = True
+                    lSeasonAfternoon.SeasonSelected(19) = True
+                    lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lSummerTimeseries, Nothing)(0)
+                    Dim lAfternoonDailyMax As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                    Dim lAfternoonDailyMin As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
                     Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                    Dim lAfternoonMin As Double = lSeasonTimeseries.Attributes.GetValue("Min")
-                    Dim lAfternoonMax As Double = lSeasonTimeseries.Attributes.GetValue("Max")
+                    Dim lAfternoonMin As Double = lAfternoonDailyMin.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Min")
+                    Dim lAfternoonMax As Double = lAfternoonDailyMax.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Max")
                     lRow = lDiurnalTable.NewRow
                     lRow("Reach") = lRCHRES.Id
                     lRow("MorningMean") = DecimalAlign(lMorningMean, , 2, 7)
@@ -1928,6 +1966,25 @@ Module HSPFOutputReports
                     lRow("AfternoonMin") = DecimalAlign(lAfternoonMin, , 2, 7)
                     lRow("MorningMax") = DecimalAlign(lMorningMax, , 2, 7)
                     lRow("AfternoonMax") = DecimalAlign(lAfternoonMax, , 2, 7)
+                    Dim lAnomalyCount As Integer = 0
+                    Dim lDiff As Double
+                    For i As Integer = 1 To lMorningDailyMax.numValues
+                        If Not Double.IsNaN(lMorningDailyMax.Value(i)) AndAlso Not Double.IsNaN(lAfternoonDailyMax.Value(i)) Then
+                            lDiff = lAfternoonDailyMax.Value(i) - lMorningDailyMax.Value(i)
+                            Select Case aConstituent
+                                Case "DO"
+                                    If lDiff < 0 Then 'max DO should be less in pm than in am
+                                        lAnomalyCount += 1
+                                    End If
+                                Case "Water Temperature", "CHLA"
+                                    If lDiff < 0 Then 'max Temp should be less in am than in pm
+                                        lAnomalyCount += 1
+                                    End If
+                            End Select
+                        End If
+                    Next
+                    lRow("AnomalyCount") = lAnomalyCount
+                    lRow("AnomalyPercent") = DecimalAlign(100 * lAnomalyCount / lMorningDailyMax.numValues, , 2, 7)
                     lDiurnalTable.Rows.Add(lRow)
                 End If
             Else
@@ -1937,6 +1994,7 @@ Module HSPFOutputReports
 
         If lDiurnalTable.Rows.Count > 0 Then
             lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
+            lDiurnalPattern.AppendLine("<sup>*</sup><i>Days where expected morning/afternoon pattern is not observed (i.e. afternoon max does not exceed morning max)</i>")
         Else
             lDiurnalPattern.AppendLine("<p>No hourly timeseries available for " & aConstituent & "</p>")
         End If
