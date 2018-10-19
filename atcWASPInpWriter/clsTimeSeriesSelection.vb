@@ -227,7 +227,7 @@ Public Class clsTimeSeriesSelection
                 ts.Add(WaspProject.EDate, Val(DataSource))
 
             Case enumSelectionType.Database
-                For i As Integer = 0 To Me.ts.numValues - 1
+                For i As Integer = 0 To Me.ts.numValues
                     ts.Add(Date.FromOADate(Me.ts.Dates.Value(i)), Me.ts.Value(i))
                 Next
 

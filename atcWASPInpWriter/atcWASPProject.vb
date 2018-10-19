@@ -412,9 +412,9 @@ Public Class atcWASPProject
                     If seg.FlowTimeSeries.SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
                         WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", seg.Name, "flow", seg.FlowTimeSeries.ToFullString) & vbCr
                     End If
-                    aSW.WriteLine("{0,5}               Number of time-flow values in {1}", .Count, seg.FlowTimeSeries.ToFullString)
-                    For t As Integer = 0 To .Count - 1
-                        aSW.WriteLine(String.Format("{0,8:0.000} {1,9:0.00000}", .Keys(t).Subtract(SDate).TotalDays, .Values(t)))
+                    aSW.WriteLine("{0,5}               Number of time-flow values in {1}", .Count - 1, seg.FlowTimeSeries.ToFullString)
+                    For t As Integer = 1 To .Count - 1
+                        aSW.WriteLine(String.Format("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t)))
                     Next
                 End With
             Next

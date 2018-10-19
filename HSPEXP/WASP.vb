@@ -44,9 +44,11 @@ Module WASP
         Dim lDepth_m As Double = 1.0
         Dim lWidth_m As Double = 10.0
         Dim lVolume_m3 As Double = 100.0
+        Dim lSegName As String = "Segment"
         If aHSPFUCI.OperationExists("RCHRES", aReachId) Then
             lLength_km = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("HYDR-PARM2").Parms("LEN").Value * 1.60934 'Converting stream length in miles to km
             lSlope = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("HYDR-PARM2").Parms("DELTH").Value * 0.3048 / (lLength_km * 1000.0)  'Converting delth in ft to m
+            lSegName = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("GEN-INFO").Parms("RCHID").Value
             'Depth (ft)= a*DrainageArea^b (english):  a= 1.5; b=0.284    -- assumption from GBMM used in BASINS WASP plugin
             '   drainage area appears to be in sq km
             Dim lOperationTypes As New atcCollection
@@ -104,7 +106,7 @@ Module WASP
             End If
             lSeg.ID = Str(i)
             lSeg.Length = lLength_km
-            lSeg.Name = Str(i)
+            lSeg.Name = lSegName & Str(i)
             lSeg.Slope = lSlope
             lSeg.WaspID = i
             lSeg.WaspName = Str(i)
@@ -195,32 +197,39 @@ Module WASP
             End With
         Next
 
+        'One way to find input timeseries is to look in WDM file for upstream contributors.
+        'The concern with this is that all tribs have to be added together, plus we need local inflows.
         'Look for timeseries from contributing reaches 
         Dim lReach As HspfOperation = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId)
         Dim lCompositeTimeseries As atcTimeseries = Nothing
-        Dim lCountTimeseries As Integer = 0
-        For Each lSource As HspfConnection In lReach.Sources
-            If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "RCHRES" Then
-                'here's a contributing reach
-                Dim lTimeSeriesIsInWDM As Boolean = False
-                Dim lTimeseries As atcTimeseries = Nothing
-                lTimeseries = LocateTheTimeSeries(aHSPFUCI, aReachId, "ROFLOW", "ROVOL", 1, 1, lTimeSeriesIsInWDM)
-                If Not lTimeSeriesIsInWDM Then
-                    lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "ROVOL")(0)
-                End If
-                If lTimeseries IsNot Nothing Then
-                    lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 0.00123348185532 'Converting flow in ac-ft to hm3
-                End If
-                If lTimeseries IsNot Nothing Then
-                    If lCountTimeseries = 0 Then
-                        lCompositeTimeseries = lTimeseries
-                    Else
-                        lCompositeTimeseries = lCompositeTimeseries + lTimeseries
-                    End If
-                    lCountTimeseries += 1
-                End If
-            End If
-        Next
+        'Dim lCountTimeseries As Integer = 0
+        'For Each lSource As HspfConnection In lReach.Sources
+        '    If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "RCHRES" Then
+        '        'here's a contributing reach
+        '        Dim lTimeSeriesIsInWDM As Boolean = False
+        '        Dim lTimeseries As atcTimeseries = Nothing
+        '        lTimeseries = LocateTheTimeSeries(aHSPFUCI, lSource.Source.VolId, "HYDR", "RO", 1, 1, lTimeSeriesIsInWDM)
+        '        If lTimeseries IsNot Nothing Then
+        '            lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) / 35.315 'Converting flow cfs to cms
+        '        End If
+        '        If lTimeseries IsNot Nothing Then
+        '            If lCountTimeseries = 0 Then
+        '                lCompositeTimeseries = lTimeseries
+        '            Else
+        '                lCompositeTimeseries = lCompositeTimeseries + lTimeseries
+        '            End If
+        '            lCountTimeseries += 1
+        '        End If
+        '    End If
+        'Next
+
+        'a lot more straightforward is just to use the ivol term from the bino file
+        lCompositeTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "IVOL")(0)
+        If lCompositeTimeseries IsNot Nothing Then
+            'convert from ivol in ac.ft/ivld to cms
+            Dim lConvFact As Double = 1233.48 / (24 * 60 * 60)
+            lCompositeTimeseries = Aggregate(lCompositeTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * lConvFact
+        End If
         If lCompositeTimeseries IsNot Nothing Then
             lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
             lWaspProject.Segments(lNSegs - 1).FlowTimeSeries.ts = lCompositeTimeseries
