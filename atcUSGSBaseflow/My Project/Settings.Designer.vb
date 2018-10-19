@@ -64,9 +64,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.atcUSGSBaseflow.My.MySettings
+        Friend ReadOnly Property Settings() As Global.GroundwaterWatch.My.MySettings
             Get
-                Return Global.atcUSGSBaseflow.My.MySettings.Default
+                Return Global.GroundwaterWatch.My.MySettings.Default
             End Get
         End Property
     End Module
