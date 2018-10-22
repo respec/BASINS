@@ -230,6 +230,7 @@ Module WASP
             'convert from ivol in ac.ft/ivld to cms
             Dim lConvFact As Double = 1233.48 / (24 * 60 * 60)
             lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * lConvFact
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lTimeseries IsNot Nothing Then
             lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
@@ -240,46 +241,46 @@ Module WASP
 
         'Ammonia              TAM-INTOT (lbs)
         Dim lConvFactP As Double = 1 / 2.205
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
 
         'Nitrate              NO3-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
 
         'Organic Nitrogen     N-TOTORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
 
         'Orthophosphate       PO4-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
 
         'Organic Phosphorus   P-TOTORG-IN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
 
         'Phytoplankton Chla   PHYTO-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5, aSDateJ, aEDateJ)
 
         'CBOD 1(Ultimate)     BODIN (lbs) 
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6, aSDateJ, aEDateJ)
 
         'CBOD 2(Ultimate)     *** 
         'CBOD 3(Ultimate)     *** 
 
         'Dissolved Oxygen     DOXIN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9, aSDateJ, aEDateJ)
 
         'Detrital Carbon      C-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10, aSDateJ, aEDateJ)
 
         'Detrital Nitrogen    N-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
 
         'Detrital Phosphorus  P-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
 
         'Salinity             ***
 
         'Solids               ISED-TOT (tons)
         Dim lConvFactT As Double = 907.185  'tons to kg
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14, aSDateJ, aEDateJ)
 
         'now ready to write
         lWaspProject.WriteINP(lFileName)
@@ -287,11 +288,13 @@ Module WASP
 
     Sub LinkBinoTimeseriesToWASPLoadTimeseries(ByRef aWaspProject As atcWASPProject, ByVal aBinaryData As atcDataSource,
                                                ByVal aReachId As Integer, ByVal aConstituent As String,
-                                               ByVal aConvFact As Double, ByVal aLoadID As Integer)
+                                               ByVal aConvFact As Double, ByVal aLoadID As Integer,
+                                               ByVal aSDateJ As Double, ByVal aEDateJ As Double)
         Dim lTimeseries As atcTimeseries = Nothing
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", aConstituent)(0)
         If lTimeseries IsNot Nothing Then
             lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lTimeseries IsNot Nothing Then
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
