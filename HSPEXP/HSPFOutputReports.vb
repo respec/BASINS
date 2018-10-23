@@ -311,6 +311,7 @@ Module HSPFOutputReports
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
                     File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
+                    OpenFile(pTestPath & "ModelQAQC.htm")
                 End If
 
                 Logger.Status(Now & " Output Written to " & pOutFolderName)
