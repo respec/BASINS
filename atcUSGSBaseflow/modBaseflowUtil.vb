@@ -10,15 +10,24 @@ Public Module modBaseflowUtil
     Public OutputDir As String
     Private pUADepth As Double = 0.03719
 
+    Private pConsoleDebug As Boolean = True
+
     Public Sub Main(ByVal args As String())
+        Dim lcurdir As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        If pConsoleDebug Then
+            Console.WriteLine(lcurdir)
+        End If
         For Each arg As String In args
             'Console.WriteLine(arg)
+            If Not IO.File.Exists(arg) Then
+                arg = IO.Path.Combine(lcurdir, arg)
+            End If
             DoBatch(arg)
             Exit For
         Next
     End Sub
 
-    Private Function DoBatch(ByVal txtSpecFile As String) As Boolean
+    Public Function DoBatch(ByVal txtSpecFile As String) As Boolean
         Dim pBatchConfig As New clsBatchBFSpec()
         If Not pBatchConfig.SpecFilename = txtSpecFile AndAlso IO.File.Exists(txtSpecFile) Then
             pBatchConfig.SpecFilename = txtSpecFile
@@ -28,6 +37,9 @@ Public Module modBaseflowUtil
         pBatchConfig.Clear()
         'Application.DoEvents()
         'pBatchConfig.DoBatch()
+        If pConsoleDebug Then
+            Console.WriteLine(txtSpecFile)
+        End If
         Try
             pBatchConfig.PopulateScenarios()
             pBatchConfig.DoBatchIntermittent()
