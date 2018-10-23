@@ -648,7 +648,13 @@ Public Class clsBatchBFSpec
             End If
         End If
         If lDataReady Then
-            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            Dim lGroup As atcTimeseriesGroup = Nothing
+            If aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "Streamflow" Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            ElseIf aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "FLOW" Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "FLOW")
+            End If
+
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
                 If aPreserve Then
                     Return lGroup(0)
@@ -839,8 +845,12 @@ Public Class clsBatchBFSpec
     '{
     Public Sub DoBatchIntermittent()
         If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
+#If App = "GWWatch" Then
+            Console.WriteLine("Please address following issues before running batch:" & vbCrLf & Message)
+#Else
             Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message,
                        "Base-flow Separation Batch")
+#End If
             Exit Sub
         Else
             Message = ""
@@ -872,8 +882,12 @@ Public Class clsBatchBFSpec
         Dim lDrainageArea As Double = 0.0
         '{Loop through each batch group, lBFOpn
         For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
+#If App = "GWWatch" Then
+            Console.WriteLine("Batch Group: " & lBFOpnId)
+#Else
             Logger.Status("Batch Group: " & lBFOpnId)
             Logger.Progress(lBFOpnCount, lTotalBFOpnGroups)
+#End If
             Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
             Dim lbatchUnitStation As clsBatchUnitStation = lBFOpn.ItemByIndex(0)
             Dim lBFOpnOutputDir As String = lbatchUnitStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
@@ -1146,9 +1160,13 @@ Public Class clsBatchBFSpec
         lSummary.Flush()
         lSummary.Close()
         lSummary = Nothing
-        Logger.Status("")
         'UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
+#If App = "GWWatch" Then
+        Console.WriteLine("Base-flow Separation Complete for " & lTotalStations & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", MsgBoxStyle.Information, "Batch Run Base-flow Separation")
+#Else
+        Logger.Status("")
         Logger.Msg("Base-flow Separation Complete for " & lTotalStations & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", MsgBoxStyle.Information, "Batch Run Base-flow Separation")
+#End If
     End Sub '}
 
     Public Shared Function TSerOverlap(ByVal aFullTser As atcTimeseries, ByVal aPartialTser As atcTimeseries) As Boolean

@@ -37,6 +37,14 @@ Module WASP
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Solids (mg/L)", "", ""))
 
+        'if model type is heat
+        'lWaspProject.WASPConstituents = New Generic.List(Of clsWASPConstituent)
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Temperature (°C)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Bacteria (#/100 ml)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Silts and Fines (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Sands (mg/L)", "", ""))
+
         'need segments -- will make some assumptions here 
         Dim lNSegs As Integer = 1
         Dim lLength_km As Double = 1.0
@@ -49,43 +57,75 @@ Module WASP
             lLength_km = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("HYDR-PARM2").Parms("LEN").Value * 1.60934 'Converting stream length in miles to km
             lSlope = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("HYDR-PARM2").Parms("DELTH").Value * 0.3048 / (lLength_km * 1000.0)  'Converting delth in ft to m
             lSegName = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("GEN-INFO").Parms("RCHID").Value
-            'Depth (ft)= a*DrainageArea^b (english):  a= 1.5; b=0.284    -- assumption from GBMM used in BASINS WASP plugin
-            '   drainage area appears to be in sq km
-            Dim lOperationTypes As New atcCollection
-            lOperationTypes.Add("P:", "PERLND")
-            lOperationTypes.Add("I:", "IMPLND")
-            lOperationTypes.Add("R:", "RCHRES")
-            lOperationTypes.Add("B:", "BMPRAC")
-            Dim lContributingLandUseAreas As atcCollection = ContributingLandUseAreas(aHSPFUCI, lOperationTypes, "R:" & aReachId.ToString)
-            Dim lDrainageArea As Double = 0.0
-            For Each lArea In lContributingLandUseAreas
-                lDrainageArea += StrRetRem(lArea)
-                If lArea.Length > 0 Then
-                    lDrainageArea += lArea
-                End If
-            Next
-            lDrainageArea = lDrainageArea / 247.105   'to convert acres to sq km
-            Dim lDepth = 1.5 * (lDrainageArea ^ 0.284)   'gives depth in ft
-            lDepth_m = lDepth / 3.281   'depth in m
 
-            'basins uses these formulae for depth and width from drainage area 
-            Dim lDepthFromBASINS As Double = (0.13) * ((lDrainageArea) ^ (0.4))   'meters
-            Dim lWidthFromBASINS As Double = (1.29) * ((lDrainageArea) ^ (0.6))   'meters
-
-            'from FTABLE can get surface area, volume, and discharge at this depth
+            'we need depth, width, and volume -- we may be able to get these from the HBN
+            Dim lDepth As Double = -999
+            Dim lTopWidth As Double = -999
+            Dim lVol As Double = -999
+            Dim lFlow As Double = -999
             Dim lFlowThru_days As Double = 0.0
-            Dim lHspfFtable As HspfFtable = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).FTable
-            For lRow As Integer = 1 To lHspfFtable.Nrows
-                If lHspfFtable.Depth(lRow) > lDepth Then
-                    'use this as approximation
-                    lWidth_m = lHspfFtable.Area(lRow) * 4046.856 / (lLength_km * 1000.0)   'converting acres to m2
-                    lVolume_m3 = lHspfFtable.Volume(lRow) * 1233.48            'converting acft to m3
-                    If lHspfFtable.Outflow1(lRow) > 0.0 Then
-                        lFlowThru_days = (lHspfFtable.Volume(lRow) * 43560 / lHspfFtable.Outflow1(lRow)) / (60 * 60 * 24)  'assuming first exit is the main one
+            Dim lDepthTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "DEP")(0)
+            If lDepthTimeseries IsNot Nothing Then
+                lDepth = lDepthTimeseries.Attributes.GetDefinedValue("Mean").Value
+            End If
+            Dim lWidthTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "TWID")(0)
+            If lWidthTimeseries IsNot Nothing Then
+                lTopWidth = lWidthTimeseries.Attributes.GetDefinedValue("Mean").Value
+            End If
+            Dim lVolTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "VOL")(0)
+            If lVolTimeseries IsNot Nothing Then
+                lVol = lVolTimeseries.Attributes.GetDefinedValue("Mean").Value
+            End If
+            Dim lFlowTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "RO")(0)
+            If lFlowTimeseries IsNot Nothing Then
+                lFlow = lFlowTimeseries.Attributes.GetDefinedValue("Mean").Value
+            End If
+            lDepth_m = lDepth / 3.281      'depth in m
+            lWidth_m = lTopWidth / 3.281   'width in m
+            lVolume_m3 = lVol * 1233.48            'converting acft to m3
+            If lFlow > 0.0 Then
+                lFlowThru_days = (lVol * 43560 / lFlow) / (60 * 60 * 24)
+            End If
+
+            If lDepth < 0 Then
+                'Alternate method of getting depth, width, volume if HBN is not available 
+                Dim lOperationTypes As New atcCollection
+                Dim lContributingLandUseAreas As New atcCollection
+                Dim lDrainageArea As Double = 0.0
+                'Depth (ft)= a*DrainageArea^b (english):  a= 1.5; b=0.284    -- assumption from GBMM used in BASINS WASP plugin
+                '   drainage area appears to be in sq km
+                lOperationTypes.Add("P:", "PERLND")
+                lOperationTypes.Add("I:", "IMPLND")
+                lOperationTypes.Add("R:", "RCHRES")
+                lOperationTypes.Add("B:", "BMPRAC")
+                lContributingLandUseAreas = ContributingLandUseAreas(aHSPFUCI, lOperationTypes, "R:" & aReachId.ToString)
+                For Each lArea In lContributingLandUseAreas
+                    lDrainageArea += StrRetRem(lArea)
+                    If lArea.Length > 0 Then
+                        lDrainageArea += lArea
                     End If
-                    Exit For
-                End If
-            Next
+                Next
+                lDrainageArea = lDrainageArea / 247.105   'to convert acres to sq km
+                lDepth = 1.5 * (lDrainageArea ^ 0.284)   'gives depth in ft
+                lDepth_m = lDepth / 3.281   'depth in m
+                'basins uses these formulae for depth and width from drainage area 
+                'Dim lDepthFromBASINS As Double = (0.13) * ((lDrainageArea) ^ (0.4))   'meters
+                'Dim lWidthFromBASINS As Double = (1.29) * ((lDrainageArea) ^ (0.6))   'meters
+                'from FTABLE can get surface area, volume, and discharge at this depth
+                Dim lHspfFtable As HspfFtable = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).FTable
+                For lRow As Integer = 1 To lHspfFtable.Nrows
+                    If lHspfFtable.Depth(lRow) > lDepth Then
+                        'use this as approximation
+                        lWidth_m = lHspfFtable.Area(lRow) * 4046.856 / (lLength_km * 1000.0)   'converting acres to m2
+                        lVolume_m3 = lHspfFtable.Volume(lRow) * 1233.48            'converting acft to m3
+                        If lHspfFtable.Outflow1(lRow) > 0.0 Then
+                            lFlowThru_days = (lHspfFtable.Volume(lRow) * 43560 / lHspfFtable.Outflow1(lRow)) / (60 * 60 * 24)  'assuming first exit is the main one
+                        End If
+                        Exit For
+                    End If
+                Next
+            End If
+
             Dim lMinFlowThruDays As Double = 0.1  '0.1?
             If lFlowThru_days > lMinFlowThruDays Then
                 'break up to keep less than 0.1 days of flow-thru time
@@ -230,6 +270,7 @@ Module WASP
             'convert from ivol in ac.ft/ivld to cms
             Dim lConvFact As Double = 1233.48 / (24 * 60 * 60)
             lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * lConvFact
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lTimeseries IsNot Nothing Then
             lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
@@ -240,46 +281,58 @@ Module WASP
 
         'Ammonia              TAM-INTOT (lbs)
         Dim lConvFactP As Double = 1 / 2.205
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
 
         'Nitrate              NO3-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
 
         'Organic Nitrogen     N-TOTORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
 
         'Orthophosphate       PO4-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
 
         'Organic Phosphorus   P-TOTORG-IN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
 
         'Phytoplankton Chla   PHYTO-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5, aSDateJ, aEDateJ)
 
         'CBOD 1(Ultimate)     BODIN (lbs) 
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6, aSDateJ, aEDateJ)
 
         'CBOD 2(Ultimate)     *** 
         'CBOD 3(Ultimate)     *** 
 
         'Dissolved Oxygen     DOXIN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9, aSDateJ, aEDateJ)
 
         'Detrital Carbon      C-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10, aSDateJ, aEDateJ)
 
         'Detrital Nitrogen    N-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
 
         'Detrital Phosphorus  P-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
 
         'Salinity             ***
 
         'Solids               ISED-TOT (tons)
         Dim lConvFactT As Double = 907.185  'tons to kg
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14, aSDateJ, aEDateJ)
+
+        ''if using heat model
+        ''Temperature (°C)     
+        'Dim lConvFactD As Double = 5 / 9  ' F to C conversion needed
+        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TW", lConvFactD, 0, aSDateJ, aEDateJ)
+        ''Salinity             ***
+        ''Bacteria (#/100 ml)  ***  map from gqual?
+        ''Silts and Fines
+        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SILT", lConvFactT, 3, aSDateJ, aEDateJ)
+        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-CLAY", lConvFactT, 3, aSDateJ, aEDateJ)
+        ''Sands 
+        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SAND", lConvFactT, 4, aSDateJ, aEDateJ)
 
         'now ready to write
         lWaspProject.WriteINP(lFileName)
@@ -287,11 +340,13 @@ Module WASP
 
     Sub LinkBinoTimeseriesToWASPLoadTimeseries(ByRef aWaspProject As atcWASPProject, ByVal aBinaryData As atcDataSource,
                                                ByVal aReachId As Integer, ByVal aConstituent As String,
-                                               ByVal aConvFact As Double, ByVal aLoadID As Integer)
+                                               ByVal aConvFact As Double, ByVal aLoadID As Integer,
+                                               ByVal aSDateJ As Double, ByVal aEDateJ As Double)
         Dim lTimeseries As atcTimeseries = Nothing
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", aConstituent)(0)
         If lTimeseries IsNot Nothing Then
             lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lTimeseries IsNot Nothing Then
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
