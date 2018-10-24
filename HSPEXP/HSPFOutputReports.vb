@@ -1748,7 +1748,9 @@ Module HSPFOutputReports
         Next
         StorageTrend.AppendLine("</ul>")
 
-        If lNumberOfTrendIssues > 0 Then
+        If lStorageVarCount.Count = 0 Then 'no timeseries found on binary file
+            OverAllStorageTrend.AppendLine("<p>No storage or concentration timeseries were found for analysis in the binary output file.</p>")
+        ElseIf lNumberOfTrendIssues > 0 Then
             OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.</p>")
             OverAllStorageTrend.Append(StorageTrend)
         Else
