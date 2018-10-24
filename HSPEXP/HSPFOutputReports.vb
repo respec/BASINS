@@ -1676,6 +1676,7 @@ Module HSPFOutputReports
         If lSimSpan < 1827 Then
             OverAllStorageTrend.AppendLine("<p>The time span of simulation is shorter than 5 years. The long term trend analysis may not be accurate.</p>")
         End If
+        Dim lStorageVarCount As New atcCollection
         StorageTrend.AppendLine("<ul>")
         For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
             Dim lLocationName As String = ""
@@ -1699,40 +1700,49 @@ Module HSPFOutputReports
                 Dim lIntercept As Double = 0
                 Dim lRCoeff As Double = 0
                 Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
-                If lStorageTimeSeries Is Nothing Then Continue For
-                Dim lTempTimeSeries As New atcTimeseries(Nothing)
-                lTempTimeSeries = lStorageTimeSeries.Clone
-                For i As Integer = 0 To lStorageTimeSeries.numValues
-                    lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
-                Next
-                Dim lArgs As New atcDataAttributes()
-                Dim lTSerAverage As Double = 0
-                Dim lTSerStdev As Double = 0
-                Dim lCoeffVariation As Double = 0
-                Try
-                    lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
-                    lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
-                    lCoeffVariation = lTSerStdev / lTSerAverage
-                Catch
-                    StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+                If Not lStorageTimeSeries Is Nothing Then 'binary output found
+                    If lStorageVarCount.Keys.Contains(StorageVariable) Then
+                        lStorageVarCount.ItemByKey(StorageVariable) += 1
+                    Else
+                        lStorageVarCount.Add(StorageVariable, 1)
+                    End If
+                    Dim lTempTimeSeries As New atcTimeseries(Nothing)
+                    lTempTimeSeries = lStorageTimeSeries.Clone
+                    For i As Integer = 0 To lStorageTimeSeries.numValues
+                        lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
+                    Next
+                    Dim lArgs As New atcDataAttributes()
+                    Dim lTSerAverage As Double = 0
+                    Dim lTSerStdev As Double = 0
+                    Dim lCoeffVariation As Double = 0
+                    Try
+                        lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
+                        lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
+                        lCoeffVariation = lTSerStdev / lTSerAverage
+                    Catch
+                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
 
-                    Continue For
-                End Try
-                If lCoeffVariation < 0.1 Then Continue For
-                lArgs.SetValue("Timeseries", lStorageTimeSeries)
-                lArgs.SetValue("Number", lTSerAverage)
-                lStorageTimeSeries = DoMath("subtract", lArgs)
-                lArgs.SetValue("Timeseries", lStorageTimeSeries)
-                lArgs.SetValue("Number", lTSerStdev)
-                lStorageTimeSeries = DoMath("divide", lArgs)
-                'Now find the slope of this timeseries
-                FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
-                If lSlope > 0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
-                    lNumberOfTrendIssues += 1
-                ElseIf lSlope < -0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
-                    lNumberOfTrendIssues += 1
+                        Continue For
+                    End Try
+                    If lCoeffVariation > 0.1 Then 'satisfactory covariance value, OK to check slope
+                        'first generate timeseries of difference from mean through time
+                        lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                        lArgs.SetValue("Number", lTSerAverage)
+                        lStorageTimeSeries = DoMath("subtract", lArgs)
+                        'now divide by standard deviation
+                        lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                        lArgs.SetValue("Number", lTSerStdev)
+                        lStorageTimeSeries = DoMath("divide", lArgs)
+                        'Now find the slope of this timeseries
+                        FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
+                        If lSlope > 0.002 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
+                            lNumberOfTrendIssues += 1
+                        ElseIf lSlope < -0.002 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
+                            lNumberOfTrendIssues += 1
+                        End If
+                    End If
                 End If
             Next
         Next
@@ -1744,6 +1754,13 @@ Module HSPFOutputReports
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
+        OverAllStorageTrend.AppendLine("<p>The following model elements were reviewed (count of datasets in parentheses):<ul>")
+        For Each StorageVariable As String In lListOfStorageVariables
+            StorageVariable = StorageVariable.Split(":")(1)
+            OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+        Next
+        OverAllStorageTrend.AppendLine("</ul>")
+
 
         Return OverAllStorageTrend.ToString
     End Function
