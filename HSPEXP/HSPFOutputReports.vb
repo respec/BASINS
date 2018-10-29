@@ -1308,7 +1308,10 @@ Module HSPFOutputReports
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
                 OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
         End Select
-
+        OverAllComments.AppendLine("<p>The box-whisker plot shows the variation in average annual loading among the model segments within each land use category.  If there is only one
+                                    model segment, there will be only a single tick at the average annual load for that land use.  If there are multiple model segments, the tick will be
+                                    at the median, and the extent of the box will indicate the interquartile range (25th and 75th percentile).  The whiskers extend to the highest and 
+                                    lowest average annual loading rate for the segments of that land use classification.</p>")
         Return OverAllComments.ToString
     End Function
 
