@@ -310,8 +310,7 @@ Module HSPFOutputReports
                     Logger.Status("Closing the QAQC Report")
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
-                    File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
-                    OpenFile(pTestPath & "ModelQAQC.htm")
+                    File.WriteAllText(pOutFolderName & "\ModelQAQC.htm", QAQCReportFile.ToString())
                 End If
 
                 Logger.Status(Now & " Output Written to " & pOutFolderName)
@@ -320,6 +319,7 @@ Module HSPFOutputReports
                 Logger.Msg("HSPEXP+ is complete")
 
                 OpenFile(pOutFolderName)
+                If pModelQAQC Then OpenFile(pOutFolderName & "ModelQAQC.htm")
             End Using
 
         Catch ex As Exception
@@ -1712,7 +1712,7 @@ Module HSPFOutputReports
                     Dim lTempTimeSeries As New atcTimeseries(Nothing)
                     lTempTimeSeries = lStorageTimeSeries.Clone
                     For i As Integer = 0 To lStorageTimeSeries.numValues
-                        lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
+                        lTempTimeSeries.Value(i) = i ' lStorageTimeSeries.Dates.Value(i)
                     Next
                     Dim lArgs As New atcDataAttributes()
                     Dim lTSerAverage As Double = 0
@@ -1732,17 +1732,20 @@ Module HSPFOutputReports
                         lArgs.SetValue("Timeseries", lStorageTimeSeries)
                         lArgs.SetValue("Number", lTSerAverage)
                         lStorageTimeSeries = DoMath("subtract", lArgs)
-                        'now divide by standard deviation
+                        'compute differences in terms of standard deviation
                         lArgs.SetValue("Timeseries", lStorageTimeSeries)
                         lArgs.SetValue("Number", lTSerStdev)
                         lStorageTimeSeries = DoMath("divide", lArgs)
                         'Now find the slope of this timeseries
                         FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
-                        If lSlope > 0.002 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
+                        Dim lY As Double = ((lSlope * lTempTimeSeries.Value(0)) + lIntercept) * lTSerStdev + lTSerAverage
+                        Dim lY2 As Double = ((lSlope * lTempTimeSeries.Value(lTempTimeSeries.numValues - 1)) + lIntercept) * lTSerStdev + lTSerAverage
+                        Dim lPercentChange As Double = 100 * ((lY2 - lY) / lY)
+                        If lSlope > 0.002 AndAlso lPercentChange > 20 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
-                        ElseIf lSlope < -0.002 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
+                        ElseIf lSlope < -0.002 AndAlso lPercentChange < -20 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
                         End If
                     End If
@@ -1754,8 +1757,9 @@ Module HSPFOutputReports
         If lStorageVarCount.Count = 0 Then 'no timeseries found on binary file
             OverAllStorageTrend.AppendLine("<p>No storage or concentration timeseries were found for analysis in the binary output file.</p>")
         ElseIf lNumberOfTrendIssues > 0 Then
-            OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.</p>")
+            OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.<sup>*</sup></p>")
             OverAllStorageTrend.Append(StorageTrend)
+            OverAllStorageTrend.AppendLine("<sup>*</sup><i>Based on fitted line through difference of values from mean over time</i>")
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
@@ -1830,6 +1834,7 @@ Module HSPFOutputReports
     Private Function QACheckDiurnalPattern(ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
         Logger.Status("Creating the QAQC Diurnal Pattern Report")
         Dim lDiurnalPattern As New Text.StringBuilder
+        Dim lDiurnalDetails As New Text.StringBuilder
         Dim lFoundTheTS As Boolean = False
         Dim lGroupName As String = ""
         Dim lMemberName As String = ""
@@ -1864,8 +1869,9 @@ Module HSPFOutputReports
                 '    lConstituent = "CHLA"
         End Select
         lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table (May - Sept) - " & lHeaderLabel & "</h2>")
-        Dim lDiurnalTable As DataTable
-        lDiurnalTable = New DataTable("DiurnalPatternTable")
+        Dim lDiurnalTable As New DataTable("DiurnalPatternTable")
+        lDiurnalDetails.AppendLine("<h2>Details of Diurnal Anomalies Table (May - Sept) - " & lHeaderLabel & "</h2>")
+        Dim lAnomalyDetails As New DataTable("AnomalyDetailsTable")
         Dim lColumn As DataColumn
 
         lColumn = New DataColumn()
@@ -1915,13 +1921,39 @@ Module HSPFOutputReports
         lColumn.Caption = "Daily Anomaly<sup>*</sup><br>Count"
         lColumn.DataType = Type.GetType("System.Int64")
         lDiurnalTable.Columns.Add(lColumn)
-        Dim lRow As DataRow
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "AnomalyPercent"
         lColumn.Caption = "Daily Anomaly<br>Percent"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsReach"
+        lColumn.Caption = "Reach"
+        lColumn.DataType = Type.GetType("System.String")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Date"
+        lColumn.Caption = "Date"
+        lColumn.DataType = Type.GetType("System.String")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsMorningMax"
+        lColumn.Caption = "Daily Max<br>Morning<br>(12am - 8am)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsAfternoonMax"
+        lColumn.Caption = "Daily Max<br>Afternoon<br>(12pm - 8pm)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        Dim lRow As DataRow
+        Dim lDetailRow As DataRow
 
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
@@ -1995,13 +2027,25 @@ Module HSPFOutputReports
                         If Not Double.IsNaN(lMorningDailyMax.Value(i)) AndAlso Not Double.IsNaN(lAfternoonDailyMax.Value(i)) Then
                             lDiff = lAfternoonDailyMax.Value(i) - lMorningDailyMax.Value(i)
                             Select Case aConstituent
-                                Case "DO"
-                                    If lDiff < 0 Then 'max DO should be less in pm than in am
+                                Case "DO", "Water Temperature"
+                                    If lDiff < 0 Then 'max DO and Temp should be less in pm than in am
                                         lAnomalyCount += 1
+                                        lDetailRow = lAnomalyDetails.NewRow
+                                        lDetailRow("DetailsReach") = lRCHRES.Id
+                                        lDetailRow("Date") = DumpDate(lMorningDailyMax.Dates.Value(i)).Substring(0, 10)
+                                        lDetailRow("DetailsMorningMax") = DecimalAlign(lMorningDailyMax.Value(i), , 2, 7)
+                                        lDetailRow("DetailsAfternoonMax") = DecimalAlign(lAfternoonDailyMax.Value(i), , 2, 7)
+                                        lAnomalyDetails.Rows.Add(lDetailRow)
                                     End If
-                                Case "Water Temperature", "CHLA"
-                                    If lDiff < 0 Then 'max Temp should be less in am than in pm
+                                Case "CHLA"
+                                    If lDiff > 0 Then 'TODO: check CHLA pattern
                                         lAnomalyCount += 1
+                                        lDetailRow = lAnomalyDetails.NewRow
+                                        lDetailRow("DetailsReach") = lRCHRES.Id
+                                        lDetailRow("Date") = DumpDate(lMorningDailyMax.Dates.Value(i)).Substring(0, 10)
+                                        lDetailRow("DetailsMorningMax") = DecimalAlign(lMorningDailyMax.Value(i), , 2, 7)
+                                        lDetailRow("DetailsAfternoonMax") = DecimalAlign(lAfternoonDailyMax.Value(i), , 2, 7)
+                                        lAnomalyDetails.Rows.Add(lDetailRow)
                                     End If
                             End Select
                         End If
@@ -2017,7 +2061,13 @@ Module HSPFOutputReports
 
         If lDiurnalTable.Rows.Count > 0 Then
             lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
-            lDiurnalPattern.AppendLine("<sup>*</sup><i>Days where expected morning/afternoon pattern is not observed (i.e. afternoon max does not exceed morning max)</i>")
+            lDiurnalPattern.AppendLine("<sup>*</sup><i>Days where expected morning/afternoon pattern is not observed (i.e. afternoon max does not exceed morning max)</i></p>")
+            Dim lFileName As String = "DiurnalAnomalyDetails-" & aConstituent.Replace(" ", "") & ".htm"
+            lDiurnalPattern.AppendLine("Details of each anomaly may be found <a href=./" & lFileName & ">here.</a></p>")
+            lDiurnalDetails.Append(ConvertToHtmlFile(lAnomalyDetails))
+            lDiurnalDetails.AppendLine("</body>")
+            lDiurnalDetails.AppendLine("</html>")
+            File.WriteAllText(pOutFolderName & lFileName, lDiurnalDetails.ToString())
         Else
             lDiurnalPattern.AppendLine("<p>No hourly timeseries available for " & aConstituent & "</p>")
         End If
