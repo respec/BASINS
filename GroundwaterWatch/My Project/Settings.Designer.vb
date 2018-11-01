@@ -55,3 +55,19 @@ Namespace My
         End Property
     End Class
 End Namespace
+
+Namespace My
+    
+    <Global.Microsoft.VisualBasic.HideModuleNameAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute()>  _
+    Friend Module MySettingsProperty
+        
+        <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
+        Friend ReadOnly Property Settings() As Global.GroundwaterWatch.My.MySettings
+            Get
+                Return Global.GroundwaterWatch.My.MySettings.Default
+            End Get
+        End Property
+    End Module
+End Namespace

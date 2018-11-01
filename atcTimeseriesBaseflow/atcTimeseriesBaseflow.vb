@@ -26,6 +26,7 @@ Public Class BFInputNames
     Public Shared TwoParamEstMethod As String = "TwoParamEstimationMethod"
     Public Shared StationFile As String = "StationFile"
     Public Shared FullSpanDuration As String = "FullSpanDuration"
+    Public Shared Graph As String = "Graphs"
 End Class
 
 Public Class atcTimeseriesBaseflow

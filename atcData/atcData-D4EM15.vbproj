@@ -54,7 +54,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\D4EM15\AnyDebug\</OutputPath>
+    <OutputPath>..\bin-D4EM15\AnyDebug\</OutputPath>
     <DocumentationFile>atcData.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -368,9 +368,6 @@
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
       <Name>MapWinUtility-D4EM15</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

@@ -14,7 +14,7 @@ Public Class clsFall
     Private pFileOutSum As String = "fallsum.txt"
 
     'In this class, missing data is allowed, and simply marked as -999 in the original FORTRAN code
-    Public GraphTsGroup As atcTimeseriesGroup
+    'Public GraphTsGroup As atcTimeseriesGroup
 
     Public ApplyDatum As Boolean = False
     Private pDatum As Double = 0 'usually 0 for depth to water and arbitrary for water level altitude as long as it is less than the minimum water level
@@ -70,7 +70,6 @@ Public Class clsFall
     ''' <summary>
     ''' Find either a falling (true) or rising (false) limb
     ''' </summary>
-    ''' <param name="aFall">True (default): find falling limb; False: find rising limb</param>
     ''' <remarks></remarks>
     Public Overrides Sub RecessGetAllSegments() 'Optional ByVal aFall As Boolean = True
         'If DataType = 1 AndAlso ApplyDatum Then

@@ -1,5 +1,8 @@
 ﻿Imports atcUtility
+#If GISProvider = "DotSpatial" Then
+#Else
 Imports MapWindow.Interfaces
+#End If
 Imports MapWinUtility
 Imports System.IO
 Imports System.Text

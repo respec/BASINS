@@ -63,7 +63,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\Basins\</OutputPath>
+    <OutputPath>..\bin-D4EM15\x86Debug\</OutputPath>
     <DocumentationFile>atcUSGSUtility.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
@@ -145,24 +145,27 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM15.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>MapWinUtility-D4EM15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData-D4EM15.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
       <Name>atcData-D4EM15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph-D4EM15.vbproj">
       <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
       <Name>atcGraph-D4EM15</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM15.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-D4EM15</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

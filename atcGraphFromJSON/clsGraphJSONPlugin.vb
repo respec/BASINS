@@ -15,7 +15,8 @@ Public Class clsGraphJSONPlugIn
             Return "Create a Graph from a JSON file."
         End Get
     End Property
-
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)>
     Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
         pMapWin = MapWin
@@ -45,4 +46,5 @@ Public Class clsGraphJSONPlugIn
             Handled = True
         End If
     End Sub
+#End If
 End Class

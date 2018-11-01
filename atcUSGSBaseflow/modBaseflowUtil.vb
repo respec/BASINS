@@ -1,6 +1,8 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports atcTimeseriesBaseflow
+Imports atcGraph
+Imports ZedGraph
 Imports MapWinUtility
 Imports System.Text.RegularExpressions
 
@@ -11,21 +13,6 @@ Public Module modBaseflowUtil
     Private pUADepth As Double = 0.03719
 
     Private pConsoleDebug As Boolean = True
-
-    Public Sub Main(ByVal args As String())
-        Dim lcurdir As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        If pConsoleDebug Then
-            Console.WriteLine(lcurdir)
-        End If
-        For Each arg As String In args
-            'Console.WriteLine(arg)
-            If Not IO.File.Exists(arg) Then
-                arg = IO.Path.Combine(lcurdir, arg)
-            End If
-            DoBatch(arg)
-            Exit For
-        Next
-    End Sub
 
     Public Function DoBatch(ByVal txtSpecFile As String) As Boolean
         Dim pBatchConfig As New clsBatchBFSpec()
@@ -2791,6 +2778,611 @@ Public Module modBaseflowUtil
 
         Return lTsGroupToGraph
     End Function
+
+    '{
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aGraphType">LogTimeseries, Duration</param>
+    ''' <param name="aTsFlow">Flow data, no need for date adjustment</param>
+    ''' <param name="aReportAttribs">Additional specifications</param>
+    Public Sub DoBFGraphTimeseriesGWWatch(ByVal aGraphType As String,
+                                          ByVal aTsFlow As atcTimeseries,
+                                          ByVal aReportAttribs As atcDataAttributes)
+        If aTsFlow Is Nothing Then
+            Exit Sub
+        End If
+        Dim lOutputDir As String = aReportAttribs.GetValue("OutputDir", "")
+        If Not IO.Directory.Exists(lOutputDir) Then
+            Exit Sub
+        End If
+
+        Dim aPerUnitArea As Boolean = False
+        Dim lSeparateGraphs As Boolean = False
+        Select Case MethodsLastDone.Count
+            Case 0 : Exit Sub
+            Case 1 : lSeparateGraphs = False
+            Case Else
+                lSeparateGraphs = False
+        End Select
+
+        'Debug only
+        Dim pDataGroup As New atcTimeseriesGroup()
+
+        'Dim lStart As Double = -99.9
+        'Dim lEnd As Double = -99.9
+        Dim lDA As Double = 1.0
+
+        'Dim lTsDailyStreamflow As atcTimeseries = pDataGroup(0)
+
+        Dim lTsGroupPart As atcCollection = aReportAttribs.GetValue("GroupPart", Nothing)
+        Dim lTsGroupFixed As atcCollection = aReportAttribs.GetValue("GroupFixed", Nothing)
+        Dim lTsGroupLocMin As atcCollection = aReportAttribs.GetValue("GroupLocMin", Nothing)
+        Dim lTsGroupSlide As atcCollection = aReportAttribs.GetValue("GroupSlide", Nothing)
+        Dim lTsGroupBFIStandard As atcCollection = aReportAttribs.GetValue("GroupBFIStandard", Nothing)
+        Dim lTsGroupBFIModified As atcCollection = aReportAttribs.GetValue("GroupBFIModified", Nothing)
+        Dim lTsGroupBFLOW As atcCollection = aReportAttribs.GetValue("GroupBFLOW", Nothing)
+        Dim lTsGroupTwoPRDF As atcCollection = aReportAttribs.GetValue("GroupTwoPRDF", Nothing)
+
+        Dim lYAxisTitleText As String = "FLOW, IN CUBIC FEET PER SECOND"
+        If aPerUnitArea Then lYAxisTitleText &= " (per unit square mile)"
+        If aGraphType = "CDist" Then lYAxisTitleText = "Flow (in)"
+        Dim lTsFlow As atcTimeseries = aTsFlow.Clone() 'SubsetByDate(aTsFlow, lStart, lEnd, Nothing)
+        lTsFlow.Attributes.SetValue("Units", lYAxisTitleText)
+        lTsFlow.Attributes.SetValue("YAxis", "LEFT")
+
+        Dim lArgs As New atcDataAttributes
+        With lArgs
+            .SetValue("Drainage Area", lDA)
+            .SetValue("PerUnitArea", aPerUnitArea)
+            .SetValue("GraphType", aGraphType)
+            .SetValue("StreamFlow", lTsFlow)
+            .SetValue("YAxisTitleText", lYAxisTitleText)
+            .SetValue("Method", "")
+        End With
+
+        Dim lTsGraphAll As atcTimeseriesGroup
+        If lSeparateGraphs Then
+            Dim lTsBF4Graph As atcTimeseries = Nothing
+            If lTsGroupPart.Count > 0 Then
+                lArgs.SetValue("Method", "Part")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupPart, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupFixed.Count > 0 Then
+                lArgs.SetValue("Method", "Fixed")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupFixed, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupLocMin.Count > 0 Then
+                lArgs.SetValue("Method", "LocMin")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupLocMin, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+
+            End If
+            If lTsGroupSlide.Count > 0 Then
+                lArgs.SetValue("Method", "Slide")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupSlide, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+
+            If lTsGroupBFIStandard.Count > 0 Then
+                lArgs.SetValue("Method", "BFIStandard")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFIStandard, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupBFIModified.Count > 0 Then
+                lArgs.SetValue("Method", "BFIModified")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFIModified, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupBFLOW.Count > 0 Then
+                lArgs.SetValue("Method", "BFLOW")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupBFLOW, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+            If lTsGroupTwoPRDF.Count > 0 Then
+                lArgs.SetValue("Method", "TwoPRDF")
+                Dim lDataGroup As atcTimeseriesGroup = SetupGraphTsGroup(lTsGroupTwoPRDF, lArgs)
+                If aGraphType = "Timeseries" Then
+                    'DisplayTsGraph(lDataGroup)
+                ElseIf aGraphType = "Duration" Then
+                    'DisplayDurGraph(lDataGroup, aPerUnitArea)
+                ElseIf aGraphType = "CDist" Then
+                    'DisplayCDistGraph(lDataGroup)
+                End If
+            End If
+        Else 'all in one graph
+            lTsGraphAll = New atcTimeseriesGroup
+
+            Dim lTsGroupPart1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupFixed1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupLocMin1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupSlide1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFIStandard1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFIModified1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupBFLOW1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupTwoPRDF1 As atcTimeseriesGroup = Nothing
+            Dim lTsGroupStock As New atcTimeseriesGroup
+            If lTsGroupPart.Count > 0 Then
+                lArgs.SetValue("Method", "Part")
+                lTsGroupPart1 = SetupGraphTsGroup(lTsGroupPart, lArgs)
+                lTsGroupStock.AddRange(lTsGroupPart1)
+                'lTsTemp = lTsGroupPart.ItemByKey("RateDaily").Clone()
+                'With lTsTemp.Attributes
+                '    .SetValue("Constituent", "Baseflow")
+                '    .SetValue("Scenario", "Estimated by Part")
+                '    .SetValue("Units", lYAxisTitleText)
+                '    .SetValue("YAxis", "LEFT")
+                'End With
+                'lTsGraphAll.Add(lTsTemp)
+                'If aGraphType = "Duration" Then
+                '    lTsROPart = lTsFlow - lTsTemp
+                '    With lTsROPart.Attributes
+                '        .SetValue("Constituent", "Runoff")
+                '        .SetValue("Scenario", "Estimated by Part")
+                '        .SetValue("Units", lYAxisTitleText)
+                '        .SetValue("YAxis", "LEFT")
+                '    End With
+                'End If
+            End If
+            If lTsGroupFixed.Count > 0 Then
+                lArgs.SetValue("Method", "Fixed")
+                lTsGroupFixed1 = SetupGraphTsGroup(lTsGroupFixed, lArgs)
+                lTsGroupStock.AddRange(lTsGroupFixed1)
+            End If
+            If lTsGroupLocMin.Count > 0 Then
+                lArgs.SetValue("Method", "LocMin")
+                lTsGroupLocMin1 = SetupGraphTsGroup(lTsGroupLocMin, lArgs)
+                lTsGroupStock.AddRange(lTsGroupLocMin1)
+            End If
+            If lTsGroupSlide.Count > 0 Then
+                lArgs.SetValue("Method", "Slide")
+                lTsGroupSlide1 = SetupGraphTsGroup(lTsGroupSlide, lArgs)
+                lTsGroupStock.AddRange(lTsGroupSlide1)
+            End If
+            If lTsGroupBFIStandard.Count > 0 Then
+                lArgs.SetValue("Method", "BFIStandard")
+                lTsGroupBFIStandard1 = SetupGraphTsGroup(lTsGroupBFIStandard, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFIStandard1)
+            End If
+            If lTsGroupBFIModified.Count > 0 Then
+                lArgs.SetValue("Method", "BFIModified")
+                lTsGroupBFIModified1 = SetupGraphTsGroup(lTsGroupBFIModified, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFIModified1)
+            End If
+            If lTsGroupBFLOW.Count > 0 Then
+                lArgs.SetValue("Method", "BFLOW")
+                lTsGroupBFLOW1 = SetupGraphTsGroup(lTsGroupBFLOW, lArgs)
+                lTsGroupStock.AddRange(lTsGroupBFLOW1)
+            End If
+            If lTsGroupTwoPRDF.Count > 0 Then
+                lArgs.SetValue("Method", "TwoPRDF")
+                lTsGroupTwoPRDF1 = SetupGraphTsGroup(lTsGroupTwoPRDF, lArgs)
+                lTsGroupStock.AddRange(lTsGroupTwoPRDF1)
+            End If
+
+            'Originally thought would treat CDist graph differently from other type of graphs
+            'If aGraphType = "CDist" Then
+            '    lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            'Else
+            '    'lTsGraphAll.Add(lTsFlow)
+            '    lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            'End If
+
+            lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "Streamflow")(0))
+            If lTsGraphAll.Count = 0 Then 'didn't find Streamflow, then try finding 'FLOW'
+                lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
+            End If
+
+            Dim lAttribs As New atcDataAttributes()
+            lAttribs.Add("ShowForm", False)
+            lAttribs.Add("SaveToFile", IO.Path.Combine(lOutputDir, "plot_" & aGraphType & ".png"))
+
+            Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
+            lTsGraphAll.AddRange(lTsGroupBf)
+            If aGraphType.ToLower().Contains("timeseries") Then
+                DisplayTsGraph(lTsGraphAll, lAttribs)
+            ElseIf aGraphType.ToLower() = "duration" Then
+                Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
+                lTsGraphAll.AddRange(lTsGroupRO)
+                DisplayDurGraph(lTsGraphAll, aPerUnitArea, lAttribs)
+            ElseIf aGraphType = "CDist" Then
+                Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
+                lTsGraphAll.AddRange(lTsGroupRO)
+                'DisplayCDistGraph(lTsGraphAll)
+            End If
+        End If
+
+        'lDataGroup.Clear()
+        'lDataGroup = Nothing
+    End Sub '}
+
+    Public Sub DisplayTsGraph(ByVal aDataGroup As atcTimeseriesGroup, Optional ByVal aSpecs As atcDataAttributes = Nothing)
+        'Make sure graph can't find provisional attribute
+        Dim lDataMin As Double = Double.MaxValue
+        Dim lDataMax As Double = Double.MinValue
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", "X" & lTs.Attributes.GetValue("ProvisionalValueAttribute", ""))
+            If lTs.Attributes.GetValue("Min") < lDataMin Then lDataMin = lTs.Attributes.GetValue("Min")
+            If lTs.Attributes.GetValue("Max") > lDataMax Then lDataMax = lTs.Attributes.GetValue("Max")
+        Next
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        'lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphTime(aDataGroup, lZgc)
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            .YAxis.Type = AxisType.Log
+            'Dim lScaleMin As Double = 1
+            '.YAxis.Scale.Min = lScaleMin
+            .AxisChange()
+            .CurveList.Item(0).Color = Drawing.Color.Red
+            If aDataGroup.Count > 2 Then
+                CType(.CurveList.Item(0), LineItem).Line.Width = 3
+                For I As Integer = 1 To aDataGroup.Count - 1
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
+                Next
+            Else
+                .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                CType(.CurveList.Item(1), LineItem).Line.Width = 2
+            End If
+        End With
+        Dim lShowForm As Boolean = False
+        Dim lSaveToFile As String = ""
+        If aSpecs IsNot Nothing Then
+            lShowForm = aSpecs.GetValue("ShowForm", False)
+            lSaveToFile = aSpecs.GetValue("SaveToFile", "")
+        End If
+        If lShowForm Then
+            lGraphForm.Show()
+        Else
+            If IO.Directory.Exists(IO.Path.GetDirectoryName(lSaveToFile)) Then
+                TryDelete(lSaveToFile)
+                lGraphForm.RefreshGraph()
+                lGraphForm.SaveGraph(lSaveToFile)
+                lGraphForm.FreeResources()
+            End If
+        End If
+        'Restore provisional attribute after graphing
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
+        Next
+    End Sub
+
+    Public Sub DisplayDurGraph(ByVal aDataGroup As atcTimeseriesGroup, ByVal aPerUnitArea As Boolean,
+                                Optional ByVal aSpecs As atcDataAttributes = Nothing)
+        Dim lGraphForm As New atcGraph.atcGraphForm()
+        'lGraphForm.Icon = Me.Icon
+        Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
+        Dim lGraphTS As New clsGraphProbability(aDataGroup, lZgc)
+        lGraphForm.Grapher = lGraphTS
+        With lGraphForm.Grapher.ZedGraphCtrl.GraphPane
+            .YAxis.Scale.MinAuto = False
+            Dim lScaleMin As Double = 10
+            'originally based on pDataGroup in frmUSGSBaseflow form
+            If aDataGroup IsNot Nothing AndAlso aDataGroup.Count > 0 Then
+                Dim lmeanVal As Double = aDataGroup(0).Attributes.GetValue("Mean")
+                If lmeanVal < lScaleMin Then
+                    lScaleMin = 1.0
+                End If
+            End If
+            If aPerUnitArea Then lScaleMin = 0.005
+            .YAxis.Scale.Min = lScaleMin
+            .AxisChange()
+            .CurveList.Item(0).Color = Drawing.Color.Red
+
+            If aDataGroup.Count > 3 Then
+                'this scheme assume the order in which ts are added is as follow:
+                'streamflow, all bf, then all ro
+                Dim lBFCurveCount As Integer = (aDataGroup.Count - 1) / 2
+                Dim lBFInitColor As Integer = Drawing.Color.DarkBlue.ToArgb
+                For I As Integer = 1 To lBFCurveCount
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    'CType(.CurveList.Item(I), LineItem).Line.Style = Drawing.Drawing2D.DashStyle.Dash
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
+                Next
+                lBFInitColor = Drawing.Color.DarkCyan.ToArgb
+                For I As Integer = lBFCurveCount + 1 To aDataGroup.Count - 1
+                    '.CurveList.Item(I).Color = System.Drawing.Color.FromArgb(lBFInitColor - (I - 1) * 8)
+                    .CurveList.Item(I).Color = GetCurveColor(aDataGroup(I))
+                Next
+            Else
+                .CurveList.Item(1).Color = Drawing.Color.DarkBlue
+                'CType(.CurveList.Item(1), LineItem).Line.Width = 2
+                .CurveList.Item(2).Color = Drawing.Color.Cyan
+            End If
+            With .Legend.FontSpec
+                .IsBold = False
+                .Border.IsVisible = False
+                .Size = 12
+            End With
+            .XAxis.Title.Text = "PERCENTAGE OF TIME FLOW WAS EQUALED OR EXCEEDED"
+        End With
+        lGraphForm.Grapher.ZedGraphCtrl.Refresh()
+
+        Dim lShowForm As Boolean = True
+        Dim lSaveToFile As String = ""
+        If aSpecs IsNot Nothing Then
+            lShowForm = aSpecs.GetValue("ShowForm", False)
+            lSaveToFile = aSpecs.GetValue("SaveToFile", "")
+        End If
+        If lShowForm Then
+            lGraphForm.Show()
+        Else
+            If IO.Directory.Exists(IO.Path.GetDirectoryName(lSaveToFile)) Then
+                TryDelete(lSaveToFile)
+                lGraphForm.RefreshGraph()
+                lGraphForm.SaveGraph(lSaveToFile)
+                lGraphForm.FreeResources()
+            End If
+        End If
+    End Sub
+
+    Public Function GetCurveColor(ByVal aTs As atcTimeseries) As System.Drawing.Color
+        Dim lCons As String = aTs.Attributes.GetValue("Constituent").ToString.ToLower
+        Dim lMethod As BFMethods = aTs.Attributes.GetValue("Method")
+
+        Select Case lMethod
+            Case BFMethods.PART
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkBlue
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.LightBlue
+                End If
+            Case BFMethods.HySEPFixed
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkGreen
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.LightGreen
+                End If
+            Case BFMethods.HySEPLocMin
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkOrange
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Orange
+                End If
+            Case BFMethods.HySEPSlide
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.Maroon
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Magenta
+                End If
+            Case BFMethods.BFIStandard
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkCyan
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Cyan
+                End If
+            Case BFMethods.BFIModified
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.Yellow
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.YellowGreen
+                End If
+            Case BFMethods.BFLOW
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkMagenta
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Magenta
+                End If
+            Case BFMethods.TwoPRDF
+                If lCons.StartsWith("baseflow") Then
+                    Return Drawing.Color.DarkGoldenrod
+                ElseIf lCons.StartsWith("runoff") Then
+                    Return Drawing.Color.Goldenrod
+                End If
+        End Select
+    End Function
+
+    Private Function DoLogTransform(ByRef aTs As atcTimeseries) As Boolean
+        If aTs Is Nothing Then Return False
+        Try
+            For i As Integer = 0 To aTs.numValues
+                If Double.IsNaN(aTs.Value(i)) Then
+                ElseIf aTs.Value(i) = 0 Then
+                ElseIf aTs.Value(i) > 0 Then
+                    aTs.Value(i) = Math.Log10(aTs.Value(i))
+                Else
+                    aTs.Value(i) = Double.NaN
+                End If
+            Next
+            Return True
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
+    '{
+    Public Function SetupGraphTsGroup(ByVal aTsCollection As atcCollection, ByVal aParams As atcDataAttributes) As atcTimeseriesGroup
+        Dim lDA As Double = aParams.GetValue("Drainage Area")
+        Dim lPerUnitArea As Boolean = aParams.GetValue("PerUnitArea")
+        If lPerUnitArea AndAlso (Not (lDA > 0) OrElse Double.IsNaN(lDA)) Then
+            lDA = 1.0
+            Logger.Msg("Drainage area is not positive, it is set to 1.", MsgBoxStyle.Information, "Setup Graph Time Series Group")
+        End If
+        Dim lGraphType As String = aParams.GetValue("GraphType")
+        Dim lTsFlow As atcTimeseries = aParams.GetValue("StreamFlow").Clone()
+        Dim lYAxisTitleText As String = aParams.GetValue("YAxisTitleText")
+        Dim lMethod As String = aParams.GetValue("Method")
+        Dim lMethodAtt As BFMethods
+        Select Case lMethod.ToLower
+            Case "part" : lMethodAtt = BFMethods.PART
+            Case "fixed" : lMethodAtt = BFMethods.HySEPFixed
+            Case "locmin" : lMethodAtt = BFMethods.HySEPLocMin
+            Case "slide" : lMethodAtt = BFMethods.HySEPSlide
+            Case "bfistandard" : lMethodAtt = BFMethods.BFIStandard
+            Case "bfimodified" : lMethodAtt = BFMethods.BFIModified
+            Case "bflow" : lMethodAtt = BFMethods.BFLOW
+            Case "twoprdf" : lMethodAtt = BFMethods.TwoPRDF
+        End Select
+        Dim lBFTser As atcTimeseries = aTsCollection.ItemByKey("RateDaily")
+        Dim lTsBF4Graph As atcTimeseries = Nothing
+        If lMethod.ToLower().Contains("bfi") Then
+            Dim lStartOfGoodValue As Integer
+            For I As Integer = 0 To lBFTser.numValues - 1
+                If lBFTser.Value(I + 1) > 0 Then
+                    lStartOfGoodValue = lBFTser.Dates.Value(I)
+                    Exit For
+                End If
+            Next
+            If lStartOfGoodValue > lBFTser.Dates.Value(0) Then
+                lTsBF4Graph = SubsetByDate(lBFTser, lStartOfGoodValue, lBFTser.Dates.Value(lBFTser.numValues), Nothing)
+            ElseIf lTsBF4Graph Is Nothing Then
+                lTsBF4Graph = lBFTser.Clone()
+            End If
+        Else
+            lTsBF4Graph = lBFTser.Clone()
+        End If
+
+        lDA = lTsBF4Graph.Attributes.GetValue("Drainage Area")
+        With lTsBF4Graph.Attributes
+            .SetValue("Constituent", "Baseflow")
+            .SetValue("Scenario", "Estimated by " & lMethod)
+            .SetValue("Units", lYAxisTitleText)
+            .SetValue("YAxis", "LEFT")
+        End With
+        Dim lDataGroup As New atcData.atcTimeseriesGroup
+        Dim lTsRunoff As atcTimeseries = Nothing
+        If lGraphType.ToLower() = "duration" Then
+            lTsRunoff = Nothing 'lTsFlow - lTsBF4Graph
+            If lMethod.ToLower().Contains("bfi") Then
+                If lTsFlow.Dates.Value(0) < lTsBF4Graph.Dates.Value(0) Then
+                    Dim lTsFlowSubs As atcTimeseries = SubsetByDate(lTsFlow, lTsBF4Graph.Dates.Value(0), lTsBF4Graph.Dates.Value(lTsBF4Graph.numValues), Nothing)
+                    lTsRunoff = lTsFlowSubs - lTsBF4Graph
+                    lTsFlowSubs.Clear()
+                Else
+                    lTsRunoff = lTsFlow - lTsBF4Graph
+                End If
+            Else
+                lTsRunoff = lTsFlow - lTsBF4Graph
+            End If
+
+            If lPerUnitArea Then
+                lTsFlow = lTsFlow / lDA
+                lTsBF4Graph = lTsBF4Graph / lDA
+                If lTsRunoff IsNot Nothing Then
+                    lTsRunoff = lTsRunoff / lDA
+                End If
+            End If
+            With lTsRunoff.Attributes
+                .SetValue("Constituent", "Runoff")
+                .SetValue("Scenario", "Estimated by " & lMethod)
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+                .SetValue("Method", lMethodAtt)
+            End With
+        End If
+        If lGraphType = "CDist" Then
+            'Dim lTimeUnitToAggregate As atcTimeUnit = atcTimeUnit.TUMonth
+            lTsRunoff = Nothing
+            If lMethod.ToLower().Contains("bfi") Then
+                If lTsFlow.Dates.Value(0) < lTsBF4Graph.Dates.Value(0) Then
+                    Dim lTsFlowSubs As atcTimeseries = SubsetByDate(lTsFlow, lTsBF4Graph.Dates.Value(0), lTsBF4Graph.Dates.Value(lTsBF4Graph.numValues), Nothing)
+                    lTsRunoff = lTsFlowSubs - lTsBF4Graph
+                    lTsFlowSubs.Clear()
+                Else
+                    lTsRunoff = lTsFlow - lTsBF4Graph
+                End If
+            Else
+                lTsRunoff = lTsFlow - lTsBF4Graph
+            End If
+
+            'Convert to depth inch
+            Dim lConversionFactor As Double = 0.03719 / lDA
+
+            'Dim lGraphTsFlow As atcTimeseries = Aggregate(lTsFlow, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            'Dim lGraphTsBF As atcTimeseries = Aggregate(lTsBF4Graph, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+            'Dim lGraphTsRunoff As atcTimeseries = Aggregate(lTsRunoff, lTimeUnitToAggregate, 1, atcTran.TranSumDiv)
+
+            Dim lGraphTsFlow As atcTimeseries = lTsFlow.Clone()
+            Dim lGraphTsBF As atcTimeseries = lTsBF4Graph.Clone()
+            Dim lGraphTsRunoff As atcTimeseries = lTsRunoff.Clone()
+
+            Dim lGraphTsFlowIn As atcTimeseries = lGraphTsFlow * lConversionFactor
+            With lGraphTsFlowIn.Attributes
+                '.SetValue("Constituent", "Streamflow")
+                '.SetValue("Scenario", "Observed")
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+            End With
+
+            Dim lGraphTsBFIn As atcTimeseries = lGraphTsBF * lConversionFactor
+            With lGraphTsBFIn.Attributes
+                .SetValue("Constituent", "Baseflow")
+                .SetValue("Scenario", "Estimated by " & lMethod)
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+            End With
+
+            Dim lGraphTsRunoffIn As atcTimeseries = lGraphTsRunoff * lConversionFactor
+            With lGraphTsRunoffIn.Attributes
+                .SetValue("Constituent", "Runoff")
+                .SetValue("Scenario", "Estimated by " & lMethod)
+                .SetValue("Units", lYAxisTitleText)
+                .SetValue("YAxis", "LEFT")
+                .SetValue("Method", lMethodAtt)
+            End With
+
+            lDataGroup.Add(lGraphTsFlowIn)
+            lDataGroup.Add(lGraphTsBFIn)
+            lDataGroup.Add(lGraphTsRunoffIn)
+        Else
+            lDataGroup.Add(lTsFlow)
+            lDataGroup.Add(lTsBF4Graph)
+            If lTsRunoff IsNot Nothing Then lDataGroup.Add(lTsRunoff)
+            For Each lTs As atcTimeseries In lDataGroup
+                lTs.Attributes.SetValue("Method", lMethodAtt)
+                If lGraphType.ToLower() = "logtimeseries" Then
+                    DoLogTransform(lTs)
+                End If
+            Next
+        End If
+
+        Return lDataGroup
+    End Function '}
 
     ''' <summary>
     ''' this is the .BSF WatStore format ASCII output
@@ -5806,7 +6398,18 @@ Public Module modBaseflowUtil
         Next
 
         Dim lStartTime As Double = aTsGroup(0).Dates.Value(0)
-        Dim lEndTime As Double = aTsGroup(aTsGroup.Count - 1).Dates.Value(aTsGroup(aTsGroup.Count - 1).numValues)
+        Dim lEndTime As Double = Double.MinValue 'aTsGroup(aTsGroup.Count - 1).Dates.Value(aTsGroup(aTsGroup.Count - 1).numValues)
+        For J As Integer = aTsGroup.Count - 1 To 0 Step -1
+            Try
+                Dim et As Double = aTsGroup(J).Dates.Value(aTsGroup(J).numValues)
+                If et > lEndTime Then
+                    lEndTime = et
+                    Exit For
+                End If
+            Catch ex As Exception
+                'ok, move to the next one
+            End Try
+        Next
         Dim lNewTser As atcTimeseries = NewTimeseries(lStartTime, lEndTime, lTu, lTs, Nothing, Double.NaN)
         MergeAttributes(aTsGroup, lNewTser)
         Dim lDate1 As Double = 0
@@ -5814,6 +6417,9 @@ Public Module modBaseflowUtil
         Dim lSearchIndex As Integer = 1
         For J As Integer = 0 To aTsGroup.Count - 1
             Dim lTsChunk As atcTimeseries = aTsGroup(J)
+            If lTsChunk.Values Is Nothing Then
+                Continue For
+            End If
             For K As Integer = 1 To lTsChunk.numValues
                 lDate1 = lTsChunk.Dates.Value(K - 1)
                 For I As Integer = lSearchIndex To lNewTser.numValues

@@ -62,11 +62,12 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <OutputPath>..\bin-D4EM15\x86Debug\</OutputPath>
     <DocumentationFile>atcUSGSBaseflow.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineDebug>true</DefineDebug>
@@ -243,11 +244,6 @@
     <ProjectReference Include="..\atcUtility\atcUtility-D4EM15.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\BASINS\GWToolbox-D4EM15.vbproj">
-      <Project>{37d44868-95ce-4a21-a43a-13e7e7f2ad09}</Project>
-      <Name>GWToolbox-D4EM15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM15.vbproj">
