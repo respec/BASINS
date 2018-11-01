@@ -120,8 +120,8 @@ Module WASP
                         lVolume_m3 = lHspfFtable.Volume(lRow) * 1233.48            'converting acft to m3
                         If lHspfFtable.Outflow1(lRow) > 0.0 Then
                             lFlowThru_days = (lHspfFtable.Volume(lRow) * 43560 / lHspfFtable.Outflow1(lRow)) / (60 * 60 * 24)  'assuming first exit is the main one
+                            Exit For
                         End If
-                        Exit For
                     End If
                 Next
             End If
@@ -130,6 +130,12 @@ Module WASP
             If lFlowThru_days > lMinFlowThruDays Then
                 'break up to keep less than 0.1 days of flow-thru time
                 lNSegs = CInt((lFlowThru_days / lMinFlowThruDays) + 0.5)
+                'with this many segments, is the width much larger than the length?
+                If lWidth_m > lLength_km * 1000 * 10 / lNSegs Then
+                    'make the segments about as long as they are wide
+                    lNSegs = ((lLength_km * 1000) / lWidth_m) + 1
+                End If
+                If lNSegs = 0 Then lNSegs = 1
                 lLength_km = lLength_km / lNSegs
                 lVolume_m3 = lVolume_m3 / lNSegs
             End If
