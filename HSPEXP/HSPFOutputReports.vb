@@ -208,14 +208,36 @@ Module HSPFOutputReports
                 Directory.CreateDirectory(pOutFolderName)
                 File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
 
+                'read binary output files for later use in wq reports, qa reports, or receiving models 
+                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Or pModelQAQC Then
+                    Dim lOpenHspfBinDataSource As New atcDataSource
+                    Logger.Dbg(Now & " Opening the binary output files.")
+                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
+                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                            If lOpenHspfBinDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                End If
+                            End If
+                        End If
+                    Next i
+                End If
+
                 'Start QA/QC Report
                 Dim QAQCReportFile As New Text.StringBuilder
                 If pModelQAQC Then
+                    Logger.Status("Beginning the QAQC Report")
                     QAQCReportFile.AppendLine("<html>")
                     QAQCReportFile.AppendLine(QAReportStyle())
                     QAQCReportFile.AppendLine("<body>")
                     QAQCReportFile.AppendLine(QAGeneralModelInfo(aHspfUci, lRunMade))
+                    QAQCReportFile.AppendLine(QAModelAreaReport(aHspfUci, lOperationTypes))
                     QAQCReportFile.AppendLine(QACheckHSPFParmValues(aHspfUci, lRunMade))
+                    QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "DO"))
+                    QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "Water Temperature"))
+                    'note that qa reports for loading rate, land use comparison, and storage are done in the wq section
                 End If
 
                 'Do automated graphs
@@ -236,23 +258,6 @@ Module HSPFOutputReports
                 'Do Expert System Stats
                 If pExpertSystemStats Then
                     DoExpertSystemStats(aHspfUci, lRunMade)
-                End If
-
-                'read binary output files for use in wq reports or receiving models 
-                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Then
-                    Dim lOpenHspfBinDataSource As New atcDataSource
-                    Logger.Dbg(Now & " Opening the binary output files.")
-                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
-                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
-                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                            If lOpenHspfBinDataSource Is Nothing Then
-                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                End If
-                            End If
-                        End If
-                    Next i
                 End If
 
                 'Write input file for BATHTUB
@@ -282,13 +287,13 @@ Module HSPFOutputReports
                         For Each lLocation As String In pOutputLocations
                             lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lLocation))
                             Dim lLocationID As Integer = lLocation.Substring(2)
-                            Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
-                            For Each lSource As HspfConnection In lRCHRESOperation.Sources
-                                If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
-                                    Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ": " & lSource.Source.VolId
-                                    lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
-                                End If
-                            Next
+                            'Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
+                            'For Each lSource As HspfConnection In lRCHRESOperation.Sources
+                            '    If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
+                            '        Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ": " & lSource.Source.VolId
+                            '        'lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
+                            '    End If
+                            'Next
                             WASPInputFile(aHspfUci, lWASPDataSource, pSDateJ, pEDateJ, lLocationID, pTestPath)
                         Next
                     End If
@@ -296,16 +301,16 @@ Module HSPFOutputReports
 
                 ' Do Water Quality Reports
                 If pConstituents.Count > 0 Then
+                    'includes qa reports for loading rate, land use comparison, and storage 
                     DoWaterQualityReports(aHspfUci, lRunMade, lDateString, lOperationTypes, QAQCReportFile)
                 End If
 
                 If pModelQAQC Then
-                    'Do Area Report
-                    QAQCReportFile.AppendLine(QAModelAreaReport(aHspfUci, lOperationTypes))
                     'Close out the QA report
+                    Logger.Status("Closing the QAQC Report")
                     QAQCReportFile.AppendLine("</body>")
                     QAQCReportFile.AppendLine("</html>")
-                    File.WriteAllText(pTestPath & "\ModelQAQC.htm", QAQCReportFile.ToString())
+                    File.WriteAllText(pOutFolderName & "\ModelQAQC.htm", QAQCReportFile.ToString())
                 End If
 
                 Logger.Status(Now & " Output Written to " & pOutFolderName)
@@ -314,6 +319,7 @@ Module HSPFOutputReports
                 Logger.Msg("HSPEXP+ is complete")
 
                 OpenFile(pOutFolderName)
+                If pModelQAQC Then OpenFile(pOutFolderName & "ModelQAQC.htm")
             End Using
 
         Catch ex As Exception
@@ -590,6 +596,10 @@ Module HSPFOutputReports
                 lReportCons = Nothing
                 Dim lOutFileName As String = ""
 
+                Logger.Status(Now & " Generating Reports for " & lConstituent)
+                Logger.Dbg(Now & " Generating Reports for " & lConstituent)
+
+                'LandLoadingReports generates a text file report as well as the info needed for the QA report
                 Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
@@ -597,17 +607,19 @@ Module HSPFOutputReports
                     aQAQCReportFile.AppendLine(QALoadingRateComparison(lConstituentName, LandLoadingReportForConstituents, aDateString))
                 End If
 
-                ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                'ReachBudgetReports generates a text file report only
+                If Not pModelQAQC Then
+                    ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                End If
+
                 If pModelQAQC Then
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                 End If
 
-                Logger.Status(Now & " Generating Reports for " & lConstituent)
-                Logger.Dbg(Now & " Generating Reports for " & lConstituent)
                 lReportCons = Nothing
 
-                If lConstituent = "TN" OrElse lConstituent = "TP" OrElse
-                    lConstituent = "Sediment" OrElse lConstituent = "Water" Then
+                If (lConstituent = "TN" Or lConstituent = "TP" Or
+                    lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
                     With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
                                                           lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties)
@@ -764,6 +776,7 @@ Module HSPFOutputReports
     ''' <param name="aRunMade"></param>
     ''' <returns></returns>
     Private Function QACheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
+        Logger.Status("Creating the QAQC Model Parameter Report")
         Dim HSPFParmTable As XmlDocument = New XmlDocument()
         Dim TableName As String = ""
         Dim ParameterName As String
@@ -841,6 +854,7 @@ Module HSPFOutputReports
             OperationType = node.SelectSingleNode("OPNTYPE").InnerText
             TableName = node.SelectSingleNode("TABLE").InnerText
             ParameterName = node.SelectSingleNode("ParameterName").InnerText
+            Logger.Status("Creating the QAQC Model Parameter Report -- Examining Table " & TableName)
             'If ParameterName = "TAUCS" Then Stop
             Dim IsMonthlyValuePossible As Integer
             Try
@@ -991,6 +1005,8 @@ Module HSPFOutputReports
             Next loperation
 
         Next
+        Logger.Status("Creating the QAQC Model Parameter Report")
+
         Dim lReachesWithAdsDepoIssue As Integer = 0
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             If lRCHRES.Tables("ACTIVITY").Parms("NUTFG").Value = 1 AndAlso (lRCHRES.Tables("NUT-FLAGS").Parms("ADNHFG").Value = 0 OrElse
@@ -1087,7 +1103,7 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
-        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values, Area"
+        Dim QAQCAnalysis As String = "    <td align=center>Parameter Values, Area, Diurnal Patterns"
         If pConstituents.Contains("Water") Then
             QAQCAnalysis &= ", Water"
         End If
@@ -1122,6 +1138,7 @@ Module HSPFOutputReports
         Dim lCalibrationLocations As New atcCollection
         Dim lLocationsToOutput As New atcCollection
 
+        Logger.Status("Creating the QAQC Model Area Report")
         'First add calibration reaches by looking at contents of expert system .exs files
         Dim lExpertSystemFileNames As New NameValueCollection
         AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
@@ -1204,6 +1221,7 @@ Module HSPFOutputReports
 
     Private Function QALoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
                                            ByVal aDateString As String) As String
+        Logger.Status("Creating the QAQC Loading Rate Comparison Report")
         Dim OverAllComments As New Text.StringBuilder
         Dim LoadingRateComments As New Text.StringBuilder
         Dim newColumn As DataColumn
@@ -1290,7 +1308,10 @@ Module HSPFOutputReports
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
                 OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
         End Select
-
+        OverAllComments.AppendLine("<p>The box-whisker plot shows the variation in average annual loading among the model segments within each land use category.  If there is only one
+                                    model segment, there will be only a single tick at the average annual load for that land use.  If there are multiple model segments, the tick will be
+                                    at the median, and the extent of the box will indicate the interquartile range (25th and 75th percentile).  The whiskers extend to the highest and 
+                                    lowest average annual loading rate for the segments of that land use classification.</p>")
         Return OverAllComments.ToString
     End Function
 
@@ -1619,6 +1640,7 @@ Module HSPFOutputReports
     'End Function
 
     Private Function QAVerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
+        Logger.Status("Creating the QAQC Storage Trend Report")
         Dim StorageTrend As New Text.StringBuilder
         Dim OverAllStorageTrend As New Text.StringBuilder
         Dim lSimSpan As Double = aUCI.GlobalBlock.EdateJ - aUCI.GlobalBlock.SDateJ
@@ -1657,6 +1679,7 @@ Module HSPFOutputReports
         If lSimSpan < 1827 Then
             OverAllStorageTrend.AppendLine("<p>The time span of simulation is shorter than 5 years. The long term trend analysis may not be accurate.</p>")
         End If
+        Dim lStorageVarCount As New atcCollection
         StorageTrend.AppendLine("<ul>")
         For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
             Dim lLocationName As String = ""
@@ -1670,6 +1693,7 @@ Module HSPFOutputReports
                 Case Else
                     Continue For
             End Select
+            Logger.Status("Creating the QAQC Storage Trend Report for " & aConstituent & " in " & lLocationName)
 
             For Each StorageVariable As String In lListOfStorageVariables
                 If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
@@ -1679,51 +1703,73 @@ Module HSPFOutputReports
                 Dim lIntercept As Double = 0
                 Dim lRCoeff As Double = 0
                 Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
-                If lStorageTimeSeries Is Nothing Then Continue For
-                Dim lTempTimeSeries As New atcTimeseries(Nothing)
-                lTempTimeSeries = lStorageTimeSeries.Clone
-                For i As Integer = 0 To lStorageTimeSeries.numValues
-                    lTempTimeSeries.Value(i) = lStorageTimeSeries.Dates.Value(i)
-                Next
-                Dim lArgs As New atcDataAttributes()
-                Dim lTSerAverage As Double = 0
-                Dim lTSerStdev As Double = 0
-                Dim lCoeffVariation As Double = 0
-                Try
-                    lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
-                    lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
-                    lCoeffVariation = lTSerStdev / lTSerAverage
-                Catch
-                    StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+                If Not lStorageTimeSeries Is Nothing Then 'binary output found
+                    If lStorageVarCount.Keys.Contains(StorageVariable) Then
+                        lStorageVarCount.ItemByKey(StorageVariable) += 1
+                    Else
+                        lStorageVarCount.Add(StorageVariable, 1)
+                    End If
+                    Dim lTempTimeSeries As New atcTimeseries(Nothing)
+                    lTempTimeSeries = lStorageTimeSeries.Clone
+                    For i As Integer = 0 To lStorageTimeSeries.numValues
+                        lTempTimeSeries.Value(i) = i ' lStorageTimeSeries.Dates.Value(i)
+                    Next
+                    Dim lArgs As New atcDataAttributes()
+                    Dim lTSerAverage As Double = 0
+                    Dim lTSerStdev As Double = 0
+                    Dim lCoeffVariation As Double = 0
+                    Try
+                        lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
+                        lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
+                        lCoeffVariation = lTSerStdev / lTSerAverage
+                    Catch
+                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
 
-                    Continue For
-                End Try
-                If lCoeffVariation < 0.1 Then Continue For
-                lArgs.SetValue("Timeseries", lStorageTimeSeries)
-                lArgs.SetValue("Number", lTSerAverage)
-                lStorageTimeSeries = DoMath("subtract", lArgs)
-                lArgs.SetValue("Timeseries", lStorageTimeSeries)
-                lArgs.SetValue("Number", lTSerStdev)
-                lStorageTimeSeries = DoMath("divide", lArgs)
-                'Now find the slope of this timeseries
-                FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
-                If lSlope > 0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is increasing.</li>")
-                    lNumberOfTrendIssues += 1
-                ElseIf lSlope < -0.002 Then
-                    StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " is decreasing.</li>")
-                    lNumberOfTrendIssues += 1
+                        Continue For
+                    End Try
+                    If lCoeffVariation > 0.1 Then 'satisfactory covariance value, OK to check slope
+                        'first generate timeseries of difference from mean through time
+                        lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                        lArgs.SetValue("Number", lTSerAverage)
+                        lStorageTimeSeries = DoMath("subtract", lArgs)
+                        'compute differences in terms of standard deviation
+                        lArgs.SetValue("Timeseries", lStorageTimeSeries)
+                        lArgs.SetValue("Number", lTSerStdev)
+                        lStorageTimeSeries = DoMath("divide", lArgs)
+                        'Now find the slope of this timeseries
+                        FitLine(lStorageTimeSeries, lTempTimeSeries, lSlope, lIntercept, lRCoeff, "")
+                        Dim lY As Double = ((lSlope * lTempTimeSeries.Value(0)) + lIntercept) * lTSerStdev + lTSerAverage
+                        Dim lY2 As Double = ((lSlope * lTempTimeSeries.Value(lTempTimeSeries.numValues - 1)) + lIntercept) * lTSerStdev + lTSerAverage
+                        Dim lPercentChange As Double = 100 * ((lY2 - lY) / lY)
+                        If lSlope > 0.002 AndAlso lPercentChange > 20 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
+                            lNumberOfTrendIssues += 1
+                        ElseIf lSlope < -0.002 AndAlso lPercentChange < -20 Then
+                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
+                            lNumberOfTrendIssues += 1
+                        End If
+                    End If
                 End If
             Next
         Next
         StorageTrend.AppendLine("</ul>")
 
-        If lNumberOfTrendIssues > 0 Then
-            OverAllStorageTrend.AppendLine("<p>Following non-typical long term trend issues were noticed in the model.</p>")
+        If lStorageVarCount.Count = 0 Then 'no timeseries found on binary file
+            OverAllStorageTrend.AppendLine("<p>No storage or concentration timeseries were found for analysis in the binary output file.</p>")
+        ElseIf lNumberOfTrendIssues > 0 Then
+            OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.<sup>*</sup></p>")
             OverAllStorageTrend.Append(StorageTrend)
+            OverAllStorageTrend.AppendLine("<sup>*</sup><i>Based on fitted line through difference of values from mean over time</i>")
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
+        OverAllStorageTrend.AppendLine("<p>The following model elements were reviewed (count of datasets in parentheses):<ul>")
+        For Each StorageVariable As String In lListOfStorageVariables
+            StorageVariable = StorageVariable.Split(":")(1)
+            OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+        Next
+        OverAllStorageTrend.AppendLine("</ul>")
+
 
         Return OverAllStorageTrend.ToString
     End Function
@@ -1785,14 +1831,17 @@ Module HSPFOutputReports
     ''' <param name="aUCI"></param>
     ''' <param name="aConstituent"></param>
     ''' <returns></returns>
-    Private Function QACheckDiurnalPattern(ByVal aBinaryData As atcDataSource, ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+    Private Function QACheckDiurnalPattern(ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+        Logger.Status("Creating the QAQC Diurnal Pattern Report")
         Dim lDiurnalPattern As New Text.StringBuilder
+        Dim lDiurnalDetails As New Text.StringBuilder
         Dim lFoundTheTS As Boolean = False
         Dim lGroupName As String = ""
         Dim lMemberName As String = ""
         Dim lMemSub1 As Integer = 0
         Dim lMemSub2 As Integer = 0
         Dim lConstituent As String = ""
+        Dim lHeaderLabel As String = ""
         Select Case aConstituent
             Case "DO"
                 lGroupName = "OXRX"
@@ -1800,77 +1849,228 @@ Module HSPFOutputReports
                 lMemSub1 = 1
                 lMemSub2 = 1
                 lConstituent = "DOXCONC"
+                lHeaderLabel = "DO (mg/l)"
             Case "Water Temperature"
-                lGroupName = "OXRX"
-                lMemberName = "DOX"
+                lGroupName = "HTRCH" '"OXRX"
+                lMemberName = "TW" '"DOX"
                 lMemSub1 = 1
                 lMemSub2 = 1
                 lConstituent = "TW"
+                If aUCI.GlobalBlock.EmFg = 1 Then
+                    lHeaderLabel = "Water Temperature (Deg F)"
+                Else
+                    lHeaderLabel = "Water Temperature (Deg C)"
+                End If
+                'Case "CHLA"
+                '    lGroupName = "PLANK"
+                '    lMemberName = "TBENAL"
+                '    lMemSub1 = 2
+                '    lMemSub2 = 1
+                '    lConstituent = "CHLA"
         End Select
-        lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table - " & lConstituent & "</h2>")
-        Dim lDiurnalTable As DataTable
-        lDiurnalTable = New DataTable("DiurnalPatternTable")
+        lDiurnalPattern.AppendLine("<h2>Diurnal Pattern Table (May - Sept) - " & lHeaderLabel & "</h2>")
+        Dim lDiurnalTable As New DataTable("DiurnalPatternTable")
+        lDiurnalDetails.AppendLine("<h2>Details of Diurnal Anomalies Table (May - Sept) - " & lHeaderLabel & "</h2>")
+        Dim lAnomalyDetails As New DataTable("AnomalyDetailsTable")
         Dim lColumn As DataColumn
 
         lColumn = New DataColumn()
         lColumn.ColumnName = "Reach"
-        lColumn.Caption = "Reach Name"
+        lColumn.Caption = "Reach"
         lColumn.DataType = Type.GetType("System.String")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
-        lColumn.ColumnName = "Morning"
-        lColumn.Caption = "Morning (12am - 4am)"
+        lColumn.ColumnName = "MorningMean"
+        lColumn.Caption = "Mean - All<br>Morning Hours (12am - 8am)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
 
         lColumn = New DataColumn()
-        lColumn.ColumnName = "Afternoon"
-        lColumn.Caption = "Morning (12pm - 4pm)"
+        lColumn.ColumnName = "AfternoonMean"
+        lColumn.Caption = "Mean - All<br>Afternoon Hours (12pm - 8pm)"
         lColumn.DataType = Type.GetType("System.Double")
         lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "MorningMin"
+        lColumn.Caption = "Mean - Daily Min<br>Morning Hours (12am - 8am)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AfternoonMin"
+        lColumn.Caption = "Mean - Daily Min<br>Afternoon Hours (12pm - 8pm)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "MorningMax"
+        lColumn.Caption = "Mean - Daily Max<br>Morning Hours (12am - 8am)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AfternoonMax"
+        lColumn.Caption = "Mean - Daily Max<br>Afternoon Hours  (12pm - 8pm)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AnomalyCount"
+        lColumn.Caption = "Daily Anomaly<sup>*</sup><br>Count"
+        lColumn.DataType = Type.GetType("System.Int64")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "AnomalyPercent"
+        lColumn.Caption = "Daily Anomaly<br>Percent"
+        lColumn.DataType = Type.GetType("System.Double")
+        lDiurnalTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsReach"
+        lColumn.Caption = "Reach"
+        lColumn.DataType = Type.GetType("System.String")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Date"
+        lColumn.Caption = "Date"
+        lColumn.DataType = Type.GetType("System.String")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsMorningMax"
+        lColumn.Caption = "Daily Max<br>Morning<br>(12am - 8am)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAnomalyDetails.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "DetailsAfternoonMax"
+        lColumn.Caption = "Daily Max<br>Afternoon<br>(12pm - 8pm)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAnomalyDetails.Columns.Add(lColumn)
+
         Dim lRow As DataRow
+        Dim lDetailRow As DataRow
 
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
 
-            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
-                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then 'This means that timeseries is hourly or minute
+                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+                End If
             End If
             If lTS Is Nothing Then
-                lTS = aBinaryData.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
+                lTS = atcDataManager.DataSets.FindData("Constituent", lConstituent).FindData("Location", "R:" & lRCHRES.Id)(0)
             End If
-            If (Not lTS Is Nothing) OrElse (lTS.Attributes.GetDefinedValue("Time Unit").Value < 3) Then 'This means that timeseries is hourly or minute
-                lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'In case the timeseries is shorter than hour, then aggregate it to hourly
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
+                    lTS = Aggregate(lTS, atcTimeUnit.TUHour, 1, atcTran.TranAverSame) 'timeseries is shorter than hour, then aggregate it to hourly
+                End If
             End If
-            If lTS.Attributes.GetDefinedValue("Time Unit").Value = 2 Then 'Getting to this loop only if timestep is hourly
-                'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
-                Dim lSeasonMorning As New atcSeasonsHour
-                'hours ending 1am - 4am
-                lSeasonMorning.SeasonSelected(0) = True
-                lSeasonMorning.SeasonSelected(1) = True
-                lSeasonMorning.SeasonSelected(2) = True
-                lSeasonMorning.SeasonSelected(3) = True
-                Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lTS, Nothing)(0)
-                Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                Dim lSeasonAfternoon As New atcSeasonsHour
-                'hours ending 1pm - 4pm
-                lSeasonAfternoon.SeasonSelected(12) = True
-                lSeasonAfternoon.SeasonSelected(13) = True
-                lSeasonAfternoon.SeasonSelected(14) = True
-                lSeasonAfternoon.SeasonSelected(15) = True
-                lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lTS, Nothing)(0)
-                Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
-                lRow = lDiurnalTable.NewRow
-                lRow("Reach") = lRCHRES.Id
-                lRow("Morning") = DecimalAlign(lMorningMean, , 2, 7)
-                lRow("Afternoon") = DecimalAlign(lAfternoonMean, , 2, 7)
-                lDiurnalTable.Rows.Add(lRow)
+            If Not lTS Is Nothing Then
+                If lTS.Attributes.GetDefinedValue("Time Unit").Value = 3 Then 'Getting to this loop only if timestep is hourly
+                    Dim lSeasonSummer As New atcSeasonsMonth
+                    lSeasonSummer.SeasonSelected(5) = True
+                    lSeasonSummer.SeasonSelected(6) = True
+                    lSeasonSummer.SeasonSelected(7) = True
+                    lSeasonSummer.SeasonSelected(8) = True
+                    lSeasonSummer.SeasonSelected(9) = True
+                    Dim lSummerTimeseries As atcTimeseries = lSeasonSummer.SplitBySelected(lTS, Nothing)(0)
+                    'Find the 12 to 4 am timeseries, and 12 to 4pm timeseries
+                    Dim lSeasonMorning As New atcSeasonsHour
+                    'hours ending 1am - 4am
+                    lSeasonMorning.SeasonSelected(0) = True
+                    lSeasonMorning.SeasonSelected(1) = True
+                    lSeasonMorning.SeasonSelected(2) = True
+                    lSeasonMorning.SeasonSelected(3) = True
+                    lSeasonMorning.SeasonSelected(4) = True
+                    lSeasonMorning.SeasonSelected(5) = True
+                    lSeasonMorning.SeasonSelected(6) = True
+                    lSeasonMorning.SeasonSelected(7) = True
+                    Dim lSeasonTimeseries As atcTimeseries = lSeasonMorning.SplitBySelected(lSummerTimeseries, Nothing)(0)
+                    Dim lMorningDailyMax As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                    Dim lMorningDailyMin As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
+                    Dim lMorningMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                    Dim lMorningMin As Double = lMorningDailyMin.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Min")
+                    Dim lMorningMax As Double = lMorningDailyMax.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Max")
+                    Dim lSeasonAfternoon As New atcSeasonsHour
+                    'hours ending 1pm - 4pm
+                    lSeasonAfternoon.SeasonSelected(12) = True
+                    lSeasonAfternoon.SeasonSelected(13) = True
+                    lSeasonAfternoon.SeasonSelected(14) = True
+                    lSeasonAfternoon.SeasonSelected(15) = True
+                    lSeasonAfternoon.SeasonSelected(16) = True
+                    lSeasonAfternoon.SeasonSelected(17) = True
+                    lSeasonAfternoon.SeasonSelected(18) = True
+                    lSeasonAfternoon.SeasonSelected(19) = True
+                    lSeasonTimeseries = lSeasonAfternoon.SplitBySelected(lSummerTimeseries, Nothing)(0)
+                    Dim lAfternoonDailyMax As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMax)
+                    Dim lAfternoonDailyMin As atcTimeseries = Aggregate(lSeasonTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranMin)
+                    Dim lAfternoonMean As Double = lSeasonTimeseries.Attributes.GetValue("Mean")
+                    Dim lAfternoonMin As Double = lAfternoonDailyMin.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Min")
+                    Dim lAfternoonMax As Double = lAfternoonDailyMax.Attributes.GetValue("Mean") 'lSeasonTimeseries.Attributes.GetValue("Max")
+                    lRow = lDiurnalTable.NewRow
+                    lRow("Reach") = lRCHRES.Id
+                    lRow("MorningMean") = DecimalAlign(lMorningMean, , 2, 7)
+                    lRow("AfternoonMean") = DecimalAlign(lAfternoonMean, , 2, 7)
+                    lRow("MorningMin") = DecimalAlign(lMorningMin, , 2, 7)
+                    lRow("AfternoonMin") = DecimalAlign(lAfternoonMin, , 2, 7)
+                    lRow("MorningMax") = DecimalAlign(lMorningMax, , 2, 7)
+                    lRow("AfternoonMax") = DecimalAlign(lAfternoonMax, , 2, 7)
+                    Dim lAnomalyCount As Integer = 0
+                    Dim lDiff As Double
+                    For i As Integer = 1 To lMorningDailyMax.numValues
+                        If Not Double.IsNaN(lMorningDailyMax.Value(i)) AndAlso Not Double.IsNaN(lAfternoonDailyMax.Value(i)) Then
+                            lDiff = lAfternoonDailyMax.Value(i) - lMorningDailyMax.Value(i)
+                            Select Case aConstituent
+                                Case "DO", "Water Temperature"
+                                    If lDiff < 0 Then 'max DO and Temp should be less in pm than in am
+                                        lAnomalyCount += 1
+                                        lDetailRow = lAnomalyDetails.NewRow
+                                        lDetailRow("DetailsReach") = lRCHRES.Id
+                                        lDetailRow("Date") = DumpDate(lMorningDailyMax.Dates.Value(i)).Substring(0, 10)
+                                        lDetailRow("DetailsMorningMax") = DecimalAlign(lMorningDailyMax.Value(i), , 2, 7)
+                                        lDetailRow("DetailsAfternoonMax") = DecimalAlign(lAfternoonDailyMax.Value(i), , 2, 7)
+                                        lAnomalyDetails.Rows.Add(lDetailRow)
+                                    End If
+                                Case "CHLA"
+                                    If lDiff > 0 Then 'TODO: check CHLA pattern
+                                        lAnomalyCount += 1
+                                        lDetailRow = lAnomalyDetails.NewRow
+                                        lDetailRow("DetailsReach") = lRCHRES.Id
+                                        lDetailRow("Date") = DumpDate(lMorningDailyMax.Dates.Value(i)).Substring(0, 10)
+                                        lDetailRow("DetailsMorningMax") = DecimalAlign(lMorningDailyMax.Value(i), , 2, 7)
+                                        lDetailRow("DetailsAfternoonMax") = DecimalAlign(lAfternoonDailyMax.Value(i), , 2, 7)
+                                        lAnomalyDetails.Rows.Add(lDetailRow)
+                                    End If
+                            End Select
+                        End If
+                    Next
+                    lRow("AnomalyCount") = lAnomalyCount
+                    lRow("AnomalyPercent") = DecimalAlign(100 * lAnomalyCount / lMorningDailyMax.numValues, , 2, 7)
+                    lDiurnalTable.Rows.Add(lRow)
+                End If
+            Else
+                Logger.Dbg("No timeseries found for " & aConstituent)
             End If
-
         Next
 
-        lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
+        If lDiurnalTable.Rows.Count > 0 Then
+            lDiurnalPattern.Append(ConvertToHtmlFile(lDiurnalTable))
+            lDiurnalPattern.AppendLine("<sup>*</sup><i>Days where expected morning/afternoon pattern is not observed (i.e. afternoon max does not exceed morning max)</i></p>")
+            Dim lFileName As String = "DiurnalAnomalyDetails-" & aConstituent.Replace(" ", "") & ".htm"
+            lDiurnalPattern.AppendLine("Details of each anomaly may be found <a href=./" & lFileName & ">here.</a></p>")
+            lDiurnalDetails.Append(ConvertToHtmlFile(lAnomalyDetails))
+            lDiurnalDetails.AppendLine("</body>")
+            lDiurnalDetails.AppendLine("</html>")
+            File.WriteAllText(pOutFolderName & lFileName, lDiurnalDetails.ToString())
+        Else
+            lDiurnalPattern.AppendLine("<p>No hourly timeseries available for " & aConstituent & "</p>")
+        End If
 
         Return lDiurnalPattern.ToString
     End Function

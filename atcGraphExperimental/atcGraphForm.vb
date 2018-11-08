@@ -526,7 +526,7 @@ Public Class atcGraphForm
         End If
     End Sub
 
-    Private Sub FreeResources()
+    Public Sub FreeResources()
         If Not pEditor Is Nothing Then
             pEditor.Dispose()
             pEditor = Nothing

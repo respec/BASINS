@@ -71,6 +71,8 @@ Public Class SpatialOperations
         End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     ''' <summary>
     ''' Remove a layer from the map given its file name
     ''' </summary>
@@ -163,7 +165,7 @@ Public Class SpatialOperations
                         lResult &= "<add_grid>" & aDestinationFilename & "</add_grid>"
                     Else
                         Logger.Status("Merging grid " & IO.Path.GetFileNameWithoutExtension(aFromFilename))
-                        Logger.Dbg("Merging '" & aFromFilename & "' and existing" & vbCrLf & _
+                        Logger.Dbg("Merging '" & aFromFilename & "' and existing" & vbCrLf &
                                    "'" & aDestinationFilename & "'")
 
                         Dim tGrids(1) As MapWinGIS.Grid
@@ -262,7 +264,7 @@ UnknownFileType:
         End If
         Return lResult
     End Function
-
+#End If
     Public Shared Function SameProjection(ByVal aProj1 As String, ByVal aProj2 As String) As Boolean
         Dim lProj1 As String = aProj1.ToLower.Trim
         Dim lProj2 As String = aProj2.ToLower.Trim
@@ -303,7 +305,8 @@ UnknownFileType:
     '        If lProjection.ToLower.Equals(aProjectionString.ToLower) Then aProjectionString = AlbersProjections(0)
     '    Next
     'End Sub
-
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Shared Function ProjectShapefile(ByVal aNativeProjection As String, ByVal aDesiredProjection As String, ByVal aShapeFilename As String) As Boolean
         Dim lSuccess As Boolean = False
         If SameProjection(aNativeProjection, aDesiredProjection) Then
@@ -350,7 +353,7 @@ UnknownFileType:
         End If
         Return lSuccess
     End Function
-
+#End If
     ''' <summary>
     ''' Use ShapeUtil.exe to merge shapes in aFromFilename into aDestinationFilename.
     ''' </summary>
@@ -398,9 +401,11 @@ UnknownFileType:
         Return lShapeUtilExe
     End Function
 
-    Public Shared Sub ProjectAndClipGridLayers(ByVal aFolder As String, _
-                                               ByVal aNativeProjection As String, _
-                                               ByVal aDesiredProjection As String, _
+#If GISProvider = "DotSpatial" Then
+#Else
+    Public Shared Sub ProjectAndClipGridLayers(ByVal aFolder As String,
+                                               ByVal aNativeProjection As String,
+                                               ByVal aDesiredProjection As String,
                                       Optional ByVal aClipRegion As Region = Nothing)
         ProjectAndClipGridLayers(aFolder, aNativeProjection, aDesiredProjection, aClipRegion, "*.tif")
     End Sub
@@ -470,7 +475,7 @@ UnknownFileType:
         End If
     End Sub
 
-    Public Shared Sub TryProjectGrid(ByVal aNativeProjection As String, ByVal aDesiredProjection As String, _
+    Public Shared Sub TryProjectGrid(ByVal aNativeProjection As String, ByVal aDesiredProjection As String,
                                      ByVal aLayerFilename As String, ByVal aProjectedFilename As String)
         'RepairProjection(aNativeProjection)
         'RepairProjection(aDesiredProjection)
@@ -688,7 +693,7 @@ ProjectIt:
             MapWinGeoProc.SpatialReference.ProjectImage(aCurrentProjection, aDesiredProjection, aSourceFilename, aDestinationFilename, New MapWinCallback)
         End Using
     End Sub
-
+#End If
     Private Shared RenderersPath As String = Nothing
 
     ''' <summary>
@@ -984,7 +989,10 @@ NextRecord:
                             Dim lShapeFilename As String = IO.Path.Combine(aFolder, "places.shp")
                             TryDeleteShapefile(lShapeFilename)
                             lNewDBF.WriteFile(IO.Path.ChangeExtension(lShapeFilename, ".dbf"))
+#If GISProvider = "DotSpatial" Then
+#Else
                             ProjectShapefile(GeographicProjection, aProjection, lShapeFilename)
+#End If
                             lInstructions &= "<add_shape>" & lShapeFilename & "</add_shape>" & vbCrLf
                         End If
                     Next
@@ -1035,6 +1043,8 @@ NextRecord:
         End Try
     End Function
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Shared Function ChangeGridFormat(ByVal aSourceFilename As String, ByVal aDestinationFilename As String) As Boolean
         MapWinGeoProc.DataManagement.ChangeGridFormat(aSourceFilename, aDestinationFilename, MapWinGIS.GridFileType.UseExtension, MapWinGIS.GridDataType.UnknownDataType, 1)
     End Function
@@ -1060,6 +1070,7 @@ Public Class MapWinCallback
         Logger.Progress(Percent, 100)
         If Not String.IsNullOrEmpty(Message) Then Logger.Status("LABEL MIDDLE " & Message)
     End Sub
+#End If
 End Class
 
 'Public Module FeatureSetShapefileExtensions

@@ -277,6 +277,10 @@
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility-D4EM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcWASPInpWriter\atcWASPInpWriter-D4EM10.vbproj">
+      <Project>{74201f53-b122-40f0-9678-1dcdc45e99bc}</Project>
+      <Name>atcWASPInpWriter-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcWDM\atcWDM-D4EM10.vbproj">
       <Project>{F0F41E48-35ED-43F4-AB00-30252B0E5690}</Project>
       <Name>atcWDM-D4EM10</Name>

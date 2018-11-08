@@ -504,6 +504,7 @@ Partial Class StartUp
         '
         Me.GroupBox1.Controls.Add(Me.chkWASP)
         Me.GroupBox1.Controls.Add(Me.chkBathtub)
+        Me.GroupBox1.Enabled = False
         Me.GroupBox1.Location = New System.Drawing.Point(18, 491)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(418, 55)

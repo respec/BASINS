@@ -26,6 +26,7 @@ Public Class BFInputNames
     Public Shared TwoParamEstMethod As String = "TwoParamEstimationMethod"
     Public Shared StationFile As String = "StationFile"
     Public Shared FullSpanDuration As String = "FullSpanDuration"
+    Public Shared Graph As String = "Graphs"
 End Class
 
 Public Class atcTimeseriesBaseflow
@@ -678,7 +679,8 @@ Public Class atcTimeseriesBaseflow
             Return False 'no datasets added, not a data source
         End If
     End Function
-
+#If GISProvider = "DotSpatial" Then
+#Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
@@ -686,4 +688,5 @@ Public Class atcTimeseriesBaseflow
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+#End If
 End Class

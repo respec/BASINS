@@ -78,6 +78,7 @@ Public Class StartUp
         chkGQUAL5.Enabled = False
         chkGQUAL6.Enabled = False
         chkGQUAL7.Enabled = False
+        chkModelQAQC.Checked = False
 
 
         Dim lUCI As String = cmbUCIPath.Text
@@ -180,7 +181,7 @@ Public Class StartUp
 
     Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged,
                                             chkGQUAL1.CheckedChanged, chkGQUAL2.CheckedChanged, chkGQUAL3.CheckedChanged, chkGQUAL4.CheckedChanged, chkGQUAL5.CheckedChanged, chkGQUAL6.CheckedChanged, chkGQUAL7.CheckedChanged
-        If chkWaterBalance.Checked OrElse
+        If (chkWaterBalance.Checked OrElse
             chkSedimentBalance.Checked OrElse
             chkTotalNitrogen.Checked OrElse
             chkTotalPhosphorus.Checked OrElse
@@ -193,7 +194,7 @@ Public Class StartUp
             chkGQUAL6.Checked OrElse
             chkGQUAL7.Checked OrElse
             chkBathtub.Checked OrElse
-            chkWASP.Checked Then
+            chkWASP.Checked) And Not chkModelQAQC.Checked Then
             lblRCH.Enabled = True
             txtRCH.Enabled = True
             pnlHighlight.Enabled = True
@@ -258,7 +259,7 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP20_Manual.pdf")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP30_Manual.pdf")
     End Sub
 
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged
@@ -365,7 +366,7 @@ Public Class StartUp
             chkMultiSim.Enabled = False
             chkMultiSim.Checked = False
             chkRunHSPF.Enabled = False
-            'chkRunHSPF.Checked = True
+            chkRunHSPF.Checked = False
             'chkAreaReports.Enabled = False
             'chkAreaReports.Checked = False
             chkExpertStats.Enabled = False
@@ -382,7 +383,7 @@ Public Class StartUp
             chkTotalNitrogen.Checked = False
             'chkTotalPhosphorus.Enabled = False
             chkTotalPhosphorus.Checked = False
-            chkWaterBalance.Checked = True
+            chkWaterBalance.Checked = False
             'chkWaterBalance.Enabled = False
             chkSedimentBalance.Checked = False
             'chkSedimentBalance.Enabled = False
@@ -407,7 +408,7 @@ Public Class StartUp
             txtRCH.Enabled = False
             chkWASP.Enabled = False
             chkBathtub.Enabled = False
-
+            GroupBox2.Text = "Loading Rates and Storage Trends to Report"
         Else
             chkRunHSPF.Enabled = True
             'chkAreaReports.Enabled = True
@@ -428,6 +429,10 @@ Public Class StartUp
             chkGQUAL5.Enabled = True
             chkGQUAL6.Enabled = True
             chkGQUAL7.Enabled = True
+            chkWASP.Enabled = True
+            chkBathtub.Enabled = True
+            chkMultiSim.Enabled = True
+            GroupBox2.Text = "Constituent Balance Reports"
         End If
     End Sub
 
