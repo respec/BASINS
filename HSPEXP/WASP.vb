@@ -285,46 +285,46 @@ Module WASP
 
         'also add loadings at the upstream boundary (needs to be kg/day)
 
-        'Ammonia              TAM-INTOT (lbs)
+        'Ammonia Nitrogen               TAM-INTOT (lbs)
         Dim lConvFactP As Double = 1 / 2.205
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
 
-        'Nitrate              NO3-INTOT (lbs)
+        'Nitrate Nitrogen               NO3-INTOT (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
 
-        'Organic Nitrogen     N-TOTORG-IN (lbs)  
+        'Dissolved Organic Nitrogen     N-TOTORG-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
 
-        'Orthophosphate       PO4-INTOT (lbs)
+        'Inorganic Phosphate            PO4-INTOT (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
 
-        'Organic Phosphorus   P-TOTORG-IN (lbs)
+        'Dissolved Organic Phosphorus   P-TOTORG-IN (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
 
-        'Phytoplankton Chla   PHYTO-IN (lbs)  
+        'Phytoplankton Chla             PHYTO-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5, aSDateJ, aEDateJ)
 
-        'CBOD 1(Ultimate)     BODIN (lbs) 
+        'CBOD 1(Ultimate)               BODIN (lbs) 
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6, aSDateJ, aEDateJ)
 
-        'CBOD 2(Ultimate)     *** 
-        'CBOD 3(Ultimate)     *** 
+        'CBOD 2(Ultimate)               *** 
+        'CBOD 3(Ultimate)               *** 
 
-        'Dissolved Oxygen     DOXIN (lbs)
+        'Dissolved Oxygen               DOXIN (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9, aSDateJ, aEDateJ)
 
-        'Detrital Carbon      C-REFORG-IN (lbs)  
+        'Detrital Carbon                C-REFORG-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10, aSDateJ, aEDateJ)
 
-        'Detrital Nitrogen    N-REFORG-IN (lbs)  
+        'Detrital Nitrogen              N-REFORG-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
 
-        'Detrital Phosphorus  P-REFORG-IN (lbs)  
+        'Detrital Phosphorus            P-REFORG-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
 
-        'Salinity             ***
+        'Salinity                       ***
 
-        'Solids               ISED-TOT (tons)
+        'Solids                         ISED-TOT (tons)
         Dim lConvFactT As Double = 907.185  'tons to kg
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14, aSDateJ, aEDateJ)
 
