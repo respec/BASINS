@@ -1181,7 +1181,7 @@ Module HSPFOutputReports
         'Then add outlet reaches
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
-            If lDownstreamReachID = 0 Then
+            If Not aUCI.OperationExists("RCHRES", lDownstreamReachID) Then
                 lOutletLocations.Add("R:" & lRCHRES.Id)
                 lLocationsToOutput.Add("R:" & lRCHRES.Id)
             End If
