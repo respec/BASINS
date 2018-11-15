@@ -1721,9 +1721,13 @@ Module HSPFOutputReports
                     Try
                         lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
                         lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
-                        lCoeffVariation = lTSerStdev / lTSerAverage
+                        If lTSerAverage > 0 Then
+                            lCoeffVariation = lTSerStdev / lTSerAverage
+                        Else
+                            StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Average of output timeseries is 0")
+                        End If
                     Catch
-                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Unable to compute timeseries Average and Standard Deviation")
 
                         Continue For
                     End Try
