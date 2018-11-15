@@ -183,7 +183,7 @@ Public Class atcWASPProject
                 With lSegment
                     If .WaspID = i Then
                         Dim vol As Double = .Length * 1000.0 * .Width * .Depth * 0.5 ' crude assumption for Volume in m3
-                        aSW.WriteLine("{0,10}{1,10}{2,10}{3,10:0.00}{4,10:0.000000}{5,10:0.000000}{6,10:0.000000}" &
+                        aSW.WriteLine("{0,10}{1,10}{2,10}{3,15:0.00}{4,10:0.000000}{5,10:0.000000}{6,10:0.000000}" &
                                       "{7,10:0.000000}{8,10:0.00}{9,10:0.00000}{10,10:0.0000}{11,10:0.0000}{12,10:0.0000}",
                                       .WaspID, 0, 1, vol, 0, 0, .Depth,
                                       0, .Length * 1000, .Slope, .Width, .Roughness, 0.001)
@@ -488,23 +488,21 @@ Public Class atcWASPProject
             aSW.WriteLine("{0,5}               Number of Loadings", NumLoads)
             If NumLoads > 0 Then
                 aSW.WriteLine("   1.000   1.000    Loading Scale & Conversion Factors")
-                For s As Integer = 1 To Segments.Count
-                    For Each Seg As atcWASPSegment In Segments
-                        With Seg
-                            If .WaspID = s Then
-                                aSW.WriteLine("{0,5}               Loading Segment Number", .WaspID)
-                                With Seg.LoadTimeSeries(c).GetTimeSeries(Me, Seg.ID_Name, WASPConstituents(c).Description)
-                                    If Seg.LoadTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
-                                        WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", Seg.Name, WASPConstituents(c), Seg.LoadTimeSeries(c).ToFullString) & vbCr
-                                    End If
-                                    aSW.WriteLine("{0,5}               Number of time-loading values in {1}", .Count - 1, Seg.FlowTimeSeries.ToFullString)
-                                    For t As Integer = 1 To .Count - 1
-                                        aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t))
-                                    Next
-                                End With
-                            End If
-                        End With
-                    Next
+                For Each Seg As atcWASPSegment In Segments
+                    With Seg
+                        If Seg.LoadTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then
+                            aSW.WriteLine("{0,5}               Loading Segment Number", .WaspID)
+                            With Seg.LoadTimeSeries(c).GetTimeSeries(Me, Seg.ID_Name, WASPConstituents(c).Description)
+                                If Seg.LoadTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
+                                    WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", Seg.Name, WASPConstituents(c), Seg.LoadTimeSeries(c).ToFullString) & vbCr
+                                End If
+                                aSW.WriteLine("{0,5}               Number of time-loading values in {1}", .Count - 1, Seg.FlowTimeSeries.ToFullString)
+                                For t As Integer = 1 To .Count - 1
+                                    aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t))
+                                Next
+                            End With
+                        End If
+                    End With
                 Next
             End If
         Next

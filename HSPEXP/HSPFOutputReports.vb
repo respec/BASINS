@@ -1031,16 +1031,16 @@ Module HSPFOutputReports
 
         End If
         If lParameterViolationTable.Rows.Count > 10 Then
-            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterTableTemplate.xsl"))
+            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pOutFolderName, "ParameterTableTemplate.xsl"))
             lXSLFile.Write(My.Resources.LimitViolatingParameterTemplate)
             lXSLFile.Close()
-            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterReport.xml"))
+            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pOutFolderName, "ParameterReport.xml"))
             lParameterInfo.WriteLine("<?xml version=""1.0"" encoding=""UTF-8""?>")
             lParameterInfo.WriteLine("<?xml-stylesheet version=""1.0"" type=""text/xsl"" href=""ParameterTableTemplate.xsl""?>")
             lParameterViolationTable.WriteXml(lParameterInfo, XmlWriteMode.IgnoreSchema)
             lParameterInfo.Close()
 
-            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. First 10 cases are listed below and all the 
+            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. The first 10 cases are listed below and all the 
                                         range violations are listed in a <a href=./ParameterReport.xml>separate xml table.</a></p>")
 
             ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable, 10))
@@ -1064,7 +1064,7 @@ Module HSPFOutputReports
                                         lead to hydrologic and water quality complexities that do not conform to the judgments that 
                                         are embedded in this module.  Furthermore, the set of aspects for which checks have been 
                                         included is not all-inclusive.</p>")
-        GeneralModelInfoText.AppendLine("<p>This module also assumes that first four water quality constituents simulated on the land are  
+        GeneralModelInfoText.AppendLine("<p>This module also assumes that the first four water quality constituents simulated on the land are  
                                         ammonia (NH3+NH4), nitrate as nitrogen (NO3), orthophosphorus as phosphorus (ORTHO P), and biochemical 
                                         oxygen demand (BOD) in the order that they are listed here with the QUALID as it is listed in the parenthesis.</p>")
         GeneralModelInfoText.AppendLine("<h2>How to use the QA/QC Report</h2>")
@@ -1181,7 +1181,7 @@ Module HSPFOutputReports
         'Then add outlet reaches
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
-            If lDownstreamReachID = 0 Then
+            If Not aUCI.OperationExists("RCHRES", lDownstreamReachID) Then
                 lOutletLocations.Add("R:" & lRCHRES.Id)
                 lLocationsToOutput.Add("R:" & lRCHRES.Id)
             End If
@@ -1294,19 +1294,19 @@ Module HSPFOutputReports
         Select Case aConstituentName
             Case "WAT"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on annual runoff from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
             Case "SED"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on sediment loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
             Case "TN"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total nitrogen loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
             Case "TP"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total phosphorus loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
             Case "BOD-Labile"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
         End Select
         OverAllComments.AppendLine("<p>The box-whisker plot shows the variation in average annual loading among the model segments within each land use category.  If there is only one
                                     model segment, there will be only a single tick at the average annual load for that land use.  If there are multiple model segments, the tick will be
