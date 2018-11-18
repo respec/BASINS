@@ -1528,6 +1528,7 @@ Module HSPFOutputReports
         Dim CheckTotalSedErosion As New Text.StringBuilder
         Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Dim TotalSedRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) 'Need to convert sediment erosion rate to lbs/ac
+
         Dim TotalGullyErosion As Double = 0
         Try
             TotalGullyErosion = aLandLoadingConstReport.Compute("AVG(SCRSD)", lSelectExpression)
@@ -1539,10 +1540,19 @@ Module HSPFOutputReports
         End If
 
         Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, "SED")
-        If TotalSedRunoff > LoadingRate(1) OrElse TotalSedRunoff < LoadingRate(0) Then
-            CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
-                                            LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
-        End If
+        'If TotalSedRunoff > LoadingRate(1) OrElse TotalSedRunoff < LoadingRate(0) Then
+        '    CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
+        '                                    LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+        'End If
+        Dim lMatchingRows() = aLandLoadingConstReport.Select(lSelectExpression)
+        For Each lDataRow In lMatchingRows
+            Dim lTotalRunoff As Double = lDataRow.ItemArray(5)
+            If lTotalRunoff > LoadingRate(1) OrElse lTotalRunoff < LoadingRate(0) Then
+                CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(lTotalRunoff, "0.00") & lUnits & "</b>" &
+                                                " for " & lDataRow.ItemArray(0) & "-" & lDataRow.ItemArray(1) & " is outside the typical limit of <b>" &
+                                                LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+            End If
+        Next
 
         Select Case aLanduse
             Case "Impervious"
@@ -1597,11 +1607,20 @@ Module HSPFOutputReports
         'If aConstituentName = "SED" Then lconversionfactor = 2000
         Dim TotalRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) * lconversionfactor 'Need to convert sediment erosion rate to lbs/ac
         Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, aConstituentName)
-        If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
-            CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
-                                                "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
-                Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
-        End If
+        'If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
+        '    CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
+        '                                        "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
+        '        Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
+        'End If
+        Dim lMatchingRows() = aLandLoadingConstReport.Select(lSelectExpression)
+        For Each lDataRow In lMatchingRows
+            Dim lTotalRunoff As Double = lDataRow.ItemArray(11)
+            If lTotalRunoff > LoadingRate(1) OrElse lTotalRunoff < LoadingRate(0) Then
+                CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(lTotalRunoff, "0.00") & lUnits & "</b>" &
+                                                " for " & lDataRow.ItemArray(0) & "-" & lDataRow.ItemArray(1) & " is outside the typical limit of <b>" &
+                                                LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+            End If
+        Next
 
         Return CheckNutrientLoadingText.ToString
     End Function
@@ -1724,10 +1743,10 @@ Module HSPFOutputReports
                         If lTSerAverage > 0 Then
                             lCoeffVariation = lTSerStdev / lTSerAverage
                         Else
-                            StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Average of output timeseries is 0")
+                            StorageTrend.AppendLine("<li>Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Average of output timeseries is 0" & "</li>")
                         End If
                     Catch
-                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Unable to compute timeseries Average and Standard Deviation")
+                        StorageTrend.AppendLine("<li>Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Unable to compute timeseries Average and Standard Deviation" & "</li>")
 
                         Continue For
                     End Try
@@ -1763,7 +1782,7 @@ Module HSPFOutputReports
         ElseIf lNumberOfTrendIssues > 0 Then
             OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.<sup>*</sup></p>")
             OverAllStorageTrend.Append(StorageTrend)
-            OverAllStorageTrend.AppendLine("<sup>*</sup><i>Based on fitted line through difference of values from mean over time</i>")
+            OverAllStorageTrend.AppendLine("<p><sup>*</sup><i>Based on fitted line through difference of values from mean over time</i></p>")
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
