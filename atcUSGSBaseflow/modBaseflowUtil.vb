@@ -14,6 +14,8 @@ Public Module modBaseflowUtil
 
     Private pConsoleDebug As Boolean = True
 
+    Private pTsMath As atcTimeseriesSource = Nothing
+
     Public Function DoBatch(ByVal txtSpecFile As String) As Boolean
         Dim pBatchConfig As New clsBatchBFSpec()
         If Not pBatchConfig.SpecFilename = txtSpecFile AndAlso IO.File.Exists(txtSpecFile) Then
@@ -3024,6 +3026,19 @@ Public Module modBaseflowUtil
             Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
             lTsGraphAll.AddRange(lTsGroupBf)
             If aGraphType.ToLower().Contains("timeseries") Then
+                If aGraphType.ToLower().StartsWith("log") Then
+                    Dim lArgsMath As New atcDataAttributes()
+                    lArgsMath.SetValue("mathopn", "Log 10")
+                    Dim logTsGroup As atcTimeseriesGroup = DoMath(lTsGraphAll, lArgsMath)
+                    If logTsGroup IsNot Nothing Then
+                        lTsGraphAll.Clear()
+                        lTsGraphAll.AddRange(logTsGroup)
+                        logTsGroup.Clear()
+                        logTsGroup = Nothing
+                    Else
+                        Exit Sub
+                    End If
+                End If
                 DisplayTsGraph(lTsGraphAll, lAttribs)
             ElseIf aGraphType.ToLower() = "duration" Then
                 Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
@@ -3042,6 +3057,9 @@ Public Module modBaseflowUtil
 
     Public Sub DisplayTsGraph(ByVal aDataGroup As atcTimeseriesGroup, Optional ByVal aSpecs As atcDataAttributes = Nothing)
         'Make sure graph can't find provisional attribute
+#If GISProvider = "DotSpatial" Then
+        'need all values
+#Else
         Dim lDataMin As Double = Double.MaxValue
         Dim lDataMax As Double = Double.MinValue
         For Each lTs As atcTimeseries In aDataGroup
@@ -3049,6 +3067,7 @@ Public Module modBaseflowUtil
             If lTs.Attributes.GetValue("Min") < lDataMin Then lDataMin = lTs.Attributes.GetValue("Min")
             If lTs.Attributes.GetValue("Max") > lDataMax Then lDataMax = lTs.Attributes.GetValue("Max")
         Next
+#End If
         Dim lGraphForm As New atcGraph.atcGraphForm()
         'lGraphForm.Icon = Me.Icon
         Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
@@ -3086,10 +3105,14 @@ Public Module modBaseflowUtil
                 lGraphForm.FreeResources()
             End If
         End If
+#If GISProvider = "DotSpatial" Then
+#Else
         'Restore provisional attribute after graphing
         For Each lTs As atcTimeseries In aDataGroup
             lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
         Next
+#End If
+
     End Sub
 
     Public Sub DisplayDurGraph(ByVal aDataGroup As atcTimeseriesGroup, ByVal aPerUnitArea As Boolean,
@@ -6552,5 +6575,34 @@ Public Module modBaseflowUtil
             If lTs Is Nothing Then lCtr += 1
         Next
         Return lCtr
+    End Function
+
+    Private Function DoMath(ByVal aDataGroup As atcTimeseriesGroup, ByVal aArgsMath As atcDataAttributes) As atcTimeseriesGroup
+        If aDataGroup Is Nothing OrElse aDataGroup.Count = 0 OrElse aArgsMath Is Nothing Then
+            Return Nothing
+        End If
+        Dim lTsGroupAfterMath As New atcTimeseriesGroup()
+        If pTsMath Is Nothing Then
+            pTsMath = New atcTimeseriesMath.atcTimeseriesMath()
+        Else
+            pTsMath.DataSets.Clear()
+        End If
+        Dim lArgsMath As New atcDataAttributes()
+        Dim lmathOpn As String = aArgsMath.GetValue("mathopn", "")
+        Dim lDataGroup As New atcTimeseriesGroup()
+        For Each lts As atcTimeseries In aDataGroup
+            lDataGroup.Add(lts)
+            lArgsMath.SetValue("timeseries", lDataGroup)
+            If Not String.IsNullOrEmpty(lmathOpn) Then
+                If pTsMath.Open(lmathOpn, lArgsMath) Then
+                    lTsGroupAfterMath.AddRange(pTsMath.DataSets)
+                Else
+                    ' do nothing
+                End If
+            End If
+            lArgsMath.Clear()
+            lDataGroup.Clear()
+        Next
+        Return lTsGroupAfterMath
     End Function
 End Module

@@ -226,6 +226,11 @@
       <Name>atcTimeseriesBaseflow-D4EM15</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-D4EM15.vbproj">
+      <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
+      <Name>atcTimeseriesMath-D4EM15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-D4EM15.vbproj">
       <Project>{82530A5B-FF39-4B9F-8A04-881468DFC662}</Project>
       <Name>atcTimeseriesRDB-D4EM15</Name>

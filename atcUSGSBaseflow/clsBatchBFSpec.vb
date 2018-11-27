@@ -593,7 +593,9 @@ Public Class clsBatchBFSpec
     ''' <param name="aPreserve">if work off the original Ts or off a clone</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, Optional ByVal aPreserve As Boolean = False) As atcTimeseries
+    Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation,
+                                              Optional ByVal aPreserve As Boolean = False,
+                                              Optional ByVal aNonProvisionalOnly As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
         If ListBatchUnitsData.Keys.Contains(aStation.StationID) Then
             lDataFilename = ListBatchUnitsData.ItemByKey(aStation.StationID)
@@ -667,17 +669,36 @@ Public Class clsBatchBFSpec
             End If
 
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
+                Dim lTsFlow As atcTimeseries = Nothing
                 If aPreserve Then
-                    Return lGroup(0)
+                    lTsFlow = lGroup(0)
+                    'Return lGroup(0)
                 Else
-                    Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
+                    lTsFlow = lGroup(0).Clone()
                     'aStation.DataSource.Clear()
                     'aStation.DataSource = Nothing
+                    'Return lTsFlow
+                End If
+                If aNonProvisionalOnly Then
+                    If HasProvisionalValues(lTsFlow) Then
+                        Dim lProvisionalTS As atcTimeseries = Nothing
+                        Dim lNonProvisionalTS As atcTimeseries = Nothing
+                        SplitProvisional(lTsFlow, lProvisionalTS, lNonProvisionalTS)
+                        If lNonProvisionalTS IsNot Nothing Then
+                            If lProvisionalTS IsNot Nothing Then
+                                lProvisionalTS.Clear()
+                                lProvisionalTS = Nothing
+                            End If
+                            Return lNonProvisionalTS
+                        End If
+                    Else
+                        Return lTsFlow
+                    End If
+                Else
                     Return lTsFlow
                 End If
             End If
         End If
-
         Return Nothing
     End Function
 
@@ -766,7 +787,12 @@ Public Class clsBatchBFSpec
                 'each station has its own directory
                 Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
                 MkDirPath(lStationOutDir)
+#If GISProvider = "DotSpatial" Then
+                'could set aPreserve and aNonProvisional to True
                 Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+#Else
+                Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+#End If
                 If lTsFlow IsNot Nothing Then
                     Try
                         Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
@@ -1099,7 +1125,7 @@ Public Class clsBatchBFSpec
                                     lArr = lGraphs.Split(",")
                                     For Each lGraphType As String In lArr
                                         Select Case lGraphType.ToLower()
-                                            Case "timeseries", "duration"
+                                            Case "logtimeseries", "timeseries", "duration"
                                                 DoBFGraphTimeseriesGWWatch(lGraphType, lTsFlowFullRange, lBFReportGroups)
                                         End Select
                                     Next
