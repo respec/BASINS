@@ -287,13 +287,13 @@ Module HSPFOutputReports
                         For Each lLocation As String In pOutputLocations
                             lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lLocation))
                             Dim lLocationID As Integer = lLocation.Substring(2)
-                            'Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
-                            'For Each lSource As HspfConnection In lRCHRESOperation.Sources
-                            '    If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
-                            '        Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ": " & lSource.Source.VolId
-                            '        'lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
-                            '    End If
-                            'Next
+                            Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
+                            For Each lSource As HspfConnection In lRCHRESOperation.Sources
+                                If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
+                                    Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
+                                    lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
+                                End If
+                            Next
                             WASPInputFile(aHspfUci, lWASPDataSource, pSDateJ, pEDateJ, lLocationID, pTestPath)
                         Next
                     End If
