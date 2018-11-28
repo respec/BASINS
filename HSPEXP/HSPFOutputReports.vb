@@ -1714,14 +1714,15 @@ Module HSPFOutputReports
             End Select
             Logger.Status("Creating the QAQC Storage Trend Report for " & aConstituent & " in " & lLocationName)
 
+            Dim StorageVariableNoOp As String = ""
             For Each StorageVariable As String In lListOfStorageVariables
                 If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
-                StorageVariable = StorageVariable.Split(":")(1)
+                StorageVariableNoOp = StorageVariable.Split(":")(1)
                 Logger.Dbg("Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
                 Dim lSlope As Double = 0
                 Dim lIntercept As Double = 0
                 Dim lRCoeff As Double = 0
-                Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
+                Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariableNoOp)(0)
                 If Not lStorageTimeSeries Is Nothing Then 'binary output found
                     If lStorageVarCount.Keys.Contains(StorageVariable) Then
                         lStorageVarCount.ItemByKey(StorageVariable) += 1
@@ -1765,10 +1766,10 @@ Module HSPFOutputReports
                         Dim lY2 As Double = ((lSlope * lTempTimeSeries.Value(lTempTimeSeries.numValues - 1)) + lIntercept) * lTSerStdev + lTSerAverage
                         Dim lPercentChange As Double = 100 * ((lY2 - lY) / lY)
                         If lSlope > 0.002 AndAlso lPercentChange > 20 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
+                            StorageTrend.AppendLine("<li>The " & StorageVariableNoOp & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
                         ElseIf lSlope < -0.002 AndAlso lPercentChange < -20 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
+                            StorageTrend.AppendLine("<li>The " & StorageVariableNoOp & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
                         End If
                     End If
@@ -1788,8 +1789,9 @@ Module HSPFOutputReports
         End If
         OverAllStorageTrend.AppendLine("<p>The following model elements were reviewed (count of datasets in parentheses):<ul>")
         For Each StorageVariable As String In lListOfStorageVariables
-            StorageVariable = StorageVariable.Split(":")(1)
-            OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+            If lStorageVarCount.ItemByKey(StorageVariable) IsNot Nothing Then
+                OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+            End If
         Next
         OverAllStorageTrend.AppendLine("</ul>")
 
