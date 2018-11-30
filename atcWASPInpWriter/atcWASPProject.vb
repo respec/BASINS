@@ -7,7 +7,7 @@ Public Class atcWASPProject
     Public Segments As atcWASPSegments
     Public SDate As Date = Date.MinValue
     Public EDate As Date = Date.MaxValue
-    Public ModelType As Integer = 2
+    Public ModelType As Integer = 11 '2
     Public Version As Integer = 2
     Public Name As String = ""
     Public INPFileName As String = ""

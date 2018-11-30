@@ -17,34 +17,63 @@ Module WASP
         Dim lWaspProject As New atcWASPProject
         Dim lOutputFolder As String = System.IO.Path.Combine(aOutputfolder, "WASP")
         FileIO.FileSystem.CreateDirectory(lOutputFolder)
-        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP_R" & aReachId.ToString & ".inp")
+        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP8_R" & aReachId.ToString & ".inp")
         lWaspProject.SDate = Date.FromOADate(aSDateJ)
         lWaspProject.EDate = Date.FromOADate(aEDateJ)
 
         'assuming eutrophication model
         lWaspProject.WASPConstituents = New Generic.List(Of clsWASPConstituent)
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Nitrogen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Orthophosphate (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Phosphorus (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton Chla (ug/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 1 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 2 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 3 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Solids (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Nitrogen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Orthophosphate (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Phosphorus (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton Chla (ug/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 1 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 2 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 3 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Solids (mg/L)", "", ""))
+        'need to use the list below for wasp 8 advanced eutrophication
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Phosphate", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Phosphorus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD1(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD2(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD3(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Total Detritus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity(PSU) Or TDS (mg/L)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Benthic Algae", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Periphyton Cell Quota Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Periphyton Cell Quota Phosphorous", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 1", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 2", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 3", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 1", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 2", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent(" Phytoplankton 3", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Total Inorganic C", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Alkalinity", "", ""))
 
         'if model type is heat
         'lWaspProject.WASPConstituents = New Generic.List(Of clsWASPConstituent)
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Temperature (°C)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Bacteria (#/100 ml)", "", ""))
-        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Silts and Fines (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Silts And Fines (mg/L)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Sands (mg/L)", "", ""))
 
         'need segments -- will make some assumptions here 
@@ -372,31 +401,48 @@ Module WASP
         'Dissolved Organic Phosphorus   P-TOTORG-IN (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
 
-        'Phytoplankton Chla             PHYTO-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5, aSDateJ, aEDateJ)
+        'Inorganic Silica
+        'Diss Organic Silica
 
         'CBOD 1(Ultimate)               BODIN (lbs) 
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 7, aSDateJ, aEDateJ)
 
         'CBOD 2(Ultimate)               *** 
         'CBOD 3(Ultimate)               *** 
 
         'Dissolved Oxygen               DOXIN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 10, aSDateJ, aEDateJ)
 
         'Detrital Carbon                C-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
 
         'Detrital Nitrogen              N-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
 
         'Detrital Phosphorus            P-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 13, aSDateJ, aEDateJ)
 
+        'Detrital Silica
+        'Total Detritus
         'Salinity                       ***
+        'Benthic Algae
+        'Periphyton Cell Quota Nitrogen
+        'Periphyton Cell Quota Phosphorous
 
         'Solids                         ISED-TOT (tons)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14, aSDateJ, aEDateJ)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 20, aSDateJ, aEDateJ)
+
+        'Inorganic Solids 2
+        'Inorganic Solids 3
+
+        'Phytoplankton Chla             PHYTO-IN (lbs)  
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 23, aSDateJ, aEDateJ)
+
+        'Phytoplankton 2
+        'Phytoplankton 3
+
+        'Total Inorganic C
+        'Alkalinity
 
         ''if using heat model
         ''Temperature (°C)     
