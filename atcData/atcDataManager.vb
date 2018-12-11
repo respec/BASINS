@@ -141,7 +141,7 @@ Public Class atcDataManager
     Private Shared pDisplayAttributes As Generic.List(Of String)
     Private Shared pDefaultSelectionAttributes() As String = {"Scenario", "Location", "Constituent"}
     Private Shared pDefaultSelectionAttributesGW() As String = {"StaNam", "Location", "Constituent", "Description"}
-    Private Shared pDefaultDisplayAttributes() As String = {"History 1", "Constituent", "Id", "Min", "Max", "Mean"}
+    Private Shared pDefaultDisplayAttributes() As String = {"History 1", "Scenario", "Location", "Constituent", "Id", "Min", "Max", "Mean"}
 
     Private Shared pLikelyShapeLocationFieldNames() As String = { _
         "ACC_ID", "COOP_ID", "COVNAME", "CU", "ECOREG_ID", "EPA_REG_ID", _
@@ -155,7 +155,9 @@ Public Class atcDataManager
     Shared Event ClosedData(ByVal aDataSource As atcTimeseriesSource)
 
     ''' <summary>Create a new instance of atcDataManager</summary>
-    Private Sub New()
+    Public Sub New()
+        Debug.Print("New atcDataManager created")
+        Me.Clear()
     End Sub
 
     ''' <summary>Sets data manager to its initial state.

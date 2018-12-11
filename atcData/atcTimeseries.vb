@@ -15,6 +15,10 @@ Public Class atcTimeseries
     Private Const pEpsilon As Double = 0.000000001
     Private Shared pNaN As Double = atcUtility.GetNaN
 
+    Public Sub New()
+        MyBase.New()
+    End Sub
+
     ''' <summary>
     ''' adds each value in two timseries
     ''' </summary>
