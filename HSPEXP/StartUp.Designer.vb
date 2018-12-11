@@ -29,9 +29,7 @@ Partial Class StartUp
         Me.Label1 = New System.Windows.Forms.Label()
         Me.lblRCH = New System.Windows.Forms.Label()
         Me.txtRCH = New System.Windows.Forms.TextBox()
-        Me.lblOutReach2 = New System.Windows.Forms.Label()
         Me.cmdEnd = New System.Windows.Forms.Button()
-        Me.chkAreaReports = New System.Windows.Forms.CheckBox()
         Me.chkRunHSPF = New System.Windows.Forms.CheckBox()
         Me.pnlHighlight = New System.Windows.Forms.Panel()
         Me.chkAdditionalgraphs = New System.Windows.Forms.CheckBox()
@@ -47,24 +45,29 @@ Partial Class StartUp
         Me.ttHSPEXP = New System.Windows.Forms.ToolTip(Me.components)
         Me.chkExpertStats = New System.Windows.Forms.CheckBox()
         Me.chkMultiSim = New System.Windows.Forms.CheckBox()
-        Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
-        Me.chkSedimentBalance = New System.Windows.Forms.CheckBox()
-        Me.chkWaterBalance = New System.Windows.Forms.CheckBox()
-        Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox()
-        Me.chkBODBalance = New System.Windows.Forms.CheckBox()
-        Me.chkGQUAL1 = New System.Windows.Forms.CheckBox()
-        Me.chkDO = New System.Windows.Forms.CheckBox()
-        Me.chkHeat = New System.Windows.Forms.CheckBox()
-        Me.chkGQUAL2 = New System.Windows.Forms.CheckBox()
-        Me.chkGQUAL3 = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.chkGQUAL4 = New System.Windows.Forms.CheckBox()
-        Me.chkGQUAL5 = New System.Windows.Forms.CheckBox()
-        Me.chkGQUAL6 = New System.Windows.Forms.CheckBox()
         Me.chkGQUAL7 = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL6 = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL5 = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL4 = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL3 = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL2 = New System.Windows.Forms.CheckBox()
+        Me.chkHeat = New System.Windows.Forms.CheckBox()
+        Me.chkDO = New System.Windows.Forms.CheckBox()
+        Me.chkGQUAL1 = New System.Windows.Forms.CheckBox()
+        Me.chkBODBalance = New System.Windows.Forms.CheckBox()
+        Me.chkTotalPhosphorus = New System.Windows.Forms.CheckBox()
+        Me.chkWaterBalance = New System.Windows.Forms.CheckBox()
+        Me.chkSedimentBalance = New System.Windows.Forms.CheckBox()
+        Me.chkTotalNitrogen = New System.Windows.Forms.CheckBox()
+        Me.chkModelQAQC = New System.Windows.Forms.CheckBox()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.chkWASP = New System.Windows.Forms.CheckBox()
+        Me.chkBathtub = New System.Windows.Forms.CheckBox()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdStart
@@ -72,7 +75,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(326, 594)
+        Me.cmdStart.Location = New System.Drawing.Point(307, 598)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 20
@@ -82,8 +85,8 @@ Partial Class StartUp
         'cmdBrowse
         '
         Me.cmdBrowse.AllowDrop = True
-        Me.cmdBrowse.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdBrowse.Location = New System.Drawing.Point(401, 52)
+        Me.cmdBrowse.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.cmdBrowse.Location = New System.Drawing.Point(344, 52)
         Me.cmdBrowse.Name = "cmdBrowse"
         Me.cmdBrowse.Size = New System.Drawing.Size(75, 23)
         Me.cmdBrowse.TabIndex = 2
@@ -103,70 +106,46 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Enabled = False
-        Me.lblRCH.Location = New System.Drawing.Point(20, 537)
+        Me.lblRCH.Location = New System.Drawing.Point(85, 561)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblRCH.Name = "lblRCH"
-        Me.lblRCH.Size = New System.Drawing.Size(391, 13)
+        Me.lblRCH.Size = New System.Drawing.Size(295, 13)
         Me.lblRCH.TabIndex = 7
-        Me.lblRCH.Text = "Number(s) of the outlet reach at which you would like constituent balance reports" &
-    "."
+        Me.lblRCH.Text = "Reaches for Constituent Report and Receiving Water Model."
+        Me.ttHSPEXP.SetToolTip(Me.lblRCH, "Multiple RCHRES can be entered separated by comma.")
         '
         'txtRCH
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
         Me.txtRCH.Enabled = False
-        Me.txtRCH.Location = New System.Drawing.Point(25, 561)
+        Me.txtRCH.Location = New System.Drawing.Point(27, 558)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 19
         Me.ttHSPEXP.SetToolTip(Me.txtRCH, "Enter the location at which you want to generate constituent balance and load all" &
         "ocation reports.")
         '
-        'lblOutReach2
-        '
-        Me.lblOutReach2.AutoSize = True
-        Me.lblOutReach2.Enabled = False
-        Me.lblOutReach2.Location = New System.Drawing.Point(83, 564)
-        Me.lblOutReach2.MaximumSize = New System.Drawing.Size(400, 0)
-        Me.lblOutReach2.Name = "lblOutReach2"
-        Me.lblOutReach2.Size = New System.Drawing.Size(359, 13)
-        Me.lblOutReach2.TabIndex = 18
-        Me.lblOutReach2.Text = "NOTE: You can enter multiple reaches, separated by a comma - e.g.: 5, 10"
-        '
         'cmdEnd
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(407, 594)
+        Me.cmdEnd.Location = New System.Drawing.Point(388, 598)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 21
-        Me.cmdEnd.Text = "End"
+        Me.cmdEnd.Text = "Close"
         Me.cmdEnd.UseVisualStyleBackColor = True
-        '
-        'chkAreaReports
-        '
-        Me.chkAreaReports.AutoSize = True
-        Me.chkAreaReports.Enabled = False
-        Me.chkAreaReports.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkAreaReports.Location = New System.Drawing.Point(22, 104)
-        Me.chkAreaReports.Name = "chkAreaReports"
-        Me.chkAreaReports.Size = New System.Drawing.Size(143, 17)
-        Me.chkAreaReports.TabIndex = 4
-        Me.chkAreaReports.Text = "Watershed Area Reports"
-        Me.ttHSPEXP.SetToolTip(Me.chkAreaReports, "Compute reports of watershed area based on the SCHEMATIC BLOCK.")
-        Me.chkAreaReports.UseVisualStyleBackColor = True
         '
         'chkRunHSPF
         '
         Me.chkRunHSPF.AutoSize = True
         Me.chkRunHSPF.Enabled = False
         Me.chkRunHSPF.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.chkRunHSPF.Location = New System.Drawing.Point(22, 81)
+        Me.chkRunHSPF.Location = New System.Drawing.Point(36, 94)
         Me.chkRunHSPF.Name = "chkRunHSPF"
-        Me.chkRunHSPF.Size = New System.Drawing.Size(77, 17)
+        Me.chkRunHSPF.Size = New System.Drawing.Size(78, 17)
         Me.chkRunHSPF.TabIndex = 3
-        Me.chkRunHSPF.Text = "Run HSPF"
+        Me.chkRunHSPF.Text = "Run Model"
         Me.ttHSPEXP.SetToolTip(Me.chkRunHSPF, "Makes HSPF Simulation Run.")
         Me.chkRunHSPF.UseVisualStyleBackColor = True
         '
@@ -174,7 +153,7 @@ Partial Class StartUp
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
         Me.pnlHighlight.Enabled = False
-        Me.pnlHighlight.Location = New System.Drawing.Point(19, 557)
+        Me.pnlHighlight.Location = New System.Drawing.Point(21, 554)
         Me.pnlHighlight.Name = "pnlHighlight"
         Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
         Me.pnlHighlight.TabIndex = 17
@@ -183,19 +162,20 @@ Partial Class StartUp
         '
         Me.chkAdditionalgraphs.AutoSize = True
         Me.chkAdditionalgraphs.Enabled = False
-        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(3, 19)
+        Me.chkAdditionalgraphs.Location = New System.Drawing.Point(18, 29)
         Me.chkAdditionalgraphs.Name = "chkAdditionalgraphs"
-        Me.chkAdditionalgraphs.Size = New System.Drawing.Size(286, 17)
+        Me.chkAdditionalgraphs.Size = New System.Drawing.Size(171, 17)
         Me.chkAdditionalgraphs.TabIndex = 9
-        Me.chkAdditionalgraphs.Text = "Graphs from Graph Specification Files (*.csv and *.json)"
-        Me.ttHSPEXP.SetToolTip(Me.chkAdditionalgraphs, "This option requires one or more correctly formatted graph specification file (*." &
-        "csv) in the project folder.")
+        Me.chkAdditionalgraphs.Text = "Graphs from Specification Files"
+        Me.ttHSPEXP.SetToolTip(Me.chkAdditionalgraphs, "This option requires one or more correctly formatted graph specification file in " &
+        "comma delimited format" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " (*.csv) and/or JSON (*.json) fromat in the project fold" &
+        "er.")
         Me.chkAdditionalgraphs.UseVisualStyleBackColor = True
         '
         'btn_help
         '
-        Me.btn_help.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btn_help.Location = New System.Drawing.Point(401, 19)
+        Me.btn_help.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btn_help.Location = New System.Drawing.Point(20, 598)
         Me.btn_help.Name = "btn_help"
         Me.btn_help.Size = New System.Drawing.Size(75, 23)
         Me.btn_help.TabIndex = 0
@@ -210,9 +190,9 @@ Partial Class StartUp
         Me.cmbUCIPath.DropDownStyle = System.Windows.Forms.ComboBoxStyle.Simple
         Me.cmbUCIPath.FormattingEnabled = True
         Me.cmbUCIPath.IntegralHeight = False
-        Me.cmbUCIPath.Location = New System.Drawing.Point(22, 54)
+        Me.cmbUCIPath.Location = New System.Drawing.Point(36, 54)
         Me.cmbUCIPath.Name = "cmbUCIPath"
-        Me.cmbUCIPath.Size = New System.Drawing.Size(311, 21)
+        Me.cmbUCIPath.Size = New System.Drawing.Size(286, 21)
         Me.cmbUCIPath.TabIndex = 1
         Me.cmbUCIPath.ValueMember = """STYLE"""
         '
@@ -220,7 +200,7 @@ Partial Class StartUp
         '
         Me.DateTimePicker1.Enabled = False
         Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DateTimePicker1.Location = New System.Drawing.Point(51, 19)
+        Me.DateTimePicker1.Location = New System.Drawing.Point(79, 25)
         Me.DateTimePicker1.MaxDate = New Date(2200, 12, 31, 0, 0, 0, 0)
         Me.DateTimePicker1.MinDate = New Date(1800, 1, 1, 0, 0, 0, 0)
         Me.DateTimePicker1.Name = "DateTimePicker1"
@@ -233,7 +213,7 @@ Partial Class StartUp
         '
         Me.DateTimePicker2.Enabled = False
         Me.DateTimePicker2.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DateTimePicker2.Location = New System.Drawing.Point(204, 19)
+        Me.DateTimePicker2.Location = New System.Drawing.Point(287, 22)
         Me.DateTimePicker2.Name = "DateTimePicker2"
         Me.DateTimePicker2.Size = New System.Drawing.Size(96, 20)
         Me.DateTimePicker2.TabIndex = 6
@@ -246,9 +226,9 @@ Partial Class StartUp
         Me.GroupBox3.Controls.Add(Me.Label2)
         Me.GroupBox3.Controls.Add(Me.DateTimePicker1)
         Me.GroupBox3.Controls.Add(Me.DateTimePicker2)
-        Me.GroupBox3.Location = New System.Drawing.Point(18, 132)
+        Me.GroupBox3.Location = New System.Drawing.Point(18, 122)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(442, 51)
+        Me.GroupBox3.Size = New System.Drawing.Size(418, 51)
         Me.GroupBox3.TabIndex = 47
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Analysis Period"
@@ -256,7 +236,7 @@ Partial Class StartUp
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(161, 23)
+        Me.Label3.Location = New System.Drawing.Point(255, 25)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(26, 13)
         Me.Label3.TabIndex = 48
@@ -265,7 +245,7 @@ Partial Class StartUp
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(15, 23)
+        Me.Label2.Location = New System.Drawing.Point(44, 28)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(29, 13)
         Me.Label2.TabIndex = 47
@@ -275,9 +255,9 @@ Partial Class StartUp
         '
         Me.Plotting.Controls.Add(Me.chkReganGraphs)
         Me.Plotting.Controls.Add(Me.chkAdditionalgraphs)
-        Me.Plotting.Location = New System.Drawing.Point(21, 265)
+        Me.Plotting.Location = New System.Drawing.Point(18, 222)
         Me.Plotting.Name = "Plotting"
-        Me.Plotting.Size = New System.Drawing.Size(438, 69)
+        Me.Plotting.Size = New System.Drawing.Size(418, 64)
         Me.Plotting.TabIndex = 48
         Me.Plotting.TabStop = False
         Me.Plotting.Text = "Graph"
@@ -285,7 +265,8 @@ Partial Class StartUp
         'chkReganGraphs
         '
         Me.chkReganGraphs.AutoSize = True
-        Me.chkReganGraphs.Location = New System.Drawing.Point(3, 42)
+        Me.chkReganGraphs.Enabled = False
+        Me.chkReganGraphs.Location = New System.Drawing.Point(258, 29)
         Me.chkReganGraphs.Name = "chkReganGraphs"
         Me.chkReganGraphs.Size = New System.Drawing.Size(84, 17)
         Me.chkReganGraphs.TabIndex = 10
@@ -298,7 +279,7 @@ Partial Class StartUp
         '
         Me.chkExpertStats.AutoSize = True
         Me.chkExpertStats.Enabled = False
-        Me.chkExpertStats.Location = New System.Drawing.Point(24, 232)
+        Me.chkExpertStats.Location = New System.Drawing.Point(36, 191)
         Me.chkExpertStats.Name = "chkExpertStats"
         Me.chkExpertStats.Size = New System.Drawing.Size(228, 17)
         Me.chkExpertStats.TabIndex = 8
@@ -310,7 +291,8 @@ Partial Class StartUp
         'chkMultiSim
         '
         Me.chkMultiSim.AutoSize = True
-        Me.chkMultiSim.Location = New System.Drawing.Point(24, 200)
+        Me.chkMultiSim.Enabled = False
+        Me.chkMultiSim.Location = New System.Drawing.Point(276, 94)
         Me.chkMultiSim.Name = "chkMultiSim"
         Me.chkMultiSim.Size = New System.Drawing.Size(144, 17)
         Me.chkMultiSim.TabIndex = 7
@@ -318,111 +300,6 @@ Partial Class StartUp
         Me.ttHSPEXP.SetToolTip(Me.chkMultiSim, "This option requires a specificion file for multiple simulations. If not availabl" &
         "e, a default specification file will be generated,")
         Me.chkMultiSim.UseVisualStyleBackColor = True
-        '
-        'chkTotalNitrogen
-        '
-        Me.chkTotalNitrogen.AutoSize = True
-        Me.chkTotalNitrogen.Enabled = False
-        Me.chkTotalNitrogen.Location = New System.Drawing.Point(6, 65)
-        Me.chkTotalNitrogen.Name = "chkTotalNitrogen"
-        Me.chkTotalNitrogen.Size = New System.Drawing.Size(93, 17)
-        Me.chkTotalNitrogen.TabIndex = 13
-        Me.chkTotalNitrogen.Text = "Total Nitrogen"
-        Me.chkTotalNitrogen.UseVisualStyleBackColor = True
-        '
-        'chkSedimentBalance
-        '
-        Me.chkSedimentBalance.AutoSize = True
-        Me.chkSedimentBalance.Enabled = False
-        Me.chkSedimentBalance.Location = New System.Drawing.Point(6, 42)
-        Me.chkSedimentBalance.Name = "chkSedimentBalance"
-        Me.chkSedimentBalance.Size = New System.Drawing.Size(70, 17)
-        Me.chkSedimentBalance.TabIndex = 12
-        Me.chkSedimentBalance.Text = "Sediment"
-        Me.chkSedimentBalance.UseVisualStyleBackColor = True
-        '
-        'chkWaterBalance
-        '
-        Me.chkWaterBalance.AutoSize = True
-        Me.chkWaterBalance.Enabled = False
-        Me.chkWaterBalance.Location = New System.Drawing.Point(6, 19)
-        Me.chkWaterBalance.Name = "chkWaterBalance"
-        Me.chkWaterBalance.Size = New System.Drawing.Size(55, 17)
-        Me.chkWaterBalance.TabIndex = 11
-        Me.chkWaterBalance.Text = "Water"
-        Me.chkWaterBalance.UseVisualStyleBackColor = True
-        '
-        'chkTotalPhosphorus
-        '
-        Me.chkTotalPhosphorus.AutoSize = True
-        Me.chkTotalPhosphorus.Enabled = False
-        Me.chkTotalPhosphorus.Location = New System.Drawing.Point(6, 88)
-        Me.chkTotalPhosphorus.Name = "chkTotalPhosphorus"
-        Me.chkTotalPhosphorus.Size = New System.Drawing.Size(109, 17)
-        Me.chkTotalPhosphorus.TabIndex = 14
-        Me.chkTotalPhosphorus.Text = "Total Phosphorus"
-        Me.chkTotalPhosphorus.UseVisualStyleBackColor = True
-        '
-        'chkBODBalance
-        '
-        Me.chkBODBalance.AutoSize = True
-        Me.chkBODBalance.Enabled = False
-        Me.chkBODBalance.Location = New System.Drawing.Point(6, 111)
-        Me.chkBODBalance.Name = "chkBODBalance"
-        Me.chkBODBalance.Size = New System.Drawing.Size(80, 17)
-        Me.chkBODBalance.TabIndex = 15
-        Me.chkBODBalance.Text = "BOD-Labile"
-        Me.chkBODBalance.UseVisualStyleBackColor = True
-        '
-        'chkGQUAL1
-        '
-        Me.chkGQUAL1.AutoSize = True
-        Me.chkGQUAL1.Location = New System.Drawing.Point(246, 19)
-        Me.chkGQUAL1.Name = "chkGQUAL1"
-        Me.chkGQUAL1.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL1.TabIndex = 18
-        Me.chkGQUAL1.Text = "GQUAL1"
-        Me.chkGQUAL1.UseVisualStyleBackColor = True
-        '
-        'chkDO
-        '
-        Me.chkDO.AutoSize = True
-        Me.chkDO.Location = New System.Drawing.Point(6, 134)
-        Me.chkDO.Name = "chkDO"
-        Me.chkDO.Size = New System.Drawing.Size(111, 17)
-        Me.chkDO.TabIndex = 16
-        Me.chkDO.Text = "Dissolved Oxygen"
-        Me.chkDO.UseVisualStyleBackColor = True
-        '
-        'chkHeat
-        '
-        Me.chkHeat.AutoSize = True
-        Me.chkHeat.Location = New System.Drawing.Point(6, 155)
-        Me.chkHeat.Name = "chkHeat"
-        Me.chkHeat.Size = New System.Drawing.Size(49, 17)
-        Me.chkHeat.TabIndex = 17
-        Me.chkHeat.Text = "Heat"
-        Me.chkHeat.UseVisualStyleBackColor = True
-        '
-        'chkGQUAL2
-        '
-        Me.chkGQUAL2.AutoSize = True
-        Me.chkGQUAL2.Location = New System.Drawing.Point(246, 42)
-        Me.chkGQUAL2.Name = "chkGQUAL2"
-        Me.chkGQUAL2.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL2.TabIndex = 19
-        Me.chkGQUAL2.Text = "GQUAL2"
-        Me.chkGQUAL2.UseVisualStyleBackColor = True
-        '
-        'chkGQUAL3
-        '
-        Me.chkGQUAL3.AutoSize = True
-        Me.chkGQUAL3.Location = New System.Drawing.Point(246, 65)
-        Me.chkGQUAL3.Name = "chkGQUAL3"
-        Me.chkGQUAL3.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL3.TabIndex = 20
-        Me.chkGQUAL3.Text = "GQUAL3"
-        Me.chkGQUAL3.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -440,54 +317,222 @@ Partial Class StartUp
         Me.GroupBox2.Controls.Add(Me.chkWaterBalance)
         Me.GroupBox2.Controls.Add(Me.chkSedimentBalance)
         Me.GroupBox2.Controls.Add(Me.chkTotalNitrogen)
-        Me.GroupBox2.Location = New System.Drawing.Point(18, 343)
+        Me.GroupBox2.Location = New System.Drawing.Point(18, 302)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(442, 179)
+        Me.GroupBox2.Size = New System.Drawing.Size(418, 181)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Constituent Balance Reports"
         Me.ttHSPEXP.SetToolTip(Me.GroupBox2, "This following reports require binary output to be at a monthly or shorter interv" &
         "al.")
         '
-        'chkGQUAL4
-        '
-        Me.chkGQUAL4.AutoSize = True
-        Me.chkGQUAL4.Location = New System.Drawing.Point(246, 88)
-        Me.chkGQUAL4.Name = "chkGQUAL4"
-        Me.chkGQUAL4.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL4.TabIndex = 21
-        Me.chkGQUAL4.Text = "GQUAL4"
-        Me.chkGQUAL4.UseVisualStyleBackColor = True
-        '
-        'chkGQUAL5
-        '
-        Me.chkGQUAL5.AutoSize = True
-        Me.chkGQUAL5.Location = New System.Drawing.Point(246, 111)
-        Me.chkGQUAL5.Name = "chkGQUAL5"
-        Me.chkGQUAL5.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL5.TabIndex = 22
-        Me.chkGQUAL5.Text = "GQUAL5"
-        Me.chkGQUAL5.UseVisualStyleBackColor = True
-        '
-        'chkGQUAL6
-        '
-        Me.chkGQUAL6.AutoSize = True
-        Me.chkGQUAL6.Location = New System.Drawing.Point(246, 134)
-        Me.chkGQUAL6.Name = "chkGQUAL6"
-        Me.chkGQUAL6.Size = New System.Drawing.Size(69, 17)
-        Me.chkGQUAL6.TabIndex = 23
-        Me.chkGQUAL6.Text = "GQUAL6"
-        Me.chkGQUAL6.UseVisualStyleBackColor = True
-        '
         'chkGQUAL7
         '
         Me.chkGQUAL7.AutoSize = True
-        Me.chkGQUAL7.Location = New System.Drawing.Point(246, 155)
+        Me.chkGQUAL7.Enabled = False
+        Me.chkGQUAL7.Location = New System.Drawing.Point(258, 154)
         Me.chkGQUAL7.Name = "chkGQUAL7"
         Me.chkGQUAL7.Size = New System.Drawing.Size(69, 17)
         Me.chkGQUAL7.TabIndex = 24
         Me.chkGQUAL7.Text = "GQUAL7"
         Me.chkGQUAL7.UseVisualStyleBackColor = True
+        Me.chkGQUAL7.Visible = False
+        '
+        'chkGQUAL6
+        '
+        Me.chkGQUAL6.AutoSize = True
+        Me.chkGQUAL6.Enabled = False
+        Me.chkGQUAL6.Location = New System.Drawing.Point(258, 131)
+        Me.chkGQUAL6.Name = "chkGQUAL6"
+        Me.chkGQUAL6.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL6.TabIndex = 23
+        Me.chkGQUAL6.Text = "GQUAL6"
+        Me.chkGQUAL6.UseVisualStyleBackColor = True
+        Me.chkGQUAL6.Visible = False
+        '
+        'chkGQUAL5
+        '
+        Me.chkGQUAL5.AutoSize = True
+        Me.chkGQUAL5.Enabled = False
+        Me.chkGQUAL5.Location = New System.Drawing.Point(258, 110)
+        Me.chkGQUAL5.Name = "chkGQUAL5"
+        Me.chkGQUAL5.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL5.TabIndex = 22
+        Me.chkGQUAL5.Text = "GQUAL5"
+        Me.chkGQUAL5.UseVisualStyleBackColor = True
+        Me.chkGQUAL5.Visible = False
+        '
+        'chkGQUAL4
+        '
+        Me.chkGQUAL4.AutoSize = True
+        Me.chkGQUAL4.Enabled = False
+        Me.chkGQUAL4.Location = New System.Drawing.Point(258, 87)
+        Me.chkGQUAL4.Name = "chkGQUAL4"
+        Me.chkGQUAL4.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL4.TabIndex = 21
+        Me.chkGQUAL4.Text = "GQUAL4"
+        Me.chkGQUAL4.UseVisualStyleBackColor = True
+        Me.chkGQUAL4.Visible = False
+        '
+        'chkGQUAL3
+        '
+        Me.chkGQUAL3.AutoSize = True
+        Me.chkGQUAL3.Enabled = False
+        Me.chkGQUAL3.Location = New System.Drawing.Point(258, 64)
+        Me.chkGQUAL3.Name = "chkGQUAL3"
+        Me.chkGQUAL3.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL3.TabIndex = 20
+        Me.chkGQUAL3.Text = "GQUAL3"
+        Me.chkGQUAL3.UseVisualStyleBackColor = True
+        Me.chkGQUAL3.Visible = False
+        '
+        'chkGQUAL2
+        '
+        Me.chkGQUAL2.AutoSize = True
+        Me.chkGQUAL2.Enabled = False
+        Me.chkGQUAL2.Location = New System.Drawing.Point(258, 41)
+        Me.chkGQUAL2.Name = "chkGQUAL2"
+        Me.chkGQUAL2.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL2.TabIndex = 19
+        Me.chkGQUAL2.Text = "GQUAL2"
+        Me.chkGQUAL2.UseVisualStyleBackColor = True
+        Me.chkGQUAL2.Visible = False
+        '
+        'chkHeat
+        '
+        Me.chkHeat.AutoSize = True
+        Me.chkHeat.Enabled = False
+        Me.chkHeat.Location = New System.Drawing.Point(18, 154)
+        Me.chkHeat.Name = "chkHeat"
+        Me.chkHeat.Size = New System.Drawing.Size(49, 17)
+        Me.chkHeat.TabIndex = 17
+        Me.chkHeat.Text = "Heat"
+        Me.chkHeat.UseVisualStyleBackColor = True
+        '
+        'chkDO
+        '
+        Me.chkDO.AutoSize = True
+        Me.chkDO.Enabled = False
+        Me.chkDO.Location = New System.Drawing.Point(18, 133)
+        Me.chkDO.Name = "chkDO"
+        Me.chkDO.Size = New System.Drawing.Size(111, 17)
+        Me.chkDO.TabIndex = 16
+        Me.chkDO.Text = "Dissolved Oxygen"
+        Me.chkDO.UseVisualStyleBackColor = True
+        '
+        'chkGQUAL1
+        '
+        Me.chkGQUAL1.AutoSize = True
+        Me.chkGQUAL1.Enabled = False
+        Me.chkGQUAL1.Location = New System.Drawing.Point(258, 19)
+        Me.chkGQUAL1.Name = "chkGQUAL1"
+        Me.chkGQUAL1.Size = New System.Drawing.Size(69, 17)
+        Me.chkGQUAL1.TabIndex = 18
+        Me.chkGQUAL1.Text = "GQUAL1"
+        Me.chkGQUAL1.UseVisualStyleBackColor = True
+        Me.chkGQUAL1.Visible = False
+        '
+        'chkBODBalance
+        '
+        Me.chkBODBalance.AutoSize = True
+        Me.chkBODBalance.Enabled = False
+        Me.chkBODBalance.Location = New System.Drawing.Point(18, 110)
+        Me.chkBODBalance.Name = "chkBODBalance"
+        Me.chkBODBalance.Size = New System.Drawing.Size(80, 17)
+        Me.chkBODBalance.TabIndex = 15
+        Me.chkBODBalance.Text = "BOD-Labile"
+        Me.chkBODBalance.UseVisualStyleBackColor = True
+        '
+        'chkTotalPhosphorus
+        '
+        Me.chkTotalPhosphorus.AutoSize = True
+        Me.chkTotalPhosphorus.Enabled = False
+        Me.chkTotalPhosphorus.Location = New System.Drawing.Point(18, 87)
+        Me.chkTotalPhosphorus.Name = "chkTotalPhosphorus"
+        Me.chkTotalPhosphorus.Size = New System.Drawing.Size(109, 17)
+        Me.chkTotalPhosphorus.TabIndex = 14
+        Me.chkTotalPhosphorus.Text = "Total Phosphorus"
+        Me.chkTotalPhosphorus.UseVisualStyleBackColor = True
+        '
+        'chkWaterBalance
+        '
+        Me.chkWaterBalance.AutoSize = True
+        Me.chkWaterBalance.Enabled = False
+        Me.chkWaterBalance.Location = New System.Drawing.Point(18, 18)
+        Me.chkWaterBalance.Name = "chkWaterBalance"
+        Me.chkWaterBalance.Size = New System.Drawing.Size(55, 17)
+        Me.chkWaterBalance.TabIndex = 11
+        Me.chkWaterBalance.Text = "Water"
+        Me.chkWaterBalance.UseVisualStyleBackColor = True
+        '
+        'chkSedimentBalance
+        '
+        Me.chkSedimentBalance.AutoSize = True
+        Me.chkSedimentBalance.Enabled = False
+        Me.chkSedimentBalance.Location = New System.Drawing.Point(18, 41)
+        Me.chkSedimentBalance.Name = "chkSedimentBalance"
+        Me.chkSedimentBalance.Size = New System.Drawing.Size(70, 17)
+        Me.chkSedimentBalance.TabIndex = 12
+        Me.chkSedimentBalance.Text = "Sediment"
+        Me.chkSedimentBalance.UseVisualStyleBackColor = True
+        '
+        'chkTotalNitrogen
+        '
+        Me.chkTotalNitrogen.AutoSize = True
+        Me.chkTotalNitrogen.Enabled = False
+        Me.chkTotalNitrogen.Location = New System.Drawing.Point(18, 64)
+        Me.chkTotalNitrogen.Name = "chkTotalNitrogen"
+        Me.chkTotalNitrogen.Size = New System.Drawing.Size(93, 17)
+        Me.chkTotalNitrogen.TabIndex = 13
+        Me.chkTotalNitrogen.Text = "Total Nitrogen"
+        Me.chkTotalNitrogen.UseVisualStyleBackColor = True
+        '
+        'chkModelQAQC
+        '
+        Me.chkModelQAQC.AutoSize = True
+        Me.chkModelQAQC.Enabled = False
+        Me.chkModelQAQC.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.chkModelQAQC.Location = New System.Drawing.Point(154, 94)
+        Me.chkModelQAQC.Name = "chkModelQAQC"
+        Me.chkModelQAQC.Size = New System.Drawing.Size(93, 17)
+        Me.chkModelQAQC.TabIndex = 49
+        Me.chkModelQAQC.Text = "Model QA/QC"
+        Me.ttHSPEXP.SetToolTip(Me.chkModelQAQC, "Compute reports of watershed area based on the SCHEMATIC BLOCK.")
+        Me.chkModelQAQC.UseVisualStyleBackColor = True
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.chkWASP)
+        Me.GroupBox1.Controls.Add(Me.chkBathtub)
+        Me.GroupBox1.Enabled = False
+        Me.GroupBox1.Location = New System.Drawing.Point(18, 491)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(418, 55)
+        Me.GroupBox1.TabIndex = 50
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Receiving Water Model"
+        '
+        'chkWASP
+        '
+        Me.chkWASP.AutoSize = True
+        Me.chkWASP.Enabled = False
+        Me.chkWASP.Location = New System.Drawing.Point(258, 24)
+        Me.chkWASP.Name = "chkWASP"
+        Me.chkWASP.Size = New System.Drawing.Size(58, 17)
+        Me.chkWASP.TabIndex = 1
+        Me.chkWASP.Text = "WASP"
+        Me.chkWASP.UseVisualStyleBackColor = True
+        '
+        'chkBathtub
+        '
+        Me.chkBathtub.AutoSize = True
+        Me.chkBathtub.Enabled = False
+        Me.chkBathtub.Location = New System.Drawing.Point(18, 24)
+        Me.chkBathtub.Name = "chkBathtub"
+        Me.chkBathtub.Size = New System.Drawing.Size(77, 17)
+        Me.chkBathtub.TabIndex = 0
+        Me.chkBathtub.Text = "BATHTUB"
+        Me.chkBathtub.UseVisualStyleBackColor = True
         '
         'StartUp
         '
@@ -495,20 +540,20 @@ Partial Class StartUp
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(493, 634)
+        Me.ClientSize = New System.Drawing.Size(474, 641)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.chkModelQAQC)
         Me.Controls.Add(Me.chkMultiSim)
         Me.Controls.Add(Me.chkExpertStats)
         Me.Controls.Add(Me.Plotting)
         Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.cmbUCIPath)
         Me.Controls.Add(Me.lblRCH)
         Me.Controls.Add(Me.txtRCH)
-        Me.Controls.Add(Me.lblOutReach2)
+        Me.Controls.Add(Me.cmbUCIPath)
         Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.pnlHighlight)
         Me.Controls.Add(Me.btn_help)
         Me.Controls.Add(Me.chkRunHSPF)
-        Me.Controls.Add(Me.chkAreaReports)
+        Me.Controls.Add(Me.pnlHighlight)
         Me.Controls.Add(Me.cmdEnd)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cmdBrowse)
@@ -526,6 +571,8 @@ Partial Class StartUp
         Me.Plotting.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -535,9 +582,7 @@ Partial Class StartUp
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents lblRCH As System.Windows.Forms.Label
     Friend WithEvents txtRCH As System.Windows.Forms.TextBox
-    Friend WithEvents lblOutReach2 As System.Windows.Forms.Label
     Friend WithEvents cmdEnd As System.Windows.Forms.Button
-    Friend WithEvents chkAreaReports As System.Windows.Forms.CheckBox
     Friend WithEvents chkRunHSPF As System.Windows.Forms.CheckBox
     Friend WithEvents pnlHighlight As System.Windows.Forms.Panel
     Friend WithEvents chkAdditionalgraphs As System.Windows.Forms.CheckBox
@@ -568,4 +613,8 @@ Partial Class StartUp
     Friend WithEvents chkGQUAL6 As CheckBox
     Friend WithEvents chkGQUAL5 As CheckBox
     Friend WithEvents chkGQUAL4 As CheckBox
+    Friend WithEvents chkModelQAQC As CheckBox
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents chkWASP As CheckBox
+    Friend WithEvents chkBathtub As CheckBox
 End Class

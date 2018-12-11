@@ -41,7 +41,10 @@ Public Class clsUSGSDF2PAnalysis
     End Function
 
     Private Sub ShowForm(ByVal aTimeseriesGroup As atcData.atcDataGroup, ByVal aForm As Object)
+#If GISProvider = "DotSpatial" Then
+#Else
         LoadPlugin(pRequiredHelperPlugin)
+#End If
         Dim lBasicAttributes As New Generic.List(Of String)
         With lBasicAttributes
             .Add("ID")
@@ -65,7 +68,10 @@ Public Class clsUSGSDF2PAnalysis
                               ByVal ParamArray aOption() As String)
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
+#If GISProvider = "DotSpatial" Then
+#Else
             LoadPlugin(pRequiredHelperPlugin)
+#End If
             Dim lForm As New frmDF2P()
 
             lForm.Initialize(aTimeseriesGroup)
@@ -73,7 +79,8 @@ Public Class clsUSGSDF2PAnalysis
             'lForm.Dispose()
         End If
     End Sub
-
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
@@ -87,7 +94,7 @@ Public Class clsUSGSDF2PAnalysis
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
     End Sub
-
+#End If
     Public Shared Function ComputeRankedAnnualTimeseries(ByVal aTimeseriesGroup As atcTimeseriesGroup, _
                                                          ByVal aNDay() As Double, _
                                                          ByVal aHighFlag As Boolean, _

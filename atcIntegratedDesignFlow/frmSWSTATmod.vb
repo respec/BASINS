@@ -2414,7 +2414,22 @@ Public Class frmSWSTATmod
     Private Sub Calculate(ByVal aOperationName As String, ByVal aReturnPeriods() As Double, Optional ByVal aNDays() As Double = Nothing, Optional aDataGroup As atcTimeseriesGroup = Nothing)
         ClearAttributes()
         SeasonsYearsFromForm() 'setup all inputs from form
+        Dim lArgs As atcDataAttributes = SetOperationConditions(aOperationName, aReturnPeriods, aNDays, aDataGroup)
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        lCalculator.Open(aOperationName, lArgs)
+        lCalculator.DataSets.Clear()
+    End Sub
+
+    ''' <summary>
+    ''' This routine isolates the construction of operation conditions based on user form selections
+    ''' hence, it is to be used AFTER ClearAttributes(), SeasonsYearsFromForm() tandem calls
+    ''' </summary>
+    ''' <param name="aOperationName"></param>
+    ''' <param name="aReturnPeriods"></param>
+    ''' <param name="aNDays"></param>
+    ''' <param name="aDataGroup"></param>
+    ''' <returns></returns>
+    Private Function SetOperationConditions(ByVal aOperationName As String, ByVal aReturnPeriods() As Double, Optional ByVal aNDays() As Double = Nothing, Optional aDataGroup As atcTimeseriesGroup = Nothing) As atcDataAttributes
         For Each lTs As atcTimeseries In pDataGroup
             lTs.Attributes.SetValueIfMissing("CalcEMA", True)
         Next
@@ -2437,10 +2452,8 @@ Public Class frmSWSTATmod
         If pYearEndDay > 0 Then lArgs.SetValue("EndDay", pYearEndDay)
         If pFirstYear > 0 Then lArgs.SetValue("FirstYear", pFirstYear)
         If pLastYear > 0 Then lArgs.SetValue("LastYear", pLastYear)
-
-        lCalculator.Open(aOperationName, lArgs)
-        lCalculator.DataSets.Clear()
-    End Sub
+        Return lArgs
+    End Function
 
     Private Function SaveSettingsBatch() As String
         Dim lMsg As String = ""
@@ -2752,11 +2765,18 @@ Public Class frmSWSTATmod
         Dim dMyLat As Double
         Dim dMyLong As Double
         Dim dMyStat As Double
+        Dim lDA As Double = Double.NaN
         Dim lTs As atcTimeseries = pDataGroup.FindData("Location", aStationID)(0)
         With lTs.Attributes
             dMyLat = .GetValue("Latitude", Double.NaN)
             dMyLong = .GetValue("Longitude", Double.NaN)
             dMyStat = .GetValue(aStatName, Double.NaN)
+            lDA = .GetValue("Drainage Area", Double.NaN)
+            If Not Double.IsNaN(dMyStat) AndAlso Not Double.IsNaN(lDA) AndAlso Not Math.Abs(lDA - 0) < 0.00001 Then
+                dMyStat /= lDA
+            Else
+                dMyStat = Double.NaN
+            End If
         End With
         If Double.IsNaN(dMyLat) OrElse Double.IsNaN(dMyLong) OrElse Double.IsNaN(dMyStat) Then
             Return "No Data"
@@ -2769,7 +2789,6 @@ Public Class frmSWSTATmod
         Dim lDateArray(6) As Integer
         Dim J As Integer = 0
         Dim lStatValue As Double = Double.NaN
-        Dim lDA As Double = Double.NaN
         For I As Integer = 0 To aDataGroup.Count - 1
             lTs = aDataGroup(I)
             With lTs.Attributes
@@ -3245,14 +3264,16 @@ Public Class frmSWSTATmod
             CalculateBatch() 'setting params for batch run
         Else
             Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-            'Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
-
+            ClearAttributes()
+            SeasonsYearsFromForm() 'setup all inputs from form
+            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
             Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),
-                                                         aReturns:=ListToArray(lstRecurrence))
+                                                         aReturns:=ListToArray(lstRecurrence),
+                                                         aShowForm:=True,
+                                                         aConditions:=lAttrs)
 
-            SeasonsYearsFromForm()
 
             lFreqForm.SWSTATformmod = Me
 
@@ -4369,8 +4390,8 @@ Public Class frmSWSTATmod
     End Sub
 
     Private Sub btnOutliers_Click(sender As Object, e As EventArgs) Handles btnOutliers.Click
-        Logger.Msg("Outlier Test is under development.", MsgBoxStyle.Exclamation, "Group Outlier Test")
-        Exit Sub
+        'Logger.Msg("Outlier Test is under development.", MsgBoxStyle.Exclamation, "Group Outlier Test")
+        'Exit Sub
         If pDataGroup.Count < 5 Then
             Logger.Msg("Need to have at least 5 stations to perform the outlier test.", MsgBoxStyle.Exclamation, "Group Outlier Test")
             Exit Sub

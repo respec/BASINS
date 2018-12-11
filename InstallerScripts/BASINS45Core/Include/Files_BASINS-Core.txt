@@ -1,0 +1,79 @@
+;;BASINS Core files that are not in MapWindow
+
+Source: "..\..\bin\default.mwcfg";              DestDir: "{app}\bin"; Flags: onlyifdoesntexist;      Permissions: everyone-modify
+Source: "..\..\bin\awd.cfg";                    DestDir: "{app}\bin"; Flags: onlyifdoesntexist;      Permissions: everyone-modify
+Source: "..\..\bin\StatusMonitor.exe";          DestDir: "{app}\bin";                Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\bin\MapWinUtility.dll";          DestDir: "{app}\bin";                Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\bin\Plugins\BASINS\*";           DestDir: "{app}\bin\Plugins\BASINS"; Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\bin\Plugins\WCS\*";              DestDir: "{app}\bin\Plugins\WCS"; Flags: ignoreversion; Permissions: everyone-modify
+
+Source: "..\..\bin\Scripts\*.vb";               DestDir: "{app}\bin\Scripts";                        Permissions: everyone-modify
+
+Source: "..\..\docs\*";                         DestDir: "{app}\docs";                               Permissions: everyone-modify
+Source: "..\..\etc\*";                          DestDir: "{app}\etc";                                Permissions: everyone-modify
+Source: "..\..\etc\Reports\*";                  DestDir: "{app}\etc\Reports";                        Permissions: everyone-modify
+Source: "..\..\etc\renderers\*";                DestDir: "{app}\etc\renderers";                      Permissions: everyone-modify
+Source: "..\..\etc\TimeseriesScripts\*";        DestDir: "{app}\etc\TimeseriesScripts";              Permissions: everyone-modify
+Source: "..\..\etc\TimeseriesScripts\Samples\*"; DestDir: "{app}\etc\TimeseriesScripts\Samples";     Permissions: everyone-modify
+Source: "..\..\data\national\*";                DestDir: "{app}\data\national";                      Permissions: everyone-modify
+Source: "..\..\data\national\national.mwprj";   DestDir: "{app}\data\national";Flags: ignoreversion; Permissions: everyone-modify
+
+Source: "..\..\data\national\*";                DestDir: "{app}\data\national";                      Permissions: everyone-modify
+Source: "..\..\etc\ATCoUnits.xml";              DestDir: "{app}\etc";                                Permissions: everyone-modify
+Source: "..\..\etc\BasinsDefaultLayers.xml";    DestDir: "{app}\etc";          Flags: ignoreversion; Permissions: everyone-modify
+;Source: "..\..\bin\regATC.cmd";                 DestDir: "{app}\bin"; Flags: ignoreversion;         Permissions: everyone-modify
+Source: "..\..\bin\regDAO.cmd";                 DestDir: "{app}\bin"; Flags: ignoreversion;          Permissions: everyone-modify
+;Source: "..\..\bin\regMapWinGIS.cmd";           DestDir: "{app}\bin"; Flags: ignoreversion;         Permissions: everyone-modify
+
+Source: "..\..\bin\*.dll";                      DestDir: "{app}\bin"; Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\bin\Plugins\*.dll";              DestDir: "{app}\bin\Plugins"              ; Permissions: everyone-modify
+;Source: "..\..\bin\en\*.*";                     DestDir: "{app}\bin\en"                   ; Permissions: everyone-modify
+;Source: "..\..\bin\ApplicationPlugins\*.dll";   DestDir: "{app}\bin\ApplicationPlugins"   ; Permissions: everyone-modify
+
+Source: "..\..\system\hass_ent.dll";            DestDir: "{sys}";              Flags: sharedfile;    Permissions: everyone-modify
+Source: "..\..\system\Lf90.eer";                DestDir: "{sys}";              Flags: sharedfile;    Permissions: everyone-modify
+Source: "..\..\system\lf90wiod.dll";            DestDir: "{sys}";              Flags: sharedfile;    Permissions: everyone-modify
+
+
+;Update Checking
+Source: "..\..\bin\UpdateCheck.exe";            DestDir: "{app}\bin"; Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\bin\UpdateURL.txt";              DestDir: "{app}\bin"; Flags: ignoreversion; Permissions: everyone-modify
+
+;Web Shortcuts
+Source: ..\..\Shortcuts\BASINS_Home_Page.url; DestDir: {app}                              ; Permissions: everyone-modify
+Source: ..\..\Shortcuts\BASINS_Updates.url; DestDir: {app}                                ; Permissions: everyone-modify
+Source: ..\..\Shortcuts\MapWindow_Home_Page.url; DestDir: {app}                           ; Permissions: everyone-modify
+
+;from BASINS 3.1
+Source: "..\..\etc\hspfusgs.dbf";              DestDir: "{app}\etc"; Permissions: everyone-modify
+Source: "..\..\etc\mrlc.dbf";                  DestDir: "{app}\etc"; Permissions: everyone-modify
+Source: "..\..\etc\DataDownload\avail.dbf";           DestDir: "{app}\etc\DataDownload"                   ; Permissions: everyone-modify
+Source: "..\..\etc\DataDownload\FIPS_HUC.bin";        DestDir: "{app}\etc\DataDownload"                   ; Permissions: everyone-modify
+Source: "..\..\etc\DataDownload\ShapeUtil.exe";       DestDir: "{app}\etc\DataDownload"; Flags: ignoreversion; Permissions: everyone-modify
+Source: "..\..\etc\DataDownload\projATC.dll";         DestDir: "{app}\etc\DataDownload"                   ; Permissions: everyone-modify
+Source: "..\..\etc\DataDownload\layers.dbf";          DestDir: "{app}\etc\DataDownload"                   ; Permissions: everyone-modify
+
+;vcfiles
+Source: "..\..\vcfiles\50comupd.exe";          DestDir: {tmp}
+Source: "..\..\vcfiles\gdiplus.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "..\..\vcfiles\InstMsiA.exe";          DestDir: {tmp}; Flags: deleteafterinstall
+Source: "..\..\vcfiles\mfc71.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\msvcp71.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\msvcr71.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\msvcr71d.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+;Source: "..\..\vcfiles\vcredist.msi";          DestDir: {tmp}; Flags: deleteafterinstall
+;Source: "..\..\vcfiles\vcredist_x86_2005.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+;Source: "..\..\vcfiles\vcredist_x86_2008.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "..\..\vcfiles\DbgHelp.Dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\mfc71.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\asycfilt.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\atla.dll";              DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; DestName: atl.dll; MinVersion: 4, 0
+Source: "..\..\vcfiles\atlu.dll";              DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; DestName: atl.dll; MinVersion: 0, 4
+Source: "..\..\vcfiles\comcat.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+Source: "..\..\vcfiles\mfc42.dll";             DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+Source: "..\..\vcfiles\mfc42u.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver; MinVersion: 0, 4
+Source: "..\..\vcfiles\msvcp60.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\msvcirt.dll";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\msvcrt.dll";            DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+Source: "..\..\vcfiles\olepro32.dll";          DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile regserver
+Source: "..\..\vcfiles\stdole2.tlb";           DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile

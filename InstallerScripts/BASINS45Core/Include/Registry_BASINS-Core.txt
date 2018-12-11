@@ -1,0 +1,17 @@
+
+Root: HKLM; Subkey: "SOFTWARE\AQUA TERRA Consultants\BASINS";               ValueType: string; ValueName: "Base Directory";   ValueData: "{app}"; Flags: uninsdeletevalue;
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\Status\Paths";         ValueType: string; ValueName: "ExePath";          ValueData: "{app}\models\HSPF\bin\Status.exe";     Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\curl\paths";           ValueType: string; ValueName: "EXEpath";          ValueData: "{app}\etc\DataDownload\curl.exe";      Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\DataDownload\files";   ValueType: string; ValueName: "DataDownload.chm"; ValueData: "{app}\Docs\DataDownload.chm";          Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\DataDownload\files";   ValueType: string; ValueName: "app";              ValueData: "{app}";                                Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\DataDownload\ExePath"; ValueType: string; ValueName: "";                 ValueData: "{app}\etc\DataDownload";               Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\ATCoUnits\files";      ValueType: string; ValueName: "ATCoUnits.mdb";    ValueData: "{app}\models\HSPF\bin\ATCoUnits.mdb";  Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\BasinsArchive\ExePath"; ValueType: string; ValueName: "";                ValueData: "{app}\etc\BasinsArchive";              Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\gzip\files";           ValueType: string; ValueName: "gzip.exe";         ValueData: "{app}\etc\gzip.exe";                   Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\BASINS\files";         ValueType: string; ValueName: "ShapeUtil.exe";    ValueData: "{app}\etc\DataDownload\ShapeUtil.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\BASINS\files";         ValueType: string; ValueName: "layers.dbf";       ValueData: "{app}\etc\DataDownload\layers.dbf";    Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\BASINS\files";         ValueType: string; ValueName: "FIPS_HUC.bin";     ValueData: "{app}\etc\DataDownload\FIPS_HUC.bin";  Flags: uninsdeletekey
+
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants";                   ValueType: string; ValueName: "BASINSPath"; ValueData: "{app}";
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\files";             ValueType: string; ValueName: "HSPFMsgWDM"; ValueData: "{app}\bin\Plugins\BASINS\hspfmsg.wdm";   Flags: uninsdeletekey
+

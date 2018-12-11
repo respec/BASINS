@@ -1,0 +1,3330 @@
+UCILandUse,GeneralLandUse
+Forest South HSG-lo,Forest
+Forest South HSG-hi,Forest
+Forest North HSG-lo,Forest
+Forest North HSG-hi,Forest
+PastureHay S HSG-lo,Pasture
+PastureHay S HSG-hi,Pasture
+PastureHay N HSG-lo,Pasture
+PastureHay N HSG-hi,Pasture
+Row Crops,Ag/Other
+Farmsteads,Ag/Other
+Urban/rec Grass,Urban
+Wetland/water,Wetland
+LowDensity Resident,Urban
+HighDensity Resident,Urban
+Comm/Indust/Trans,Urban
+Landslide/Sediment,Unknown
+Harbor Brook basin,Unknown
+Otisco Lake basin,Unknown
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Developed,Urban
+Rangeland,Pasture
+Rangeland Riparian,Pasture
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Cropland Riparian,Ag/Other
+Wetland,Wetland
+Riparian,Unknown
+Feedlot,Ag/Other
+Riparian AFO,Ag/Other
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COMM/IND FLAT,Urban
+ROCK COMM/IND LOW,Urban
+ROCK COMM/IND MED,Urban
+ROCK COMM/IND STEE,Urban
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+LOW DENSITY RES R1,Urban
+OPEN R1,Urban
+LOW DENSITY RES R2,Urban
+OPEN R2,Urban
+LOW DENSITY RES R3,Urban
+MED DENSITY RES R3,Urban
+OPEN R3,Urban
+MED DENSITY RES R4,Urban
+COMMERCIAL R4,Urban
+LOW DENSITY RES R5,Urban
+MED DENSITY RES R5,Urban
+COMMERCIAL R5,Urban
+MED DENSITY RES R6,Urban
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Feedlots,Ag/Other
+Developed,Urban
+Cropland LowTill AB,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill CD,Ag/Other
+Forest,Forest
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+WATR_ALL_1,Wetland
+WATR_ALL_2,Wetland
+WATR_ALL_3,Wetland
+WATR_ALL_4,Wetland
+WATR_ALL_5,Wetland
+WETL_ALL_1,Wetland
+WETL_ALL_2,Wetland
+WETL_ALL_3,Wetland
+WETL_ALL_4,Wetland
+WETL_ALL_5,Wetland
+FRST_ABC_1,Forest
+FRST_ABC_2,Forest
+FRST_ABC_3,Forest
+FRST_ABC_4,Forest
+FRST_ABC_5,Forest
+FRST_D_1,Forest
+FRST_D_2,Forest
+FRST_D_3,Forest
+FRST_D_4,Forest
+FRST_D_5,Forest
+GRSS_ABC_1,Grassland
+GRSS_ABC_2,Grassland
+GRSS_ABC_3,Grassland
+GRSS_ABC_4,Grassland
+GRSS_ABC_5,Grassland
+GRSS_D_1,Grassland
+GRSS_D_2,Grassland
+GRSS_D_3,Grassland
+GRSS_D_4,Grassland
+GRSS_D_5,Grassland
+PAST_ABC_1,Pasture
+PAST_ABC_2,Pasture
+PAST_ABC_3,Pasture
+PAST_ABC_4,Pasture
+PAST_ABC_5,Pasture
+PAST_D_1,Pasture
+PAST_D_2,Pasture
+PAST_D_3,Pasture
+PAST_D_4,Pasture
+PAST_D_5,Pasture
+CROP_ABC_1,Ag/Other
+CROP_ABC_2,Ag/Other
+CROP_ABC_3,Ag/Other
+CROP_ABC_4,Ag/Other
+CROP_ABC_5,Ag/Other
+CROP_D_1,Ag/Other
+CROP_D_2,Ag/Other
+CROP_D_3,Ag/Other
+CROP_D_4,Ag/Other
+CROP_D_5,Ag/Other
+CONS_ABC_1,Ag/Other
+CONS_ABC_2,Ag/Other
+CONS_ABC_3,Ag/Other
+CONS_ABC_4,Ag/Other
+CONS_ABC_5,Ag/Other
+CONS_D_1,Ag/Other
+CONS_D_2,Ag/Other
+CONS_D_3,Ag/Other
+CONS_D_4,Ag/Other
+CONS_D_5,Ag/Other
+MANU_ABC_1,Ag/Other
+MANU_ABC_2,Ag/Other
+MANU_ABC_3,Ag/Other
+MANU_ABC_4,Ag/Other
+MANU_ABC_5,Ag/Other
+MANU_D_1,Ag/Other
+MANU_D_2,Ag/Other
+MANU_D_3,Ag/Other
+MANU_D_4,Ag/Other
+MANU_D_5,Ag/Other
+DEVP_ABC_1,Urban
+DEVP_ABC_2,Urban
+DEVP_ABC_3,Urban
+DEVP_ABC_4,Urban
+DEVP_ABC_5,Urban
+DEVP_D_1,Urban
+DEVP_D_2,Urban
+DEVP_D_3,Urban
+DEVP_D_4,Urban
+DEVP_D_5,Urban
+BLUFF,Unknown
+Feedlot,Ag/Other
+Developed,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland HighTill,Ag/Other
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Wetland,Wetland
+Cropland LowTill,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Forest - AB,Forest
+Forest - CD,Forest
+Water/Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland - AB,Ag/Other
+Cropland - CD,Ag/Other
+Cropland - Drained,Ag/Other
+Developed OpenSpace,Urban
+Developed Low,Urban
+Developed Med-High,Urban
+Feedlots,Ag/Other
+Forest - AB,Forest
+Forest - CD,Forest
+Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland-AB,Ag/Other
+Cropland-CD,Ag/Other
+Cropland-Drained,Ag/Other
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+FRST_AB_WST_1,Forest
+FRST_CD_WST_1,Forest
+WETW_NA_WST_1,Wetland
+GRAS_AB_WST_1,Grassland
+GRAS_CD_WST_1,Grassland
+PAST_AB_WST_1,Pasture
+PAST_CD_WST_1,Pasture
+UROP_NA_WST_1,Urban
+URLD_NA_WST_1,Urban
+URMH_NA_WST_1,Urban
+CONV_AB_WST_1,Ag/Other
+CONV_CD_WST_1,Ag/Other
+CONV_DR_WST_1,Ag/Other
+CONS_AB_WST_1,Ag/Other
+CONS_CD_WST_1,Ag/Other
+CONS_DR_WST_1,Ag/Other
+MANR_AB_WST_1,Ag/Other
+MANR_DR_WST_1,Ag/Other
+FRST_AB_WST_2,Forest
+FRST_CD_WST_2,Forest
+WETW_NA_WST_2,Wetland
+GRAS_AB_WST_2,Grassland
+GRAS_CD_WST_2,Grassland
+PAST_AB_WST_2,Pasture
+PAST_CD_WST_2,Pasture
+UROP_NA_WST_2,Urban
+URLD_NA_WST_2,Urban
+URMH_NA_WST_2,Urban
+CONV_AB_WST_2,Ag/Other
+CONV_CD_WST_2,Ag/Other
+CONV_DR_WST_2,Ag/Other
+CONS_AB_WST_2,Ag/Other
+CONS_CD_WST_2,Ag/Other
+CONS_DR_WST_2,Ag/Other
+MANR_AB_WST_2,Ag/Other
+MANR_DR_WST_2,Ag/Other
+FRST_AB_WST_3,Forest
+FRST_CD_WST_3,Forest
+WETW_NA_WST_3,Wetland
+GRAS_AB_WST_3,Grassland
+GRAS_CD_WST_3,Grassland
+PAST_AB_WST_3,Pasture
+PAST_CD_WST_3,Pasture
+UROP_NA_WST_3,Urban
+URLD_NA_WST_3,Urban
+URMH_NA_WST_3,Urban
+CONV_AB_WST_3,Ag/Other
+CONV_CD_WST_3,Ag/Other
+CONV_DR_WST_3,Ag/Other
+CONS_AB_WST_3,Ag/Other
+CONS_CD_WST_3,Ag/Other
+CONS_DR_WST_3,Ag/Other
+MANR_AB_WST_3,Ag/Other
+MANR_DR_WST_3,Ag/Other
+FRST_AB_WST_4,Forest
+FRST_CD_WST_4,Forest
+WETW_NA_WST_4,Wetland
+GRAS_AB_WST_4,Grassland
+GRAS_CD_WST_4,Grassland
+PAST_AB_WST_4,Pasture
+PAST_CD_WST_4,Pasture
+UROP_NA_WST_4,Urban
+URLD_NA_WST_4,Urban
+URMH_NA_WST_4,Urban
+CONV_AB_WST_4,Ag/Other
+CONV_CD_WST_4,Ag/Other
+CONV_DR_WST_4,Ag/Other
+CONS_AB_WST_4,Ag/Other
+CONS_CD_WST_4,Ag/Other
+CONS_DR_WST_4,Ag/Other
+MANR_AB_WST_4,Ag/Other
+MANR_DR_WST_4,Ag/Other
+FRST_AB_WST_5,Forest
+FRST_CD_WST_5,Forest
+WETW_NA_WST_5,Wetland
+GRAS_AB_WST_5,Grassland
+GRAS_CD_WST_5,Grassland
+PAST_AB_WST_5,Pasture
+PAST_CD_WST_5,Pasture
+UROP_NA_WST_5,Urban
+URLD_NA_WST_5,Urban
+URMH_NA_WST_5,Urban
+CONV_AB_WST_5,Ag/Other
+CONV_CD_WST_5,Ag/Other
+CONV_DR_WST_5,Ag/Other
+CONS_AB_WST_5,Ag/Other
+CONS_CD_WST_5,Ag/Other
+CONS_DR_WST_5,Ag/Other
+MANR_AB_WST_5,Ag/Other
+MANR_DR_WST_5,Ag/Other
+FRST_AB_WST_6,Forest
+FRST_CD_WST_6,Forest
+WETW_NA_WST_6,Wetland
+GRAS_AB_WST_6,Grassland
+GRAS_CD_WST_6,Grassland
+PAST_AB_WST_6,Pasture
+PAST_CD_WST_6,Pasture
+UROP_NA_WST_6,Urban
+URLD_NA_WST_6,Urban
+URMH_NA_WST_6,Urban
+CONV_AB_WST_6,Ag/Other
+CONV_CD_WST_6,Ag/Other
+CONV_DR_WST_6,Ag/Other
+CONS_AB_WST_6,Ag/Other
+CONS_CD_WST_6,Ag/Other
+CONS_DR_WST_6,Ag/Other
+MANR_AB_WST_6,Ag/Other
+MANR_DR_WST_6,Ag/Other
+FRST_AB_WST_7,Forest
+FRST_CD_WST_7,Forest
+WETW_NA_WST_7,Wetland
+GRAS_AB_WST_7,Grassland
+GRAS_CD_WST_7,Grassland
+PAST_AB_WST_7,Pasture
+PAST_CD_WST_7,Pasture
+UROP_NA_WST_7,Urban
+URLD_NA_WST_7,Urban
+URMH_NA_WST_7,Urban
+CONV_AB_WST_7,Ag/Other
+CONV_CD_WST_7,Ag/Other
+CONV_DR_WST_7,Ag/Other
+CONS_AB_WST_7,Ag/Other
+CONS_CD_WST_7,Ag/Other
+CONS_DR_WST_7,Ag/Other
+MANR_AB_WST_7,Ag/Other
+MANR_DR_WST_7,Ag/Other
+FRST_AB_WST_8,Forest
+FRST_CD_WST_8,Forest
+WETW_NA_WST_8,Wetland
+GRAS_AB_WST_8,Grassland
+GRAS_CD_WST_8,Grassland
+PAST_AB_WST_8,Pasture
+PAST_CD_WST_8,Pasture
+UROP_NA_WST_8,Urban
+URLD_NA_WST_8,Urban
+URMH_NA_WST_8,Urban
+CONV_AB_WST_8,Ag/Other
+CONV_CD_WST_8,Ag/Other
+CONV_DR_WST_8,Ag/Other
+CONS_AB_WST_8,Ag/Other
+CONS_CD_WST_8,Ag/Other
+CONS_DR_WST_8,Ag/Other
+MANR_AB_WST_8,Ag/Other
+MANR_DR_WST_8,Ag/Other
+FRST_AB_WST_9,Forest
+FRST_CD_WST_9,Forest
+WETW_NA_WST_9,Wetland
+GRAS_AB_WST_9,Grassland
+GRAS_CD_WST_9,Grassland
+PAST_AB_WST_9,Pasture
+PAST_CD_WST_9,Pasture
+UROP_NA_WST_9,Urban
+URLD_NA_WST_9,Urban
+URMH_NA_WST_9,Urban
+CONV_AB_WST_9,Ag/Other
+CONV_CD_WST_9,Ag/Other
+CONV_DR_WST_9,Ag/Other
+CONS_AB_WST_9,Ag/Other
+CONS_CD_WST_9,Ag/Other
+CONS_DR_WST_9,Ag/Other
+MANR_AB_WST_9,Ag/Other
+MANR_DR_WST_9,Ag/Other
+FRST_AB_WST_10,Forest
+FRST_CD_WST_10,Forest
+WETW_NA_WST_10,Wetland
+GRAS_AB_WST_10,Grassland
+GRAS_CD_WST_10,Grassland
+PAST_AB_WST_10,Pasture
+PAST_CD_WST_10,Pasture
+UROP_NA_WST_10,Urban
+URLD_NA_WST_10,Urban
+URMH_NA_WST_10,Urban
+CONV_AB_WST_10,Ag/Other
+CONV_CD_WST_10,Ag/Other
+CONV_DR_WST_10,Ag/Other
+CONS_AB_WST_10,Ag/Other
+CONS_CD_WST_10,Ag/Other
+CONS_DR_WST_10,Ag/Other
+MANR_AB_WST_10,Ag/Other
+MANR_DR_WST_10,Ag/Other
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+ROCK FOREST,Forest
+ROCK FOR RES,Urban
+ROCK LD RES,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+Feedlot,Ag/Other
+Developed,Urban
+Cropland LowTill AB,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill CD,Ag/Other
+Forest,Forest
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlots,Ag/Other
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+WATER,Wetland
+BARREN,Grassland
+WETLAND,Wetland
+FOREST_ABC,Forest
+FOREST_D,Forest
+GRASS_ABC_L,Grassland
+GRASS_ABC_H,Grassland
+GRASS_D_L,Grassland
+GRASS_D_H,Grassland
+ConvenTill_AB_L,Ag/Other
+ConvenTill_AB_H,Ag/Other
+ConvenTill_CD_L,Ag/Other
+ConvenTill_CD_H,Ag/Other
+ConserTill_AB_L,Ag/Other
+ConserTill_AB_H,Ag/Other
+ConserTill_CD_L,Ag/Other
+ConserTill_CD_H,Ag/Other
+Manure_AB_L,Ag/Other
+Manure_AB_H,Ag/Other
+Manure_CD_L,Ag/Other
+Manure_CD_H,Ag/Other
+DEVPERV_ABC,Urban
+DEVPERV_D,Urban
+BLUFF,Unknown
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+Forest,Forest
+Pasture1,Pasture
+Pasture2,Pasture
+Pasture3,Pasture
+Grass/Shrub/Barren,Grassland
+Developed Open,Urban
+Developed Low,Urban
+Developed Med/High,Urban
+Wetlands,Wetland
+Cropland,Ag/Other
+Pasture1-Litter,Pasture
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+SATURATED FOREST,Forest
+SATURATED LD RES,Urban
+ROCK FOREST,Forest
+ROCK LD RES,Urban
+SATURATED FOR RES,Urban
+FOREST,Forest
+HIGH TILL CROPLAND,Ag/Other
+LOW TILL CROPLAND,Ag/Other
+PASTURE,Pasture
+URBAN,Urban
+HAY,Pasture
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlots,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill,Ag/Other
+Coprland HighTill,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK PAST/AG STEEP,Pasture
+ROCK FOR RES,Urban
+ROCK FOR RES STEEP,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+ROCK COM/IND FLAT,Urban
+ROCK COM/IND LOW,Urban
+ROCK COM/IND MED,Urban
+ROCK COM/IND STEEP,Urban
+Forest - AB,Forest
+Forest - CD,Forest
+Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland-AB,Ag/Other
+Cropland-CD,Ag/Other
+Cropland-Drained,Ag/Other
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+Feedlot,Ag/Other
+Developed,Urban
+Cropland LowTill AB,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill CD,Ag/Other
+Forest,Forest
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+WATR_CD_NLDAS_GP_1,Wetland
+UROP__NLDAS_GP_1,Urban
+URLD__NLDAS_GP_1,Urban
+URMH__NLDAS_GP_1,Urban
+BRRN_CD_NLDAS_GP_1,Grassland
+FRST__NLDAS_GP_1,Forest
+SHRB_AB_NLDAS_GP_1,Grassland
+SHRB_CD_NLDAS_GP_1,Grassland
+PAST_AB_NLDAS_GP_1,Pasture
+PAST_CD_NLDAS_GP_1,Pasture
+CPAB_CONV_NON_NLDAS_,Ag/Other
+CPCD_CONV_NON_NLDAS_,Ag/Other
+CPDR_CONV_NON_NLDAS_,Ag/Other
+RODP__NLDAS_GP_1,Urban
+RODU__NLDAS_GP_1,Urban
+AFOP__NLDAS_GP_1,Ag/Other
+CPAB_CONS_NON_NLDAS_,Ag/Other
+CPCD_CONS_NON_NLDAS_,Ag/Other
+CPDR_CONS_NON_NLDAS_,Ag/Other
+CPAB_CONV_MAN_NLDAS_,Ag/Other
+CPDR_CONV_MAN_NLDAS_,Ag/Other
+WATR_CD_NLDAS_GP_2,Wetland
+UROP__NLDAS_GP_2,Urban
+URLD__NLDAS_GP_2,Urban
+URMH__NLDAS_GP_2,Urban
+BRRN_CD_NLDAS_GP_2,Grassland
+FRST__NLDAS_GP_2,Forest
+SHRB_AB_NLDAS_GP_2,Grassland
+SHRB_CD_NLDAS_GP_2,Grassland
+PAST_AB_NLDAS_GP_2,Pasture
+PAST_CD_NLDAS_GP_2,Pasture
+RODP__NLDAS_GP_2,Urban
+RODU__NLDAS_GP_2,Urban
+AFOP__NLDAS_GP_2,Ag/Other
+WATR_CD_NLDAS_GP_3,Wetland
+UROP__NLDAS_GP_3,Urban
+URLD__NLDAS_GP_3,Urban
+URMH__NLDAS_GP_3,Urban
+BRRN_CD_NLDAS_GP_3,Grassland
+FRST__NLDAS_GP_3,Forest
+SHRB_AB_NLDAS_GP_3,Grassland
+SHRB_CD_NLDAS_GP_3,Grassland
+PAST_AB_NLDAS_GP_3,Pasture
+PAST_CD_NLDAS_GP_3,Pasture
+RODP__NLDAS_GP_3,Urban
+RODU__NLDAS_GP_3,Urban
+AFOP__NLDAS_GP_3,Ag/Other
+WATR_CD_NLDAS_GP_4,Wetland
+UROP__NLDAS_GP_4,Urban
+URLD__NLDAS_GP_4,Urban
+URMH__NLDAS_GP_4,Urban
+BRRN_CD_NLDAS_GP_4,Grassland
+FRST__NLDAS_GP_4,Forest
+SHRB_AB_NLDAS_GP_4,Grassland
+SHRB_CD_NLDAS_GP_4,Grassland
+PAST_AB_NLDAS_GP_4,Pasture
+PAST_CD_NLDAS_GP_4,Pasture
+RODP__NLDAS_GP_4,Urban
+RODU__NLDAS_GP_4,Urban
+AFOP__NLDAS_GP_4,Ag/Other
+WATR_CD_NLDAS_GP_5,Wetland
+UROP__NLDAS_GP_5,Urban
+URLD__NLDAS_GP_5,Urban
+URMH__NLDAS_GP_5,Urban
+BRRN_CD_NLDAS_GP_5,Grassland
+FRST__NLDAS_GP_5,Forest
+SHRB_AB_NLDAS_GP_5,Grassland
+SHRB_CD_NLDAS_GP_5,Grassland
+PAST_AB_NLDAS_GP_5,Pasture
+PAST_CD_NLDAS_GP_5,Pasture
+RODP__NLDAS_GP_5,Urban
+RODU__NLDAS_GP_5,Urban
+AFOP__NLDAS_GP_5,Ag/Other
+WATR_CD_NLDAS_GP_6,Wetland
+UROP__NLDAS_GP_6,Urban
+URLD__NLDAS_GP_6,Urban
+URMH__NLDAS_GP_6,Urban
+BRRN_CD_NLDAS_GP_6,Grassland
+FRST__NLDAS_GP_6,Forest
+SHRB_AB_NLDAS_GP_6,Grassland
+SHRB_CD_NLDAS_GP_6,Grassland
+PAST_AB_NLDAS_GP_6,Pasture
+PAST_CD_NLDAS_GP_6,Pasture
+RODP__NLDAS_GP_6,Urban
+RODU__NLDAS_GP_6,Urban
+AFOP__NLDAS_GP_6,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+FRSD_AB_MN211630,Forest
+FRSD_CD_MN211630,Forest
+FRSE_AB_MN211630,Forest
+FRSE_CD_MN211630,Forest
+WETF_CD_MN211630,Wetland
+WETH_CD_MN211630,Wetland
+SHRB_AB_MN211630,Grassland
+SHRB_CD_MN211630,Grassland
+PAST_AB_MN211630,Pasture
+PAST_CD_MN211630,Pasture
+CROP_AB_MN211630,Ag/Other
+CROP_CD_MN211630,Ag/Other
+CROP_Drained_MN21163,Ag/Other
+UROP_N/A_MN211630,Urban
+URMD_N/A_MN211630,Urban
+WATR_CD_MN211630,Wetland
+BRRN_CD_MN211630,Grassland
+FRSD_AB_MN213863,Forest
+FRSD_CD_MN213863,Forest
+FRSE_AB_MN213863,Forest
+FRSE_CD_MN213863,Forest
+WETF_CD_MN213863,Wetland
+WETH_CD_MN213863,Wetland
+SHRB_AB_MN213863,Grassland
+SHRB_CD_MN213863,Grassland
+PAST_AB_MN213863,Pasture
+PAST_CD_MN213863,Pasture
+CROP_AB_MN213863,Ag/Other
+CROP_CD_MN213863,Ag/Other
+CROP_Drained_MN21386,Ag/Other
+UROP_N/A_MN213863,Urban
+URMD_N/A_MN213863,Urban
+URHD_N/A_MN213863,Urban
+WATR_CD_MN213863,Wetland
+BRRN_CD_MN213863,Grassland
+FRSD_AB_WI476413,Forest
+FRSD_CD_WI476413,Forest
+FRSE_AB_WI476413,Forest
+FRSE_CD_WI476413,Forest
+WETF_CD_WI476413,Wetland
+WETH_CD_WI476413,Wetland
+SHRB_AB_WI476413,Grassland
+SHRB_CD_WI476413,Grassland
+PAST_AB_WI476413,Pasture
+PAST_CD_WI476413,Pasture
+CROP_AB_WI476413,Ag/Other
+CROP_CD_WI476413,Ag/Other
+CROP_Drained_WI47641,Ag/Other
+UROP_N/A_WI476413,Urban
+URMD_N/A_WI476413,Urban
+WATR_CD_WI476413,Wetland
+BRRN_CD_WI476413,Grassland
+FRSD_AB_WI478349,Forest
+FRSD_CD_WI478349,Forest
+FRSE_AB_WI478349,Forest
+FRSE_CD_WI478349,Forest
+WETF_CD_WI478349,Wetland
+WETH_CD_WI478349,Wetland
+SHRB_CD_WI478349,Grassland
+PAST_AB_WI478349,Pasture
+PAST_CD_WI478349,Pasture
+CROP_AB_WI478349,Ag/Other
+CROP_CD_WI478349,Ag/Other
+CROP_Drained_WI47834,Ag/Other
+UROP_N/A_WI478349,Urban
+URMD_N/A_WI478349,Urban
+URHD_N/A_WI478349,Urban
+WATR_CD_WI478349,Wetland
+BRRN_CD_WI478349,Grassland
+FRSD_D_MN213863,Forest
+FRSE_D_MN213863,Forest
+WETH_D_MN213863,Wetland
+SHRB_D_MN213863,Grassland
+PAST_D_MN213863,Pasture
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL FOR RES,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+SATURATED FOREST,Forest
+SATURATED LD RES,Urban
+ROCK FOREST,Forest
+ROCK FOR RES,Urban
+ROCK LD RES,Urban
+Urban,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Cropland HT Res.,Ag/Other
+Rangeland AB,Pasture
+Rangeland CD,Pasture
+Pasture AB,Pasture
+Pasture CD,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+TILL PASTURE,Pasture
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+Urban,Urban
+Forest,Forest
+High Till Crop,Ag/Other
+Low Till Crop,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Urban,Urban
+Forest,Forest
+High Till Crop,Ag/Other
+Low Till Crop,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Feedlot,Ag/Other
+Forest - AB,Forest
+Forest - CD,Forest
+Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland-AB,Ag/Other
+Cropland-CD,Ag/Other
+Cropland-Drained,Ag/Other
+Developed Open Spac,Urban
+Developed Low Inten,Urban
+Developed Medium an,Urban
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+Developed,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Cropland HighTill,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+WATR_NIL_L_1,Wetland
+DEVP_B_L_1,Urban
+FRST_D_H_1,Forest
+MANR_C_L_1,Ag/Other
+DEVP_C_L_1,Urban
+MANR_B_L_1,Ag/Other
+DEVP_D_L_1,Urban
+MANR_A_L_1,Ag/Other
+DEVP_A_H_1,Urban
+WETL_NIL_L_1,Wetland
+FRST_C_H_1,Forest
+CONS_D_H_1,Ag/Other
+MANR_C_H_1,Ag/Other
+CONS_C_H_1,Ag/Other
+MANR_D_L_1,Ag/Other
+DEVP_B_H_1,Urban
+CONS_B_H_1,Ag/Other
+DEVP_C_H_1,Urban
+BARN_NIL_L_1,Ag/Other
+DEVP_D_H_1,Urban
+FRST_B_H_1,Forest
+CONS_A_H_1,Ag/Other
+PAST_A_L_1,Pasture
+CONS_D_L_1,Ag/Other
+PAST_B_L_1,Pasture
+CONS_C_L_1,Ag/Other
+PAST_C_L_1,Pasture
+BARN_NIL_H_1,Ag/Other
+FRST_A_H_1,Forest
+CONS_B_L_1,Ag/Other
+MANR_D_H_1,Ag/Other
+CONS_A_L_1,Ag/Other
+PAST_D_L_1,Pasture
+CONV_D_H_1,Ag/Other
+PAST_A_H_1,Pasture
+CONV_C_H_1,Ag/Other
+FRST_A_L_1,Forest
+MANR_B_H_1,Ag/Other
+FRST_D_L_1,Forest
+CONV_B_H_1,Ag/Other
+MANR_A_H_1,Ag/Other
+PAST_B_H_1,Pasture
+CONV_A_H_1,Ag/Other
+PAST_C_H_1,Pasture
+PAST_D_H_1,Pasture
+FRST_B_L_1,Forest
+FRST_C_L_1,Forest
+CONV_D_L_1,Ag/Other
+CONV_A_L_1,Ag/Other
+CONV_C_L_1,Ag/Other
+DEVP_A_L_1,Urban
+CONV_B_L_1,Ag/Other
+CONV_B_L_2,Ag/Other
+CONV_C_L_2,Ag/Other
+FRST_B_L_2,Forest
+FRST_C_L_2,Forest
+PAST_D_H_2,Pasture
+CONV_D_L_2,Ag/Other
+PAST_C_H_2,Pasture
+MANR_A_H_2,Ag/Other
+PAST_B_H_2,Pasture
+CONV_A_H_2,Ag/Other
+MANR_D_H_2,Ag/Other
+CONV_B_H_2,Ag/Other
+FRST_D_L_2,Forest
+FRST_A_L_2,Forest
+PAST_A_H_2,Pasture
+CONV_C_H_2,Ag/Other
+MANR_B_H_2,Ag/Other
+PAST_D_L_2,Pasture
+CONV_D_H_2,Ag/Other
+CONS_A_L_2,Ag/Other
+BARN_NIL_H_2,Ag/Other
+FRST_A_H_2,Forest
+PAST_C_L_2,Pasture
+CONS_B_L_2,Ag/Other
+PAST_B_L_2,Pasture
+CONS_C_L_2,Ag/Other
+PAST_A_L_2,Pasture
+CONS_D_L_2,Ag/Other
+DEVP_D_H_2,Urban
+CONS_A_H_2,Ag/Other
+FRST_B_H_2,Forest
+BARN_NIL_L_2,Ag/Other
+DEVP_C_H_2,Urban
+MANR_D_L_2,Ag/Other
+DEVP_B_H_2,Urban
+CONS_B_H_2,Ag/Other
+CONS_C_H_2,Ag/Other
+DEVP_A_H_2,Urban
+WETL_NIL_L_2,Wetland
+FRST_C_H_2,Forest
+CONS_D_H_2,Ag/Other
+MANR_C_H_2,Ag/Other
+DEVP_D_L_2,Urban
+MANR_A_L_2,Ag/Other
+DEVP_C_L_2,Urban
+MANR_B_L_2,Ag/Other
+DEVP_B_L_2,Urban
+MANR_C_L_2,Ag/Other
+FRST_D_H_2,Forest
+WATR_NIL_L_2,Wetland
+DEVP_A_L_2,Urban
+CONV_A_L_2,Ag/Other
+PAST_D_L_3,Pasture
+MANR_C_L_3,Ag/Other
+WATR_NIL_L_3,Wetland
+PAST_A_H_3,Pasture
+FRST_D_L_3,Forest
+PAST_B_H_3,Pasture
+DEVP_A_L_3,Urban
+PAST_C_L_3,Pasture
+MANR_B_L_3,Ag/Other
+FRST_A_H_3,Forest
+MANR_A_L_3,Ag/Other
+PAST_C_H_3,Pasture
+PAST_B_L_3,Pasture
+FRST_D_H_3,Forest
+CONS_D_H_3,Ag/Other
+DEVP_B_L_3,Urban
+FRST_C_L_3,Forest
+WETL_NIL_L_3,Wetland
+PAST_D_H_3,Pasture
+CONS_C_H_3,Ag/Other
+MANR_D_H_3,Ag/Other
+MANR_C_H_3,Ag/Other
+CONV_A_L_3,Ag/Other
+CONS_B_H_3,Ag/Other
+DEVP_C_L_3,Urban
+PAST_A_L_3,Pasture
+CONV_B_L_3,Ag/Other
+CONS_A_H_3,Ag/Other
+BARN_NIL_L_3,Ag/Other
+MANR_A_H_3,Ag/Other
+MANR_D_L_3,Ag/Other
+DEVP_D_L_3,Urban
+CONV_C_L_3,Ag/Other
+FRST_B_L_3,Forest
+CONS_D_L_3,Ag/Other
+DEVP_D_H_3,Urban
+CONS_C_L_3,Ag/Other
+FRST_B_H_3,Forest
+FRST_C_H_3,Forest
+CONV_D_L_3,Ag/Other
+DEVP_A_H_3,Urban
+CONV_A_H_3,Ag/Other
+DEVP_C_H_3,Urban
+CONS_B_L_3,Ag/Other
+BARN_NIL_H_3,Ag/Other
+FRST_A_L_3,Forest
+CONS_A_L_3,Ag/Other
+CONV_B_H_3,Ag/Other
+CONV_C_H_3,Ag/Other
+DEVP_B_H_3,Urban
+MANR_B_H_3,Ag/Other
+CONV_D_H_3,Ag/Other
+CONV_C_H_4,Ag/Other
+CONV_D_H_4,Ag/Other
+CONV_B_H_4,Ag/Other
+BARN_NIL_H_4,Ag/Other
+CONS_A_L_4,Ag/Other
+FRST_B_H_4,Forest
+CONS_B_L_4,Ag/Other
+DEVP_C_H_4,Urban
+FRST_A_L_4,Forest
+CONV_A_H_4,Ag/Other
+DEVP_A_H_4,Urban
+CONV_D_L_4,Ag/Other
+MANR_D_L_4,Ag/Other
+FRST_C_H_4,Forest
+MANR_D_H_4,Ag/Other
+CONS_C_L_4,Ag/Other
+DEVP_D_H_4,Urban
+CONS_D_L_4,Ag/Other
+CONV_C_L_4,Ag/Other
+DEVP_D_L_4,Urban
+FRST_B_L_4,Forest
+BARN_NIL_L_4,Ag/Other
+CONV_B_L_4,Ag/Other
+CONS_A_H_4,Ag/Other
+DEVP_C_L_4,Urban
+PAST_A_L_4,Pasture
+MANR_C_L_4,Ag/Other
+CONV_A_L_4,Ag/Other
+CONS_B_H_4,Ag/Other
+WETL_NIL_L_4,Wetland
+PAST_D_H_4,Pasture
+CONS_C_H_4,Ag/Other
+DEVP_B_L_4,Urban
+MANR_C_H_4,Ag/Other
+PAST_B_L_4,Pasture
+FRST_C_L_4,Forest
+PAST_C_H_4,Pasture
+CONS_D_H_4,Ag/Other
+PAST_B_H_4,Pasture
+MANR_B_H_4,Ag/Other
+FRST_A_H_4,Forest
+MANR_A_L_4,Ag/Other
+DEVP_A_L_4,Urban
+PAST_C_L_4,Pasture
+FRST_D_H_4,Forest
+MANR_B_L_4,Ag/Other
+PAST_A_H_4,Pasture
+WATR_NIL_L_4,Wetland
+DEVP_B_H_4,Urban
+FRST_D_L_4,Forest
+PAST_D_L_4,Pasture
+MANR_A_H_4,Ag/Other
+DEVP_C_L_5,Urban
+PAST_D_L_5,Pasture
+MANR_D_H_5,Ag/Other
+CONS_A_H_5,Ag/Other
+CONS_C_H_5,Ag/Other
+CONV_B_H_5,Ag/Other
+FRST_D_L_5,Forest
+MANR_C_H_5,Ag/Other
+MANR_C_L_5,Ag/Other
+FRST_C_H_5,Forest
+PAST_A_H_5,Pasture
+DEVP_B_H_5,Urban
+DEVP_B_L_5,Urban
+CONS_D_L_5,Ag/Other
+FRST_B_H_5,Forest
+DEVP_C_H_5,Urban
+DEVP_D_L_5,Urban
+PAST_C_L_5,Pasture
+MANR_B_L_5,Ag/Other
+PAST_B_H_5,Pasture
+FRST_A_L_5,Forest
+CONV_A_H_5,Ag/Other
+FRST_D_H_5,Forest
+DEVP_A_L_5,Urban
+CONV_D_H_5,Ag/Other
+FRST_C_L_5,Forest
+BARN_NIL_L_5,Ag/Other
+CONS_D_H_5,Ag/Other
+PAST_C_H_5,Pasture
+WETL_NIL_L_5,Wetland
+CONV_D_L_5,Ag/Other
+WATR_NIL_L_5,Wetland
+BARN_NIL_H_5,Ag/Other
+PAST_B_L_5,Pasture
+FRST_A_H_5,Forest
+DEVP_D_H_5,Urban
+MANR_B_H_5,Ag/Other
+PAST_D_H_5,Pasture
+CONS_A_L_5,Ag/Other
+CONS_C_L_5,Ag/Other
+CONV_C_L_5,Ag/Other
+MANR_A_H_5,Ag/Other
+MANR_D_L_5,Ag/Other
+CONS_B_H_5,Ag/Other
+FRST_B_L_5,Forest
+CONV_B_L_5,Ag/Other
+CONV_A_L_5,Ag/Other
+MANR_A_L_5,Ag/Other
+CONS_B_L_5,Ag/Other
+CONV_C_H_5,Ag/Other
+PAST_A_L_5,Pasture
+DEVP_A_H_5,Urban
+FRST_B_L_6,Forest
+DEVP_A_H_6,Urban
+CONV_A_L_6,Ag/Other
+PAST_A_L_6,Pasture
+CONV_B_L_6,Ag/Other
+MANR_D_H_6,Ag/Other
+DEVP_A_L_6,Urban
+MANR_B_H_6,Ag/Other
+CONS_B_L_6,Ag/Other
+MANR_C_L_6,Ag/Other
+CONS_B_H_6,Ag/Other
+DEVP_D_H_6,Urban
+WATR_NIL_L_6,Wetland
+CONV_C_L_6,Ag/Other
+CONS_A_L_6,Ag/Other
+PAST_D_H_6,Pasture
+FRST_A_H_6,Forest
+WETL_NIL_L_6,Wetland
+CONS_C_L_6,Ag/Other
+MANR_D_L_6,Ag/Other
+BARN_NIL_L_6,Ag/Other
+CONV_D_L_6,Ag/Other
+PAST_C_H_6,Pasture
+CONS_D_H_6,Ag/Other
+PAST_B_L_6,Pasture
+CONV_D_H_6,Ag/Other
+FRST_A_L_6,Forest
+FRST_C_L_6,Forest
+DEVP_C_H_6,Urban
+DEVP_D_L_6,Urban
+FRST_B_H_6,Forest
+MANR_C_H_6,Ag/Other
+PAST_B_H_6,Pasture
+MANR_B_L_6,Ag/Other
+PAST_C_L_6,Pasture
+CONS_D_L_6,Ag/Other
+PAST_A_H_6,Pasture
+FRST_D_L_6,Forest
+CONV_B_H_6,Ag/Other
+BARN_NIL_H_6,Ag/Other
+CONS_C_H_6,Ag/Other
+FRST_C_H_6,Forest
+PAST_D_L_6,Pasture
+DEVP_B_L_6,Urban
+CONV_C_H_6,Ag/Other
+DEVP_B_H_6,Urban
+MANR_A_L_6,Ag/Other
+FRST_D_H_6,Forest
+CONV_C_H_7,Ag/Other
+DEVP_B_L_7,Urban
+MANR_D_L_7,Ag/Other
+BARN_NIL_H_7,Ag/Other
+CONV_B_H_7,Ag/Other
+CONS_C_H_7,Ag/Other
+CONV_A_H_7,Ag/Other
+DEVP_C_H_7,Urban
+FRST_A_L_7,Forest
+CONV_D_H_7,Ag/Other
+CONV_D_L_7,Ag/Other
+CONS_D_H_7,Ag/Other
+MANR_B_H_7,Ag/Other
+FRST_B_H_7,Forest
+MANR_C_L_7,Ag/Other
+CONS_B_H_7,Ag/Other
+WATR_NIL_L_7,Wetland
+CONV_C_L_7,Ag/Other
+CONS_A_L_7,Ag/Other
+DEVP_D_H_7,Urban
+DEVP_A_L_7,Urban
+DEVP_A_H_7,Urban
+CONV_B_L_7,Ag/Other
+FRST_A_H_7,Forest
+FRST_B_L_7,Forest
+CONV_A_L_7,Ag/Other
+PAST_A_L_7,Pasture
+CONS_B_L_7,Ag/Other
+MANR_A_L_7,Ag/Other
+MANR_C_H_7,Ag/Other
+FRST_C_H_7,Forest
+BARN_NIL_L_7,Ag/Other
+WETL_NIL_L_7,Wetland
+DEVP_D_L_7,Urban
+PAST_D_H_7,Pasture
+MANR_A_H_7,Ag/Other
+CONS_C_L_7,Ag/Other
+MANR_D_H_7,Ag/Other
+PAST_C_H_7,Pasture
+PAST_B_L_7,Pasture
+PAST_B_H_7,Pasture
+FRST_C_L_7,Forest
+MANR_B_L_7,Ag/Other
+PAST_A_H_7,Pasture
+CONS_D_L_7,Ag/Other
+CONS_A_H_7,Ag/Other
+PAST_C_L_7,Pasture
+FRST_D_H_7,Forest
+PAST_D_L_7,Pasture
+DEVP_C_L_7,Urban
+DEVP_B_H_7,Urban
+FRST_D_L_7,Forest
+CONS_D_L_8,Ag/Other
+CONS_A_H_8,Ag/Other
+CONS_C_L_8,Ag/Other
+WETL_NIL_L_8,Wetland
+DEVP_D_L_8,Urban
+BARN_NIL_L_8,Ag/Other
+FRST_C_H_8,Forest
+CONS_B_L_8,Ag/Other
+CONS_A_L_8,Ag/Other
+DEVP_A_H_8,Urban
+CONS_B_H_8,Ag/Other
+FRST_B_H_8,Forest
+CONV_D_H_8,Ag/Other
+DEVP_B_L_8,Urban
+CONV_C_H_8,Ag/Other
+BARN_NIL_H_8,Ag/Other
+MANR_D_L_8,Ag/Other
+CONV_B_H_8,Ag/Other
+DEVP_B_H_8,Urban
+CONS_C_H_8,Ag/Other
+MANR_C_L_8,Ag/Other
+MANR_B_H_8,Ag/Other
+MANR_D_H_8,Ag/Other
+CONV_A_H_8,Ag/Other
+DEVP_A_L_8,Urban
+FRST_A_L_8,Forest
+CONV_D_L_8,Ag/Other
+DEVP_C_H_8,Urban
+CONS_D_H_8,Ag/Other
+MANR_C_H_8,Ag/Other
+WATR_NIL_L_8,Wetland
+CONV_C_L_8,Ag/Other
+DEVP_D_H_8,Urban
+CONV_B_L_8,Ag/Other
+FRST_A_H_8,Forest
+CONV_A_L_8,Ag/Other
+FRST_B_L_8,Forest
+MANR_A_L_8,Ag/Other
+PAST_A_L_8,Pasture
+PAST_D_H_8,Pasture
+PAST_C_H_8,Pasture
+MANR_A_H_8,Ag/Other
+PAST_B_H_8,Pasture
+PAST_B_L_8,Pasture
+FRST_C_L_8,Forest
+PAST_A_H_8,Pasture
+MANR_B_L_8,Ag/Other
+PAST_C_L_8,Pasture
+FRST_D_L_8,Forest
+FRST_D_H_8,Forest
+PAST_D_L_8,Pasture
+DEVP_C_L_8,Urban
+MANR_B_L_9,Ag/Other
+MANR_A_L_9,Ag/Other
+CONS_D_H_9,Ag/Other
+CONS_C_H_9,Ag/Other
+CONS_B_H_9,Ag/Other
+CONS_A_H_9,Ag/Other
+CONS_D_L_9,Ag/Other
+CONS_B_L_9,Ag/Other
+CONS_A_L_9,Ag/Other
+CONV_D_H_9,Ag/Other
+CONV_C_H_9,Ag/Other
+CONV_B_H_9,Ag/Other
+MANR_D_L_9,Ag/Other
+CONV_A_H_9,Ag/Other
+CONV_D_L_9,Ag/Other
+CONV_B_L_9,Ag/Other
+CONV_A_L_9,Ag/Other
+PAST_D_H_9,Pasture
+PAST_C_H_9,Pasture
+PAST_B_H_9,Pasture
+MANR_A_H_9,Ag/Other
+PAST_A_H_9,Pasture
+PAST_D_L_9,Pasture
+PAST_C_L_9,Pasture
+PAST_B_L_9,Pasture
+PAST_A_L_9,Pasture
+DEVP_D_H_9,Urban
+DEVP_C_H_9,Urban
+DEVP_B_H_9,Urban
+MANR_B_H_9,Ag/Other
+DEVP_A_H_9,Urban
+DEVP_D_L_9,Urban
+DEVP_B_L_9,Urban
+DEVP_A_L_9,Urban
+FRST_D_H_9,Forest
+FRST_C_H_9,Forest
+FRST_B_H_9,Forest
+FRST_A_H_9,Forest
+MANR_C_H_9,Ag/Other
+FRST_D_L_9,Forest
+FRST_C_L_9,Forest
+FRST_B_L_9,Forest
+FRST_A_L_9,Forest
+BARN_NIL_H_9,Ag/Other
+BARN_NIL_L_9,Ag/Other
+WETL_NIL_L_9,Wetland
+WATR_NIL_L_9,Wetland
+MANR_D_H_9,Ag/Other
+Developed,Urban
+Forest Deciduous,Forest
+Forest Conifer,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Pasture,Pasture
+Grassland,Grassland
+Wetland Woody,Wetland
+Wetland Herbaceous,Wetland
+Feedlot,Ag/Other
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+FOREST,Forest
+AG/OTHER,Ag/Other
+URBAN,Urban
+WETLAND,Wetland
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+Developed,Urban
+Forest Deciduous,Forest
+Cropland HighTill,Ag/Other
+Cropland LowTill,Ag/Other
+Grassland,Grassland
+Wetland,Wetland
+Feedlot,Ag/Other
+Pasture,Pasture
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+Developed,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Cropland HighTillRes,Ag/Other
+Rangeland AB,Pasture
+Rangeland CD,Pasture
+Pasture AB,Pasture
+Pasture CD,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Urban,Urban
+Forest High Runoff,Forest
+Forest Low Runoff,Forest
+Cropland High Runof,Ag/Other
+Cropland Low Runoff,Ag/Other
+Grassland High Runo,Grassland
+Grassland Low Runof,Grassland
+Pasture High Runoff,Pasture
+Pasture Low Runoff,Pasture
+Water/Wetlands,Wetland
+Developed,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Cropland HighTillRes,Ag/Other
+Rangeland AB,Pasture
+Rangeland CD,Pasture
+Pasture AB,Pasture
+Pasture CD,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Feedlot,Ag/Other
+Developed,Urban
+Cropland LowTill AB,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill CD,Ag/Other
+Forest,Forest
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Forest - AB,Forest
+Forest - CD,Forest
+Emerg Herb Wetland,Wetland
+Woody Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland - AB,Ag/Other
+Cropland - CD,Ag/Other
+Cropland-Drained,Ag/Other
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+Feedlot,Ag/Other
+Developed,Urban
+Cropland LowTill AB,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill CD,Ag/Other
+Forest,Forest
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL FOR RES,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED COMM/IND,Urban
+ROCK FOREST,Forest
+ROCK LD RES,Urban
+ROCK COMM/IND FLAT,Urban
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Feedlot,Ag/Other
+Forest - AB,Forest
+Forest - CD,Forest
+Emerg Herb Wetland,Wetland
+Woody Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland - AB,Ag/Other
+Cropland - CD,Ag/Other
+Cropland-Drained,Ag/Other
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+FRSD_AB_MN210387,Forest
+FRSD_CD_MN210387,Forest
+FRSE_AB_MN210387,Forest
+FRSE_CD_MN210387,Forest
+WETF_CD_MN210387,Wetland
+WETH_CD_MN210387,Wetland
+SHRB_AB_MN210387,Grassland
+SHRB_CD_MN210387,Grassland
+PAST_AB_MN210387,Pasture
+PAST_CD_MN210387,Pasture
+CROP_AB_MN210387,Ag/Other
+CROP_CD_MN210387,Ag/Other
+CROP_Drained_MN21038,Ag/Other
+UROP_N/A_MN210387,Urban
+URMD_N/A_MN210387,Urban
+URHD_N/A_MN210387,Urban
+WATR_CD_MN210387,Wetland
+BRRN_CD_MN210387,Grassland
+FRSD_AB_MN210989,Forest
+FRSD_CD_MN210989,Forest
+FRSE_AB_MN210989,Forest
+FRSE_CD_MN210989,Forest
+WETF_CD_MN210989,Wetland
+WETH_CD_MN210989,Wetland
+SHRB_AB_MN210989,Grassland
+SHRB_CD_MN210989,Grassland
+PAST_AB_MN210989,Pasture
+PAST_CD_MN210989,Pasture
+CROP_AB_MN210989,Ag/Other
+CROP_CD_MN210989,Ag/Other
+UROP_N/A_MN210989,Urban
+URMD_N/A_MN210989,Urban
+URHD_N/A_MN210989,Urban
+WATR_CD_MN210989,Wetland
+BRRN_CD_MN210989,Grassland
+FRSD_AB_MN211630,Forest
+FRSD_CD_MN211630,Forest
+FRSE_AB_MN211630,Forest
+FRSE_CD_MN211630,Forest
+WETF_CD_MN211630,Wetland
+WETH_CD_MN211630,Wetland
+SHRB_AB_MN211630,Grassland
+SHRB_CD_MN211630,Grassland
+PAST_AB_MN211630,Pasture
+PAST_CD_MN211630,Pasture
+CROP_AB_MN211630,Ag/Other
+CROP_CD_MN211630,Ag/Other
+CROP_Drained_MN21163,Ag/Other
+UROP_N/A_MN211630,Urban
+URMD_N/A_MN211630,Urban
+URHD_N/A_MN211630,Urban
+WATR_CD_MN211630,Wetland
+BRRN_CD_MN211630,Grassland
+FRSD_AB_MN211840,Forest
+FRSD_CD_MN211840,Forest
+FRSE_AB_MN211840,Forest
+FRSE_CD_MN211840,Forest
+WETF_CD_MN211840,Wetland
+WETH_CD_MN211840,Wetland
+SHRB_AB_MN211840,Grassland
+SHRB_CD_MN211840,Grassland
+PAST_AB_MN211840,Pasture
+PAST_CD_MN211840,Pasture
+CROP_AB_MN211840,Ag/Other
+CROP_CD_MN211840,Ag/Other
+CROP_Drained_MN21184,Ag/Other
+UROP_N/A_MN211840,Urban
+URMD_N/A_MN211840,Urban
+URHD_N/A_MN211840,Urban
+WATR_CD_MN211840,Wetland
+BRRN_CD_MN211840,Grassland
+FRSD_AB_MN212248,Forest
+FRSD_CD_MN212248,Forest
+FRSE_AB_MN212248,Forest
+FRSE_CD_MN212248,Forest
+WETF_CD_MN212248,Wetland
+WETH_CD_MN212248,Wetland
+SHRB_AB_MN212248,Grassland
+SHRB_CD_MN212248,Grassland
+PAST_AB_MN212248,Pasture
+PAST_CD_MN212248,Pasture
+CROP_AB_MN212248,Ag/Other
+CROP_CD_MN212248,Ag/Other
+CROP_Drained_MN21224,Ag/Other
+UROP_N/A_MN212248,Urban
+URMD_N/A_MN212248,Urban
+URHD_N/A_MN212248,Urban
+WATR_CD_MN212248,Wetland
+BRRN_CD_MN212248,Grassland
+FRSD_AB_MN212576,Forest
+FRSD_CD_MN212576,Forest
+FRSE_AB_MN212576,Forest
+FRSE_CD_MN212576,Forest
+WETF_CD_MN212576,Wetland
+WETH_CD_MN212576,Wetland
+SHRB_AB_MN212576,Grassland
+SHRB_CD_MN212576,Grassland
+PAST_AB_MN212576,Pasture
+PAST_CD_MN212576,Pasture
+CROP_AB_MN212576,Ag/Other
+CROP_CD_MN212576,Ag/Other
+CROP_Drained_MN21257,Ag/Other
+UROP_N/A_MN212576,Urban
+URMD_N/A_MN212576,Urban
+URHD_N/A_MN212576,Urban
+WATR_CD_MN212576,Wetland
+BRRN_CD_MN212576,Grassland
+FRSD_AB_MN212645,Forest
+FRSD_CD_MN212645,Forest
+FRSE_AB_MN212645,Forest
+FRSE_CD_MN212645,Forest
+WETF_CD_MN212645,Wetland
+WETH_CD_MN212645,Wetland
+SHRB_AB_MN212645,Grassland
+SHRB_CD_MN212645,Grassland
+PAST_AB_MN212645,Pasture
+PAST_CD_MN212645,Pasture
+CROP_AB_MN212645,Ag/Other
+CROP_CD_MN212645,Ag/Other
+CROP_Drained_MN21264,Ag/Other
+UROP_N/A_MN212645,Urban
+URMD_N/A_MN212645,Urban
+URHD_N/A_MN212645,Urban
+WATR_CD_MN212645,Wetland
+BRRN_CD_MN212645,Grassland
+FRSD_AB_MN212842,Forest
+FRSD_CD_MN212842,Forest
+FRSE_AB_MN212842,Forest
+FRSE_CD_MN212842,Forest
+WETF_CD_MN212842,Wetland
+WETH_CD_MN212842,Wetland
+SHRB_AB_MN212842,Grassland
+SHRB_CD_MN212842,Grassland
+PAST_AB_MN212842,Pasture
+PAST_CD_MN212842,Pasture
+CROP_AB_MN212842,Ag/Other
+CROP_CD_MN212842,Ag/Other
+CROP_Drained_MN21284,Ag/Other
+UROP_N/A_MN212842,Urban
+URMD_N/A_MN212842,Urban
+URHD_N/A_MN212842,Urban
+WATR_CD_MN212842,Wetland
+BRRN_CD_MN212842,Grassland
+FRSD_AB_MN213730,Forest
+FRSD_CD_MN213730,Forest
+FRSE_AB_MN213730,Forest
+FRSE_CD_MN213730,Forest
+WETF_CD_MN213730,Wetland
+WETH_CD_MN213730,Wetland
+SHRB_AB_MN213730,Grassland
+SHRB_CD_MN213730,Grassland
+PAST_AB_MN213730,Pasture
+PAST_CD_MN213730,Pasture
+CROP_AB_MN213730,Ag/Other
+CROP_CD_MN213730,Ag/Other
+CROP_Drained_MN21373,Ag/Other
+UROP_N/A_MN213730,Urban
+URMD_N/A_MN213730,Urban
+URHD_N/A_MN213730,Urban
+WATR_CD_MN213730,Wetland
+BRRN_CD_MN213730,Grassland
+FRSD_AB_MN213863,Forest
+FRSD_CD_MN213863,Forest
+FRSE_AB_MN213863,Forest
+FRSE_CD_MN213863,Forest
+WETF_CD_MN213863,Wetland
+WETH_CD_MN213863,Wetland
+SHRB_AB_MN213863,Grassland
+SHRB_CD_MN213863,Grassland
+PAST_AB_MN213863,Pasture
+PAST_CD_MN213863,Pasture
+CROP_AB_MN213863,Ag/Other
+CROP_CD_MN213863,Ag/Other
+CROP_Drained_MN21386,Ag/Other
+UROP_N/A_MN213863,Urban
+URMD_N/A_MN213863,Urban
+URHD_N/A_MN213863,Urban
+WATR_CD_MN213863,Wetland
+BRRN_CD_MN213863,Grassland
+FRSD_AB_WI476413,Forest
+FRSD_CD_WI476413,Forest
+FRSE_AB_WI476413,Forest
+FRSE_CD_WI476413,Forest
+WETF_CD_WI476413,Wetland
+WETH_CD_WI476413,Wetland
+SHRB_AB_WI476413,Grassland
+SHRB_CD_WI476413,Grassland
+PAST_AB_WI476413,Pasture
+PAST_CD_WI476413,Pasture
+CROP_AB_WI476413,Ag/Other
+CROP_CD_WI476413,Ag/Other
+CROP_Drained_WI47641,Ag/Other
+UROP_N/A_WI476413,Urban
+URMD_N/A_WI476413,Urban
+URHD_N/A_WI476413,Urban
+WATR_CD_WI476413,Wetland
+BRRN_CD_WI476413,Grassland
+FRSD_AB_WI478349,Forest
+FRSD_CD_WI478349,Forest
+FRSE_AB_WI478349,Forest
+FRSE_CD_WI478349,Forest
+WETF_CD_WI478349,Wetland
+WETH_CD_WI478349,Wetland
+SHRB_AB_WI478349,Grassland
+SHRB_CD_WI478349,Grassland
+PAST_AB_WI478349,Pasture
+PAST_CD_WI478349,Pasture
+CROP_AB_WI478349,Ag/Other
+CROP_CD_WI478349,Ag/Other
+CROP_Drained_WI47834,Ag/Other
+UROP_N/A_WI478349,Urban
+URMD_N/A_WI478349,Urban
+URHD_N/A_WI478349,Urban
+WATR_CD_WI478349,Wetland
+BRRN_CD_WI478349,Grassland
+FRSD_AB_HIBBING,Forest
+FRSD_CD_HIBBING,Forest
+FRSE_AB_HIBBING,Forest
+FRSE_CD_HIBBING,Forest
+WETF_CD_HIBBING,Wetland
+WETH_CD_HIBBING,Wetland
+SHRB_AB_HIBBING,Grassland
+SHRB_CD_HIBBING,Grassland
+PAST_AB_HIBBING,Pasture
+PAST_CD_HIBBING,Pasture
+CROP_AB_HIBBING,Ag/Other
+CROP_CD_HIBBING,Ag/Other
+CROP_Drained_HIBBING,Ag/Other
+UROP_N/A_HIBBING,Urban
+URMD_N/A_HIBBING,Urban
+URHD_N/A_HIBBING,Urban
+WATR_CD_HIBBING,Wetland
+BRRN_CD_HIBBING,Grassland
+FRSD_AB_JANZEN_E,Forest
+FRSD_CD_JANZEN_E,Forest
+FRSE_AB_JANZEN_E,Forest
+FRSE_CD_JANZEN_E,Forest
+WETF_CD_JANZEN_E,Wetland
+WETH_CD_JANZEN_E,Wetland
+SHRB_AB_JANZEN_E,Grassland
+SHRB_CD_JANZEN_E,Grassland
+PAST_AB_JANZEN_E,Pasture
+PAST_CD_JANZEN_E,Pasture
+CROP_AB_JANZEN_E,Ag/Other
+CROP_CD_JANZEN_E,Ag/Other
+CROP_Drained_JANZEN_,Ag/Other
+UROP_N/A_JANZEN_E,Urban
+URMD_N/A_JANZEN_E,Urban
+URHD_N/A_JANZEN_E,Urban
+WATR_CD_JANZEN_E,Wetland
+BRRN_CD_JANZEN_E,Grassland
+FRSD_AB_KUUSINEN,Forest
+FRSD_CD_KUUSINEN,Forest
+FRSE_AB_KUUSINEN,Forest
+FRSE_CD_KUUSINEN,Forest
+WETF_CD_KUUSINEN,Wetland
+WETH_CD_KUUSINEN,Wetland
+SHRB_AB_KUUSINEN,Grassland
+SHRB_CD_KUUSINEN,Grassland
+PAST_AB_KUUSINEN,Pasture
+PAST_CD_KUUSINEN,Pasture
+CROP_AB_KUUSINEN,Ag/Other
+CROP_CD_KUUSINEN,Ag/Other
+CROP_Drained_KUUSINE,Ag/Other
+UROP_N/A_KUUSINEN,Urban
+URMD_N/A_KUUSINEN,Urban
+URHD_N/A_KUUSINEN,Urban
+WATR_CD_KUUSINEN,Wetland
+BRRN_CD_KUUSINEN,Grassland
+FRSD_AB_POMROY,Forest
+FRSD_CD_POMROY,Forest
+FRSE_AB_POMROY,Forest
+FRSE_CD_POMROY,Forest
+WETF_CD_POMROY,Wetland
+WETH_CD_POMROY,Wetland
+SHRB_AB_POMROY,Grassland
+SHRB_CD_POMROY,Grassland
+PAST_AB_POMROY,Pasture
+PAST_CD_POMROY,Pasture
+CROP_AB_POMROY,Ag/Other
+CROP_CD_POMROY,Ag/Other
+CROP_Drained_POMROY,Ag/Other
+UROP_N/A_POMROY,Urban
+URMD_N/A_POMROY,Urban
+WATR_CD_POMROY,Wetland
+BRRN_CD_POMROY,Grassland
+FRSD_AB_SIKKILA,Forest
+FRSD_CD_SIKKILA,Forest
+FRSE_AB_SIKKILA,Forest
+FRSE_CD_SIKKILA,Forest
+WETF_CD_SIKKILA,Wetland
+WETH_CD_SIKKILA,Wetland
+SHRB_AB_SIKKILA,Grassland
+SHRB_CD_SIKKILA,Grassland
+PAST_AB_SIKKILA,Pasture
+PAST_CD_SIKKILA,Pasture
+CROP_AB_SIKKILA,Ag/Other
+CROP_CD_SIKKILA,Ag/Other
+CROP_Drained_SIKKILA,Ag/Other
+UROP_N/A_SIKKILA,Urban
+URMD_N/A_SIKKILA,Urban
+URHD_N/A_SIKKILA,Urban
+WATR_CD_SIKKILA,Wetland
+BRRN_CD_SIKKILA,Grassland
+WATR_N/A_WST_8,Wetland
+UROP_N/A_WST_8,Urban
+URLD_N/A_WST_8,Urban
+URMH_N/A_WST_8,Urban
+BRRN_CD_WST_8,Grassland
+WETW_CD_WST_8,Wetland
+WETH_CD_WST_8,Wetland
+FDAB_AB_WST_8,Forest
+FDCD_CD_WST_8,Forest
+FCAB_AB_WST_8,Forest
+FCCD_CD_WST_8,Forest
+HBAB_AB_WST_8,Grassland
+HBCD_CD_WST_8,Grassland
+CPAB_AB_WST_8,Ag/Other
+CPCD_CD_WST_8,Ag/Other
+RODP_N/A_WST_8,Urban
+RODU_N/A_WST_8,Urban
+WATR_N/A_WST_9,Wetland
+UROP_N/A_WST_9,Urban
+URLD_N/A_WST_9,Urban
+URMH_N/A_WST_9,Urban
+BRRN_CD_WST_9,Grassland
+WETW_CD_WST_9,Wetland
+WETH_CD_WST_9,Wetland
+FDAB_AB_WST_9,Forest
+FDCD_CD_WST_9,Forest
+FCAB_AB_WST_9,Forest
+FCCD_CD_WST_9,Forest
+HBAB_AB_WST_9,Grassland
+HBCD_CD_WST_9,Grassland
+CPAB_AB_WST_9,Ag/Other
+CPCD_CD_WST_9,Ag/Other
+RODP_N/A_WST_9,Urban
+RODU_N/A_WST_9,Urban
+WATR_N/A_WST_10,Wetland
+UROP_N/A_WST_10,Urban
+URLD_N/A_WST_10,Urban
+URMH_N/A_WST_10,Urban
+BRRN_CD_WST_10,Grassland
+WETW_CD_WST_10,Wetland
+WETH_CD_WST_10,Wetland
+FDAB_AB_WST_10,Forest
+FDCD_CD_WST_10,Forest
+FCAB_AB_WST_10,Forest
+FCCD_CD_WST_10,Forest
+HBAB_AB_WST_10,Grassland
+HBCD_CD_WST_10,Grassland
+CPAB_AB_WST_10,Ag/Other
+CPCD_CD_WST_10,Ag/Other
+RODP_N/A_WST_10,Urban
+RODU_N/A_WST_10,Urban
+WATR_N/A_WST_11,Wetland
+UROP_N/A_WST_11,Urban
+URLD_N/A_WST_11,Urban
+URMH_N/A_WST_11,Urban
+BRRN_CD_WST_11,Grassland
+WETW_CD_WST_11,Wetland
+WETH_CD_WST_11,Wetland
+FDAB_AB_WST_11,Forest
+FDCD_CD_WST_11,Forest
+FCAB_AB_WST_11,Forest
+FCCD_CD_WST_11,Forest
+HBAB_AB_WST_11,Grassland
+HBCD_CD_WST_11,Grassland
+CPAB_AB_WST_11,Ag/Other
+CPCD_CD_WST_11,Ag/Other
+RODP_N/A_WST_11,Urban
+RODU_N/A_WST_11,Urban
+WATR_N/A_WST_12,Wetland
+UROP_N/A_WST_12,Urban
+URLD_N/A_WST_12,Urban
+URMH_N/A_WST_12,Urban
+BRRN_CD_WST_12,Grassland
+WETW_CD_WST_12,Wetland
+WETH_CD_WST_12,Wetland
+FDAB_AB_WST_12,Forest
+FDCD_CD_WST_12,Forest
+FCAB_AB_WST_12,Forest
+FCCD_CD_WST_12,Forest
+HBAB_AB_WST_12,Grassland
+HBCD_CD_WST_12,Grassland
+CPAB_AB_WST_12,Ag/Other
+CPCD_CD_WST_12,Ag/Other
+RODP_N/A_WST_12,Urban
+RODU_N/A_WST_12,Urban
+WATR_N/A_WST_13,Wetland
+UROP_N/A_WST_13,Urban
+URLD_N/A_WST_13,Urban
+URMH_N/A_WST_13,Urban
+BRRN_CD_WST_13,Grassland
+WETW_CD_WST_13,Wetland
+WETH_CD_WST_13,Wetland
+FDAB_AB_WST_13,Forest
+FDCD_CD_WST_13,Forest
+FCAB_AB_WST_13,Forest
+FCCD_CD_WST_13,Forest
+HBAB_AB_WST_13,Grassland
+HBCD_CD_WST_13,Grassland
+RODP_N/A_WST_13,Urban
+RODU_N/A_WST_13,Urban
+WATR_N/A_WST_14,Wetland
+UROP_N/A_WST_14,Urban
+URLD_N/A_WST_14,Urban
+BRRN_CD_WST_14,Grassland
+WETW_CD_WST_14,Wetland
+WETH_CD_WST_14,Wetland
+FDAB_AB_WST_14,Forest
+FDCD_CD_WST_14,Forest
+FCAB_AB_WST_14,Forest
+FCCD_CD_WST_14,Forest
+HBAB_AB_WST_14,Grassland
+HBCD_CD_WST_14,Grassland
+RODP_N/A_WST_14,Urban
+RODU_N/A_WST_14,Urban
+WATR_N/A_WST_15,Wetland
+UROP_N/A_WST_15,Urban
+URLD_N/A_WST_15,Urban
+URMH_N/A_WST_15,Urban
+BRRN_CD_WST_15,Grassland
+WETW_CD_WST_15,Wetland
+WETH_CD_WST_15,Wetland
+FDAB_AB_WST_15,Forest
+FDCD_CD_WST_15,Forest
+FCAB_AB_WST_15,Forest
+FCCD_CD_WST_15,Forest
+HBAB_AB_WST_15,Grassland
+HBCD_CD_WST_15,Grassland
+CPAB_AB_WST_15,Ag/Other
+CPCD_CD_WST_15,Ag/Other
+RODP_N/A_WST_15,Urban
+RODU_N/A_WST_15,Urban
+WATR_N/A_WST_16,Wetland
+UROP_N/A_WST_16,Urban
+URLD_N/A_WST_16,Urban
+URMH_N/A_WST_16,Urban
+BRRN_CD_WST_16,Grassland
+WETW_CD_WST_16,Wetland
+WETH_CD_WST_16,Wetland
+FDAB_AB_WST_16,Forest
+FDCD_CD_WST_16,Forest
+FCAB_AB_WST_16,Forest
+FCCD_CD_WST_16,Forest
+HBAB_AB_WST_16,Grassland
+HBCD_CD_WST_16,Grassland
+CPAB_AB_WST_16,Ag/Other
+CPCD_CD_WST_16,Ag/Other
+RODP_N/A_WST_16,Urban
+RODU_N/A_WST_16,Urban
+WATR_N/A_WST_17,Wetland
+UROP_N/A_WST_17,Urban
+URLD_N/A_WST_17,Urban
+URMH_N/A_WST_17,Urban
+BRRN_CD_WST_17,Grassland
+WETW_CD_WST_17,Wetland
+WETH_CD_WST_17,Wetland
+FDAB_AB_WST_17,Forest
+FDCD_CD_WST_17,Forest
+FCAB_AB_WST_17,Forest
+FCCD_CD_WST_17,Forest
+HBAB_AB_WST_17,Grassland
+HBCD_CD_WST_17,Grassland
+CPCD_CD_WST_17,Ag/Other
+RODP_N/A_WST_17,Urban
+RODU_N/A_WST_17,Urban
+WATR_N/A_WST_18,Wetland
+UROP_N/A_WST_18,Urban
+URLD_N/A_WST_18,Urban
+URMH_N/A_WST_18,Urban
+BRRN_CD_WST_18,Grassland
+WETW_CD_WST_18,Wetland
+WETH_CD_WST_18,Wetland
+FDAB_AB_WST_18,Forest
+FDCD_CD_WST_18,Forest
+FCAB_AB_WST_18,Forest
+FCCD_CD_WST_18,Forest
+HBAB_AB_WST_18,Grassland
+HBCD_CD_WST_18,Grassland
+CPCD_CD_WST_18,Ag/Other
+RODP_N/A_WST_18,Urban
+RODU_N/A_WST_18,Urban
+WATR_N/A_WST_1,Wetland
+UROP_N/A_WST_1,Urban
+URLD_N/A_WST_1,Urban
+URMH_N/A_WST_1,Urban
+BRRN_CD_WST_1,Grassland
+WETW_CD_WST_1,Wetland
+WETH_CD_WST_1,Wetland
+FDAB_AB_WST_1,Forest
+FDCD_CD_WST_1,Forest
+FCAB_AB_WST_1,Forest
+FCCD_CD_WST_1,Forest
+HBAB_AB_WST_1,Grassland
+HBCD_CD_WST_1,Grassland
+CPAB_AB_WST_1,Ag/Other
+CPCD_CD_WST_1,Ag/Other
+RODP_N/A_WST_1,Urban
+RODU_N/A_WST_1,Urban
+WATR_N/A_WST_2,Wetland
+UROP_N/A_WST_2,Urban
+URLD_N/A_WST_2,Urban
+URMH_N/A_WST_2,Urban
+BRRN_CD_WST_2,Grassland
+WETW_CD_WST_2,Wetland
+WETH_CD_WST_2,Wetland
+FDAB_AB_WST_2,Forest
+FDCD_CD_WST_2,Forest
+FCAB_AB_WST_2,Forest
+FCCD_CD_WST_2,Forest
+HBAB_AB_WST_2,Grassland
+HBCD_CD_WST_2,Grassland
+CPAB_AB_WST_2,Ag/Other
+CPCD_CD_WST_2,Ag/Other
+RODP_N/A_WST_2,Urban
+RODU_N/A_WST_2,Urban
+WATR_N/A_WST_3,Wetland
+UROP_N/A_WST_3,Urban
+URLD_N/A_WST_3,Urban
+URMH_N/A_WST_3,Urban
+BRRN_CD_WST_3,Grassland
+WETW_CD_WST_3,Wetland
+WETH_CD_WST_3,Wetland
+FDAB_AB_WST_3,Forest
+FDCD_CD_WST_3,Forest
+FCAB_AB_WST_3,Forest
+FCCD_CD_WST_3,Forest
+HBAB_AB_WST_3,Grassland
+HBCD_CD_WST_3,Grassland
+CPAB_AB_WST_3,Ag/Other
+CPCD_CD_WST_3,Ag/Other
+RODP_N/A_WST_3,Urban
+RODU_N/A_WST_3,Urban
+WATR_N/A_WST_4,Wetland
+UROP_N/A_WST_4,Urban
+URLD_N/A_WST_4,Urban
+URMH_N/A_WST_4,Urban
+BRRN_CD_WST_4,Grassland
+WETW_CD_WST_4,Wetland
+WETH_CD_WST_4,Wetland
+FDAB_AB_WST_4,Forest
+FDCD_CD_WST_4,Forest
+FCAB_AB_WST_4,Forest
+FCCD_CD_WST_4,Forest
+HBAB_AB_WST_4,Grassland
+HBCD_CD_WST_4,Grassland
+CPAB_AB_WST_4,Ag/Other
+CPCD_CD_WST_4,Ag/Other
+RODP_N/A_WST_4,Urban
+RODU_N/A_WST_4,Urban
+WATR_N/A_WST_5,Wetland
+UROP_N/A_WST_5,Urban
+URLD_N/A_WST_5,Urban
+URMH_N/A_WST_5,Urban
+BRRN_CD_WST_5,Grassland
+WETW_CD_WST_5,Wetland
+WETH_CD_WST_5,Wetland
+FDAB_AB_WST_5,Forest
+FDCD_CD_WST_5,Forest
+FCAB_AB_WST_5,Forest
+FCCD_CD_WST_5,Forest
+HBAB_AB_WST_5,Grassland
+HBCD_CD_WST_5,Grassland
+CPAB_AB_WST_5,Ag/Other
+CPCD_CD_WST_5,Ag/Other
+RODP_N/A_WST_5,Urban
+RODU_N/A_WST_5,Urban
+WATR_N/A_WST_6,Wetland
+UROP_N/A_WST_6,Urban
+URLD_N/A_WST_6,Urban
+URMH_N/A_WST_6,Urban
+BRRN_CD_WST_6,Grassland
+WETW_CD_WST_6,Wetland
+WETH_CD_WST_6,Wetland
+FDAB_AB_WST_6,Forest
+FDCD_CD_WST_6,Forest
+FCAB_AB_WST_6,Forest
+FCCD_CD_WST_6,Forest
+HBAB_AB_WST_6,Grassland
+HBCD_CD_WST_6,Grassland
+CPAB_AB_WST_6,Ag/Other
+CPCD_CD_WST_6,Ag/Other
+RODP_N/A_WST_6,Urban
+RODU_N/A_WST_6,Urban
+WATR_N/A_WST_7,Wetland
+UROP_N/A_WST_7,Urban
+URLD_N/A_WST_7,Urban
+URMH_N/A_WST_7,Urban
+BRRN_CD_WST_7,Grassland
+WETW_CD_WST_7,Wetland
+WETH_CD_WST_7,Wetland
+FDAB_AB_WST_7,Forest
+FDCD_CD_WST_7,Forest
+FCAB_AB_WST_7,Forest
+FCCD_CD_WST_7,Forest
+HBAB_AB_WST_7,Grassland
+HBCD_CD_WST_7,Grassland
+CPAB_AB_WST_7,Ag/Other
+CPCD_CD_WST_7,Ag/Other
+RODP_N/A_WST_7,Urban
+RODU_N/A_WST_7,Urban
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COM/IND FLAT,Urban
+TILL COM/IND LOW,Urban
+TILL COM/IND MED,Urban
+TILL COM/IND STEEP,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COM/IND,Urban
+Feedlot,Ag/Other
+Developed,Urban
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Grassland,Grassland
+Wetland Woody,Wetland
+Wetland Herbaceous,Wetland
+Forest AB,Forest
+Pasture AB,Pasture
+Pasture CD,Pasture
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Grassland,Grassland
+Pasture AB,Pasture
+Pasture CD,Pasture
+Cropland,Ag/Other
+Wetland,Wetland
+Developed,Urban
+Forest AB,Forest
+Forest CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Wetland,Wetland
+Developed,Urban
+Forest Deciduous AB,Forest
+Forest Deciduous CD,Forest
+Forest Young AB,Forest
+Forest Young CD,Forest
+Forest Conifer AB,Forest
+Forest Conifer CD,Forest
+Cropland LowTill,Ag/Other
+Cropland HighTill,Ag/Other
+Grasslands,Grassland
+Feedlot,Ag/Other
+Developed,Urban
+Forest,Forest
+Cropland LowTill AB,Ag/Other
+Cropland LowTill CD,Ag/Other
+Cropland HighTill AB,Ag/Other
+Cropland HighTill CD,Ag/Other
+Cropland Man. HT AB,Ag/Other
+Grassland,Grassland
+Pasture,Pasture
+Wetland,Wetland
+Feedlot,Ag/Other
+Bluff,Unknown
+Ravine,Unknown
+TILL FOREST,Forest
+TILL PAST/AG,Pasture
+TILL PAST/AG STEEP,Pasture
+TILL FOR RES,Urban
+TILL FOR RES STEEP,Urban
+TILL LD RES,Urban
+TILL HD RES,Urban
+TILL COMM/IND FLAT,Urban
+TILL COMM/IND LOW,Urban
+TILL COMM/IND MED,Urban
+TILL COMM/IND STEE,Urban
+OUTWASH FOREST,Forest
+OUTWASH PASTURE,Pasture
+OUTWASH FOR RES,Urban
+OUTWASH LD RES,Urban
+OUTWASH HD RES,Urban
+OUTWASH COMM/IND,Urban
+SATURATED FOREST,Forest
+SATURATED PAST/AG,Pasture
+SATURATED FOR RES,Urban
+SATURATED LD RES,Urban
+SATURATED HD RES,Urban
+SATURATED COMM/IND,Urban
+ROCK FOREST,Forest
+ROCK PAST/AG,Pasture
+ROCK FOR RES,Urban
+ROCK LD RES,Urban
+ROCK HD RES,Urban
+Urban,Urban
+Forest Low RO,Forest
+Forest High RO,Forest
+Cropland High Till,Ag/Other
+Cropland Low Till,Ag/Other
+Pasture Low RO,Pasture
+Pasture High RO,Pasture
+Grassland Low RO,Grassland
+Grassland High RO,Grassland
+Wetlands,Wetland
+Forest - AB,Forest
+Forest - CD,Forest
+Water/Wetlands,Wetland
+Grassland - AB,Grassland
+Grassland - CD,Grassland
+Pasture - AB,Pasture
+Pasture - CD,Pasture
+Cropland - AB,Ag/Other
+Cropland - CD,Ag/Other
+Cropland - Drained,Ag/Other
+Developed OpenSpace,Urban
+Developed Low,Urban
+Developed Med-High,Urban
+Feedlots,Ag/Other
+LowDensity Resident,Urban
+HighDensity Resident,Urban
+Comm/Indust/Trans,Urban
+CSO LowDensity Res,Urban
+CSO HighDensity Res,Urban
+CSO Comm/Indust/Tran,Urban
+URBAN,Urban
+ROAD,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERCIAL/INDUSTR,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+LOW DENSITY RES R1,Urban
+LOW DENSITY RES R2,Urban
+LOW DENSITY RES R3,Urban
+MED DENSITY RES R3,Urban
+MED DENSITY RES R4,Urban
+COMMERCIAL R4,Urban
+LOW DENSITY RES R5,Urban
+MED DENSITY RES R5,Urban
+COMMERCIAL R5,Urban
+MED DENSITY RES R6,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+IMPERV,Urban
+Urban EIA,Urban
+Developed EIA,Urban
+Developed OpenSpace,Urban
+Developed Low,Urban
+Developed Med-High,Urban
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+UROP_NA_WST_1,Urban
+URLD_NA_WST_1,Urban
+URMH_NA_WST_1,Urban
+UROP_NA_WST_2,Urban
+URLD_NA_WST_2,Urban
+URMH_NA_WST_2,Urban
+UROP_NA_WST_3,Urban
+URLD_NA_WST_3,Urban
+URMH_NA_WST_3,Urban
+UROP_NA_WST_4,Urban
+URLD_NA_WST_4,Urban
+URMH_NA_WST_4,Urban
+UROP_NA_WST_5,Urban
+URLD_NA_WST_5,Urban
+URMH_NA_WST_5,Urban
+UROP_NA_WST_6,Urban
+URLD_NA_WST_6,Urban
+URMH_NA_WST_6,Urban
+UROP_NA_WST_7,Urban
+URLD_NA_WST_7,Urban
+URMH_NA_WST_7,Urban
+UROP_NA_WST_8,Urban
+URLD_NA_WST_8,Urban
+URMH_NA_WST_8,Urban
+UROP_NA_WST_9,Urban
+URLD_NA_WST_9,Urban
+URMH_NA_WST_9,Urban
+UROP_NA_WST_10,Urban
+URLD_NA_WST_10,Urban
+URMH_NA_WST_10,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERCIAL/INDUSTR,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERCIAL/INDUSTR,Urban
+ROAD EIA,Urban
+URBAN,Urban
+ROAD,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERC/INDUST EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERC/INDUST EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERC/INDUST EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERC/INDUST EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+IMPERV,Urban
+URBAN,Urban
+ROAD,Urban
+Developed Open,Urban
+Developed Low,Urban
+Developed Med/High,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+ANIMAL/FEEDLOT,Ag/Other
+RESIDENTIAL,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+UROP__NLDAS_GP_1,Urban
+URLD__NLDAS_GP_1,Urban
+URMH__NLDAS_GP_1,Urban
+UROP__NLDAS_GP_2,Urban
+URLD__NLDAS_GP_2,Urban
+URMH__NLDAS_GP_2,Urban
+UROP__NLDAS_GP_3,Urban
+URLD__NLDAS_GP_3,Urban
+URMH__NLDAS_GP_3,Urban
+UROP__NLDAS_GP_4,Urban
+URLD__NLDAS_GP_4,Urban
+URMH__NLDAS_GP_4,Urban
+UROP__NLDAS_GP_5,Urban
+URLD__NLDAS_GP_5,Urban
+URMH__NLDAS_GP_5,Urban
+UROP__NLDAS_GP_6,Urban
+URLD__NLDAS_GP_6,Urban
+URMH__NLDAS_GP_6,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+UROP_N/A_MN211630,Urban
+URMD_N/A_MN211630,Urban
+ROAD_MN211630,Urban
+UROP_N/A_MN213863,Urban
+URMD_N/A_MN213863,Urban
+URHD_N/A_MN213863,Urban
+ROAD_MN213863,Urban
+UROP_N/A_WI476413,Urban
+URMD_N/A_WI476413,Urban
+ROAD_WI476413,Urban
+UROP_N/A_WI478349,Urban
+URMD_N/A_WI478349,Urban
+URHD_N/A_WI478349,Urban
+ROAD_WI478349,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERC/INDUST EIA,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+URBAN,Urban
+ROAD,Urban
+Urban EIA,Urban
+Urban EIA,Urban
+Developed EIA,Urban
+URBAN,Urban
+ROAD,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+DEVP_A_L_1,Urban
+DEVP_B_H_1,Urban
+DEVP_B_L_1,Urban
+DEVP_D_L_1,Urban
+DEVP_C_H_1,Urban
+DEVP_C_L_1,Urban
+DEVP_D_H_1,Urban
+DEVP_A_H_1,Urban
+DEVP_D_L_2,Urban
+DEVP_A_H_2,Urban
+DEVP_B_H_2,Urban
+DEVP_A_L_2,Urban
+DEVP_D_H_2,Urban
+DEVP_B_L_2,Urban
+DEVP_C_H_2,Urban
+DEVP_C_L_2,Urban
+DEVP_A_L_3,Urban
+DEVP_B_H_3,Urban
+DEVP_A_H_3,Urban
+DEVP_C_L_3,Urban
+DEVP_C_H_3,Urban
+DEVP_D_H_3,Urban
+DEVP_B_L_3,Urban
+DEVP_D_L_3,Urban
+DEVP_C_L_4,Urban
+DEVP_D_L_4,Urban
+DEVP_B_L_4,Urban
+DEVP_A_H_4,Urban
+DEVP_A_L_4,Urban
+DEVP_B_H_4,Urban
+DEVP_C_H_4,Urban
+DEVP_D_H_4,Urban
+DEVP_C_H_5,Urban
+DEVP_C_L_5,Urban
+DEVP_D_L_5,Urban
+DEVP_B_L_5,Urban
+DEVP_A_L_5,Urban
+DEVP_A_H_5,Urban
+DEVP_B_H_5,Urban
+DEVP_D_H_5,Urban
+DEVP_B_H_6,Urban
+DEVP_B_L_6,Urban
+DEVP_A_L_6,Urban
+DEVP_D_L_6,Urban
+DEVP_D_H_6,Urban
+DEVP_C_H_6,Urban
+DEVP_A_H_6,Urban
+DEVP_D_L_7,Urban
+DEVP_B_H_7,Urban
+DEVP_B_L_7,Urban
+DEVP_A_L_7,Urban
+DEVP_A_H_7,Urban
+DEVP_D_H_7,Urban
+DEVP_C_L_7,Urban
+DEVP_C_H_7,Urban
+DEVP_D_H_8,Urban
+DEVP_A_H_8,Urban
+DEVP_B_L_8,Urban
+DEVP_A_L_8,Urban
+DEVP_D_L_8,Urban
+DEVP_C_L_8,Urban
+DEVP_C_H_8,Urban
+DEVP_B_H_8,Urban
+DEVP_B_H_9,Urban
+DEVP_C_H_9,Urban
+DEVP_D_H_9,Urban
+DEVP_A_H_9,Urban
+DEVP_B_L_9,Urban
+DEVP_D_L_9,Urban
+DEVP_A_L_9,Urban
+Developed EIA,Urban
+Urban EIA,Urban
+URBAN,Urban
+ROAD,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERCIAL/INDUSTR,Urban
+ROAD EIA,Urban
+Urban EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Urban,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+Dev Open Space,Urban
+Dev Low Intensity,Urban
+Dev Medium Intensit,Urban
+UROP_N/A_MN210387,Urban
+URMD_N/A_MN210387,Urban
+URHD_N/A_MN210387,Urban
+UROP_N/A_MN210989,Urban
+URMD_N/A_MN210989,Urban
+URHD_N/A_MN210989,Urban
+UROP_N/A_MN211630,Urban
+URMD_N/A_MN211630,Urban
+URHD_N/A_MN211630,Urban
+UROP_N/A_MN211840,Urban
+URMD_N/A_MN211840,Urban
+URHD_N/A_MN211840,Urban
+UROP_N/A_MN212248,Urban
+URMD_N/A_MN212248,Urban
+URHD_N/A_MN212248,Urban
+UROP_N/A_MN212576,Urban
+URMD_N/A_MN212576,Urban
+URHD_N/A_MN212576,Urban
+UROP_N/A_MN212645,Urban
+URMD_N/A_MN212645,Urban
+URHD_N/A_MN212645,Urban
+UROP_N/A_MN212842,Urban
+URMD_N/A_MN212842,Urban
+URHD_N/A_MN212842,Urban
+UROP_N/A_MN213730,Urban
+URMD_N/A_MN213730,Urban
+URHD_N/A_MN213730,Urban
+UROP_N/A_MN213863,Urban
+URMD_N/A_MN213863,Urban
+URHD_N/A_MN213863,Urban
+UROP_N/A_WI476413,Urban
+URMD_N/A_WI476413,Urban
+URHD_N/A_WI476413,Urban
+UROP_N/A_WI478349,Urban
+URMD_N/A_WI478349,Urban
+URHD_N/A_WI478349,Urban
+UROP_N/A_HIBBING,Urban
+URMD_N/A_HIBBING,Urban
+URHD_N/A_HIBBING,Urban
+UROP_N/A_JANZEN_E,Urban
+URMD_N/A_JANZEN_E,Urban
+URHD_N/A_JANZEN_E,Urban
+UROP_N/A_KUUSINEN,Urban
+URMD_N/A_KUUSINEN,Urban
+URHD_N/A_KUUSINEN,Urban
+UROP_N/A_POMROY,Urban
+URMD_N/A_POMROY,Urban
+UROP_N/A_SIKKILA,Urban
+URMD_N/A_SIKKILA,Urban
+URHD_N/A_SIKKILA,Urban
+ROAD_N/A_MN210387,Urban
+ROAD_N/A_MN210989,Urban
+road_N/A_MN211630,Urban
+ROAD_N/A_MN211840,Urban
+ROAD_N/A_MN212248,Urban
+ROAD_N/A_MN212576,Urban
+ROAD_N/A_MN212645,Urban
+ROAD_N/A_MN212842,Urban
+ROAD_N/A_MN213730,Urban
+ROAD_N/A_MN213863,Urban
+ROAD_N/A_WI476413,Urban
+ROAD_N/A_WI478349,Urban
+ROAD_N/A_HIBBING,Urban
+ROAD_N/A_JANZEN_E,Urban
+ROAD_N/A_KUUSINEN,Urban
+ROAD_N/A_POMROY,Urban
+ROAD_N/A_SIKKILA,Urban
+UROP_N/A_WST_8,Urban
+URLD_N/A_WST_8,Urban
+URMH_N/A_WST_8,Urban
+RODP_N/A_WST_8,Urban
+RODU_N/A_WST_8,Urban
+UROP_N/A_WST_9,Urban
+URLD_N/A_WST_9,Urban
+URMH_N/A_WST_9,Urban
+RODP_N/A_WST_9,Urban
+RODU_N/A_WST_9,Urban
+UROP_N/A_WST_10,Urban
+URLD_N/A_WST_10,Urban
+URMH_N/A_WST_10,Urban
+RODP_N/A_WST_10,Urban
+RODU_N/A_WST_10,Urban
+UROP_N/A_WST_11,Urban
+URLD_N/A_WST_11,Urban
+URMH_N/A_WST_11,Urban
+RODP_N/A_WST_11,Urban
+RODU_N/A_WST_11,Urban
+UROP_N/A_WST_12,Urban
+URLD_N/A_WST_12,Urban
+URMH_N/A_WST_12,Urban
+RODP_N/A_WST_12,Urban
+RODU_N/A_WST_12,Urban
+UROP_N/A_WST_13,Urban
+URLD_N/A_WST_13,Urban
+URMH_N/A_WST_13,Urban
+RODP_N/A_WST_13,Urban
+RODU_N/A_WST_13,Urban
+UROP_N/A_WST_14,Urban
+URLD_N/A_WST_14,Urban
+RODP_N/A_WST_14,Urban
+RODU_N/A_WST_14,Urban
+UROP_N/A_WST_15,Urban
+URLD_N/A_WST_15,Urban
+URMH_N/A_WST_15,Urban
+RODP_N/A_WST_15,Urban
+RODU_N/A_WST_15,Urban
+UROP_N/A_WST_16,Urban
+URLD_N/A_WST_16,Urban
+URMH_N/A_WST_16,Urban
+RODP_N/A_WST_16,Urban
+RODU_N/A_WST_16,Urban
+UROP_N/A_WST_17,Urban
+URLD_N/A_WST_17,Urban
+URMH_N/A_WST_17,Urban
+RODP_N/A_WST_17,Urban
+RODU_N/A_WST_17,Urban
+UROP_N/A_WST_18,Urban
+URLD_N/A_WST_18,Urban
+URMH_N/A_WST_18,Urban
+RODP_N/A_WST_18,Urban
+RODU_N/A_WST_18,Urban
+UROP_N/A_WST_1,Urban
+URLD_N/A_WST_1,Urban
+URMH_N/A_WST_1,Urban
+RODP_N/A_WST_1,Urban
+RODU_N/A_WST_1,Urban
+UROP_N/A_WST_2,Urban
+URLD_N/A_WST_2,Urban
+URMH_N/A_WST_2,Urban
+RODP_N/A_WST_2,Urban
+RODU_N/A_WST_2,Urban
+UROP_N/A_WST_3,Urban
+URLD_N/A_WST_3,Urban
+URMH_N/A_WST_3,Urban
+RODP_N/A_WST_3,Urban
+RODU_N/A_WST_3,Urban
+UROP_N/A_WST_4,Urban
+URLD_N/A_WST_4,Urban
+URMH_N/A_WST_4,Urban
+RODP_N/A_WST_4,Urban
+RODU_N/A_WST_4,Urban
+UROP_N/A_WST_5,Urban
+URLD_N/A_WST_5,Urban
+URMH_N/A_WST_5,Urban
+RODP_N/A_WST_5,Urban
+RODU_N/A_WST_5,Urban
+UROP_N/A_WST_6,Urban
+URLD_N/A_WST_6,Urban
+URMH_N/A_WST_6,Urban
+RODP_N/A_WST_6,Urban
+RODU_N/A_WST_6,Urban
+UROP_N/A_WST_7,Urban
+URLD_N/A_WST_7,Urban
+URMH_N/A_WST_7,Urban
+RODP_N/A_WST_7,Urban
+RODU_N/A_WST_7,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COM/IND EIA,Urban
+ROAD EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+Developed EIA,Urban
+LD RESIDENTIAL EIA,Urban
+HD RESIDENTIAL EIA,Urban
+COMMERCIAL/INDUSTR,Urban
+ROAD EIA,Urban
+Urban or Built-up L,Urban
+Developed OpenSpace,Urban
+Developed Low,Urban
+Developed Med-High,Urban
+Undisturbed Forest,Forest
+Disturbed Forest,Forest
+Paved Roads,Urban
+Unpaved Roads,Urban
+Hay/Cropland,Ag/Other

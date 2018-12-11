@@ -442,11 +442,21 @@ Public Class clsGraphBoxWhisker
             'outliers
             Dim outs As New PointPairList()
             'Add the values
-            Dim lmedian As Double = GetStatistic(i, "%50")
-            Dim lmin As Double = GetStatistic(i, "min")
-            Dim lmax As Double = GetStatistic(i, "max")
-            Dim lpct25 As Double = GetStatistic(i, "%25")
-            Dim lpct75 As Double = GetStatistic(i, "%75")
+            Dim lmedian As Double = clsGraphBoxWhisker.Median(data(i))
+            Dim lmin As Double = clsGraphBoxWhisker.Min(data(i))
+            Dim lmax As Double = clsGraphBoxWhisker.Max(data(i))
+            Dim lpct25 As Double = clsGraphBoxWhisker.Pct25(data(i))
+            Dim lpct75 As Double = clsGraphBoxWhisker.Pct75(data(i))
+
+            'Dim ltemp(1) As Double    for testing
+            'ltemp(0) = 2.3
+            'ltemp(1) = 2.5
+            'lmedian = clsGraphBoxWhisker.Median(ltemp)
+            'lmin = clsGraphBoxWhisker.Min(ltemp)
+            'lmax = clsGraphBoxWhisker.Max(ltemp)
+            'lpct25 = clsGraphBoxWhisker.Pct25(ltemp)
+            'lpct75 = clsGraphBoxWhisker.Pct75(ltemp)
+
             medians.Add(i, lmedian)
             hiLowList.Add(i, lpct75, lpct25)
             Dim iqr As Double = 1.5 * (lpct75 - lpct25)
@@ -569,5 +579,61 @@ Public Class clsGraphBoxWhisker
             End Select
         End With
         Return lTimeUnit
+    End Function
+
+    Private Shared Function Median(aRandArray As Double()) As Double
+        Dim lSortedArray() As Double = aRandArray
+        Array.Sort(lSortedArray)
+        If lSortedArray.Length Mod 2 = 0 Then
+            Return (lSortedArray(lSortedArray.Length \ 2 - 1) + lSortedArray(lSortedArray.Length \ 2)) / 2
+        Else
+            Return lSortedArray(lSortedArray.Length \ 2)
+        End If
+    End Function
+
+    Private Shared Function Min(aRandArray As Double()) As Double
+        Dim lSortedArray() As Double = aRandArray
+        Array.Sort(lSortedArray)
+        Return lSortedArray(0)
+    End Function
+
+    Private Shared Function Max(aRandArray As Double()) As Double
+        Dim lSortedArray() As Double = aRandArray
+        Array.Sort(lSortedArray)
+        Return lSortedArray(lSortedArray.Length - 1)
+    End Function
+
+    Private Shared Function Pct25(aRandArray As Double()) As Double
+        Dim lSortedArray() As Double = aRandArray
+        Array.Sort(lSortedArray)
+        Dim lNVals As Integer = Int(lSortedArray.Length / 2)
+        If lSortedArray.Length Mod 2 <> 0 Then
+            lNVals += 1
+        End If
+        Dim lNewArray(lNVals - 1) As Double
+        For i As Integer = 0 To lNVals - 1
+            lNewArray(i) = lSortedArray(i)
+        Next
+        Return Median(lNewArray)
+    End Function
+
+    Private Shared Function Pct75(aRandArray As Double()) As Double
+        Dim lSortedArray() As Double = aRandArray
+        Array.Sort(lSortedArray)
+        Dim lNVals As Integer = Int(lSortedArray.Length / 2)
+        If lSortedArray.Length Mod 2 <> 0 Then
+            lNVals += 1
+        End If
+        Dim lNewArray(lNVals - 1) As Double
+        If lSortedArray.Length Mod 2 <> 0 Then
+            For i As Integer = 0 To lNVals - 1
+                lNewArray(i) = lSortedArray(i + lNVals - 1)
+            Next
+        Else
+            For i As Integer = 0 To lNVals - 1
+                lNewArray(i) = lSortedArray(i + lNVals)
+            Next
+        End If
+        Return Median(lNewArray)
     End Function
 End Class

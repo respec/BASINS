@@ -403,6 +403,7 @@ End Class
 
 Public Class clsWQDUSLocations
     Public Locations As New Dictionary(Of String, clsWQDUSLocation)()
+    Public FileName As String
     Public ReadOnly Property GetUniqueConstituentList() As List(Of String)
         Get
             Dim lsortedPreferred As New SortedList(Of String, Integer)()

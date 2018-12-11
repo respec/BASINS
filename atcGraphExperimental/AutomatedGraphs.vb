@@ -59,8 +59,11 @@ Public Module AutomatedGraphs
                 Dim lines() As String = {}
                 If System.IO.File.Exists(lGraphSpecificationFile) Then
 
+
                     MyReader.TextFieldType = FileIO.FieldType.Delimited
                     MyReader.SetDelimiters(",")
+
+
                     Dim CurrentRow As String()
 
                     While Not MyReader.EndOfData
@@ -87,10 +90,9 @@ Public Module AutomatedGraphs
                             End If
 
 
-                        Catch ex As Microsoft.VisualBasic.
-                                    FileIO.MalformedLineException
-                            MsgBox("Line " & ex.Message &
-                            "is not valid and will be skipped.")
+                        Catch ex As Microsoft.VisualBasic.FileIO.MalformedLineException
+                            Logger.Dbg("Line " & ex.Message & " is not valid and will be skipped.")
+                            Exit While
                         End Try
                     End While
                     Logger.Dbg(lGraphSpecificationFile & " was used as the Graph Specification File")
@@ -98,7 +100,7 @@ Public Module AutomatedGraphs
                     MsgBox("The Graph specification files were not found.", vbOKOnly)
                     Exit For
                 Else
-                    MsgBox("The" & lGraphSpecificationFile & " file didn't exist or was blank. Reading next CSV file!", vbOKOnly)
+                    Logger.Dbg("The" & lGraphSpecificationFile & " file didn't exist or was blank. Reading next CSV file!")
                     Continue For
                 End If
 
@@ -107,7 +109,7 @@ Public Module AutomatedGraphs
                 Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "regression", "45-deg line"}
 
                 If lgraphRecordsNew.Count < 1 Then
-                    MsgBox("The" & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!", vbOKOnly)
+                    Logger.Dbg("The" & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!")
                     Continue For
                 End If
 
@@ -117,13 +119,13 @@ Public Module AutomatedGraphs
                     Dim lGraphInit() As String = lgraphRecordsNew(lRecordIndex)
                     Dim TypeOfGraph As String = Trim(lGraphInit(0)).ToLower
                     If Not (ListTypeOfGraph.Contains(TypeOfGraph)) Then
-                        MsgBox("Wrong type of graph specified. Aborting graphing from file " & lGraphSpecificationFile & " Reading next CSV file!", vbOKOnly)
+                        Logger.Dbg("Wrong type of graph specified. Aborting graphing from file " & lGraphSpecificationFile & " Reading next CSV file!")
                         Continue For
                     End If
                     Dim lNumberOfCurves As Integer = Trim(lGraphInit(2))
                     Dim lOutFileName As String = aOutputDirectory & Trim(lGraphInit(1))
                     If lNumberOfCurves < 1 Then
-                        MsgBox("The " & lOutFileName & " graph in " & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!", vbOKOnly)
+                        Logger.Dbg("The " & lOutFileName & " graph in " & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!")
                         Continue For
                     End If
                     Logger.Dbg("Started preparing graph " & lOutFileName)
@@ -184,6 +186,22 @@ Public Module AutomatedGraphs
                                     End If
 
                                 Case ".hbn", ".dbf"
+                                    lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
+                                                                      .FindData("Constituent", Trim(lGraphDataset(3)))(0)
+                                    lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)
+                                    If lTimeSeries Is Nothing OrElse lTimeSeries.numValues < 1 Then
+                                        MsgBox("No timeseries was available from " & lDataSourceFilename & " for " &
+                                                " Location " & Trim(lGraphDataset(2)) & " Constituent " & Trim(lGraphDataset(3)) &
+                                                " to make " & IO.Path.GetFileName(lOutFileName) & " graph. Moving to next graph!",
+                                               vbOKOnly, "Automated Graph: Time Series Issue")
+                                        lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+
+                                        skipGraph = True
+                                        Exit Do
+
+                                    End If
+
+                                Case ".filtered"
                                     lTimeSeries = lDataSource.DataSets.FindData("Location", Trim(lGraphDataset(2))) _
                                                                       .FindData("Constituent", Trim(lGraphDataset(3)))(0)
                                     lTimeSeries = SubsetByDate(lTimeSeries, lGraphStartDateJ, lGraphEndDateJ, Nothing)

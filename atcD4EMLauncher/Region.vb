@@ -1,6 +1,9 @@
 Imports atcUtility
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+#Else
 Imports MapWinGIS
+#End If
 
 Public Class Region
     'TODO: make this a base class, move code that depends on kind of Region (box, circle, polygon) into subclasses
@@ -107,6 +110,8 @@ Public Class Region
         End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     ''' <summary>
     ''' Overlay this region on a shape file and returns a value from the
     ''' shape table for each shape that overlaps this region.
@@ -260,6 +265,8 @@ NextShape:
         Return lKeys
     End Function
 
+#End If
+
     Public Property PreferredFormat() As String
         Get
             Return pPreferredFormat
@@ -294,6 +301,8 @@ NextShape:
         End Set
     End Property
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overridable Property HUC8s() As Generic.List(Of String)
         Get
             Try
@@ -360,7 +369,7 @@ retry:
         Return True
     End Function
 
-    Private Sub CopyRecord(ByVal aFromShapefile As MapWinGIS.Shapefile, ByVal aFromIndex As Integer, _
+    Private Sub CopyRecord(ByVal aFromShapefile As MapWinGIS.Shapefile, ByVal aFromIndex As Integer,
                            ByVal aToShapefile As MapWinGIS.Shapefile, ByVal aToIndex As Integer)
         Dim lLastField As Integer = aFromShapefile.NumFields - 1
         For lFieldIndex As Integer = 0 To lLastField
@@ -590,7 +599,7 @@ SkipShape:
             End If
         End If
     End Sub
-
+#End If
     Public Overrides Function ToString() As String
         Return "Region Box North " & pNorth & " South " & pSouth & " West " & pWest & " East " & pEast
     End Function

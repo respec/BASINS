@@ -14,7 +14,7 @@ Public Class StartUp
             UciChanged()
         End If
         If pUci IsNot Nothing AndAlso IO.File.Exists(pUci.Name) Then
-            ScriptMain(Nothing, pUci)
+            Main(Nothing, pUci)
         Else
             Logger.Msg("The UCI file " & cmbUCIPath.Text & " does not exist", MsgBoxStyle.Critical, "HSPEXP+")
         End If
@@ -42,10 +42,13 @@ Public Class StartUp
         Dim lExists As Boolean = IO.File.Exists(cmbUCIPath.Text)
         'cmbUCIPath.Visible = lExists
         chkRunHSPF.Enabled = lExists
-        chkAreaReports.Enabled = lExists
+        chkModelQAQC.Enabled = lExists
+        'chkAreaReports.Enabled = lExists
         DateTimePicker1.Enabled = lExists
         DateTimePicker2.Enabled = lExists
         chkExpertStats.Enabled = lExists
+        chkMultiSim.Enabled = lExists
+        chkReganGraphs.Enabled = lExists
         'chkGraphStandard.Enabled = lExists
         chkWaterBalance.Enabled = lExists
         chkAdditionalgraphs.Enabled = lExists
@@ -57,9 +60,10 @@ Public Class StartUp
         chkHeat.Enabled = lExists
         txtRCH.Enabled = lExists
         lblRCH.Enabled = lExists
-        lblOutReach2.Enabled = lExists
         pnlHighlight.Enabled = lExists
         cmdStart.Enabled = lExists
+        chkBathtub.Enabled = lExists
+        chkWASP.Enabled = lExists
         chkGQUAL1.Visible = False
         chkGQUAL2.Visible = False
         chkGQUAL3.Visible = False
@@ -74,6 +78,7 @@ Public Class StartUp
         chkGQUAL5.Enabled = False
         chkGQUAL6.Enabled = False
         chkGQUAL7.Enabled = False
+        chkModelQAQC.Checked = False
 
 
         Dim lUCI As String = cmbUCIPath.Text
@@ -91,6 +96,23 @@ Public Class StartUp
 
                 DateTimePicker1.Value = System.DateTime.FromOADate(lSDateJ)
                 DateTimePicker2.Value = System.DateTime.FromOADate(lEDateJ - 1)
+
+                'The issue with the following code is that it assumes that first operation has the proper active sections.
+
+                'If pUci.OpnBlks("RCHRES").Ids(0).TableExists("ACTIVITY") Then
+                '    Select Case True
+                '        Case pUci.OpnBlks("RCHRES").Ids(0).Tables("ACTIVITY").ParmValue("SDFG") = "1"
+                '            chkSedimentBalance.Enabled = True
+
+                '        Case pUci.OpnBlks("RCHRES").Ids(0).Tables("ACTIVITY").ParmValue("NUFG") = "1"
+                '            chkTotalNitrogen.Enabled = True
+                '            chkTotalPhosphorus.Enabled = True
+                '        Case pUci.OpnBlks("OXRX").Ids(0).Tables("ACTIVITY").ParmValue("OXRX") = "1"
+                '            chkDO.Enabled = True
+                '        Case pUci.OpnBlks("OXRX").Ids(0).Tables("ACTIVITY").ParmValue("HTFG") = "1"
+                '            chkHeat.Enabled = True
+                '    End Select
+                'End If
 
                 'list of available gquals 
                 If pUci.OpnBlks("RCHRES").Ids(0).TableExists("GQ-QALDATA") Then
@@ -159,7 +181,7 @@ Public Class StartUp
 
     Private Sub chkConstituentReportChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkWaterBalance.CheckedChanged, chkSedimentBalance.CheckedChanged, chkTotalNitrogen.CheckedChanged, chkTotalPhosphorus.CheckedChanged, chkBODBalance.CheckedChanged,
                                             chkGQUAL1.CheckedChanged, chkGQUAL2.CheckedChanged, chkGQUAL3.CheckedChanged, chkGQUAL4.CheckedChanged, chkGQUAL5.CheckedChanged, chkGQUAL6.CheckedChanged, chkGQUAL7.CheckedChanged
-        If chkWaterBalance.Checked OrElse
+        If (chkWaterBalance.Checked OrElse
             chkSedimentBalance.Checked OrElse
             chkTotalNitrogen.Checked OrElse
             chkTotalPhosphorus.Checked OrElse
@@ -170,23 +192,19 @@ Public Class StartUp
             chkGQUAL4.Checked OrElse
             chkGQUAL5.Checked OrElse
             chkGQUAL6.Checked OrElse
-            chkGQUAL7.Checked Then
-
+            chkGQUAL7.Checked OrElse
+            chkBathtub.Checked OrElse
+            chkWASP.Checked) And Not chkModelQAQC.Checked Then
             lblRCH.Enabled = True
-            lblOutReach2.Enabled = True
             txtRCH.Enabled = True
             pnlHighlight.Enabled = True
         Else
             lblRCH.Enabled = False
-            lblOutReach2.Enabled = False
             txtRCH.Enabled = False
             pnlHighlight.Enabled = False
         End If
 
     End Sub
-
-
-
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -217,12 +235,12 @@ Public Class StartUp
         pHspfMsg = New atcUCI.HspfMsg
         pHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename) 'Becky: this can be found at C:\BASINS\models\HSPF\bin if you did the typical BASINS install
 
-
         atcData.atcDataManager.Clear()
         With atcData.atcDataManager.DataPlugins
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
             .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
             .Add(New atcWDM.atcDataSourceWDM)
+            .Add(New atcTimeseriesWaterQualUS.atcTimeseriesWaterQualUS)
             '.Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
             '.Add(New atcTimeseriesRDB.atcTimeseriesRDB)
             '.Add(New atcTimeseriesScript.atcTimeseriesScriptPlugin)
@@ -241,15 +259,15 @@ Public Class StartUp
     End Sub
 
     Private Sub btn_help_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_help.Click
-        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP+.chm")
+        Help.ShowHelp(Me, Application.StartupPath & "\HSPEXP30_Manual.pdf")
     End Sub
 
     Private Sub chkHydrologySensitivity_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkMultiSim.CheckedChanged
         If chkMultiSim.Checked = True Then
             chkRunHSPF.Enabled = False
             chkRunHSPF.Checked = False
-            chkAreaReports.Enabled = False
-            chkAreaReports.Checked = False
+            'chkAreaReports.Enabled = False
+            'chkAreaReports.Checked = False
             chkExpertStats.Enabled = False
             chkExpertStats.Checked = False
             chkReganGraphs.Checked = False
@@ -286,11 +304,13 @@ Public Class StartUp
             chkGQUAL5.Enabled = False
             chkGQUAL6.Enabled = False
             chkGQUAL7.Enabled = False
+            chkBathtub.Enabled = False
+            chkWASP.Enabled = False
             txtRCH.Enabled = False
 
         Else
             chkRunHSPF.Enabled = True
-            chkAreaReports.Enabled = True
+            'chkAreaReports.Enabled = True
             chkExpertStats.Enabled = True
             chkReganGraphs.Enabled = True
             chkAdditionalgraphs.Enabled = True
@@ -308,6 +328,8 @@ Public Class StartUp
             chkGQUAL5.Enabled = True
             chkGQUAL6.Enabled = True
             chkGQUAL7.Enabled = True
+            chkWASP.Enabled = True
+            chkBathtub.Enabled = True
         End If
 
 
@@ -336,6 +358,101 @@ Public Class StartUp
     End Sub
 
     Private Sub cmbUCIPath_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbUCIPath.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub chkModelQAQC_CheckedChanged(sender As Object, e As EventArgs) Handles chkModelQAQC.CheckedChanged
+        If chkModelQAQC.Checked = True Then
+            chkMultiSim.Enabled = False
+            chkMultiSim.Checked = False
+            chkRunHSPF.Enabled = False
+            chkRunHSPF.Checked = False
+            'chkAreaReports.Enabled = False
+            'chkAreaReports.Checked = False
+            chkExpertStats.Enabled = False
+            chkExpertStats.Checked = False
+            chkReganGraphs.Checked = False
+            chkReganGraphs.Enabled = False
+            chkAdditionalgraphs.Enabled = False
+            chkAdditionalgraphs.Checked = False
+            'chkBODBalance.Enabled = False
+            chkBODBalance.Checked = False
+            chkGQUAL1.Checked = False
+            chkGQUAL1.Enabled = False
+            'chkTotalNitrogen.Enabled = False
+            chkTotalNitrogen.Checked = False
+            'chkTotalPhosphorus.Enabled = False
+            chkTotalPhosphorus.Checked = False
+            chkWaterBalance.Checked = False
+            'chkWaterBalance.Enabled = False
+            chkSedimentBalance.Checked = False
+            'chkSedimentBalance.Enabled = False
+            chkDO.Checked = False
+            chkDO.Enabled = False
+            chkHeat.Checked = False
+            chkHeat.Enabled = False
+            chkGQUAL1.Checked = False
+            chkGQUAL2.Checked = False
+            chkGQUAL3.Checked = False
+            chkGQUAL4.Checked = False
+            chkGQUAL5.Checked = False
+            chkGQUAL6.Checked = False
+            chkGQUAL7.Checked = False
+            chkGQUAL1.Enabled = False
+            chkGQUAL2.Enabled = False
+            chkGQUAL3.Enabled = False
+            chkGQUAL4.Enabled = False
+            chkGQUAL5.Enabled = False
+            chkGQUAL6.Enabled = False
+            chkGQUAL7.Enabled = False
+            txtRCH.Enabled = False
+            chkWASP.Enabled = False
+            chkBathtub.Enabled = False
+            GroupBox2.Text = "Loading Rates and Storage Trends to Report"
+        Else
+            chkRunHSPF.Enabled = True
+            'chkAreaReports.Enabled = True
+            chkExpertStats.Enabled = True
+            chkReganGraphs.Enabled = True
+            chkAdditionalgraphs.Enabled = True
+            chkBODBalance.Enabled = True
+            chkTotalNitrogen.Enabled = True
+            chkTotalPhosphorus.Enabled = True
+            chkWaterBalance.Enabled = True
+            chkSedimentBalance.Enabled = True
+            chkDO.Enabled = True
+            chkHeat.Enabled = True
+            chkGQUAL1.Enabled = True
+            chkGQUAL2.Enabled = True
+            chkGQUAL3.Enabled = True
+            chkGQUAL4.Enabled = True
+            chkGQUAL5.Enabled = True
+            chkGQUAL6.Enabled = True
+            chkGQUAL7.Enabled = True
+            chkWASP.Enabled = True
+            chkBathtub.Enabled = True
+            chkMultiSim.Enabled = True
+            GroupBox2.Text = "Constituent Balance Reports"
+        End If
+    End Sub
+
+    Private Sub lblOutReach2_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub txtRCH_TextChanged(sender As Object, e As EventArgs) Handles txtRCH.TextChanged
+
+    End Sub
+
+    Private Sub lblRCH_Click(sender As Object, e As EventArgs) Handles lblRCH.Click
+
+    End Sub
+
+    Private Sub pnlHighlight_Paint(sender As Object, e As PaintEventArgs) Handles pnlHighlight.Paint
+
+    End Sub
+
+    Private Sub chkAreaReports_CheckedChanged(sender As Object, e As EventArgs)
 
     End Sub
 End Class

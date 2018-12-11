@@ -24,6 +24,7 @@ Public Class BFBatchInputNames
     Public Shared OUTPUTPrefix As String = "OUTPUTPrefix"
     Public Shared SAVERESULT As String = "SAVERESULT"
     Public Shared FullSpanDuration As String = "FullSpanDuration"
+    Public Shared Graph As String = "Graphs"
 
     Public Shared BFM_HYFX As String = "HYFX"
     Public Shared BFM_HYLM As String = "HYLM"
@@ -350,6 +351,9 @@ Public Class clsBatchBFSpec
                 Else
                     GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.FullSpanDuration, False)
                 End If
+            Case atcTimeseriesBaseflow.BFInputNames.Graph.ToLower()
+                Dim lGraphTypes As String = lArr(1).Trim().ToUpper()
+                GlobalSettings.Add(atcTimeseriesBaseflow.BFInputNames.Graph, lGraphTypes)
             Case Else
                 GlobalSettings.Add(lArr(0), lArr(1))
         End Select
@@ -572,6 +576,13 @@ Public Class clsBatchBFSpec
                         lStation.BFInputs.SetValue(BFBatchInputNames.OUTPUTPrefix, lOutputPrefix)
                     Next
                 End If
+            Case BFBatchInputNames.Graph.ToLower()
+                Dim lAttribValue As String = lArr(1).Trim()
+                If Not String.IsNullOrEmpty(lAttribValue) Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(BFBatchInputNames.Graph, lAttribValue)
+                    Next
+                End If
         End Select
     End Sub
 
@@ -582,7 +593,9 @@ Public Class clsBatchBFSpec
     ''' <param name="aPreserve">if work off the original Ts or off a clone</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, Optional ByVal aPreserve As Boolean = False) As atcTimeseries
+    Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation,
+                                              Optional ByVal aPreserve As Boolean = False,
+                                              Optional ByVal aNonProvisionalOnly As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
         If ListBatchUnitsData.Keys.Contains(aStation.StationID) Then
             lDataFilename = ListBatchUnitsData.ItemByKey(aStation.StationID)
@@ -648,19 +661,44 @@ Public Class clsBatchBFSpec
             End If
         End If
         If lDataReady Then
-            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            Dim lGroup As atcTimeseriesGroup = Nothing
+            If aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "Streamflow" Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            ElseIf aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "FLOW" Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "FLOW")
+            End If
+
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
+                Dim lTsFlow As atcTimeseries = Nothing
                 If aPreserve Then
-                    Return lGroup(0)
+                    lTsFlow = lGroup(0)
+                    'Return lGroup(0)
                 Else
-                    Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
+                    lTsFlow = lGroup(0).Clone()
                     'aStation.DataSource.Clear()
                     'aStation.DataSource = Nothing
+                    'Return lTsFlow
+                End If
+                If aNonProvisionalOnly Then
+                    If HasProvisionalValues(lTsFlow) Then
+                        Dim lProvisionalTS As atcTimeseries = Nothing
+                        Dim lNonProvisionalTS As atcTimeseries = Nothing
+                        SplitProvisional(lTsFlow, lProvisionalTS, lNonProvisionalTS)
+                        If lNonProvisionalTS IsNot Nothing Then
+                            If lProvisionalTS IsNot Nothing Then
+                                lProvisionalTS.Clear()
+                                lProvisionalTS = Nothing
+                            End If
+                            Return lNonProvisionalTS
+                        End If
+                    Else
+                        Return lTsFlow
+                    End If
+                Else
                     Return lTsFlow
                 End If
             End If
         End If
-
         Return Nothing
     End Function
 
@@ -749,7 +787,12 @@ Public Class clsBatchBFSpec
                 'each station has its own directory
                 Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
                 MkDirPath(lStationOutDir)
+#If GISProvider = "DotSpatial" Then
+                'could set aPreserve and aNonProvisional to True
                 Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+#Else
+                Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+#End If
                 If lTsFlow IsNot Nothing Then
                     Try
                         Dim CalcBF As atcTimeseriesBaseflow.atcTimeseriesBaseflow = New atcTimeseriesBaseflow.atcTimeseriesBaseflow()
@@ -839,8 +882,12 @@ Public Class clsBatchBFSpec
     '{
     Public Sub DoBatchIntermittent()
         If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
+#If GISProvider = "DotSpatial" Then
+            Console.WriteLine("Please address following issues before running batch:" & vbCrLf & Message)
+#Else
             Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message,
                        "Base-flow Separation Batch")
+#End If
             Exit Sub
         Else
             Message = ""
@@ -872,8 +919,12 @@ Public Class clsBatchBFSpec
         Dim lDrainageArea As Double = 0.0
         '{Loop through each batch group, lBFOpn
         For Each lBFOpnId As Integer In ListBatchBaseflowOpns.Keys
+#If GISProvider = "DotSpatial" Then
+            Console.WriteLine("Batch Group: " & lBFOpnId)
+#Else
             Logger.Status("Batch Group: " & lBFOpnId)
             Logger.Progress(lBFOpnCount, lTotalBFOpnGroups)
+#End If
             Dim lBFOpn As atcCollection = ListBatchBaseflowOpns.ItemByKey(lBFOpnId)
             Dim lbatchUnitStation As clsBatchUnitStation = lBFOpn.ItemByIndex(0)
             Dim lBFOpnOutputDir As String = lbatchUnitStation.BFInputs.GetValue(BFBatchInputNames.OUTPUTDIR, "")
@@ -885,6 +936,8 @@ Public Class clsBatchBFSpec
             End If
             MkDirPath(lBFOpnDir)
 
+            Dim lArr() As String = Nothing
+            Dim lGraphs As String = ""
             Using lProgressLevel As New ProgressLevel
                 Dim lStationCtr As Integer = 1
                 Dim lStationsCount As Integer = lBFOpn.Count
@@ -1058,6 +1111,7 @@ Public Class clsBatchBFSpec
                                     Dim lDF2PMethod = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, atcTimeseriesBaseflow.clsBaseflow2PRDF.ETWOPARAMESTIMATION.NONE)
                                     .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, lDF2PMethod)
                                 End If
+                                .SetValue("OutputDir", lStationOutDir)
                             End With
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
@@ -1066,6 +1120,16 @@ Public Class clsBatchBFSpec
                             If lTsFlowFullRange IsNot Nothing AndAlso lTsFlowFullRange.Attributes.GetValue("count positive") > 0 Then
                                 AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
                                 ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                                lGraphs = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.Graph, "")
+                                If Not String.IsNullOrEmpty(lGraphs) Then
+                                    lArr = lGraphs.Split(",")
+                                    For Each lGraphType As String In lArr
+                                        Select Case lGraphType.ToLower()
+                                            Case "logtimeseries", "timeseries", "duration"
+                                                DoBFGraphTimeseriesGWWatch(lGraphType, lTsFlowFullRange, lBFReportGroups)
+                                        End Select
+                                    Next
+                                End If
                             Else
                                 Try
                                     lDateFormat.Midnight24 = False
@@ -1146,9 +1210,13 @@ Public Class clsBatchBFSpec
         lSummary.Flush()
         lSummary.Close()
         lSummary = Nothing
-        Logger.Status("")
         'UpdateStatus("Base-flow Separation Complete for " & lTotalBFOpn & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", True)
+#If GISProvider = "DotSpatial" Then
+        Console.WriteLine("Base-flow Separation Complete for " & lTotalStations & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", MsgBoxStyle.Information, "Batch Run Base-flow Separation")
+#Else
+        Logger.Status("")
         Logger.Msg("Base-flow Separation Complete for " & lTotalStations & " Stations in " & ListBatchBaseflowOpns.Count & " groups.", MsgBoxStyle.Information, "Batch Run Base-flow Separation")
+#End If
     End Sub '}
 
     Public Shared Function TSerOverlap(ByVal aFullTser As atcTimeseries, ByVal aPartialTser As atcTimeseries) As Boolean

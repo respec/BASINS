@@ -6,13 +6,13 @@ Public Class PlugIn
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Model Setup (HSPF/AQUATOX)"
+            Return "Model Setup for HSPF"
         End Get
     End Property
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "An interface for initializing two BASINS models: HSPF and AQUATOX."
+            Return "An interface for setting up the HSPF watershed model."
         End Get
     End Property
 
@@ -21,12 +21,12 @@ Public Class PlugIn
         pMapWin = MapWin
         atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, "mnuFile")
         atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "HSPF")
-        atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_AQUATOX", ModelsMenuName, "AQUATOX")
+        'atcData.atcDataManager.AddMenuIfMissing(ModelsMenuName & "_AQUATOX", ModelsMenuName, "AQUATOX")
     End Sub
 
     Public Overrides Sub Terminate()
         atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_HSPF")
-        atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_AQUATOX")
+        'atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName & "_AQUATOX")
         atcData.atcDataManager.RemoveMenuIfEmpty(ModelsMenuName)
     End Sub
 
@@ -39,13 +39,13 @@ Public Class PlugIn
             lFormModelSetup.Show()
             lFormModelSetup.InitializeMetStationList()
             Handled = True
-        ElseIf ItemName = ModelsMenuName & "_AQUATOX" Then
-            Dim lFormModelSetup As New frmModelSetup
-            GisUtil.MappingObject = pMapWin
-            lFormModelSetup.SetModelName("AQUATOX")
-            lFormModelSetup.InitializeUI()
-            lFormModelSetup.Show()
-            Handled = True
+            'ElseIf ItemName = ModelsMenuName & "_AQUATOX" Then
+            '    Dim lFormModelSetup As New frmModelSetup
+            '    GisUtil.MappingObject = pMapWin
+            '    lFormModelSetup.SetModelName("AQUATOX")
+            '    lFormModelSetup.InitializeUI()
+            '    lFormModelSetup.Show()
+            '    Handled = True
         End If
     End Sub
 End Class

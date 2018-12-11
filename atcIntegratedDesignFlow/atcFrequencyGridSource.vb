@@ -18,7 +18,7 @@ Public Class atcFrequencyGridSource
 
     Private pCalculatedNdays As New ArrayList
     Private pCalculatedRecurrence As New ArrayList
-
+    Private pConditions As atcDataAttributes
     '"SWSTAT version 5.0" & vbCrLf & _
     Public Shared SWStatDisclaimer As String = _
         "USGS has conducted limited testing and review of this program." & vbCrLf & _
@@ -31,7 +31,8 @@ Public Class atcFrequencyGridSource
     ''' <param name="aNdays">Which numbers of days are displayed (Nothing = display all present in attributes)</param>
     ''' <param name="aNyears">Which return periods are displayed (Nothing = display all present in attributes)</param>
     ''' <remarks></remarks>
-    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aNdays() As Double, ByVal aNyears() As Double)
+    Sub New(ByVal aDataGroup As atcData.atcTimeseriesGroup, ByVal aNdays() As Double, ByVal aNyears() As Double,
+            Optional ByVal aConditions As atcDataAttributes = Nothing)
         Dim lAdjStr As String
         Dim lAdjProbStr As String
         Dim lHighLow As String
@@ -42,6 +43,7 @@ Public Class atcFrequencyGridSource
         pNdays = New SortedList
         'pAdj = New SortedList
         'pAdjProb = New SortedList
+        pConditions = aConditions
 
         Dim lKeyFmt As String = "00000.0000"
         Dim lIsSelected As Boolean = False
@@ -300,6 +302,17 @@ Public Class atcFrequencyGridSource
 
                 lArgs.SetValue("NDay", lNdays)
                 lArgs.SetValue("Return Period", lReturns)
+
+                If pConditions IsNot Nothing Then
+                    Dim lAttribute As String = "BoundaryMonth"
+                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
+                    lAttribute = "BoundaryDay"
+                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
+                    lAttribute = "EndMonth"
+                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
+                    lAttribute = "EndDay"
+                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
+                End If
 
                 lCalculator.Open(lOperationName, lArgs)
             Catch e As Exception

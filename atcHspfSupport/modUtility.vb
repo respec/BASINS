@@ -2,6 +2,7 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 Imports atcUCI
+Imports System.Data
 
 Public Module Utility
     Public Class ConstituentProperties
@@ -118,18 +119,16 @@ Public Module Utility
     Public Function ConstituentsThatNeedMassLink() As Generic.List(Of String)
         Static pConstituentsThatNeedMassLink As Generic.List(Of String) = Nothing
         If pConstituentsThatNeedMassLink Is Nothing Then
-            Dim lConstituentsThatNeedMassLink() As String = _
-                {"WSSD", "SCRSD", "SOSLD", "PERO", "SURO", "IFWO", "AGWO", "NO3+NO2-N - SURFACE LAYER OUTFLOW", _
-                "NO3+NO2-N - UPPER LAYER OUTFLOW", "NO3+NO2-N - GROUNDWATER OUTFLOW", "NO3-N - TOTAL OUTFLOW", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", _
-                "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", _
-                 "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "POQUAL-NH3+NH4", "SOQUAL-NH3+NH4", _
-                 "IOQUAL-NH3+NH4", "AOQUAL-NH3+NH4", "POQUAL-NO3", "SOQUAL-NO3", "AOQUAL-NO3", "IOQUAL-NO3", "WASHQS-BOD", _
-                 "SOQUAL-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "POQUAL-BOD", "ORGN - TOTAL OUTFLOW", "NITROGEN - TOTAL OUTFLOW", _
-                "LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "POQUAL-ORTHO P", "SOQUAL-ORTHO P", _
-                 "IOQUAL-ORTHO P", "AOQUAL-ORTHO P", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", _
-                 "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "SDP4A", _
-                "SDORP" _
-                }
+            Dim lConstituentsThatNeedMassLink() As String =
+                {"WSSD", "SCRSD", "SOSLD", "PERO", "SURO", "IFWO", "AGWO", "NO3+NO2-N - SURFACE LAYER OUTFLOW",
+                "NO3+NO2-N - UPPER LAYER OUTFLOW", "NO3+NO2-N - GROUNDWATER OUTFLOW", "NO3-N - TOTAL OUTFLOW", "NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW",
+                "NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW",
+                 "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "POQUAL-NH3+NH4", "SOQUAL-NH3+NH4", "SOQO-NH3+NH4", "WASHQS-NH3+NH4",
+                 "IOQUAL-NH3+NH4", "AOQUAL-NH3+NH4", "POQUAL-NO3", "SOQUAL-NO3", "SOQO-NO3", "WASHQS-NO3", "AOQUAL-NO3", "IOQUAL-NO3", "WASHQS-BOD",
+                 "SOQUAL-BOD", "SOQO-BOD", "IOQUAL-BOD", "AOQUAL-BOD", "POQUAL-BOD", "ORGN - TOTAL OUTFLOW", "NITROGEN - TOTAL OUTFLOW",
+                "LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "POQUAL-ORTHO P", "SOQUAL-ORTHO P",
+                 "IOQUAL-ORTHO P", "AOQUAL-ORTHO P", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW",
+                 "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "SDP4A", "SDORP"}
             pConstituentsThatNeedMassLink = New Generic.List(Of String)(lConstituentsThatNeedMassLink)
         End If
         Return pConstituentsThatNeedMassLink
@@ -308,7 +307,7 @@ Public Module Utility
                 End With
 #End Region
 #Region "Case TotalN"
-            Case "TotalN" 'use PQUAL
+            Case "TotalN", "TN" 'use PQUAL
                 With lConstituentsToOutput
                     .Add("P:Header1", "Nitrogen Loss (lb/ac)")
                     .Add("P:Header1a", "  NO3 Loss")
@@ -495,7 +494,7 @@ Public Module Utility
                     Dim headerLabel() As String = {"a", "b", "c", "d"}
                     Dim headerLabelCount As Integer = 0
                     For Each ConstProperty As ConstituentProperties In aConstProperties
-                        If ConstProperty.ConstNameForEXPPlus = "TotalN" Then Continue For
+                        If ConstProperty.ConstNameForEXPPlus = "TN" Then Continue For
                         Select Case ConstProperty.ConstNameForEXPPlus
                             Case "NO3"
                                 .Add("P:Header4", "NO3+NO2 (PQUAL)")
@@ -562,14 +561,16 @@ Public Module Utility
 
 
                     .Add("R:Header13", "Total NH3 as N")
-                    .Add("R:TAM-INTOT", "  Total NH3 Inflow")
-                    .Add("R:TAM-INDIS", "  Dissolved NH3 inflow")
+                    .Add("R:TAM-INTOT", "  Total Ammonia Inflow")
+                    .Add("R:TAM-INDIS", "  Dissolved TAM inflow")
                     .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
-                    .Add("R:TAM-PROCFLUX-TOT", "  NH3 Process Fluxes")
+                    .Add("R:TAM-PROCFLUX-TOT", "  TAM Process Fluxes")
+                    .Add("R:TAM-ADSDES-TOT", "  TAM Adsorption/Desorption")
+                    .Add("R:TAM-SCOURDEP-TOT", "  TAM Scour/Deposition")
                     .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
-                    .Add("R:TAM-OUTTOT", "  Total NH3 Outflow")
-                    .Add("R:TAM-OUTDIS", "  Dissolved NH3 Outflow")
-                    .Add("R:TAM-OUTPART-TOT", "  Particulate NH3 Outflow")
+                    .Add("R:TAM-OUTTOT", "  Total TAM Outflow")
+                    .Add("R:TAM-OUTDIS", "  Dissolved TAM Outflow")
+                    .Add("R:TAM-OUTPART-TOT", "  Particulate TAM Outflow")
 
                     .Add("R:Header14", "Refractory-N")
                     .Add("R:N-REFORG-IN", "  Refr-N Inflow")
@@ -601,7 +602,7 @@ Public Module Utility
             '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
 #End Region
 #Region "Case TotalP"
-            Case "TotalP"
+            Case "TP"
 
                 With lConstituentsToOutput
                     .Add("P:Header1", "Phosphorus Loss (lb/ac")
@@ -715,13 +716,13 @@ Public Module Utility
 
                             Case "Ref-OrgP"
                                 .Add("I:Header11", "RefOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
-                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
+                                .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
 
                             Case "lab-OrgP"
                                 .Add("I:Header12", "LabileOrgP (IQUAL)")
-                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
+                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
 
                         End Select
 
@@ -732,6 +733,8 @@ Public Module Utility
                     .Add("R:PO4-INDIS", "  Dissolved PO4 Inflow")
                     .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
                     .Add("R:PO4-PROCFLUX-TOT", "  PO4 Process Fluxes")
+                    .Add("R:PO4-ADSDES-TOT", "  PO4 Adsorption/Desorption")
+                    .Add("R:PO4-SCOURDEP-TOT", "  PO4 Scour/Deposition")
                     .Add("R:PO4-OUTTOT", "  Total PO4 Outflow")
                     .Add("R:PO4-ATMDEPTOT", " Atmospheric PO4 Deposition")
                     .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")
@@ -833,7 +836,7 @@ Public Module Utility
         Dim lOperations As atcCollection
         For lOperationIndex As Integer = 0 To aUci.OpnSeqBlock.Opns.Count - 1
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
-            If lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND" OrElse lOperation.Name = "RCHRES" Then
+            If aOperationTypes.Contains(lOperation.Name) Then
                 Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                 If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
 
@@ -892,19 +895,20 @@ Public Module Utility
                                          ByVal aLocation As String,
                                          ByVal aOperationTypes As atcCollection,
                                          ByRef aLocations As atcCollection)
-        LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True)
+        Dim lUpstreamChecked As New atcCollection
+        LocationAreaCalc(aUci, aLocation, aOperationTypes, aLocations, True, lUpstreamChecked)
     End Sub
 
     Public Sub LocationAreaCalc(ByVal aUci As HspfUci,
                                 ByVal aLocation As String,
                                 ByVal aOperationTypes As atcCollection,
                                 ByRef aLocations As atcCollection,
-                                ByVal aUpstream As Boolean)
+                                ByVal aUpstream As Boolean,
+                                ByRef aUpstreamChecked As atcCollection)
 
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
         Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).OperFromID(aLocation.Substring(2))
         If Not lOperation Is Nothing Then
-            Dim lUpstreamChecked As New atcCollection
             For Each lConnection As HspfConnection In lOperation.Sources
                 Dim lSourceVolName As String = lConnection.Source.VolName
                 Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
@@ -916,9 +920,9 @@ Public Module Utility
                     End If
 
 
-                ElseIf lSourceVolName = "RCHRES" Then
+                ElseIf lSourceVolName = "RCHRES" Or lSourceVolName = "BMPRAC" Then
                     If aUpstream Then
-                        If lUpstreamChecked.Contains(lLocationKey) Then
+                        If aUpstreamChecked.Contains(lLocationKey) Then
                             Logger.Dbg("SkipDuplicate:" & lLocationKey)
                         ElseIf aUci.Name.ToLower.Contains("scr") AndAlso
                                lConnection.Source.VolId = 229 AndAlso
@@ -926,8 +930,8 @@ Public Module Utility
                             'TODO: figure out a way not to hardcode this!
                             Logger.Dbg("Skip 229 to 516 in SantaClara")
                         Else
-                            LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True)
-                            lUpstreamChecked.Add(lLocationKey)
+                            LocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations, True, aUpstreamChecked)
+                            aUpstreamChecked.Add(lLocationKey)
                         End If
                     Else
                         aLocations.Add(lLocationKey, 0)
@@ -1081,7 +1085,8 @@ Public Module Utility
         Dim lUpstreamLocations As New atcCollection
         Dim lUpstreamLocationsString As String = ""
         Dim lLocalArea As Double = 0.0
-        LocationAreaCalc(aUci, aLocation, aOperationtypes, lLocations, False)
+        Dim lUpstreamChecked As New atcCollection
+        LocationAreaCalc(aUci, aLocation, aOperationtypes, lLocations, False, lUpstreamChecked)
         For lIndex As Integer = 0 To lLocations.Count - 1
             lLocalArea += lLocations.Item(lIndex)
             If lLocations.Item(lIndex) < 0.00001 Then
@@ -1139,6 +1144,15 @@ Public Module Utility
         Return lLUCombined
     End Function
 
+    'given a uci and an outlet location (like R:930), return a collection of contributing areas 
+    Public Function ContributingLandUseAreas(ByVal aUci As HspfUci,
+                                             ByVal aOperationTypes As atcCollection,
+                                             ByVal aOutletLocation As String) As atcCollection
+        Dim lLandUses As atcCollection = LandUses(aUci, aOperationTypes, aOutletLocation)
+        Dim lLandUsesCombinePervImpv As atcCollection = LandUsesCombined(lLandUses)
+        Return lLandUsesCombinePervImpv
+    End Function
+
     Public Function FindMassLinkFactor(ByVal aUCI As HspfUci, ByVal aMassLink As Integer, ByVal aConstituent As String,
                                                ByVal aBalanceType As String, ByVal aConversionFactor As Double, ByVal aMultipleIndex As Integer,
                                        Optional ByVal aGQALID As Integer = 0) As Double
@@ -1169,7 +1183,7 @@ Public Module Utility
                         Exit For
                     End If
 
-                Case "TotalN"
+                Case "TN"
                     Select Case True
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1310,7 +1324,7 @@ Public Module Utility
                     'End If
 
 
-                Case "TotalP"
+                Case "TP"
                     'If aConstituent.Contains("SOQUAL") Then Stop
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
@@ -1689,9 +1703,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TotalN" Then
+        If aBalanceType = "TN" Then
             aConversionFactorFromOxygen = CVON
-        ElseIf aBalanceType = "TotalP" Then
+        ElseIf aBalanceType = "TP" Then
             aConversionFactorFromOxygen = CVOP
         End If
 
@@ -1717,9 +1731,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TotalN" Then
+        If aBalanceType = "TN" Then
             aConversionFactorFromBiomass = CVBN
-        ElseIf aBalanceType = "TotalP" Then
+        ElseIf aBalanceType = "TP" Then
             aConversionFactorFromBiomass = CVBP
         End If
 
@@ -1730,7 +1744,7 @@ Public Module Utility
 
     Public Function LocateConstituentNames(ByVal aUCI As HspfUci, ByVal aBalanceType As String, Optional ByVal aGQALID As Integer = 0) As List(Of ConstituentProperties)
         Dim QUALs As New List(Of ConstituentProperties)
-        Dim QUALNames As ConstituentProperties
+        Dim QUALNames As ConstituentProperties = Nothing
         Dim QUALName As String = ""
         Dim QUALUnit As String = ""
         Dim NQUALS As Integer = 0
@@ -1777,7 +1791,7 @@ Public Module Utility
 
                     End If
 
-                Case "TotalN"
+                Case "TN"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                         lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
@@ -1862,7 +1876,7 @@ Public Module Utility
 
                     End If
 
-                Case "TotalP"
+                Case "TP"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
@@ -1929,6 +1943,11 @@ Public Module Utility
             End Select
 
         Next lML
+        If QUALNames Is Nothing Then
+            Logger.Msg("No appropriate MASS-LINK connections were found for " & aBalanceType & ". The program will quit", vbOKOnly)
+            Return Nothing
+        End If
+
 
         Select Case aBalanceType
             Case "Water"
@@ -1981,10 +2000,10 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
-            Case "TotalN"
+            Case "TN"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TotalN"
-                QUALNames.ConstituentNameInUCI = "TotalN"
+                QUALNames.ConstNameForEXPPlus = "TN"
+                QUALNames.ConstituentNameInUCI = "TN"
 
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
@@ -1997,10 +2016,10 @@ Public Module Utility
                 QUALs.Add(QUALNames)
                 Return QUALs
 
-            Case "TotalP"
+            Case "TP"
                 QUALNames = New ConstituentProperties
-                QUALNames.ConstNameForEXPPlus = "TotalP"
-                QUALNames.ConstituentNameInUCI = "TotalP"
+                QUALNames.ConstNameForEXPPlus = "TP"
+                QUALNames.ConstituentNameInUCI = "TP"
                 If aUCI.GlobalBlock.EmFg = 1 Then
                     QUALNames.ConstituentUnit = QUALs(0).ConstituentUnit
                 Else
@@ -2191,18 +2210,92 @@ Public Module Utility
             End If
             'Do While lUnits.Length = 0
             For lIndex As Integer = 2 To 10
-                    If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                        lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
-                        If aGQualName = lTempQual Then
+                If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                    lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("GQID").Value)
+                    If aGQualName = lTempQual Then
                         'found it
                         lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
                         Exit For
                     End If
-                    End If
-                Next
+                End If
+            Next
             'Loop
         End If
 
         Return lUnits
     End Function
+
+
+    Public Function AreaReportInTableFormat(ByVal aUCI As HspfUci, ByVal aOperationTypes As atcCollection, ByVal aLocation As String) As DataTable
+
+        Dim lAreaTable As DataTable
+        lAreaTable = New DataTable("ModelAreaTable")
+        Dim lColumn As DataColumn
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "Landuse"
+        lColumn.Caption = "Landuse Category"
+        lColumn.DataType = Type.GetType("System.String")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "PervArea"
+        lColumn.Caption = "Pervious Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "ImpervArea"
+        lColumn.Caption = "Impervious Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        lColumn = New DataColumn()
+        lColumn.ColumnName = "TotalArea"
+        lColumn.Caption = "Total Area (ac)"
+        lColumn.DataType = Type.GetType("System.Double")
+        lAreaTable.Columns.Add(lColumn)
+
+        Dim lRow As DataRow
+
+        Dim lContributingLandUseAreas As atcCollection = ContributingLandUseAreas(aUCI, aOperationTypes, aLocation)
+
+        Dim lTotalAreaFromLandUses As Double = 0
+        Dim lTotalAreaPerv As Double = 0.0
+        Dim lTotalAreaImpr As Double = 0.0
+        For lLandUseIndex As Integer = 0 To lContributingLandUseAreas.Count - 1
+            Dim lLandUseAreaString As String = lContributingLandUseAreas.Item(lLandUseIndex)
+            Dim lImprArea As Double = StrRetRem(lLandUseAreaString)
+            Dim lPervArea As Double = 0
+            If lLandUseAreaString.Length > 0 Then
+                lPervArea = lLandUseAreaString
+            End If
+
+            Dim lLandUseArea As Double = lPervArea + lImprArea
+
+            lRow = lAreaTable.NewRow
+            lRow("Landuse") = lContributingLandUseAreas.Keys(lLandUseIndex).ToString
+            lRow("PervArea") = DecimalAlign(lPervArea, , 2, 7)
+            lRow("ImpervArea") = DecimalAlign(lImprArea, , 2, 7)
+            lRow("TotalArea") = DecimalAlign(lLandUseArea, , 2, 7)
+            lAreaTable.Rows.Add(lRow)
+
+            lTotalAreaPerv += lPervArea
+            lTotalAreaImpr += lImprArea
+            lTotalAreaFromLandUses += lLandUseArea
+        Next
+        lContributingLandUseAreas.Clear()
+
+        lRow = lAreaTable.NewRow
+        lAreaTable.Rows.Add(lRow)
+
+        lRow = lAreaTable.NewRow
+        lRow("Landuse") = "Total"
+        lRow("PervArea") = DecimalAlign(lTotalAreaPerv, , 2, 7)
+        lRow("ImpervArea") = DecimalAlign(lTotalAreaImpr, , 2, 7)
+        lRow("TotalArea") = DecimalAlign(lTotalAreaFromLandUses, , 2, 7)
+        lAreaTable.Rows.Add(lRow)
+        Return lAreaTable
+    End Function
+
 End Module

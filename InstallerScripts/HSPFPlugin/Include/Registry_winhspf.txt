@@ -1,0 +1,16 @@
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\WinHSPF31";         Flags: uninsdeletekeyifempty; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPFEngine";        Flags: uninsdeletekeyifempty; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\StatusMonitor";     Flags: uninsdeletekeyifempty; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPF\files";     ValueType: string; ValueName: "WinHSPF31.chm";  ValueData: "{app}\Docs\WinHSPF31.chm";                    Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPF\files";     ValueType: string; ValueName: "starter.uci";  ValueData: "{app}\models\WinHSPF31\bin\starter\starter.uci"; Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPF\files";     ValueType: string; ValueName: "poltnt_2.prn"; ValueData: "{app}\models\WinHSPF31\bin\poltnt_2.prn";        Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPF\files";     ValueType: string; ValueName: "hspfmsg.wdm";  ValueData: "{app}\models\WinHSPF31\bin\hspfmsg.wdm";         Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPF\files";     ValueType: string; ValueName: "hspfmsg.mdb";  ValueData: "{app}\models\WinHSPF31\bin\hspfmsg.mdb";         Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\HSPFEngineNet\files";  ValueType: string; ValueName: "HSPFEngineNet.exe"; ValueData: "{app}\models\WinHSPF31\bin\HSPFEngineNet.exe"; Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\StatusMonitor\Paths";  ValueType: string; ValueName: "ExePath"; ValueData: "{app}\models\WinHSPF31\bin\StatusMonitor.exe";     Flags: uninsdeletekey; 
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\ATCoRend";          ValueType: string; ValueName: "Path";       ValueData: "{app}\models\WinHSPF31\bin\ATCoRend.dbf";     Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\files";             ValueType: string; ValueName: "HSPFMsgMDB"; ValueData: "{app}\models\WinHSPF31\bin\HspfMsgWDM.mdb";   Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\files";             ValueType: string; ValueName: "HSPFEngineNet"; ValueData: "{app}\models\WinHSPF31\bin\HSPFEngineNet.exe";   Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\ATCoUnits\files";   ValueType: string; ValueName: "ATCoUnits.mdb"; ValueData: "{app}\models\HSPF\bin\ATCoUnits.mdb";  Flags: uninsdeletekey
+
+Root: HKLM; Subkey: "Software\AQUA TERRA Consultants\WinHSPF\ExePath";   ValueType: string; ValueName: "";           ValueData: "{app}\models\WinHSPF31\bin";                Flags: uninsdeletekey; 

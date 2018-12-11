@@ -70,7 +70,6 @@ Public Module ConstituentBalance
             Dim lLocationProgress As Integer = 0
             Dim lLastLocation As Integer = aLocations.Count
             For Each lLocation As String In aLocations
-
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lLocationDataGroup As New atcTimeseriesGroup
@@ -103,10 +102,13 @@ Public Module ConstituentBalance
                                     lConstituentDataGroup.Add(lLocationDataGroup.FindData("Constituent", lConstituentDataName))
                                     If lConstituentDataGroup.Count > 0 Then
                                         lHaveData = True
-
                                         Dim lTempDataSet As atcDataSet = lConstituentDataGroup.Item(0)
+                                        lTempDataSet = SubsetByDate(lTempDataSet, aSDateJ, aEDateJ, Nothing)
                                         Dim lSeasons As atcSeasonBase
-                                        If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                        Dim lDate(5) As Integer
+                                        J2Date(aSDateJ, lDate)
+
+                                        If lDate(1) = 10 Then 'month Oct
                                             lSeasons = New atcSeasonsWaterYear
                                         Else
                                             lSeasons = New atcSeasonsCalendarYear
@@ -126,7 +128,6 @@ Public Module ConstituentBalance
                                             Case "R" : lOperName = "RCHRES"
                                         End Select
                                         If lNeedHeader Then  'get operation description for header
-
                                             Dim lDesc As String = ""
                                             If lOperName.Length > 0 Then
                                                 lDesc = aUci.OpnBlks(lOperName).OperFromID(lLocation.Substring(2)).Description
@@ -141,9 +142,9 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
-                                                Case "TotalN_PERLND", "TotalN_IMPLND", "TotalP_PERLND", "TotalP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
-                                                Case "TotalN_RCHRES", "TotalP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case Else
                                                     Dim lPrefix As String = ""
@@ -159,7 +160,6 @@ Public Module ConstituentBalance
 
                                             .NumHeaderRows = 1
                                             .Delimiter = vbTab
-
                                             .NumFields = 2 + lYearlyAttributes.Count
                                             .FieldLength(1) = 16
                                             .FieldName(1) = "Date".PadRight(12)
@@ -191,10 +191,12 @@ Public Module ConstituentBalance
                                         Dim lTotalArea As Double = 0.0
                                         Dim MassLinkExists As Boolean = True
 
-                                        If lConstituentDataName.ToUpper.Contains("QUAL") OrElse ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
+                                        If lConstituentDataName.ToUpper.Contains("QUAL") OrElse
+                                           lConstituentDataName.ToUpper.Contains("SOQO") OrElse
+                                           lConstituentDataName.ToUpper.Contains("WASHQS") OrElse
+                                           ConstituentsThatNeedMassLink.Contains(lConstituentDataName.ToUpper) Then
 
                                             For Each lConnection As HspfConnection In lOperation.Targets
-
                                                 If lConnection.Target.VolName = "RCHRES" Then
                                                     Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                                     If aReach Is Nothing Then
@@ -206,7 +208,7 @@ Public Module ConstituentBalance
 
                                                     End If
                                                     Dim aConversionFactor As Double = 0.0
-                                                    If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Then
+                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Then
                                                         aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                     End If
 
@@ -220,7 +222,7 @@ Public Module ConstituentBalance
                                                             ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
                                                             Dim ConstNameEXP As String = ""
                                                             For Each constt As ConstituentProperties In aConstProperties
-                                                                If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                                                If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
                                                                     ConstNameEXP = constt.ConstNameForEXPPlus
                                                                     If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
                                                                     ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
@@ -228,31 +230,23 @@ Public Module ConstituentBalance
                                                             Next
                                                         End If
 
-
                                                         lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, ConstNameMassLink, aBalanceType,
                                                                                        aConversionFactor, lMultipleIndex)
-
                                                     Else
                                                         MassLinkExists = False
                                                     End If
                                                     Dim lArea As Double = lConnection.MFact
-                                                    If lArea = 0 Then
-                                                        lArea = 0.0000000001
-                                                    End If
-                                                    If aBalanceType = "Water" Then
-                                                        lMassLinkFactor *= 12
-                                                    End If
+                                                    If lArea = 0 Then lArea = 0.0000000001
+                                                    If aBalanceType = "Water" OrElse aBalanceType = "WAT" Then lMassLinkFactor *= 12
                                                     lTotalLoad += lArea * lMassLinkFactor
                                                     lTotalArea += lArea
                                                 End If
-
                                             Next
-
                                             lMult = lTotalLoad / lTotalArea
-
                                         End If
 
-                                        If lConstituentDataName.ToUpper.Contains("F.COLIFORM") Or lConstituentDataName.ToUpper.StartsWith("BACT") Then 'Assuming that unit of F.Coliform unit is #ORG
+                                        If lConstituentDataName.ToUpper.Contains("F.COLIFORM") OrElse
+                                            lConstituentDataName.ToUpper.StartsWith("BACT") Then 'Assuming that unit of F.Coliform unit is #ORG
                                             lMult = 1 / 1000000000.0 '10^9
                                         End If
 
@@ -260,18 +254,15 @@ Public Module ConstituentBalance
                                             lAttribute = lTempDataSet.Attributes.GetDefinedValue("Last")
                                             lStateVariable = True
                                         Else
-
                                             lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
                                             lStateVariable = False
                                         End If
 
                                         .Value(1) = lConstituentName.PadRight(aFieldWidth)
                                         If Not lAttribute Is Nothing Then
-
                                             If lStateVariable Then 'no value needed for mean column
                                                 .Value(2) = "<NA>".PadLeft(10)
                                             Else
-
                                                 .Value(2) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
                                             End If
                                             Dim lFieldIndex As Integer = 3
@@ -306,17 +297,13 @@ Public Module ConstituentBalance
                                         Next
                                         .CurrentRecord += 1
                                     Else
-                                        If lPendingOutput.Length > 0 Then
-                                            lPendingOutput &= vbCr
-                                        End If
-                                        If lConstituentDataName.StartsWith("Header") Then
-                                            lPendingOutput &= vbCr
-                                        End If
+                                        If lPendingOutput.Length > 0 Then lPendingOutput &= vbCr
+                                        If lConstituentDataName.StartsWith("Header") Then lPendingOutput &= vbCr
+
                                         lPendingOutput &= lConstituentName
                                         Dim lSkipTo As String = FindSkipTo(lConstituentDataName)
                                         If lSkipTo IsNot Nothing Then
                                             Dim lSkipToindex2 As Integer = 2000
-
                                             If lSkipTo.StartsWith("NO3+NO2") Then
                                                 lSkipTo = "NO3+NO2 (PQUAL)"
                                                 Dim lSkip2 As String = "NH3+NH4 (PQUAL)"
@@ -325,9 +312,7 @@ Public Module ConstituentBalance
                                             Dim lSkipToindex As Integer = lConstituentsToOutput.IndexOf(lSkipTo)
 
                                             If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
-                                            If lSkipToindex > lConstituentIndex Then
-                                                lConstituentIndex = lSkipToindex - 1
-                                            End If
+                                            If lSkipToindex > lConstituentIndex Then lConstituentIndex = lSkipToindex - 1
                                             lPendingOutput = ""
                                         End If
                                     End If

@@ -89,7 +89,7 @@ Public Module ConstituentBudget
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ISED-TOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
-            Case "TotalN"
+            Case "TN"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
@@ -113,7 +113,7 @@ Public Module ConstituentBudget
                 lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
 
-            Case "TotalP"
+            Case "TP"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW"))
@@ -559,7 +559,7 @@ Public Module ConstituentBudget
                     lReport.Append(.ToString)
                 End With
 
-            Case "TotalN"
+            Case "TN"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
@@ -850,7 +850,7 @@ Public Module ConstituentBudget
 
                 End With
 
-            Case "TotalP"
+            Case "TP"
                 Dim lGENERInNetworkBlockMessageShown As Boolean = False
                 lReport2.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
@@ -1165,7 +1165,7 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TotalN" Or aBalanceType = "TotalP" Or aBalanceType = "Sediment" Then
+        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "Sediment" Then
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)
             Dim lLandusesHeader As String = ""
@@ -1391,6 +1391,8 @@ Public Module ConstituentBudget
                         ByRef aReachTotal As Double,
                         ByVal aReporting As Boolean,
                         ByRef aContribPercent As atcCollection,
+                        ByVal aSDateJ As Double,
+                        ByVal aEDateJ As Double,
                         Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing)
 
         Dim lTotalIndex As Integer = 0
@@ -1421,7 +1423,7 @@ Public Module ConstituentBudget
                         Dim lConstituentTotal As Double = 0
                         lTotal = 0
                         For Each lTs As atcTimeseries In aNonpointData.FindData("Location", lTestLocation)
-
+                            lTs = SubsetByDate(lTs, aSDateJ, aEDateJ, Nothing)
                             Dim lMassLinkFactor As Double = 0.0
                             If lTs.Attributes.GetDefinedValue("SumAnnual").Value > 0 Then
                                 Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
@@ -1430,7 +1432,7 @@ Public Module ConstituentBudget
                                     ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
                                     Dim ConstNameEXP As String = ""
                                     For Each constt As ConstituentProperties In aConstProperties
-                                        If constt.ConstituentNameInUCI = ConstNameMassLink Then
+                                        If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
                                             ConstNameEXP = constt.ConstNameForEXPPlus
                                             If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
                                             ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(0) & "-" & ConstNameEXP
@@ -1569,8 +1571,8 @@ Public Module ConstituentBudget
         Dim lContribPercent As New atcCollection
 
         'If aReach.Id = "148" Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
 
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
@@ -1580,8 +1582,8 @@ Public Module ConstituentBudget
         Next
         aTotalInflow += -UpStreamDiversion
         'If aReach.Id = 102 Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
         'If aReach.Id = 102 Then Stop
 
         'Dim GENERTSinWDM As Boolean = False
@@ -1723,28 +1725,32 @@ Public Module ConstituentBudget
         Dim aGENERID As Integer = aSource.Source.VolId
         Dim aGENEROperationisOutputtoWDM As Boolean = False
         Dim aGENEROperation As HspfOperation = aSource.Source.Opn
-        For Each EXTTarget As HspfConnection In aGENEROperation.Targets
-            If EXTTarget.Target.VolName.Contains("WDM") Then
-                aGENEROperationisOutputtoWDM = True
-                Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                Dim lDSN As Integer = EXTTarget.Target.VolId
-                For i As Integer = 0 To aUCI.FilesBlock.Count
-                    If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
-                        Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                        Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                        If lDataSource Is Nothing Then
-                            If atcDataManager.OpenDataSource(lFileName) Then
-                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+        If Not aGENEROperation Is Nothing Then
+            For Each EXTTarget As HspfConnection In aGENEROperation.Targets
+                If EXTTarget.Target.VolName.Contains("WDM") Then
+                    aGENEROperationisOutputtoWDM = True
+                    Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
+                    Dim lDSN As Integer = EXTTarget.Target.VolId
+                    For i As Integer = 0 To aUCI.FilesBlock.Count
+                        If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
+                            Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                            Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            If lDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lFileName) Then
+                                    lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                End If
                             End If
-                        End If
-                        Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                        ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                        aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+                            Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                            ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                            aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
 
-                    End If
-                Next
-            End If
-        Next EXTTarget
+                        End If
+                    Next
+                End If
+            Next EXTTarget
+
+        End If
+
 
         Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
     End Function

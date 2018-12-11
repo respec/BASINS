@@ -684,8 +684,13 @@ Public Class frmBatchMap
             Dim lArgs As New atcDataAttributes()
             With lArgs
                 .SetValue("GetNewest", chkGetNewest.Checked)
+#If GISProvider = "DotSpatial" Then
+#Else
                 .SetValue("CacheFolder", BASINS.g_CacheDir)
+#End If
             End With
+#If GISProvider = "DotSpatial" Then
+#Else
             Try
                 If lStationsNeedDownload.Count > 0 OrElse chkGetNewest.Checked Then
                     If lStationsNeedDownload.Count = 0 Then
@@ -702,6 +707,7 @@ Public Class frmBatchMap
                            pDataPath, "Batch Map")
                 Return
             End Try
+#End If
         End If
     End Sub
 

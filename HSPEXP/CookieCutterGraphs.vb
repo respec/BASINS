@@ -40,23 +40,26 @@ Public Module CookieCutterGraphs
 
         Dim lLocations As New atcCollection
         Dim lScenarioResults As New atcDataSource
+
+        Dim lWDMDataSource As New atcDataSource
+
         For i As Integer = 0 To aHSPFUCI.FilesBlock.Count
             If aHSPFUCI.FilesBlock.Value(i).Typ = "BINO" Then
                 Dim lHspfBinFileName As String = AbsolutePath(aHSPFUCI.FilesBlock.Value(i).Name.Trim, CurDir())
-                Dim lOpenHspfBinDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                If lOpenHspfBinDataSource Is Nothing Then
+                Dim lDataSource As atcDataSource
+                lDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                If lDataSource Is Nothing Then
                     If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                        lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                        lDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
                     End If
                 End If
-                If lOpenHspfBinDataSource.DataSets.Count > 1 Then
-                    lLocations.AddRange(lOpenHspfBinDataSource.DataSets.SortedAttributeValues("Location"))
+                If lDataSource.DataSets.Count > 1 Then
+                    lLocations.AddRange(lDataSource.DataSets.SortedAttributeValues("Location"))
                     Dim lConstituentNames As New SortedSet(Of String)
                     For Each lKey As String In lConstituentsToGraph.Keys
-
                         lConstituentNames.Add(lKey.ToUpper)
                     Next
-                    For Each lTs As atcTimeseries In lOpenHspfBinDataSource.DataSets
+                    For Each lTs As atcTimeseries In lDataSource.DataSets
                         Dim ConstituentFromTS = lTs.Attributes.GetValue("Constituent").ToString.ToUpper
                         If lConstituentNames.Contains(ConstituentFromTS) Then
                             lTs = SubsetByDate(lTs, aSDateJ, aEDateJ, Nothing)
@@ -73,8 +76,16 @@ Public Module CookieCutterGraphs
                         Dim lRchresCaption As String = aHSPFUCI.OpnBlks("RCHRES").OperFromID(lRchId).Caption
                         lRchresCaption = Trim(Mid(lRchresCaption, 11))
                         Dim lTimeseriesGroup As New atcTimeseriesGroup
-                        Dim lTimeSeries As atcTimeseries
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BALCLA1")(0)
+                        Dim lTimeSeries As atcTimeseries = Nothing
+                        Dim lFoundTheTimeSeriesinWDMFile As Boolean = False
+
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "BALCLA", 4, 1, lFoundTheTimeSeriesinWDMFile)
+
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            'Reading the required time series from Binary file and resetting the flag to false
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BALCLA1")(0)
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
 
                         If lTimeSeries IsNot Nothing Then
                             TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
@@ -84,8 +95,13 @@ Public Module CookieCutterGraphs
                             lTimeSeries.Attributes.SetValue("YAxis", "Aux")
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PHYCLA")(0)
 
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "PHYCLA", 1, 1, lFoundTheTimeSeriesinWDMFile)
+
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PHYCLA")(0)
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
                             TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
                             If TSTimeUnit <= 4 Then
@@ -94,98 +110,115 @@ Public Module CookieCutterGraphs
                             lTimeSeries.Attributes.SetValue("YAxis", "Left")
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PO4-CONCDIS")(0)
 
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PO4-CONCDIS")(0)
+
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
+                        If lTimeSeries IsNot Nothing Then
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                End If
+                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                                lTimeseriesGroup.Add(lTimeSeries)
+                            End If
+
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 2, 1, lFoundTheTimeSeriesinWDMFile)
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "TAM-CONCDIS")(0)
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
                             TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
                             If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                End If
+                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                                lTimeseriesGroup.Add(lTimeSeries)
                             End If
-                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                            lTimeseriesGroup.Add(lTimeSeries)
+
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "NO3-CONCDIS")(0)
                         End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "TAM-CONCDIS")(0)
+                        lFoundTheTimeSeriesinWDMFile = False
 
                         If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                End If
+                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                                lTimeseriesGroup.Add(lTimeSeries)
                             End If
-                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                            lTimeseriesGroup.Add(lTimeSeries)
-                        End If
 
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "NO3-CONCDIS")(0)
-                        If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If lTimeseriesGroup.Count = 5 Then
+                                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                                Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+                                Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
+                                Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                                Dim lCurve As ZedGraph.LineItem = Nothing
+                                lAuxPane.YAxis.Title.Text = "Ben. algae (" & ChrW(956) & "g/m^2"
+                                lAuxPane.YAxis.Scale.Min = 0
+                                lMainPane.YAxis.Title.Text = "Phytoplankton as chlorophyll a (" & ChrW(956) & "g/L)"
+                                lMainPane.YAxis.Scale.Min = 0
+                                lMainPane.Y2Axis.Title.Text = "Dissolved NH4-N, NO3-N, and PO4-P (mg/L)"
+                                lMainPane.Y2Axis.Scale.Min = 0
 
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                            End If
-                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                            lTimeseriesGroup.Add(lTimeSeries)
-                        End If
+                                lMainPane.XAxis.Title.Text = lRchresCaption
 
-                        If lTimeseriesGroup.Count = 5 Then
-                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
-                            Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
-                            Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
-                            Dim lCurve As ZedGraph.LineItem = Nothing
-                            lAuxPane.YAxis.Title.Text = "Ben. algae (" & ChrW(956) & "g/m^2"
-                            lAuxPane.YAxis.Scale.Min = 0
-                            lMainPane.YAxis.Title.Text = "Phytoplankton as chlorophyll a (" & ChrW(956) & "g/L)"
-                            lMainPane.YAxis.Scale.Min = 0
-                            lMainPane.Y2Axis.Title.Text = "Dissolved NH4-N, NO3-N, and PO4-P (mg/L)"
-                            lMainPane.Y2Axis.Scale.Min = 0
+                                lCurve = lAuxPane.CurveList.Item(0)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("Red")
+                                lCurve.Line.Width = 1
 
-                            lMainPane.XAxis.Title.Text = lRchresCaption
+                                lCurve.Label.Text = "Benthic Algae"
 
-                            lCurve = lAuxPane.CurveList.Item(0)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("Red")
-                            lCurve.Line.Width = 1
-
-                            lCurve.Label.Text = "Benthic Algae"
-
-                            lCurve = lMainPane.CurveList.Item(0)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("Red")
-                            lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Phytoplankton as chlorophyll a"
-                            lCurve = lMainPane.CurveList.Item(1)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("Green")
-                            lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Dissolved PO4-P"
-                            lCurve = lMainPane.CurveList.Item(2)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("Purple")
-                            lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Dissolved TAM-N"
-                            lCurve = lMainPane.CurveList.Item(3)
-                            lCurve.Line.IsVisible = True
-                            lCurve.Symbol.Type = SymbolType.None
-                            lCurve.Line.Color = Drawing.Color.FromName("Black")
-                            lCurve.Line.Width = 1
-                            lCurve.Label.Text = "Dissolved NO3-N"
+                                lCurve = lMainPane.CurveList.Item(0)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("Red")
+                                lCurve.Line.Width = 1
+                                lCurve.Label.Text = "Phytoplankton as chlorophyll a"
+                                lCurve = lMainPane.CurveList.Item(1)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("Green")
+                                lCurve.Line.Width = 1
+                                lCurve.Label.Text = "Dissolved PO4-P"
+                                lCurve = lMainPane.CurveList.Item(2)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("Purple")
+                                lCurve.Line.Width = 1
+                                lCurve.Label.Text = "Dissolved TAM-N"
+                                lCurve = lMainPane.CurveList.Item(3)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("Black")
+                                lCurve.Line.Width = 1
+                                lCurve.Label.Text = "Dissolved NO3-N"
                             lZgc.SaveIn(lOutputFolder & "Nutrient_RCHRES_" & lRchId & ".png")
+                            Logger.Dbg("Generated graph " & lOutputFolder & "Nutrient_RCHRES_" & lRchId & ".png")
                         Else
-                            '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
-                            'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
-                        End If
+                                '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
+                                'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
+                            End If
 #End Region
-                        'Plotting the TSS Curve
+                            'Plotting the TSS Curve
 #Region "Plotting TSS Curve"
 
-                        lTimeseriesGroup = New atcTimeseriesGroup
-
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "RO")(0)
-
+                            lTimeseriesGroup = New atcTimeseriesGroup
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "RO", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "RO")(0)
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
                             TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
                             If TSTimeUnit <= 4 Then
@@ -194,25 +227,35 @@ Public Module CookieCutterGraphs
                             lTimeSeries.Attributes.SetValue("YAxis", "Aux")
                             lTimeseriesGroup.Add(lTimeSeries)
                         End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "SSED-TOT")(0)
+
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "SSED", 4, 1, lFoundTheTimeSeriesinWDMFile)
+
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "SSED-TOT")(0)
+                        End If
+                        lFoundTheTimeSeriesinWDMFile = False
 
                         If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                End If
+                                lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                                lTimeseriesGroup.Add(lTimeSeries)
                             End If
-                            lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                            lTimeseriesGroup.Add(lTimeSeries)
+                        lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "BEDDEP", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        If lFoundTheTimeSeriesinWDMFile = False Then
+                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BEDDEP")(0)
                         End If
-                        lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BEDDEP")(0)
+                        lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
-                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                            If TSTimeUnit <= 4 Then
-                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                End If
+                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                                lTimeseriesGroup.Add(lTimeSeries)
                             End If
-                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                            lTimeseriesGroup.Add(lTimeSeries)
-                        End If
 
                         If lTimeseriesGroup.Count = 3 Then
                             Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
@@ -233,16 +276,13 @@ Public Module CookieCutterGraphs
                             lCurve.Symbol.Type = SymbolType.None
                             lCurve.Line.Color = Drawing.Color.FromName("Red")
                             lCurve.Line.Width = 1
-
                             lCurve.Label.Text = "Flow (cfs)"
-
                             lCurve = lMainPane.CurveList.Item(0)
                             lCurve.Line.IsVisible = True
                             lCurve.Symbol.Type = SymbolType.None
                             lCurve.Line.Color = Drawing.Color.FromName("Red")
                             lCurve.Line.Width = 1
                             lCurve.Label.Text = "Total Suspended Solids (mg/L)"
-
                             lCurve = lMainPane.CurveList.Item(1)
                             lCurve.Line.IsVisible = True
                             lCurve.Symbol.Type = SymbolType.None
@@ -250,14 +290,22 @@ Public Module CookieCutterGraphs
                             lCurve.Line.Width = 1
                             lCurve.Label.Text = "Bed Depth (ft)"
                             lZgc.SaveIn(lOutputFolder & "TSS_RCHRES_" & lRchId & ".png")
+                            Logger.Dbg("Generated graph " & lOutputFolder & "TSS_RCHRES_" & lRchId & ".png")
                         End If
 #End Region
 
                         'Plotting DO Concentrations
                         Dim lTimeseriesGroupDO As New atcTimeseriesGroup
                         Dim lTimeSeriesDO As New atcTimeseries(Nothing)
-                        lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
-                        If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value <= 3 Then
+                        Dim lTimeSeriesTimeUnit As Integer
+                        lTimeSeriesDO = LocateTheTimeSeries(aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
+
+                        If lFoundTheTimeSeriesinWDMFile = False OrElse lTimeSeriesTimeUnit < 3 Then
+                            lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
+                        End If
+                        lTimeSeriesTimeUnit = lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value
+                        lFoundTheTimeSeriesinWDMFile = False
+                        If lTimeSeriesDO.Attributes.GetDefinedValue("Time Unit").Value < 3 Then
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMax))
                             lTimeseriesGroupDO.Add(Aggregate(lTimeSeriesDO, atcTimeUnit.TUDay, 1, atcTran.TranMin))
 
@@ -283,7 +331,9 @@ Public Module CookieCutterGraphs
                             lMainPane.YAxis.Scale.Min = 0
                             lMainPane.YAxis.Scale.Max = 20
                             lZgc.SaveIn(lOutputFolder & "DO_Concentration_RCHRES_" & RCHRES.split(":")(1) & ".png")
-
+                            Logger.Dbg("Generated graph " & lOutputFolder & "DO_Concentration_RCHRES_" & RCHRES.split(":")(1) & ".png")
+                        Else
+                            Logger.Dbg("The time unit of DO timeseries is daily or greater, so max daily and min daily will not be calculated for RCHRES:" & lRchId)
                         End If
 
                         'Plotting Load Duration Curve
@@ -292,7 +342,7 @@ Public Module CookieCutterGraphs
                         If CommonRESStandard = 0.0 Then
 
                             If Not (lRchId = LowerRangeRCHId Or lRchId = HigherRangeRCHId Or
-                                                        (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId)) Then
+                                                            (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId)) Then
                                 WQCriteriaInmgperliter = 0.0
                                 Dim lRESStandardFileNames As New NameValueCollection
                                 AddFilesInDir(lRESStandardFileNames, IO.Directory.GetCurrentDirectory, False, "*RES_TP_Standard.csv")
@@ -312,7 +362,7 @@ Public Module CookieCutterGraphs
                                         While Not MyReader.EndOfData
                                             Try
                                                 If MyReader.PeekChars(10000).Contains("***") Or
-                                                MyReader.PeekChars(10000).Contains("RCHRES") Then
+                                                    MyReader.PeekChars(10000).Contains("RCHRES") Then
 
                                                     CurrentRow = MyReader.ReadFields
                                                 Else
@@ -324,7 +374,7 @@ Public Module CookieCutterGraphs
                                                         LowerRangeRCHId = CType(Trim(Range(0)), Integer)
                                                         HigherRangeRCHId = CType(Trim(Range(1)), Integer)
                                                         If lRchId = LowerRangeRCHId Or lRchId = HigherRangeRCHId Or
-                                                            (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId) Then
+                                                               (lRchId > LowerRangeRCHId AndAlso lRchId < HigherRangeRCHId) Then
                                                             WQCriteriaInmgperliter = CurrentRow(1)
                                                             Exit While
                                                         End If
@@ -335,7 +385,7 @@ Public Module CookieCutterGraphs
 
                                                 End If
                                             Catch ex As Microsoft.VisualBasic.
-                                                FileIO.MalformedLineException
+                                                   FileIO.MalformedLineException
                                                 MsgBox("Line " & ex.Message & "is not valid and will be skipped.")
                                             End Try
                                         End While
@@ -347,15 +397,17 @@ Public Module CookieCutterGraphs
 
                         Else
                             WQCriteriaInmgperliter = CommonRESStandard
-                        End If
+                            End If
 
-                        If WQCriteriaInmgperliter > 0.0 Then
+                            If WQCriteriaInmgperliter > 0.0 Then
 
 
-                            lTimeseriesGroup = New atcTimeseriesGroup
-
-                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
-
+                                lTimeseriesGroup = New atcTimeseriesGroup
+                            lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "IVOL", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                            If lFoundTheTimeSeriesinWDMFile = False Then
+                                lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
+                            End If
+                            lFoundTheTimeSeriesinWDMFile = False
                             If lTimeSeries IsNot Nothing Then
                                 TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
                                 If TSTimeUnit <= 4 Then
@@ -365,49 +417,53 @@ Public Module CookieCutterGraphs
                                     lTimeseriesGroup.Add(lTimeSeries)
                                 End If
                             End If
-                            lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
+                            lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "TPKIF", 5, 1, lFoundTheTimeSeriesinWDMFile)
+                            If lFoundTheTimeSeriesinWDMFile = False Then
+                                lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
+                            End If
+                            lFoundTheTimeSeriesinWDMFile = False
 
                             If lTimeSeries IsNot Nothing Then
-                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                                If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                                    lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                                    lTimeseriesGroup.Add(lTimeSeries)
+                                    TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                    If TSTimeUnit <= 4 Then
+                                        lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                                        lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                                        lTimeseriesGroup.Add(lTimeSeries)
+                                    End If
                                 End If
-                            End If
-                            If lTimeseriesGroup.Count = 2 Then
+                                If lTimeseriesGroup.Count = 2 Then
 
-                                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                                Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
-                                Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                                    Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                                    Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
+                                    Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
 
-                                Dim lCurve As ZedGraph.LineItem = Nothing
-                                lCurve = lMainPane.CurveList.Item(0)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("green")
-                                lCurve.Line.Width = 2
-                                lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
-                                lCurve = lMainPane.CurveList.Item(1)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("red")
-                                lCurve.Line.Width = 2
-                                lCurve.Label.Text = "Baseline"
+                                    Dim lCurve As ZedGraph.LineItem = Nothing
+                                    lCurve = lMainPane.CurveList.Item(0)
+                                    lCurve.Line.IsVisible = True
+                                    lCurve.Symbol.Type = SymbolType.None
+                                    lCurve.Line.Color = Drawing.Color.FromName("green")
+                                    lCurve.Line.Width = 2
+                                    lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
+                                    lCurve = lMainPane.CurveList.Item(1)
+                                    lCurve.Line.IsVisible = True
+                                    lCurve.Symbol.Type = SymbolType.None
+                                    lCurve.Line.Color = Drawing.Color.FromName("red")
+                                    lCurve.Line.Width = 2
+                                    lCurve.Label.Text = "Baseline"
 
-                                lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
-                                lMainPane.YAxis.Scale.Min = 0
-                                lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
+                                    lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
+                                    lMainPane.YAxis.Scale.Min = 0
+                                    lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
 
-                                lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
-
+                                    lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
+                                Logger.Dbg("Generated graph " & lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
                             End If
 
                         End If
 
 
 
-                    End If
+                        End If
 #End Region
 
 
@@ -425,4 +481,42 @@ Public Module CookieCutterGraphs
         'Dim lRCH As HspfOperation
 
     End Sub
+    Friend Function LocateTheTimeSeries(ByVal aHSPFUCI As HspfUci,
+                                         ByVal aRCHId As Integer, ByVal aGroupName As String,
+                                         ByVal aMemberName As String, ByVal aMemSub1 As Integer,
+                                         ByVal aMemSub2 As Integer, ByRef aFoundTheTS As Boolean) As atcTimeseries
+        Dim lDataSource As New atcDataSource
+        Dim aTimeSeries As atcTimeseries = Nothing
+        aFoundTheTS = False
+        Dim lDataID As Integer = 0
+        For Each lconnection As HspfConnection In aHSPFUCI.Connections
+            If lconnection.Source.VolName = "RCHRES" AndAlso lconnection.Source.VolId = aRCHId AndAlso
+                                lconnection.Source.Group = aGroupName AndAlso lconnection.Source.Member = aMemberName AndAlso
+                                lconnection.Source.MemSub1 = aMemSub1 AndAlso lconnection.Source.MemSub2 = aMemSub2 AndAlso
+                                lconnection.Target.VolName.Contains("WDM") Then
+                lDataID = lconnection.Target.VolId
+                For i As Integer = 0 To aHSPFUCI.FilesBlock.Count
+                    If aHSPFUCI.FilesBlock.Value(i).Typ = lconnection.Target.VolName Then
+                        Dim lFileName As String = AbsolutePath(aHSPFUCI.FilesBlock.Value(i).Name.Trim, CurDir())
+                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                        If lDataSource Is Nothing Then
+                            If atcDataManager.OpenDataSource(lFileName) Then
+                                lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                            End If
+                        End If
+                        Exit For
+                    End If
+                Next
+                aFoundTheTS = True
+                Exit For
+            End If
+        Next lconnection
+        If lDataID > 0 Then
+            aTimeSeries = lDataSource.DataSets.FindData("ID", lDataID)(0)
+            aFoundTheTS = True
+        End If
+
+        Return aTimeSeries
+    End Function
+
 End Module

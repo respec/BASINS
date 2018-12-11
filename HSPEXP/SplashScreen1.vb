@@ -1,4 +1,5 @@
-﻿Public NotInheritable Class SplashScreen1
+﻿Imports MapWinUtility
+Public NotInheritable Class SplashScreen1
 
     'TODO: This form can easily be set as the splash screen for the application by going to the "Application" tab
     '  of the Project Designer ("Properties" under the "Project" menu).
@@ -28,8 +29,9 @@
 
         With My.Application.Info.Version
             Version.Text = "Version " & .Major & "." & .Minor & " beta"
+            Logger.Dbg("Software Verion:" & Version.Text)
             If .MajorRevision > 0 OrElse .MinorRevision > 0 Then
-                Version.Text &= "." & .MajorRevision & "." & .MinorRevision
+                Version.Text &= "." & .MajorRevision & "." & .MinorRevision & " beta"
             End If
         End With
         'Copyright info
