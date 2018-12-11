@@ -6,6 +6,10 @@ Imports MapWinUtility.Strings
 Public Class atcListPlugin
     Inherits atcData.atcDataDisplay
 
+    Public Sub New()
+        MyBase.New()
+    End Sub
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "Analysis::List"

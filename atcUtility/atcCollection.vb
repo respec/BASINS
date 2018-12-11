@@ -10,6 +10,10 @@ Public Class atcCollection
 
     Private pKeys As ArrayList = New ArrayList
 
+    Public Sub New()
+        MyBase.New()
+    End Sub
+
     'Do we need to do this or will operator = do this by default?
     'Public Shared Operator =(ByVal a1 As atcCollection, _
     '                         ByVal a2 As atcCollection) As Boolean
