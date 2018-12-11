@@ -157,7 +157,7 @@ Public Class atcGraphPlugin
         Else
             lForm.Grapher = lGrapher
             If pIcon IsNot Nothing Then lForm.Icon = pIcon
-            lForm.Show()
+            lForm.ShowDialog()
             Return lForm
         End If
     End Function

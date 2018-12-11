@@ -21,7 +21,7 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <RemoteDebugMachine>
     </RemoteDebugMachine>
-    <StartAction>Program</StartAction>
+    <StartAction>Project</StartAction>
     <StartArguments>
     </StartArguments>
     <StartPage>
@@ -56,5 +56,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <StartProgram>C:\dev\D4EM\Bin\FramesHspfBuilder.exe</StartProgram>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
+    <StartAction>Program</StartAction>
   </PropertyGroup>
 </Project>

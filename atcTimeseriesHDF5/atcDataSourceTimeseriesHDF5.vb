@@ -4,6 +4,7 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports System.DateTime
 Imports HDF5DotNet
+Imports System
 
 Public Class atcDataSourceTimeseriesHSF5
     Inherits atcTimeseriesSource
