@@ -1,4 +1,4 @@
-Date: 11/07/2018
+Date: 11/19/2018
 HSPEXP+3.0beta is the development version for the next version of HSPEXP+.
 Features:
 1. This version includes Model QA/QC report. The model QA/QC report is under development and it must be used with extreme caution.

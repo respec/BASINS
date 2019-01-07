@@ -15,34 +15,65 @@ Module WASP
                          ByVal aOutputfolder As String)
 
         Dim lWaspProject As New atcWASPProject
-        Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_R" & aReachId.ToString & ".inp")
+        Dim lOutputFolder As String = System.IO.Path.Combine(aOutputfolder, "WASP")
+        FileIO.FileSystem.CreateDirectory(lOutputFolder)
+        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP8_R" & aReachId.ToString & ".inp")
         lWaspProject.SDate = Date.FromOADate(aSDateJ)
         lWaspProject.EDate = Date.FromOADate(aEDateJ)
 
         'assuming eutrophication model
         lWaspProject.WASPConstituents = New Generic.List(Of clsWASPConstituent)
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Nitrogen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Orthophosphate (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Phosphorus (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton Chla (ug/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 1 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 2 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 3 (Ultimate) (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus (mg/L)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Solids (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Nitrogen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Orthophosphate (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Organic Phosphorus (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton Chla (ug/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 1 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 2 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD 3 (Ultimate) (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Solids (mg/L)", "", ""))
+        'need to use the list below for wasp 8 advanced eutrophication
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Ammonia Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Nitrate Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Phosphate", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Phosphorus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Diss Organic Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD1(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD2(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("CBOD3(ultimate)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Dissolved Oxygen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Carbon", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Phosphorus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Detrital Silica", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Total Detritus", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity(PSU) Or TDS (mg/L)", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Benthic Algae", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Periphyton Cell Quota Nitrogen", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Periphyton Cell Quota Phosphorous", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 1", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 2", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 3", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 1", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 2", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent(" Phytoplankton 3", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Total Inorganic C", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Alkalinity", "", ""))
 
         'if model type is heat
         'lWaspProject.WASPConstituents = New Generic.List(Of clsWASPConstituent)
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Temperature (°C)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Salinity (ppt)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Bacteria (#/100 ml)", "", ""))
-        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Silts and Fines (mg/L)", "", ""))
+        'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Silts And Fines (mg/L)", "", ""))
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Sands (mg/L)", "", ""))
 
         'need segments -- will make some assumptions here 
@@ -243,11 +274,81 @@ Module WASP
             End With
         Next
 
-        'One way to find input timeseries is to look in WDM file for upstream contributors.
-        'The concern with this is that all tribs have to be added together, plus we need local inflows.
-        'Look for timeseries from contributing reaches 
+        'One way to find input timeseries is to look for upstream contributors.
         Dim lReach As HspfOperation = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId)
+        Dim lConvFactP As Double = 1 / 2.205    'from pounds to kg
+        Dim lConvFactT As Double = 907.185      'tons to kg
+        Dim lConvFactF As Double = 1 / 35.315   'from cfs to cms
+        Dim lConvFactV As Double = 102.79 / (24 * 60 * 60)   'from ac.in/ivld To cms
+        'Look for timeseries from contributing reaches -- write them out
+        'Look for local inflows -- write them out
         Dim lTimeseries As atcTimeseries = Nothing
+        'For Each lSource As HspfConnection In lReach.Sources
+        '    If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "RCHRES" Then
+        '        'here's a contributing reach
+        '        Dim lContributingReachId As String = "R:" & lSource.Source.VolId
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "RO", lConvFactF, aSDateJ, aEDateJ, aOutputfolder)          'Flow
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "TAM-INTOT", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)   'Ammonia Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "NO3-INTOT", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)   'Nitrate Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "N-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder) 'Dissolved Organic Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "PO4-INTOT", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)   'Inorganic Phosphate
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "P-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder) 'Dissolved Organic Phosphorus
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "PHYTO-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)    'Phytoplankton Chla
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "BODIN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)       'CBOD 1(Ultimate)
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "DOXIN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder)       'Dissolved Oxygen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "C-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder) 'Detrital Carbon
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "N-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder) 'Detrital Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "P-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, aOutputfolder) 'Detrital Phosphorus
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingReachId, "R:" & aReachId, "ISED-TOT", lConvFactT, aSDateJ, aEDateJ, aOutputfolder)    'Solids
+        '    End If
+        '    If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "PERLND" Then
+        '        'here's a contributing perlnd
+        '        Dim lContributingId As String = "P:" & lSource.Source.VolId
+        '        Dim lMult As Double = lSource.MFact
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "PERO", lConvFactV * lMult, aSDateJ, aEDateJ, aOutputfolder)            'Flow
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOSED", lConvFactT * lMult, aSDateJ, aEDateJ, aOutputfolder)           'Solids
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "PODOXM", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)          'Dissolved Oxygen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "POQUAL-NH4", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'Ammonia Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "POQUAL-NO3", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'Nitrate Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "POQUAL-ORTHO P", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)  'Inorganic Phosphate
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "POQUAL-BOD", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'BOD for Total Organic Nitrogen, Phosphorus, and BOD
+        '    End If
+        '    If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "IMPLND" Then
+        '        'here's a contributing implnd
+        '        Dim lContributingId As String = "I:" & lSource.Source.VolId
+        '        Dim lMult As Double = lSource.MFact
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SURO", lConvFactV * lMult, aSDateJ, aEDateJ, aOutputfolder)            'Flow
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOSLD", lConvFactT * lMult, aSDateJ, aEDateJ, aOutputfolder)           'Solids
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SODOXM", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)          'Dissolved Oxygen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOQUAL-NH4", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'Ammonia Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOQUAL-NO3", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'Nitrate Nitrogen
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOQUAL-ORTHO P", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)  'Inorganic Phosphate
+        '        WriteBinoTimeseriesForWASP(aBinaryData, lContributingId, "R:" & aReachId, "SOQUAL-BOD", lConvFactP * lMult, aSDateJ, aEDateJ, aOutputfolder)      'BOD for Total Organic Nitrogen, Phosphorus, and BOD
+        '    End If
+        'Next
+        'alternate scheme to write individual and composite timeseries
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "RO", lConvFactF, aSDateJ, aEDateJ, lOutputFolder)          'Flow
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "TAM-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Ammonia Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "NO3-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Nitrate Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PO4-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Inorganic Phosphate
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Phosphorus
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PHYTO-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)    'Phytoplankton Chla
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "BODIN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)       'CBOD 1(Ultimate)
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "DOXIN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)       'Dissolved Oxygen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "C-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Carbon
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Phosphorus
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ISED-TOT", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PERO", lConvFactV, aSDateJ, aEDateJ, lOutputFolder)            'Flow
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "SOSED", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)           'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PODOXM", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)          'Dissolved Oxygen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH4", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Ammonia Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NO3", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Nitrate Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-ORTHO P", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Inorganic Phosphate
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-BOD", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'BOD for Total Organic Nitrogen, Phosphorus, and BOD
+
+        'Or from WDM
         'Dim lCompositeTimeseries As atcTimeseries = Nothing
         'Dim lCountTimeseries As Integer = 0
         'For Each lSource As HspfConnection In lReach.Sources
@@ -285,48 +386,63 @@ Module WASP
 
         'also add loadings at the upstream boundary (needs to be kg/day)
 
-        'Ammonia              TAM-INTOT (lbs)
-        Dim lConvFactP As Double = 1 / 2.205
+        'Ammonia Nitrogen               TAM-INTOT (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
 
-        'Nitrate              NO3-INTOT (lbs)
+        'Nitrate Nitrogen               NO3-INTOT (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
 
-        'Organic Nitrogen     N-TOTORG-IN (lbs)  
+        'Dissolved Organic Nitrogen     N-TOTORG-IN (lbs)  
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
 
-        'Orthophosphate       PO4-INTOT (lbs)
+        'Inorganic Phosphate            PO4-INTOT (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
 
-        'Organic Phosphorus   P-TOTORG-IN (lbs)
+        'Dissolved Organic Phosphorus   P-TOTORG-IN (lbs)
         LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
 
-        'Phytoplankton Chla   PHYTO-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 5, aSDateJ, aEDateJ)
+        'Inorganic Silica
+        'Diss Organic Silica
 
-        'CBOD 1(Ultimate)     BODIN (lbs) 
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 6, aSDateJ, aEDateJ)
+        'CBOD 1(Ultimate)               BODIN (lbs) 
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 7, aSDateJ, aEDateJ)
 
-        'CBOD 2(Ultimate)     *** 
-        'CBOD 3(Ultimate)     *** 
+        'CBOD 2(Ultimate)               *** 
+        'CBOD 3(Ultimate)               *** 
 
-        'Dissolved Oxygen     DOXIN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 9, aSDateJ, aEDateJ)
+        'Dissolved Oxygen               DOXIN (lbs)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 10, aSDateJ, aEDateJ)
 
-        'Detrital Carbon      C-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 10, aSDateJ, aEDateJ)
+        'Detrital Carbon                C-REFORG-IN (lbs)  
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
 
-        'Detrital Nitrogen    N-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
+        'Detrital Nitrogen              N-REFORG-IN (lbs)  
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
 
-        'Detrital Phosphorus  P-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
+        'Detrital Phosphorus            P-REFORG-IN (lbs)  
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 13, aSDateJ, aEDateJ)
 
-        'Salinity             ***
+        'Detrital Silica
+        'Total Detritus
+        'Salinity                       ***
+        'Benthic Algae
+        'Periphyton Cell Quota Nitrogen
+        'Periphyton Cell Quota Phosphorous
 
-        'Solids               ISED-TOT (tons)
-        Dim lConvFactT As Double = 907.185  'tons to kg
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 14, aSDateJ, aEDateJ)
+        'Solids                         ISED-TOT (tons)
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 20, aSDateJ, aEDateJ)
+
+        'Inorganic Solids 2
+        'Inorganic Solids 3
+
+        'Phytoplankton Chla             PHYTO-IN (lbs)  
+        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 23, aSDateJ, aEDateJ)
+
+        'Phytoplankton 2
+        'Phytoplankton 3
+
+        'Total Inorganic C
+        'Alkalinity
 
         ''if using heat model
         ''Temperature (°C)     
@@ -358,6 +474,134 @@ Module WASP
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID).ts = lTimeseries
         End If
+    End Sub
+
+    Sub WriteBinoTimeseriesForWASP(ByVal aBinaryData As atcDataSource,
+                                   ByVal aOpnId As String, ByVal aDownStreamReachId As String,
+                                   ByVal aConstituent As String,
+                                   ByVal aConvFact As Double,
+                                   ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                                   ByVal aOutputfolder As String)
+        Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_" & aOpnId.Replace(":", "") & "to" & aDownStreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+        Dim lTimeseries As atcTimeseries = Nothing
+        lTimeseries = aBinaryData.DataSets.FindData("Location", aOpnId).FindData("Constituent", aConstituent)(0)
+        If lTimeseries IsNot Nothing Then
+            If aConstituent = "RO" Then
+                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) * aConvFact
+            Else
+                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact
+            End If
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+            Dim lSW As IO.StreamWriter = Nothing
+            lSW = New IO.StreamWriter(lFileName, False)
+            For t As Integer = 1 To lTimeseries.Values.Count - 1
+                lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lTimeseries.Values(t))
+            Next
+            lSW.Flush()
+            lSW.Close()
+        End If
+    End Sub
+
+    Sub WriteHSPFTimeseriesForWASP(ByVal aBinaryData As atcDataSource,
+                                   ByVal aTargetReach As HspfOperation,
+                                   ByVal aType As String,
+                                   ByVal aConstituent As String,
+                                   ByVal aConvFact As Double,
+                                   ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                                   ByVal aOutputfolder As String)
+
+        Dim lCompositeTimeseries As atcTimeseries = Nothing
+        Dim lDownstreamReachId As String = "R:" & aTargetReach.Id
+        For Each lSource As HspfConnection In aTargetReach.Sources
+            If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "RCHRES" AndAlso aType = "R" Then
+                'here's a contributing reach
+                Dim lContributingReachId As String = "R:" & lSource.Source.VolId
+                Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_" & lContributingReachId.Replace(":", "") & "to" & lDownstreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+                Dim lTimeseries As atcTimeseries = Nothing
+                lTimeseries = aBinaryData.DataSets.FindData("Location", lContributingReachId).FindData("Constituent", aConstituent)(0)
+                If lTimeseries IsNot Nothing Then
+                    If aConstituent = "RO" Then
+                        lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) * aConvFact
+                    Else
+                        lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact
+                    End If
+                    lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+                    Dim lSW As IO.StreamWriter = Nothing
+                    lSW = New IO.StreamWriter(lFileName, False)
+                    For t As Integer = 1 To lTimeseries.Values.Count - 1
+                        lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lTimeseries.Values(t))
+                    Next
+                    lSW.Flush()
+                    lSW.Close()
+                    If lCompositeTimeseries Is Nothing Then
+                        lCompositeTimeseries = lTimeseries
+                    Else
+                        lCompositeTimeseries = lCompositeTimeseries + lTimeseries
+                    End If
+                End If
+            End If
+            If Not lSource.Source.Opn Is Nothing AndAlso (lSource.Source.VolName = "PERLND" Or lSource.Source.VolName = "IMPLND") AndAlso aType = "L" Then
+                'here's a contributing perlnd/implnd
+                Dim lContributingLandId As String = "P:" & lSource.Source.VolId
+                Dim lConstituent As String = aConstituent
+                Dim lMult As Double = lSource.MFact
+                If lSource.Source.VolName = "IMPLND" Then
+                    'set equivalent implnd names
+                    lContributingLandId = "I:" & lSource.Source.VolId
+                    If aConstituent = "PERO" Then
+                        lConstituent = "SURO"
+                    ElseIf aConstituent = "SOSED" Then
+                        lConstituent = "SOSLD"
+                    ElseIf aConstituent = "PODOXM" Then
+                        lConstituent = "SODOXM"
+                    ElseIf aConstituent = "POQUAL-NH4" Then
+                        lConstituent = "SOQUAL-NH4"
+                    ElseIf aConstituent = "POQUAL-NO3" Then
+                        lConstituent = "SOQUAL-NO3"
+                    ElseIf aConstituent = "POQUAL-ORTHO P" Then
+                        lConstituent = "SOQUAL-ORTHO P"
+                    ElseIf aConstituent = "POQUAL-BOD" Then
+                        lConstituent = "SOQUAL-BOD"
+                    End If
+                End If
+                Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_" & lContributingLandId.Replace(":", "") & "to" & lDownstreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+                Dim lTimeseries As atcTimeseries = Nothing
+                lTimeseries = aBinaryData.DataSets.FindData("Location", lContributingLandId).FindData("Constituent", aConstituent)(0)
+                If lTimeseries IsNot Nothing Then
+                    lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact * lMult
+                    lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+                    Dim lSW As IO.StreamWriter = Nothing
+                    lSW = New IO.StreamWriter(lFileName, False)
+                    For t As Integer = 1 To lTimeseries.Values.Count - 1
+                        lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lTimeseries.Values(t))
+                    Next
+                    lSW.Flush()
+                    lSW.Close()
+                    If lCompositeTimeseries Is Nothing Then
+                        lCompositeTimeseries = lTimeseries
+                    Else
+                        lCompositeTimeseries = lCompositeTimeseries + lTimeseries
+                    End If
+                End If
+            End If
+        Next
+        If lCompositeTimeseries IsNot Nothing Then
+            'write out the composite timeseries as well
+            Dim lFileName As String = ""
+            If aType = "R" Then
+                lFileName = System.IO.Path.Combine(aOutputfolder, "WASP_Reach_Sum_to" & lDownstreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+            Else
+                lFileName = System.IO.Path.Combine(aOutputfolder, "WASP_Land_Sum_to" & lDownstreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+            End If
+            Dim lSW As IO.StreamWriter = Nothing
+            lSW = New IO.StreamWriter(lFileName, False)
+            For t As Integer = 1 To lCompositeTimeseries.Values.Count - 1
+                lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lCompositeTimeseries.Values(t))
+            Next
+            lSW.Flush()
+            lSW.Close()
+        End If
+
     End Sub
 End Module
 

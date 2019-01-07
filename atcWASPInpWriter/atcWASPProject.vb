@@ -7,7 +7,7 @@ Public Class atcWASPProject
     Public Segments As atcWASPSegments
     Public SDate As Date = Date.MinValue
     Public EDate As Date = Date.MaxValue
-    Public ModelType As Integer = 2
+    Public ModelType As Integer = 11 '2
     Public Version As Integer = 2
     Public Name As String = ""
     Public INPFileName As String = ""
@@ -141,9 +141,9 @@ Public Class atcWASPProject
         aSW.WriteLine("    0               WQ Module Linkage Option")
         aSW.WriteLine("    0.9000          TOPT Factor")
         aSW.WriteLine("0.003000  1.000     Min and Max Timestep")
-        aSW.WriteLine("    2               Number print intervals")
-        aSW.WriteLine("      0.00  1.000   Time and Print Interval")
-        aSW.WriteLine(lJulianEnd & "  1.000   Time and Print Interval")
+        aSW.WriteLine("    0               Number print intervals")
+        'aSW.WriteLine("      0.00  1.000   Time and Print Interval")
+        'aSW.WriteLine(lJulianEnd & "  1.000   Time and Print Interval")
         Dim lTemp As String = " "
         For lIndex As Integer = 1 To Me.WASPConstituents.Count
             lTemp = lTemp & "  0"

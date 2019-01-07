@@ -287,13 +287,13 @@ Module HSPFOutputReports
                         For Each lLocation As String In pOutputLocations
                             lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lLocation))
                             Dim lLocationID As Integer = lLocation.Substring(2)
-                            'Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
-                            'For Each lSource As HspfConnection In lRCHRESOperation.Sources
-                            '    If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
-                            '        Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ": " & lSource.Source.VolId
-                            '        'lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
-                            '    End If
-                            'Next
+                            Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
+                            For Each lSource As HspfConnection In lRCHRESOperation.Sources
+                                If lSource.Source.VolName = "PERLND" OrElse lSource.Source.VolName = "IMPLND" OrElse lSource.Source.VolName = "RCHRES" Then
+                                    Dim lSourceOperation As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
+                                    lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
+                                End If
+                            Next
                             WASPInputFile(aHspfUci, lWASPDataSource, pSDateJ, pEDateJ, lLocationID, pTestPath)
                         Next
                     End If
@@ -1031,16 +1031,16 @@ Module HSPFOutputReports
 
         End If
         If lParameterViolationTable.Rows.Count > 10 Then
-            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterTableTemplate.xsl"))
+            Dim lXSLFile As StreamWriter = File.CreateText(Path.Combine(pOutFolderName, "ParameterTableTemplate.xsl"))
             lXSLFile.Write(My.Resources.LimitViolatingParameterTemplate)
             lXSLFile.Close()
-            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pTestPath, "ParameterReport.xml"))
+            Dim lParameterInfo As StreamWriter = File.CreateText(Path.Combine(pOutFolderName, "ParameterReport.xml"))
             lParameterInfo.WriteLine("<?xml version=""1.0"" encoding=""UTF-8""?>")
             lParameterInfo.WriteLine("<?xml-stylesheet version=""1.0"" type=""text/xsl"" href=""ParameterTableTemplate.xsl""?>")
             lParameterViolationTable.WriteXml(lParameterInfo, XmlWriteMode.IgnoreSchema)
             lParameterInfo.Close()
 
-            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. First 10 cases are listed below and all the 
+            ParameterInfo.AppendLine("<p> More than 10 cases were found where the model parameter values were outside the typical range. The first 10 cases are listed below and all the 
                                         range violations are listed in a <a href=./ParameterReport.xml>separate xml table.</a></p>")
 
             ParameterInfo.Append(ConvertToHtmlFile(lParameterViolationTable, 10))
@@ -1064,7 +1064,7 @@ Module HSPFOutputReports
                                         lead to hydrologic and water quality complexities that do not conform to the judgments that 
                                         are embedded in this module.  Furthermore, the set of aspects for which checks have been 
                                         included is not all-inclusive.</p>")
-        GeneralModelInfoText.AppendLine("<p>This module also assumes that first four water quality constituents simulated on the land are  
+        GeneralModelInfoText.AppendLine("<p>This module also assumes that the first four water quality constituents simulated on the land are  
                                         ammonia (NH3+NH4), nitrate as nitrogen (NO3), orthophosphorus as phosphorus (ORTHO P), and biochemical 
                                         oxygen demand (BOD) in the order that they are listed here with the QUALID as it is listed in the parenthesis.</p>")
         GeneralModelInfoText.AppendLine("<h2>How to use the QA/QC Report</h2>")
@@ -1181,7 +1181,7 @@ Module HSPFOutputReports
         'Then add outlet reaches
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lDownstreamReachID As Integer = lRCHRES.DownOper("RCHRES")
-            If lDownstreamReachID = 0 Then
+            If Not aUCI.OperationExists("RCHRES", lDownstreamReachID) Then
                 lOutletLocations.Add("R:" & lRCHRES.Id)
                 lLocationsToOutput.Add("R:" & lRCHRES.Id)
             End If
@@ -1294,19 +1294,19 @@ Module HSPFOutputReports
         Select Case aConstituentName
             Case "WAT"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on annual runoff from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""WAT_BoxWhisker.png"" alt=""Annual runoff from each land use."" height=""400"" width=""600""></img>")
             Case "SED"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on sediment loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""SED_BoxWhisker.png"" alt=""Sediment loading from each land use."" height=""400"" width=""600""></img>")
             Case "TN"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total nitrogen loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""TN_BoxWhisker.png"" alt=""Total nitrogen loading from each land use."" height=""400"" width=""600""></img>")
             Case "TP"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on total phosphorus loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""TP_BoxWhisker.png"" alt=""Total phosphorus loading from each land use."" height=""400"" width=""600""></img>")
             Case "BOD-Labile"
                 OverAllComments.AppendLine("<p>Refer to the following Box-Whisker plot for more details on biochemical oxygen demand (labile only) loading rate from each land use.</p>")
-                OverAllComments.AppendLine("<img src=""Reports_" & aDateString & "/BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
+                OverAllComments.AppendLine("<img src=""BOD-Labile_BoxWhisker.png"" alt=""Total BOD-Labile loading from each land use."" height=""400"" width=""600""></img>")
         End Select
         OverAllComments.AppendLine("<p>The box-whisker plot shows the variation in average annual loading among the model segments within each land use category.  If there is only one
                                     model segment, there will be only a single tick at the average annual load for that land use.  If there are multiple model segments, the tick will be
@@ -1528,6 +1528,7 @@ Module HSPFOutputReports
         Dim CheckTotalSedErosion As New Text.StringBuilder
         Dim lSelectExpression As String = "genLandUse = '" & aLanduse & "' And Year = 'SumAnnual'"
         Dim TotalSedRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) 'Need to convert sediment erosion rate to lbs/ac
+
         Dim TotalGullyErosion As Double = 0
         Try
             TotalGullyErosion = aLandLoadingConstReport.Compute("AVG(SCRSD)", lSelectExpression)
@@ -1539,10 +1540,19 @@ Module HSPFOutputReports
         End If
 
         Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, "SED")
-        If TotalSedRunoff > LoadingRate(1) OrElse TotalSedRunoff < LoadingRate(0) Then
-            CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
-                                            LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
-        End If
+        'If TotalSedRunoff > LoadingRate(1) OrElse TotalSedRunoff < LoadingRate(0) Then
+        '    CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(TotalSedRunoff, "0.00") & lUnits & "</b> is outside the typical limit of <b>" &
+        '                                    LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+        'End If
+        Dim lMatchingRows() = aLandLoadingConstReport.Select(lSelectExpression)
+        For Each lDataRow In lMatchingRows
+            Dim lTotalRunoff As Double = lDataRow.ItemArray(5)
+            If lTotalRunoff > LoadingRate(1) OrElse lTotalRunoff < LoadingRate(0) Then
+                CheckTotalSedErosion.AppendLine("<li>Sediment loading rate of <b>" & Format(lTotalRunoff, "0.00") & lUnits & "</b>" &
+                                                " for " & lDataRow.ItemArray(0) & "-" & lDataRow.ItemArray(1) & " is outside the typical limit of <b>" &
+                                                LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+            End If
+        Next
 
         Select Case aLanduse
             Case "Impervious"
@@ -1597,11 +1607,20 @@ Module HSPFOutputReports
         'If aConstituentName = "SED" Then lconversionfactor = 2000
         Dim TotalRunoff As Double = aLandLoadingConstReport.Compute("AVG(TotalOutflow)", lSelectExpression) * lconversionfactor 'Need to convert sediment erosion rate to lbs/ac
         Dim LoadingRate As List(Of Double) = GetMinMaxLoadingRates(aLanduse, aConstituentName)
-        If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
-            CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
-                                                "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
-                Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
-        End If
+        'If TotalRunoff > LoadingRate(1) OrElse TotalRunoff < LoadingRate(0) Then
+        '    CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(TotalRunoff, "0.00") & lUnits &
+        '                                        "</b> is outside the typical range of <b>" & Format(LoadingRate(0), "0.00") & " - " &
+        '        Format(LoadingRate(1), "0.00") & lUnits & "</b> for " & aLanduse & ".</li>")
+        'End If
+        Dim lMatchingRows() = aLandLoadingConstReport.Select(lSelectExpression)
+        For Each lDataRow In lMatchingRows
+            Dim lTotalRunoff As Double = lDataRow.ItemArray(11)
+            If lTotalRunoff > LoadingRate(1) OrElse lTotalRunoff < LoadingRate(0) Then
+                CheckNutrientLoadingText.AppendLine("<li>" & aConstituentName & " loading rate of <b>" & Format(lTotalRunoff, "0.00") & lUnits & "</b>" &
+                                                " for " & lDataRow.ItemArray(0) & "-" & lDataRow.ItemArray(1) & " is outside the typical limit of <b>" &
+                                                LoadingRate(0) & " - " & LoadingRate(1) & lUnits & "</b> for " & aLanduse & ".</li>")
+            End If
+        Next
 
         Return CheckNutrientLoadingText.ToString
     End Function
@@ -1695,14 +1714,15 @@ Module HSPFOutputReports
             End Select
             Logger.Status("Creating the QAQC Storage Trend Report for " & aConstituent & " in " & lLocationName)
 
+            Dim StorageVariableNoOp As String = ""
             For Each StorageVariable As String In lListOfStorageVariables
                 If Not StorageVariable.StartsWith(lLocationName.Substring(0, 2)) Then Continue For
-                StorageVariable = StorageVariable.Split(":")(1)
+                StorageVariableNoOp = StorageVariable.Split(":")(1)
                 Logger.Dbg("Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
                 Dim lSlope As Double = 0
                 Dim lIntercept As Double = 0
                 Dim lRCoeff As Double = 0
-                Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariable)(0)
+                Dim lStorageTimeSeries As atcTimeseries = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", StorageVariableNoOp)(0)
                 If Not lStorageTimeSeries Is Nothing Then 'binary output found
                     If lStorageVarCount.Keys.Contains(StorageVariable) Then
                         lStorageVarCount.ItemByKey(StorageVariable) += 1
@@ -1721,9 +1741,13 @@ Module HSPFOutputReports
                     Try
                         lTSerAverage = lStorageTimeSeries.Attributes.GetDefinedValue("Mean").Value
                         lTSerStdev = lStorageTimeSeries.Attributes.GetDefinedValue("Standard Deviation").Value
-                        lCoeffVariation = lTSerStdev / lTSerAverage
+                        If lTSerAverage > 0 Then
+                            lCoeffVariation = lTSerStdev / lTSerAverage
+                        Else
+                            StorageTrend.AppendLine("<li>Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Average of output timeseries is 0" & "</li>")
+                        End If
                     Catch
-                        StorageTrend.AppendLine("Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable)
+                        StorageTrend.AppendLine("<li>Could not estimate trend for Operation ID= " & lOperation.Id & ", Storage Variable = " & StorageVariable & " - Unable to compute timeseries Average and Standard Deviation" & "</li>")
 
                         Continue For
                     End Try
@@ -1742,10 +1766,10 @@ Module HSPFOutputReports
                         Dim lY2 As Double = ((lSlope * lTempTimeSeries.Value(lTempTimeSeries.numValues - 1)) + lIntercept) * lTSerStdev + lTSerAverage
                         Dim lPercentChange As Double = 100 * ((lY2 - lY) / lY)
                         If lSlope > 0.002 AndAlso lPercentChange > 20 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
+                            StorageTrend.AppendLine("<li>The " & StorageVariableNoOp & " for " & lLocationName & " increases by" & DecimalAlign(lPercentChange, 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
                         ElseIf lSlope < -0.002 AndAlso lPercentChange < -20 Then
-                            StorageTrend.AppendLine("<li>The " & StorageVariable & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
+                            StorageTrend.AppendLine("<li>The " & StorageVariableNoOp & " for " & lLocationName & " decreases by" & DecimalAlign(Math.Abs(lPercentChange), 6, 1, 4) & "%</li>")
                             lNumberOfTrendIssues += 1
                         End If
                     End If
@@ -1759,14 +1783,15 @@ Module HSPFOutputReports
         ElseIf lNumberOfTrendIssues > 0 Then
             OverAllStorageTrend.AppendLine("<p>The following non-typical long term trend issues were noticed in the model.<sup>*</sup></p>")
             OverAllStorageTrend.Append(StorageTrend)
-            OverAllStorageTrend.AppendLine("<sup>*</sup><i>Based on fitted line through difference of values from mean over time</i>")
+            OverAllStorageTrend.AppendLine("<p><sup>*</sup><i>Based on fitted line through difference of values from mean over time</i></p>")
         Else
             OverAllStorageTrend.AppendLine("<p>No long term storage or concentration issues were noticed in the model.</p>")
         End If
         OverAllStorageTrend.AppendLine("<p>The following model elements were reviewed (count of datasets in parentheses):<ul>")
         For Each StorageVariable As String In lListOfStorageVariables
-            StorageVariable = StorageVariable.Split(":")(1)
-            OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+            If lStorageVarCount.ItemByKey(StorageVariable) IsNot Nothing Then
+                OverAllStorageTrend.AppendLine("<li>" & StorageVariable & " (" & lStorageVarCount.ItemByKey(StorageVariable) & " datasets)")
+            End If
         Next
         OverAllStorageTrend.AppendLine("</ul>")
 

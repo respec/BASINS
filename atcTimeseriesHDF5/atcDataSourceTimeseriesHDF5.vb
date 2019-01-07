@@ -4,8 +4,9 @@ Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports System.DateTime
 Imports HDF5DotNet
+Imports System
 
-Public Class atcDataSourceTimeseriesHSF5
+Public Class atcDataSourceTimeseriesHDF5
     Inherits atcTimeseriesSource
     '##MODULE_REMARKS Copyright 2017 RESPEC - Royalty-free use permitted under open source license
 

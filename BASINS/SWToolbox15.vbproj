@@ -251,8 +251,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del C:\dev\BASINS\Bin\Plugins\Basins\basins.dll
-del C:\dev\BASINS\Bin\Plugins\Basins\GWToolbox.dll</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>

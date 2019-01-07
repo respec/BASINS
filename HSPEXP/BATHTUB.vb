@@ -198,13 +198,17 @@ Module BATHTUB
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "ROVOL")(0)
                 End If
 
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 0.00123348185532 'Converting flow in ac-ft to hm3
+                'save the original ROVOL timeseries for computing the flow weighted mean concentration
+                Dim lROVOLTimeseries As atcTimeseries = lTimeseries
+
+                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 0.00123348185532 'Converting flow in ac-ft to hectare-meters
                 lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""" & lSource.Source.Opn.Description & """,1,1," & Format(lDrainageAreaKM2, "0.00") & "," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00") & ",0")
 
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""CONSERVATIVE SUBST."",0,0")
+
                 'Get the total P concentration data
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, aReachId, "PLANK", "PKST4", 2, 1, lTimeSeriesIsInWDM)
                 If lTimeSeriesIsInWDM = True Then
@@ -212,8 +216,8 @@ Module BATHTUB
                 Else
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "P-TOT-CONC")(0)
                 End If
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
+                'convert to flow weighted concentration 
+                lAverage = FlowWeightedConc(lTimeseries, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL P""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
@@ -225,8 +229,8 @@ Module BATHTUB
                 Else
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "N-TOT-CONC")(0)
                 End If
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-                lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
+                'convert to flow weighted concentration
+                lAverage = FlowWeightedConc(lTimeseries, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL N""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
@@ -238,22 +242,19 @@ Module BATHTUB
                 Else
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "PO4-CONCDIS")(0)
                 End If
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
-
-                lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
+                'convert to flow weighted concentration
+                lAverage = FlowWeightedConc(lTimeseries, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""ORTHO P""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
 
                 'Get the inorganic N concentration (sum of NO3, NO2, and TAM)
-
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, aReachId, "NUTRX", "DNUST", 1, 1, lTimeSeriesIsInWDM)
                 If lTimeSeriesIsInWDM = True Then
                     lTimeSeriesIsInWDM = False
                 Else
-                    lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "NO3-CONCDIS")(0).Attributes.GetDefinedValue("Average").Value * 1000
+                    lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "NO3-CONCDIS")(0)
                 End If
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                 Dim lInorgN As atcTimeseries = lTimeseries
 
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, aReachId, "NUTRX", "DNUST", 2, 1, lTimeSeriesIsInWDM)
@@ -262,7 +263,6 @@ Module BATHTUB
                 Else
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "TAM-CONCDIS")(0)
                 End If
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                 lInorgN += lTimeseries
 
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, aReachId, "NUTRX", "DNUST", 3, 1, lTimeSeriesIsInWDM)
@@ -272,10 +272,11 @@ Module BATHTUB
                     lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "NO2-CONCDIS")(0)
                 End If
                 If Not lTimeseries Is Nothing Then
-                    lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
                     lInorgN += lTimeseries
                 End If
-                lAverage = lInorgN.Attributes.GetDefinedValue("Mean").Value * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
+
+                'convert to flow weighted concentration
+                lAverage = FlowWeightedConc(lInorgN, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lInorgN.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCov = lStdEv / lAverage
                 BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""INORGANIC N""," & Format(lAverage, "0.00") & "," & Format(lCov, "0.00"))
@@ -478,9 +479,14 @@ Module BATHTUB
             End If
 
         Next
-        Dim lAverageTS As atcTimeseries = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
-        lOrthoPAndTP(0) = lAverageTS.Attributes.GetDefinedValue("SumAnnual").Value
-        lOrthoPAndTP(1) = lAverageTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOrthoPAndTP(0)
+        If lTotalTS.numValues = 0 Then
+            lOrthoPAndTP(0) = 0.0
+            lOrthoPAndTP(1) = 0.0
+        Else
+            Dim lAverageTS As atcTimeseries = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
+            lOrthoPAndTP(0) = lAverageTS.Attributes.GetDefinedValue("SumAnnual").Value
+            lOrthoPAndTP(1) = lAverageTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOrthoPAndTP(0)
+        End If
 
         lConstituentList = ConstituentList("TP", "BOD",,, aHSPFSourceOpn.Name)
 
@@ -494,11 +500,20 @@ Module BATHTUB
                 lMassLinkFactor = FindMassLinkFactor(aHSPFUCI, aMassLink, lOutflowDataType,
                                                  "TP", lConversionFactor, 0)
             End If
-            lTotalTS += lTS * lMassLinkFactor
+            If lTotalTS.numValues = 0 Then
+                lTotalTS = lTS * lMassLinkFactor
+            Else
+                lTotalTS += lTS * lMassLinkFactor
+            End If
         Next
-        lTotalTS = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
-        lOrthoPAndTP(2) = lTotalTS.Attributes.GetDefinedValue("SumAnnual").Value
-        lOrthoPAndTP(3) = lTotalTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOrthoPAndTP(2)
+        If lTotalTS.numValues = 0 Then
+            lOrthoPAndTP(2) = 0.0
+            lOrthoPAndTP(3) = 0.0
+        Else
+            lTotalTS = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
+            lOrthoPAndTP(2) = lTotalTS.Attributes.GetDefinedValue("SumAnnual").Value
+            lOrthoPAndTP(3) = lTotalTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOrthoPAndTP(2)
+        End If
 
         Return lOrthoPAndTP
 
@@ -527,7 +542,6 @@ Module BATHTUB
             Else
                 lTotalTS += lTS * lMassLinkFactor
             End If
-
         Next
 
         lConstituentList = ConstituentList("TN", "NO3",,, aHSPFSourceOpn.Name)
@@ -541,12 +555,22 @@ Module BATHTUB
                 lMassLinkFactor = FindMassLinkFactor(aHSPFUCI, aMassLink, lOutflowDataType,
                                                  "TN", lConversionFactor, 0)
             End If
-            lTotalTS += lTS * lMassLinkFactor
+            If lTotalTS.numValues = 0 Then
+                lTotalTS = lTS * lMassLinkFactor
+            Else
+                lTotalTS += lTS * lMassLinkFactor
+            End If
         Next
-        Dim lAverageTS As atcTimeseries = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
+        If lTotalTS.numValues = 0 Then
+            lInorNAndTotalN(0) = 0.0
+            lInorNAndTotalN(1) = 0.0
+        Else
+            Dim lAverageTS As atcTimeseries = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
 
-        lInorNAndTotalN(0) = lAverageTS.Attributes.GetDefinedValue("SumAnnual").Value
-        lInorNAndTotalN(1) = lAverageTS.Attributes.GetDefinedValue("Standard Deviation").Value / lInorNAndTotalN(0)
+            lInorNAndTotalN(0) = lAverageTS.Attributes.GetDefinedValue("SumAnnual").Value
+            lInorNAndTotalN(1) = lAverageTS.Attributes.GetDefinedValue("Standard Deviation").Value / lInorNAndTotalN(0)
+        End If
+
 
         lConstituentList = ConstituentList("TN", "BOD",,, aHSPFSourceOpn.Name)
         For Each lOutflowDataType As String In lConstituentList.Values
@@ -559,15 +583,106 @@ Module BATHTUB
                 lMassLinkFactor = FindMassLinkFactor(aHSPFUCI, aMassLink, lOutflowDataType,
                                                  "TN", lConversionFactor, 0)
             End If
-            lTotalTS += lTS * lMassLinkFactor
+            If lTotalTS.numValues = 0 Then
+                lTotalTS = lTS * lMassLinkFactor
+            Else
+                lTotalTS += lTS * lMassLinkFactor
+            End If
         Next
-        lTotalTS = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
-        lInorNAndTotalN(2) = lTotalTS.Attributes.GetDefinedValue("SumAnnual").Value
-        lInorNAndTotalN(3) = lTotalTS.Attributes.GetDefinedValue("Standard Deviation").Value / lInorNAndTotalN(2)
-
+        If lTotalTS.numValues = 0 Then
+            lInorNAndTotalN(2) = 0.0
+            lInorNAndTotalN(3) = 0.0
+        Else
+            lTotalTS = Aggregate(lTotalTS, atcTimeUnit.TUYear, 1, atcTran.TranSumDiv) * 112.085 'Converting lbs/ac to mg/m2
+            lInorNAndTotalN(2) = lTotalTS.Attributes.GetDefinedValue("SumAnnual").Value
+            lInorNAndTotalN(3) = lTotalTS.Attributes.GetDefinedValue("Standard Deviation").Value / lInorNAndTotalN(2)
+        End If
 
         Return lInorNAndTotalN
 
+    End Function
+
+    Function FlowWeightedConc(ByVal aWQts As atcTimeseries, ByVal aFlowts As atcTimeseries, Optional ByVal aSpec As atcDataAttributes = Nothing) As Double
+        Dim lFWC As Double = 0.0
+
+        Dim lSumFC As Double = 0.0
+        Dim lSumF As Double = 0.0
+        Dim lWQVal As Double
+        Dim lFlowVal As Double
+
+        Dim lLogTransform As Boolean = False
+        Dim lStartDate As Double = -99
+        Dim lEndDate As Double = -99
+        Dim lSigDigit As Integer = -99
+
+        If aSpec IsNot Nothing Then
+            With aSpec
+                lLogTransform = .GetValue("Log", False)
+                lStartDate = .GetValue("Start", -99)
+                lEndDate = .GetValue("End", -99)
+                lSigDigit = .GetValue("SigDigit", -99)
+            End With
+            If lStartDate >= lEndDate Then
+                lStartDate = -99
+                lEndDate = -99
+            End If
+        End If
+
+        If lStartDate > 0 AndAlso lEndDate > 0 Then
+            aWQts = SubsetByDate(aWQts, lStartDate, lEndDate, Nothing)
+            aFlowts = SubsetByDate(aFlowts, lStartDate, lEndDate, Nothing)
+        Else
+            Dim lGroup As New atcTimeseriesGroup()
+            lGroup.Add(aWQts)
+            lGroup.Add(aFlowts)
+            Dim lFirstStart As Double
+            Dim lLastEnd As Double
+            Dim lCommonStart As Double
+            Dim lCommonEnd As Double
+            If CommonDates(lGroup, lFirstStart, lLastEnd, lCommonStart, lCommonEnd) Then
+                If lFirstStart <> lCommonStart OrElse lLastEnd <> lCommonEnd Then
+                    aWQts = SubsetByDate(aWQts, lCommonStart, lCommonEnd, Nothing)
+                    aFlowts = SubsetByDate(aFlowts, lCommonStart, lCommonEnd, Nothing)
+                End If
+            End If
+            lGroup.Clear()
+        End If
+
+        Dim lIncludeFullFlowRange As Boolean = True
+        For lIndex As Integer = 1 To aWQts.numValues
+            'assume for now the flow and wq timeseries have same start/end dates and time step
+            lWQVal = aWQts.Values(lIndex)
+            lFlowVal = aFlowts.Values(lIndex)
+
+            'bypass negative Qual values
+            If lWQVal < 0 OrElse lFlowVal < 0 OrElse
+                Double.IsNaN(lWQVal) OrElse Double.IsNaN(lFlowVal) OrElse
+                Double.IsInfinity(lWQVal) OrElse Double.IsInfinity(lFlowVal) Then
+                Continue For
+            End If
+
+            If lSigDigit > 0 Then
+                lWQVal = Math.Round(lWQVal, lSigDigit)
+            End If
+
+            If lLogTransform Then
+                If lWQVal > 0 Then
+                    lWQVal = Math.Log10(lWQVal)
+                Else
+                    lWQVal = 0.0
+                End If
+            End If
+            lSumFC += lWQVal * lFlowVal
+            lSumF += lFlowVal
+        Next
+        If lSumF > 0 Then
+            If lLogTransform Then
+                lFWC = Math.Pow(10.0, lSumFC / lSumF)
+            Else
+                lFWC = lSumFC / lSumF
+            End If
+        End If
+        Return lFWC
     End Function
 End Module
 
