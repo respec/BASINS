@@ -64,7 +64,7 @@ Module WASP
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Inorganic Solids 3", "", ""))
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 1", "", ""))
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 2", "", ""))
-        lWaspProject.WASPConstituents.Add(New clsWASPConstituent(" Phytoplankton 3", "", ""))
+        lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Phytoplankton 3", "", ""))
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Total Inorganic C", "", ""))
         lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Alkalinity", "", ""))
 
@@ -327,19 +327,19 @@ Module WASP
         '    End If
         'Next
         'alternate scheme to write individual and composite timeseries
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "RO", lConvFactF, aSDateJ, aEDateJ, lOutputFolder)          'Flow
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "TAM-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Ammonia Nitrogen
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "NO3-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Nitrate Nitrogen
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Nitrogen
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PO4-INTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Inorganic Phosphate
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-TOTORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Phosphorus
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PHYTO-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)    'Phytoplankton Chla
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "BODIN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)       'CBOD 1(Ultimate)
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "DOXIN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)       'Dissolved Oxygen
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "C-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Carbon
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Nitrogen
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-REFORG-IN", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Phosphorus
-        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ISED-TOT", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "RO", lConvFactF, aSDateJ, aEDateJ, lOutputFolder)           'Flow
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "TAM-OUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Ammonia Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "NO3-OUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Nitrate Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-TOTORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PO4-OUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Inorganic Phosphate
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-TOTORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Phosphorus
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "PHYTO-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)    'Phytoplankton Chla
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "BODOUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)    'CBOD 1(Ultimate)
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "DOXOUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)    'Dissolved Oxygen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "C-REFORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Carbon
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-REFORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-REFORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Phosphorus
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROSED-TOT", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PERO", lConvFactV, aSDateJ, aEDateJ, lOutputFolder)            'Flow
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "SOSED", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)           'Solids
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PODOXM", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)          'Dissolved Oxygen
@@ -564,9 +564,9 @@ Module WASP
                         lConstituent = "SOQUAL-BOD"
                     End If
                 End If
-                Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_" & lContributingLandId.Replace(":", "") & "to" & lDownstreamReachId.Replace(":", "") & "_" & aConstituent & ".txt")
+                Dim lFileName As String = System.IO.Path.Combine(aOutputfolder, "WASP_" & lContributingLandId.Replace(":", "") & "to" & lDownstreamReachId.Replace(":", "") & "_" & lConstituent & ".txt")
                 Dim lTimeseries As atcTimeseries = Nothing
-                lTimeseries = aBinaryData.DataSets.FindData("Location", lContributingLandId).FindData("Constituent", aConstituent)(0)
+                lTimeseries = aBinaryData.DataSets.FindData("Location", lContributingLandId).FindData("Constituent", lConstituent)(0)
                 If lTimeseries IsNot Nothing Then
                     lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact * lMult
                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
