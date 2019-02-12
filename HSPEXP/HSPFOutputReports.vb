@@ -208,8 +208,8 @@ Module HSPFOutputReports
                 Directory.CreateDirectory(pOutFolderName)
                 File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
 
-                'read binary output files for later use in wq reports, qa reports, or receiving models 
-                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Or pModelQAQC Then
+                'read binary output files for later use in qa reports
+                If pModelQAQC Then
                     Dim lOpenHspfBinDataSource As New atcDataSource
                     Logger.Dbg(Now & " Opening the binary output files.")
                     For i As Integer = 0 To aHspfUci.FilesBlock.Count
@@ -258,6 +258,23 @@ Module HSPFOutputReports
                 'Do Expert System Stats
                 If pExpertSystemStats Then
                     DoExpertSystemStats(aHspfUci, lRunMade)
+                End If
+
+                'read binary output files again for later use in wq reports or receiving models 
+                If pConstituents.Count > 0 Or pBATHTUB Or pWASP Then
+                    Dim lOpenHspfBinDataSource As New atcDataSource
+                    Logger.Dbg(Now & " Opening the binary output files.")
+                    For i As Integer = 0 To aHspfUci.FilesBlock.Count
+                        If aHspfUci.FilesBlock.Value(i).Typ = "BINO" Then
+                            Dim lHspfBinFileName As String = AbsolutePath(aHspfUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                            If lOpenHspfBinDataSource Is Nothing Then
+                                If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                End If
+                            End If
+                        End If
+                    Next i
                 End If
 
                 'Write input file for BATHTUB
@@ -318,7 +335,13 @@ Module HSPFOutputReports
                 Logger.Dbg(Now & " HSPEXP+ Complete")
                 Logger.Msg("HSPEXP+ is complete")
 
-                OpenFile(pOutFolderName)
+                If pWASP Then
+                    Dim lOutputFolder As String = System.IO.Path.Combine(pTestPath, "WASP")
+                    OpenFile(lOutputFolder)
+                Else
+                    OpenFile(pOutFolderName)
+                End If
+
                 If pModelQAQC Then OpenFile(pOutFolderName & "ModelQAQC.htm")
             End Using
 

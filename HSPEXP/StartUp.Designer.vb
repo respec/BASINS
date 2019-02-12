@@ -504,7 +504,6 @@ Partial Class StartUp
         '
         Me.GroupBox1.Controls.Add(Me.chkWASP)
         Me.GroupBox1.Controls.Add(Me.chkBathtub)
-        Me.GroupBox1.Enabled = False
         Me.GroupBox1.Location = New System.Drawing.Point(18, 491)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(418, 55)
@@ -564,7 +563,6 @@ Partial Class StartUp
         Me.Padding = New System.Windows.Forms.Padding(5)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "HSPEXP+ "
-        Me.TransparencyKey = System.Drawing.SystemColors.ActiveBorder
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
         Me.Plotting.ResumeLayout(False)

@@ -816,7 +816,7 @@ Public Class atcVariation
             Dim lXML As String = "  <" & aTag & " count='" & aDataGroup.Count & "'>" & vbCrLf
             For lIndex As Integer = 0 To aDataGroup.Count - 1
                 Dim lDataSet As atcDataSet = aDataGroup.Item(lIndex)
-                Dim lDataKey As String = aDataGroup.Keys(lIndex)
+                Dim lDataKey As String = aDataGroup.Keys(lIndex).ToString
                 If Not lDataSet Is Nothing Then
                     lXML &= "    <DataSet"
                     lXML &= " ID='" & ToXML(lDataSet.Attributes.GetValue("ID")) & "'"
