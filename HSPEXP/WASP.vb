@@ -17,7 +17,7 @@ Module WASP
         Dim lWaspProject As New atcWASPProject
         Dim lOutputFolder As String = System.IO.Path.Combine(aOutputfolder, "WASP")
         FileIO.FileSystem.CreateDirectory(lOutputFolder)
-        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP8_R" & aReachId.ToString & ".inp")
+        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP_R" & aReachId.ToString & ".inp")
         lWaspProject.SDate = Date.FromOADate(aSDateJ)
         lWaspProject.EDate = Date.FromOADate(aEDateJ)
 

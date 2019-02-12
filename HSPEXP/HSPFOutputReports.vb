@@ -335,7 +335,13 @@ Module HSPFOutputReports
                 Logger.Dbg(Now & " HSPEXP+ Complete")
                 Logger.Msg("HSPEXP+ is complete")
 
-                OpenFile(pOutFolderName)
+                If pWASP Then
+                    Dim lOutputFolder As String = System.IO.Path.Combine(pTestPath, "WASP")
+                    OpenFile(lOutputFolder)
+                Else
+                    OpenFile(pOutFolderName)
+                End If
+
                 If pModelQAQC Then OpenFile(pOutFolderName & "ModelQAQC.htm")
             End Using
 
