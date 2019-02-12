@@ -157,7 +157,11 @@ Public Class atcGraphPlugin
         Else
             lForm.Grapher = lGrapher
             If pIcon IsNot Nothing Then lForm.Icon = pIcon
+#If Python = "Yes" Then
+            lForm.ShowDialog()
+#Else
             lForm.Show()
+#End If
             Return lForm
         End If
     End Function

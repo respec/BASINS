@@ -33,7 +33,12 @@ Public Class atcSynopticAnalysisPlugin
                                    As Object 'System.Windows.Forms.Form
         Dim lForm As New frmSynoptic
         lForm.Initialize(aTimeseriesGroup)
+#If Python = "Yes" Then
+        lForm.Visible = False
+        lForm.ShowDialog()
+#Else
         Return lForm
+#End If
     End Function
 
     Public Overrides Sub Save(ByVal aTimeseriesGroup As atcDataGroup, _
