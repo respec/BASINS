@@ -2901,6 +2901,12 @@ x:
                 For Each lOperation As HspfOperation In lOpTyp.Ids
                     'Logger.Dbg lOpn.Description
                     Dim lOperationDefault As HspfOperation = MatchOperWithDefault(lOperation.Name, lOperation.Description, aDefaultUci)
+                    If lOperation.DefOpnId > 0 Then
+                        If lOperation.DefOpnId <> lOperationDefault.Id Then
+                            'want this one instead
+                            lOperationDefault = aDefaultUci.OpnBlks(lOperation.Name).OperFromID(lOperation.DefOpnId)
+                        End If
+                    End If
                     If Not lOperationDefault Is Nothing Then
                         Logger.Dbg("Match " & lOperation.Id & ":" & lOperationDefault.Id & " " & lOperation.Description & ":" & lOperationDefault.Description)
                         For Each lTable As HspfTable In lOperation.Tables
