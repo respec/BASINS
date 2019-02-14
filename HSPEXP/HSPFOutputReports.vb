@@ -422,7 +422,7 @@ Module HSPFOutputReports
                     Dim PercentMissingObservedData As Double = 0.0
 
                     If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
-                        PercentMissingObservedData = lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value * 100 / lObsTSerInches.Attributes.GetDefinedValue("Count").Value
+                        PercentMissingObservedData = lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value * 100 / lObsTSerInches.Values.Count
                         For i As Integer = 1 To lObsTSerInches.numValues
                             If Double.IsNaN(lObsTSerInches.Value(i)) Then
                                 lSimTSerInches.Value(i) = Double.NaN
