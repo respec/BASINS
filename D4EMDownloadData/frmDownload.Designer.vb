@@ -78,6 +78,8 @@ Partial Class frmDownload
         Me.chkGetNewest = New System.Windows.Forms.CheckBox()
         Me.chkNCDC_MetData = New System.Windows.Forms.CheckBox()
         Me.chkNCDC_MetStations = New System.Windows.Forms.CheckBox()
+        Me.chkNHDplus2_hydrography = New System.Windows.Forms.CheckBox()
+        Me.chkNHDplus2_elev_cm = New System.Windows.Forms.CheckBox()
         Me.btnDownload = New System.Windows.Forms.Button()
         Me.cboRegion = New System.Windows.Forms.ComboBox()
         Me.lblRegion = New System.Windows.Forms.Label()
@@ -101,8 +103,6 @@ Partial Class frmDownload
         Me.lblNWISnoStations_GW = New System.Windows.Forms.Label()
         Me.grpNCDC = New System.Windows.Forms.GroupBox()
         Me.grpNHDplus2 = New System.Windows.Forms.GroupBox()
-        Me.chkNHDplus2_hydrography = New System.Windows.Forms.CheckBox()
-        Me.chkNHDplus2_elev_cm = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_All = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_Catchment = New System.Windows.Forms.CheckBox()
         Me.grpBASINS.SuspendLayout()
@@ -440,6 +440,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD1992.TabIndex = 34
         Me.chkUSGS_Seamless_NLCD1992.Text = "1992 Land Cover"
         Me.chkUSGS_Seamless_NLCD1992.UseVisualStyleBackColor = True
+        Me.chkUSGS_Seamless_NLCD1992.Visible = False
         '
         'chkUSGS_Seamless_NLCD2001_Canopy
         '
@@ -448,7 +449,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2001_Canopy.Name = "chkUSGS_Seamless_NLCD2001_Canopy"
         Me.chkUSGS_Seamless_NLCD2001_Canopy.Size = New System.Drawing.Size(89, 17)
         Me.chkUSGS_Seamless_NLCD2001_Canopy.TabIndex = 38
-        Me.chkUSGS_Seamless_NLCD2001_Canopy.Text = "2001 Canopy"
+        Me.chkUSGS_Seamless_NLCD2001_Canopy.Text = "2011 Canopy"
         Me.chkUSGS_Seamless_NLCD2001_Canopy.UseVisualStyleBackColor = True
         '
         'chkUSGS_Seamless_NLCD2001_Impervious
@@ -733,6 +734,28 @@ Partial Class frmDownload
         Me.ToolTip1.SetToolTip(Me.chkNCDC_MetStations, "Integrated Surface Hourly weather station locations")
         Me.chkNCDC_MetStations.UseVisualStyleBackColor = True
         '
+        'chkNHDplus2_hydrography
+        '
+        Me.chkNHDplus2_hydrography.AutoSize = True
+        Me.chkNHDplus2_hydrography.Location = New System.Drawing.Point(326, 19)
+        Me.chkNHDplus2_hydrography.Name = "chkNHDplus2_hydrography"
+        Me.chkNHDplus2_hydrography.Size = New System.Drawing.Size(86, 17)
+        Me.chkNHDplus2_hydrography.TabIndex = 18
+        Me.chkNHDplus2_hydrography.Text = "Hydrography"
+        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
+        Me.chkNHDplus2_hydrography.UseVisualStyleBackColor = True
+        '
+        'chkNHDplus2_elev_cm
+        '
+        Me.chkNHDplus2_elev_cm.AutoSize = True
+        Me.chkNHDplus2_elev_cm.Location = New System.Drawing.Point(73, 19)
+        Me.chkNHDplus2_elev_cm.Name = "chkNHDplus2_elev_cm"
+        Me.chkNHDplus2_elev_cm.Size = New System.Drawing.Size(92, 17)
+        Me.chkNHDplus2_elev_cm.TabIndex = 14
+        Me.chkNHDplus2_elev_cm.Text = "Elevation Grid"
+        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_elev_cm, "elev_cm grid")
+        Me.chkNHDplus2_elev_cm.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -1010,28 +1033,6 @@ Partial Class frmDownload
         Me.grpNHDplus2.TabStop = False
         Me.grpNHDplus2.Text = "National Hydrography Dataset Plus v2.1"
         Me.grpNHDplus2.Visible = False
-        '
-        'chkNHDplus2_hydrography
-        '
-        Me.chkNHDplus2_hydrography.AutoSize = True
-        Me.chkNHDplus2_hydrography.Location = New System.Drawing.Point(326, 19)
-        Me.chkNHDplus2_hydrography.Name = "chkNHDplus2_hydrography"
-        Me.chkNHDplus2_hydrography.Size = New System.Drawing.Size(86, 17)
-        Me.chkNHDplus2_hydrography.TabIndex = 18
-        Me.chkNHDplus2_hydrography.Text = "Hydrography"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
-        Me.chkNHDplus2_hydrography.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus2_elev_cm
-        '
-        Me.chkNHDplus2_elev_cm.AutoSize = True
-        Me.chkNHDplus2_elev_cm.Location = New System.Drawing.Point(73, 19)
-        Me.chkNHDplus2_elev_cm.Name = "chkNHDplus2_elev_cm"
-        Me.chkNHDplus2_elev_cm.Size = New System.Drawing.Size(92, 17)
-        Me.chkNHDplus2_elev_cm.TabIndex = 14
-        Me.chkNHDplus2_elev_cm.Text = "Elevation Grid"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus2_elev_cm, "elev_cm grid")
-        Me.chkNHDplus2_elev_cm.UseVisualStyleBackColor = True
         '
         'chkNHDplus2_All
         '
