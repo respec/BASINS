@@ -432,6 +432,7 @@ Public Class StartUp
             chkWASP.Enabled = True
             chkBathtub.Enabled = True
             chkMultiSim.Enabled = True
+            txtRCH.Enabled = True
             GroupBox2.Text = "Constituent Balance Reports"
         End If
     End Sub

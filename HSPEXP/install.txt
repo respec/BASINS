@@ -1,5 +1,6 @@
-Date: 11/19/2018
+Date: 2/1/2019
 HSPEXP+3.0beta is the development version for the next version of HSPEXP+.
+
 Features:
 1. This version includes Model QA/QC report. The model QA/QC report is under development and it must be used with extreme caution.
 
@@ -8,6 +9,7 @@ Bugs Fixed:
 2. The location of help file was not coded properly in the previous version. That has been fixed.
 3. The reports did not include adsorption/desorption and scour/deposition of TAM and PO4. That has been fixed.
 4. The reports did not output labile and refractory organic P data for impervious areas. That has been fixed.
+5. The expert system statistics computation for percentiles now excludes missing observed values.
 
 Date: 06/15/2018
 

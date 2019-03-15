@@ -1353,7 +1353,7 @@ NextOldVal:
     ''' <remarks>Computed percentile stored in attribute within timeseries with attribute name built from percentile value prefixed with '%Sum'</remarks>
     Public Sub ComputePercentileSum(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
         Dim lAttrName As String = "%sum" & Format(aPercentile, "00.####")
-        Dim lNumValues As Integer = aTimeseries.numValues
+        Dim lNumValues As Integer = aTimeseries.numValues - aTimeseries.Attributes.GetValue("Count Missing")
         Select Case lNumValues
             Case Is < 1
                 'Can't compute with no values

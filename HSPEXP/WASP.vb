@@ -17,7 +17,7 @@ Module WASP
         Dim lWaspProject As New atcWASPProject
         Dim lOutputFolder As String = System.IO.Path.Combine(aOutputfolder, "WASP")
         FileIO.FileSystem.CreateDirectory(lOutputFolder)
-        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP8_R" & aReachId.ToString & ".inp")
+        Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP_R" & aReachId.ToString & ".inp")
         lWaspProject.SDate = Date.FromOADate(aSDateJ)
         lWaspProject.EDate = Date.FromOADate(aEDateJ)
 
@@ -529,7 +529,7 @@ Module WASP
                     Dim lSW As IO.StreamWriter = Nothing
                     lSW = New IO.StreamWriter(lFileName, False)
                     For t As Integer = 1 To lTimeseries.Values.Count - 1
-                        lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lTimeseries.Values(t))
+                        lSW.WriteLine("{0,8:0.000},{1,9:0.00000}", t, lTimeseries.Values(t))
                     Next
                     lSW.Flush()
                     lSW.Close()
@@ -573,7 +573,7 @@ Module WASP
                     Dim lSW As IO.StreamWriter = Nothing
                     lSW = New IO.StreamWriter(lFileName, False)
                     For t As Integer = 1 To lTimeseries.Values.Count - 1
-                        lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lTimeseries.Values(t))
+                        lSW.WriteLine("{0,8:0.000},{1,9:0.00000}", t, lTimeseries.Values(t))
                     Next
                     lSW.Flush()
                     lSW.Close()
@@ -596,7 +596,7 @@ Module WASP
             Dim lSW As IO.StreamWriter = Nothing
             lSW = New IO.StreamWriter(lFileName, False)
             For t As Integer = 1 To lCompositeTimeseries.Values.Count - 1
-                lSW.WriteLine("{0,8:0.000} {1,9:0.00000}", t, lCompositeTimeseries.Values(t))
+                lSW.WriteLine("{0,8:0.000},{1,9:0.00000}", t, lCompositeTimeseries.Values(t))
             Next
             lSW.Flush()
             lSW.Close()
