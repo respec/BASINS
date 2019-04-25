@@ -1700,8 +1700,10 @@ Public Module atcConstituentTables
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-INTOT")(0),
                                                                           aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
-                            Dim lTotalAtmDep As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT")(0),
-                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                            Dim lTotalAtmDep As Double = 0.0
+                            'can't be certain Atm Dep is in use, so check to see if data exists before retrieving SumAnnual
+                            lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT")(0)
+                            If lTS IsNot Nothing Then lTotalAtmDep = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
 
                             Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, lReachConstituent)
 
