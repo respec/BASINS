@@ -679,6 +679,7 @@ Public Class clsBatchBFSpec
                     'aStation.DataSource = Nothing
                     'Return lTsFlow
                 End If
+                aStation.BFInputs.SetValue("StaNam", lTsFlow.Attributes.GetValue("StaNam", "Unknown"))
                 If aNonProvisionalOnly Then
                     If HasProvisionalValues(lTsFlow) Then
                         Dim lProvisionalTS As atcTimeseries = Nothing
@@ -1112,6 +1113,7 @@ Public Class clsBatchBFSpec
                                     .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, lDF2PMethod)
                                 End If
                                 .SetValue("OutputDir", lStationOutDir)
+                                .SetValue("StaNam", lStation.BFInputs.GetValue("StaNam", "Unknown"))
                             End With
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
