@@ -222,3 +222,9 @@ Resources.resx
 *.manifest
 *.chm
 *.wdu
+*.xml
+*Thumbs.db
+SwatObject/obj/x86/Debug/
+.vs/
+_gsdata_/
+*.dll
