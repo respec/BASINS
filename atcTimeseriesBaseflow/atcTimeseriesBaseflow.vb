@@ -27,6 +27,7 @@ Public Class BFInputNames
     Public Shared StationFile As String = "StationFile"
     Public Shared FullSpanDuration As String = "FullSpanDuration"
     Public Shared Graph As String = "Graphs"
+    Public Shared INCLUDE_PROVISIONAL_DATA As String = "INCLUDE_PROVISIONAL_DATA"
 End Class
 
 Public Class atcTimeseriesBaseflow

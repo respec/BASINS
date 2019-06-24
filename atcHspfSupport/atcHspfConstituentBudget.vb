@@ -291,9 +291,9 @@ Public Module ConstituentBudget
                         If lUpstreamInflows.Keys.Contains(lID.Id) Then
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                         End If
-                        Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
+                        Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData, aSDateJ, aEDateJ)
                         Dim lNonpointVol As Double = 0.0
-                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData)
+                        Dim lOutflow As Double = ValueForReach(lID, lOutflowData, aSDateJ, aEDateJ)
                         Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
                         Dim lDiversion As Double = 0.0
                         If lID.Tables("GEN-INFO").Parms("NEXITS").Value = 1 Then
@@ -319,10 +319,10 @@ Public Module ConstituentBudget
                             lGENERLoad = .Item3
                         End With
 
-                        Dim lInflowFromPrecip As Double = ValueForReach(lID, lTotalPrecipData)
+                        Dim lInflowFromPrecip As Double = ValueForReach(lID, lTotalPrecipData, aSDateJ, aEDateJ)
 
 
-                        Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData)
+                        Dim lEvapLoss As Double = ValueForReach(lID, lEvapLossData, aSDateJ, aEDateJ)
                         Dim lAdditionalSource As Double = 0.0
                         lAdditionalSource = lTotalInflow - lNonpointVol - lUpstreamIn - lTotalPointVol - lGENERLoad
                         Dim lCumulativePointNonpoint As Double = lNonpointVol + lTotalPointVol + lAdditionalSource
@@ -474,10 +474,10 @@ Public Module ConstituentBudget
                                 lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                             End If
 
-                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
+                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData, aSDateJ, aEDateJ)
 
-                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
-                            Dim lDepScour As Double = ValueForReach(lID, lDepScourData) 'TotalForReach(lID, lAreas, lDepScourData)
+                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData, aSDateJ, aEDateJ) 'TotalForReach(lID, lAreas, lOutflowData)
+                            Dim lDepScour As Double = ValueForReach(lID, lDepScourData, aSDateJ, aEDateJ) 'TotalForReach(lID, lAreas, lDepScourData)
                             Dim lNonpointTons As Double = 0.0
 
                             Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
@@ -759,15 +759,15 @@ Public Module ConstituentBudget
                                 lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                             End If
 
-                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
+                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData, aSDateJ, aEDateJ)
                             Dim lAdditionalSourcelbs As Double = 0
                             Dim lTotalAtmDep As Double = 0
 
                             If lAtmDepData.Count > 0 Then
-                                lTotalAtmDep = ValueForReach(lID, lAtmDepData)
+                                lTotalAtmDep = ValueForReach(lID, lAtmDepData, aSDateJ, aEDateJ)
                             End If
 
-                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData)
+                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData, aSDateJ, aEDateJ)
                             Dim lDepScour As Double = lOutflow - lTotalInflow
                             Dim lDownstreamReachID As Integer = lID.DownOper("RCHRES")
                             Dim lDiversion As Double = 0.0
@@ -1076,12 +1076,12 @@ Public Module ConstituentBudget
                                 lUpstreamIn = lUpstreamInflows.ItemByKey(lID.Id)
                             End If
 
-                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData)
-                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData) 'TotalForReach(lID, lAreas, lOutflowData)
+                            Dim lTotalInflow As Double = ValueForReach(lID, lTotalInflowData, aSDateJ, aEDateJ)
+                            Dim lOutflow As Double = ValueForReach(lID, lOutflowData, aSDateJ, aEDateJ) 'TotalForReach(lID, lAreas, lOutflowData)
 
                             Dim lTotalAtmDep As Double = 0
                             If lAtmDepData.Count > 0 Then
-                                lTotalAtmDep = ValueForReach(lID, lAtmDepData)
+                                lTotalAtmDep = ValueForReach(lID, lAtmDepData, aSDateJ, aEDateJ)
                             End If
                             Dim lAdditionalSourcelbs As Double = 0
 
@@ -1371,10 +1371,12 @@ Public Module ConstituentBudget
     End Function
 
     Private Function ValueForReach(ByVal aReach As HspfOperation,
-                                   ByVal aReachData As atcTimeseriesGroup) As Double
+                                   ByVal aReachData As atcTimeseriesGroup,
+                                   ByVal aSJDate As Double,
+                                   ByVal aEJDate As Double) As Double
         Dim lOutFlow As Double
         For Each aTimeseries As atcTimeseries In aReachData.FindData("Location", "R:" & aReach.Id)
-            lOutFlow += aTimeseries.Attributes.GetValue("SumAnnual")
+            lOutFlow += SubsetByDate(aTimeseries,aSJDate,aEJDate,Nothing).Attributes.GetValue("SumAnnual")
         Next
 
         Return lOutFlow

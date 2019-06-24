@@ -418,9 +418,21 @@ Public Module Graph
             lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.IsBold = True
             lZgc.MasterPane.PaneList(1).XAxis.Scale.FontSpec.Size += 1
 
-            lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Daily Weighted Precipitation"
-            lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Daily Observed Flow"
-            lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Daily Simulated Flow"
+            If aDataGroup(2).Attributes.GetValue("Time Unit") = 4 Then
+                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Daily Weighted Precipitation"
+            Else
+                lZgc.MasterPane.PaneList(0).CurveList(0).Label.Text = "Weighted Precipitation"
+            End If
+            If aDataGroup(0).Attributes.GetValue("Time Unit") = 4 Then
+                lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Daily Observed Flow"
+            Else
+                lZgc.MasterPane.PaneList(1).CurveList(0).Label.Text = "Observed Flow"
+            End If
+            If aDataGroup(1).Attributes.GetValue("Time Unit") = 4 Then
+                lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Daily Simulated Flow"
+            Else
+                lZgc.MasterPane.PaneList(1).CurveList(1).Label.Text = "Simulated Flow"
+            End If
 
         End If
         lZgc.GraphPane.Title.Text = aOutFileBase

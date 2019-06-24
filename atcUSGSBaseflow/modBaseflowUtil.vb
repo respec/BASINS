@@ -1399,6 +1399,9 @@ Public Module modBaseflowUtil
 
         Dim lLocation As String = aTs.Attributes.GetValue("Location", "Unknown")
         Dim lStaNam As String = aTs.Attributes.GetValue("STANAM", "Unknown")
+        If lStaNam = "Unknown" AndAlso args IsNot Nothing Then
+            lStaNam = args.GetValue("StaNam", "Unknown")
+        End If
         Dim lTitleLine1 As String = "Groundwater Toolbox daily output For hydrograph separation."
         Dim lTitleLine2 As String = "Station: " & lLocation & " " & lStaNam.Replace(",", " ")
         Dim lTitleLine3 As String = "Drainage area: " & DoubleToString(lDA, , "0.0") & " square miles"

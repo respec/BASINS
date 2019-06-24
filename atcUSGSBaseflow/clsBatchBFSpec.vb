@@ -583,6 +583,13 @@ Public Class clsBatchBFSpec
                         lStation.BFInputs.SetValue(BFBatchInputNames.Graph, lAttribValue)
                     Next
                 End If
+            Case Else
+                Dim lAttribValue As String = lArr(1).Trim()
+                If Not String.IsNullOrEmpty(lAttribValue) Then
+                    For Each lStation As clsBatchUnitStation In lListBatchUnits
+                        lStation.BFInputs.SetValue(lArr(0), lAttribValue)
+                    Next
+                End If
         End Select
     End Sub
 
@@ -595,7 +602,7 @@ Public Class clsBatchBFSpec
     ''' <remarks></remarks>
     Private Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation,
                                               Optional ByVal aPreserve As Boolean = False,
-                                              Optional ByVal aNonProvisionalOnly As Boolean = False) As atcTimeseries
+                                              Optional ByVal aIncludeProvisional As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
         If ListBatchUnitsData.Keys.Contains(aStation.StationID) Then
             lDataFilename = ListBatchUnitsData.ItemByKey(aStation.StationID)
@@ -679,7 +686,10 @@ Public Class clsBatchBFSpec
                     'aStation.DataSource = Nothing
                     'Return lTsFlow
                 End If
-                If aNonProvisionalOnly Then
+                aStation.BFInputs.SetValue("StaNam", lTsFlow.Attributes.GetValue("StaNam", "Unknown"))
+                If aIncludeProvisional Then
+                    Return lTsFlow
+                Else
                     If HasProvisionalValues(lTsFlow) Then
                         Dim lProvisionalTS As atcTimeseries = Nothing
                         Dim lNonProvisionalTS As atcTimeseries = Nothing
@@ -694,8 +704,6 @@ Public Class clsBatchBFSpec
                     Else
                         Return lTsFlow
                     End If
-                Else
-                    Return lTsFlow
                 End If
             End If
         End If
@@ -951,7 +959,13 @@ Public Class clsBatchBFSpec
                     'each station has its own directory
                     Dim lStationOutDir As String = IO.Path.Combine(lBFOpnDir, "Station_" & lStation.StationID)
                     MkDirPath(lStationOutDir)
-                    Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation)
+                    Dim linclude_provisional As String = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.INCLUDE_PROVISIONAL_DATA, "")
+                    Dim lTsFlow As atcTimeseries = Nothing
+                    If linclude_provisional = "YES" OrElse linclude_provisional = "yes" Then
+                        lTsFlow = GetStationStreamFlowData(lStation, , True)
+                    Else
+                        lTsFlow = GetStationStreamFlowData(lStation)
+                    End If
                     If lTsFlow IsNot Nothing Then
                         Try
                             lDrainageArea = lTsFlow.Attributes.GetValue("Drainage Area", -99)
@@ -1112,6 +1126,7 @@ Public Class clsBatchBFSpec
                                     .SetValue(atcTimeseriesBaseflow.BFInputNames.TwoParamEstMethod, lDF2PMethod)
                                 End If
                                 .SetValue("OutputDir", lStationOutDir)
+                                .SetValue("StaNam", lStation.BFInputs.GetValue("StaNam", "Unknown"))
                             End With
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)

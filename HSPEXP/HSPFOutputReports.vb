@@ -2005,6 +2005,7 @@ Module HSPFOutputReports
 
         For Each lRCHRES As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
             Dim lTS As atcTimeseries = LocateTheTimeSeries(aUCI, lRCHRES.Id, lGroupName, lMemberName, lMemSub1, lMemSub2, lFoundTheTS) 'Look for the timeseries in the WDM file
+            lTS = SubsetByDate(lTS, pSDateJ, pEDateJ, Nothing)
 
             If Not lTS Is Nothing Then
                 If lTS.Attributes.GetDefinedValue("Time Unit").Value < 3 Then 'This means that timeseries is hourly or minute

@@ -80,6 +80,7 @@ Public Module CookieCutterGraphs
                         Dim lFoundTheTimeSeriesinWDMFile As Boolean = False
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "BALCLA", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             'Reading the required time series from Binary file and resetting the flag to false
@@ -97,6 +98,7 @@ Public Module CookieCutterGraphs
                         End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "PHYCLA", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PHYCLA")(0)
@@ -112,6 +114,7 @@ Public Module CookieCutterGraphs
                         End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "PO4-CONCDIS")(0)
 
@@ -127,6 +130,7 @@ Public Module CookieCutterGraphs
                             End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 2, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "TAM-CONCDIS")(0)
                         End If
@@ -141,6 +145,7 @@ Public Module CookieCutterGraphs
                             End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "NO3-CONCDIS")(0)
                         End If
@@ -215,6 +220,7 @@ Public Module CookieCutterGraphs
 
                             lTimeseriesGroup = New atcTimeseriesGroup
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "RO", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "RO")(0)
                         End If
@@ -229,6 +235,7 @@ Public Module CookieCutterGraphs
                         End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "SSED", 4, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
 
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "SSED-TOT")(0)
@@ -244,6 +251,7 @@ Public Module CookieCutterGraphs
                                 lTimeseriesGroup.Add(lTimeSeries)
                             End If
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "BEDDEP", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
                             lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "BEDDEP")(0)
                         End If
@@ -299,6 +307,7 @@ Public Module CookieCutterGraphs
                         Dim lTimeSeriesDO As New atcTimeseries(Nothing)
                         Dim lTimeSeriesTimeUnit As Integer
                         lTimeSeriesDO = LocateTheTimeSeries(aHSPFUCI, lRchId, "OXRX", "DOX", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                        lTimeSeriesDO = SubsetByDate(lTimeSeriesDO, aSDateJ, aEDateJ, Nothing)
 
                         If lFoundTheTimeSeriesinWDMFile = False OrElse lTimeSeriesTimeUnit < 3 Then
                             lTimeSeriesDO = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "DOXCONC")(0)
@@ -404,6 +413,7 @@ Public Module CookieCutterGraphs
 
                                 lTimeseriesGroup = New atcTimeseriesGroup
                             lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "IVOL", 1, 1, lFoundTheTimeSeriesinWDMFile)
+                            lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                             If lFoundTheTimeSeriesinWDMFile = False Then
                                 lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "IVOL")(0)
                             End If
@@ -418,6 +428,7 @@ Public Module CookieCutterGraphs
                                 End If
                             End If
                             lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "PLANK", "TPKIF", 5, 1, lFoundTheTimeSeriesinWDMFile)
+                            lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                             If lFoundTheTimeSeriesinWDMFile = False Then
                                 lTimeSeries = lScenarioResults.DataSets.FindData("Location", RCHRES).FindData("Constituent", "P-TOT-IN")(0)
                             End If
