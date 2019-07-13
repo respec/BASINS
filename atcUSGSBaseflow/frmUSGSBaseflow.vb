@@ -1280,22 +1280,22 @@ Public Class frmUSGSBaseflow
                 Else
 
                 End If
-                Dim lEst_RC As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_RC, Double.NaN)
-                Dim lEst_BFImax As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_BFImax, Double.NaN)
-                If Not Double.IsNaN(lEst_RC) Then
-                    txtDFParamRC.Text = lEst_RC.ToString()
-                Else
-                    If Not Double.TryParse(txtDFParamRC.Text, lEst_RC) Then
-                        txtDFParamRC.Text = "0.978"
-                    End If
-                End If
-                If Not Double.IsNaN(lEst_BFImax) Then
-                    txtDFParamBFImax.Text = lEst_BFImax.ToString()
-                Else
-                    If Not Double.TryParse(txtDFParamBFImax.Text, lEst_BFImax) Then
-                        txtDFParamBFImax.Text = "0.8"
-                    End If
-                End If
+                'Dim lEst_RC As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_RC, Double.NaN)
+                'Dim lEst_BFImax As Double = pDataGroup(0).Attributes.GetValue(clsRecess.CF_BFImax, Double.NaN)
+                'If Not Double.IsNaN(lEst_RC) Then
+                '    txtDFParamRC.Text = lEst_RC.ToString()
+                'Else
+                '    If Not Double.TryParse(txtDFParamRC.Text, lEst_RC) Then
+                '        txtDFParamRC.Text = "0.978"
+                '    End If
+                'End If
+                'If Not Double.IsNaN(lEst_BFImax) Then
+                '    txtDFParamBFImax.Text = lEst_BFImax.ToString()
+                'Else
+                '    If Not Double.TryParse(txtDFParamBFImax.Text, lEst_BFImax) Then
+                '        txtDFParamBFImax.Text = "0.8"
+                '    End If
+                'End If
             End If
         Else
             txt2PDefaultNotice.Visible = True

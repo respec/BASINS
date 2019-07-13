@@ -1,4 +1,4 @@
-Date: 3/13/2019
+Date: 6/21/2019
 
 HSPEXP+3.0 
 
@@ -12,6 +12,8 @@ Bugs Fixed:
 3. The reports did not include adsorption/desorption and scour/deposition of TAM and PO4. That has been fixed.
 4. The reports did not output labile and refractory organic P data for impervious areas. That has been fixed.
 5. The expert system statistics computation for percentiles now excludes missing observed values.
+6. Regan plots and Diurnal QA reports now use 'subset by date' 
+7. Better curve labeling on storm plots with non-daily data
 
 Date: 06/15/2018
 

@@ -292,7 +292,7 @@ Public Module modStat
         ElseIf aClassLimits.Count = 0 Then
             Dim lErr As String = "There are no values within the specified class limits." & vbNewLine & _
                                  "Select more class limits and try again."
-            Logger.Msg(lErr)
+            'Logger.Msg(lErr)
             Return lErr
         End If
 
