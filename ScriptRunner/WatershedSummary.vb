@@ -6,11 +6,7 @@ Imports MapWindow.Interfaces
 Imports MapWinUtility
 
 Public Module WatershedSummary
-    'Private Const pTestPath As String = "C:\test\ScriptReports\"
-    'Private Const pTestPath As String = "C:\Cibolo\split"
-    'Private Const pTestPath As String = "C:\Cibolo\FertManagement"
-    'Private Const pTestPath As String = "C:\Cibolo\HourlyFix\splitHourlyParmAdj3"
-    Private Const pTestPath As String = "C:\Cibolo\HourlyFix\splitHourly"
+    Private Const pTestPath As String = "C:\test\ScriptReports\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -35,23 +31,20 @@ Public Module WatershedSummary
 
         'build collection of constituents to report
         Dim lConstituents As New atcCollection
-        'lConstituents.Add("Water")
-        'lConstituents.Add("BOD")
-        'lConstituents.Add("DO")
+        lConstituents.Add("Water")
+        lConstituents.Add("BOD")
+        lConstituents.Add("DO")
         'lConstituents.Add("FColi")
         'lConstituents.Add("Lead")
         'lConstituents.Add("NH3")
-        'lConstituents.Add("NH4")
-        'lConstituents.Add("NO3")
-        'lConstituents.Add("OrganicN")
-        'lConstituents.Add("OrganicP")
-        'lConstituents.Add("PO4")
-        'lConstituents.Add("Sediment")
-
-        'lConstituents.Add("NO3")
+        lConstituents.Add("NH4")
+        lConstituents.Add("NO3")
+        lConstituents.Add("OrganicN")
+        lConstituents.Add("OrganicP")
+        lConstituents.Add("PO4")
+        lConstituents.Add("Sediment")
         lConstituents.Add("TotalN")
-        'lConstituents.Add("TotalP")
-
+        lConstituents.Add("TotalP")
         'lConstituents.Add("WaterTemp")
         'lConstituents.Add("Zinc")
 

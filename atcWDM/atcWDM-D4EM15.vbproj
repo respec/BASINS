@@ -214,6 +214,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcControls\atcControls-D4EM15.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls-D4EM15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcData\atcData-D4EM15.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData-D4EM15</Name>
@@ -222,6 +227,11 @@
     <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-D4EM15.vbproj">
       <Project>{40DE1F29-3531-4BC2-9D7E-324DC92689DF}</Project>
       <Name>atcTimeseriesScript-D4EM15</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-D4EM15.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility-D4EM15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM15.vbproj">

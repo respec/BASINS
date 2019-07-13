@@ -1120,14 +1120,14 @@ Public Module atcConstituentTables
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
                     Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
-                    Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "DOXOUTTOT", aSDateJ, aEDateJ)
-                    Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "DOXIN", aSDateJ, aEDateJ)
+                    Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXOUTTOT")(0),
+                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXIN")(0),
+                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lPrecIn As Double = 0
                     Try
-                        lPrecIn = SafeSumAnnual(aBinaryData, LocationName, "DOXIN-PREC", aSDateJ, aEDateJ)
-                        If lPrecIn < -99 Then
-                            lPrecIn = 0
-                        End If
+                        lPrecIn = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "DOXIN-PREC")(0),
+                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Catch
                         Logger.Dbg("Precipitation does not contain DO in this model.")
                     End Try
@@ -1274,8 +1274,10 @@ Public Module atcConstituentTables
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
                     Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
-                    Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "ROHEAT", aSDateJ, aEDateJ)
-                    Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "IHEAT", aSDateJ, aEDateJ)
+                    Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "ROHEAT")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "IHEAT")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType)
                     Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
@@ -1299,11 +1301,8 @@ Public Module atcConstituentTables
                             Case "UpstreamIn"
                                 row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
                             Case Else
-                                Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
-                                If lTest IsNot Nothing Then
-                                    row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
+                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
                                                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                End If
                         End Select
                     Next columnValue
 
@@ -1416,8 +1415,10 @@ Public Module atcConstituentTables
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
                     Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
-                    Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "BODOUTTOT", aSDateJ, aEDateJ)
-                    Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "BODIN", aSDateJ, aEDateJ)
+                    Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "BODOUTTOT")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                    Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "BODIN")(0),
+                                                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                     Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType)
                     Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
@@ -1443,11 +1444,8 @@ Public Module atcConstituentTables
                             Case "UpstreamIn"
                                 row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
                             Case Else
-                                Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
-                                If lTest IsNot Nothing Then
-                                    row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
+                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
                                                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                End If
                         End Select
                     Next columnValue
 
@@ -1539,19 +1537,26 @@ Public Module atcConstituentTables
                             End If
                             Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, lReachConstituent)
                             Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent)
-                            Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-OUTTOT", aSDateJ, aEDateJ)
-                            Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-INTOT", aSDateJ, aEDateJ)
+                            Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-OUTTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+
+                            Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-INTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             Dim lTotalAtmDep As Double = 0.0
-                            lTotalAtmDep = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-ATMDEPTOT", aSDateJ, aEDateJ)
-                            If lTotalAtmDep < -99 Then
-                                lTotalAtmDep = 0.0
+                            If aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT").Count > 0 Then
+                                lTotalAtmDep = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT")(0),
+                                                            aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             End If
-                            Dim lProcFluxTot As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-PROCFLUX-TOT", aSDateJ, aEDateJ)
+                            Dim lProcFluxTot As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-PROCFLUX-TOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             If lReachConstituent = "NO3" Then
                                 Try
-                                    lOutflow += SafeSumAnnual(aBinaryData, LocationName, "NO2-OUTTOT", aSDateJ, aEDateJ)
-                                    lTotalIn += SafeSumAnnual(aBinaryData, LocationName, "NO2-INTOT", aSDateJ, aEDateJ)
-                                    lProcFluxTot += SafeSumAnnual(aBinaryData, LocationName, "NO2-PROCFLUX-TOT", aSDateJ, aEDateJ)
+                                    lOutflow += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-OUTTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                                    lTotalIn += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-INTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                                    lProcFluxTot += SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", "NO2-PROCFLUX-TOT")(0),
+                                                                              aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                                 Catch
                                 End Try
 
@@ -1587,9 +1592,8 @@ Public Module atcConstituentTables
                                         Case lReachConstituent & "-OUTTOT"
                                             row(ColumnName) = lOutflow
                                         Case Else
-                                            Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
-                                            If lTest IsNot Nothing Then
-                                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
+                                            If aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName).Count > 0 Then
+                                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
                                                                               aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
                                             End If
                                     End Select
@@ -1692,8 +1696,10 @@ Public Module atcConstituentTables
                             End If
                             Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, lReachConstituent)
                             Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent)
-                            Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-OUTTOT", aSDateJ, aEDateJ)
-                            Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-INTOT", aSDateJ, aEDateJ)
+                            Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-OUTTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                            Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-INTOT")(0),
+                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                             Dim lTotalAtmDep As Double = 0.0
                             'can't be certain Atm Dep is in use, so check to see if data exists before retrieving SumAnnual
                             lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lReachConstituent & "-ATMDEPTOT")(0)
@@ -1724,11 +1730,8 @@ Public Module atcConstituentTables
                                         Case "UpstreamIn"
                                             row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
                                         Case Else
-                                            Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
-                                            If lTest IsNot Nothing Then
-                                                row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
-                                                                              aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                            End If
+                                            row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                             aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
                                     End Select
                                 Catch
                                 End Try
@@ -1830,8 +1833,10 @@ Public Module atcConstituentTables
                         End If
                         Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType, aGQALID)
                         Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aGQALID)
-                        Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, aBalanceType & "-TROQAL", aSDateJ, aEDateJ)
-                        Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, aBalanceType & "-TIQAL", aSDateJ, aEDateJ)
+                        Dim lOutflow As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", aBalanceType & "-TROQAL")(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
+                        Dim lTotalIn As Double = SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", aBalanceType & "-TIQAL")(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
                         Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType, aGQALID)
                         Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aGQALID)
                         Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
@@ -1856,11 +1861,8 @@ Public Module atcConstituentTables
                                     row(ColumnName) = HspfTable.NumFmtRE(lUpstreamIn, 10)
                                 Case Else
                                     Try
-                                        Dim lTest As atcTimeseries = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0)
-                                        If lTest IsNot Nothing Then
-                                            row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(lTest,
-                                                                          aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
-                                        End If
+                                        row(ColumnName) = HspfTable.NumFmtRE(SubsetByDate(aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", ColumnName)(0),
+                                                                      aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value, 10)
                                     Catch
                                         'row(ColumnName)
                                     End Try
@@ -1893,17 +1895,6 @@ Public Module atcConstituentTables
 
         End Select
     End Sub
-
-    Private Function SafeSumAnnual(ByVal aBinaryData As atcDataSource, ByVal aLocationName As String, ByVal aReachConstituent As String, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Double
-        Dim lValue As Double = -999.0
-        Try
-            lValue = SubsetByDate(aBinaryData.DataSets.FindData("Location", aLocationName).FindData("Constituent", aReachConstituent)(0),
-                                  aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
-            Return lValue
-        Catch
-            Return lValue
-        End Try
-    End Function
 
     Private Function CalculateNPSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String, Optional ByVal aGQALID As Integer = 0) As Double
         Dim NPSLoad As Double = 0.0
@@ -1955,11 +1946,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
@@ -1984,11 +1973,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
 
                             End If
@@ -2015,11 +2002,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
@@ -2046,11 +2031,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
@@ -2080,11 +2063,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
@@ -2113,11 +2094,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
@@ -2143,11 +2122,9 @@ Public Module atcConstituentTables
                                     End If
                                 End If
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                If Not ltimeseries Is Nothing Then
-                                    ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                    TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                TransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             TimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
-                                End If
                                 PSLoad += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact * TransformationMultFact / YearCount(aSDateJ, aEDateJ)
                             End If
                         Next
