@@ -650,10 +650,11 @@ Module HSPFOutputReports
                         lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
                         If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
 
-                        'lReportCons = Nothing
-                        'lReportCons = .Item2
-                        'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                        'SaveFileString(lOutFileName, lReportCons.ToString)
+                        lReportCons = Nothing  'why was this commented out???  pbd 7/18/2019  replaced by _LoadAllocation report
+                        lReportCons = .Item2
+                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
+
                         lReportCons = Nothing
                         lReportCons = .Item3
 
@@ -667,10 +668,11 @@ Module HSPFOutputReports
                             SaveFileString(lOutFileName, lReportCons.ToString)
                         End If
                         lReportCons = Nothing
-                        'lReportCons = .Item5
-                        'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                        'SaveFileString(lOutFileName, lReportCons.ToString)
-                        'lReportCons = Nothing
+
+                        lReportCons = .Item5  'why was this commented out???  pbd 7/18/2019  
+                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                        SaveFileString(lOutFileName, lReportCons.ToString)
+                        lReportCons = Nothing
 
                         If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
                             For Each location As String In .Item6.Keys
