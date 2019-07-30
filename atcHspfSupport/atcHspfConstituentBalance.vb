@@ -74,6 +74,7 @@ Public Module ConstituentBalance
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lLocationDataGroup As New atcTimeseriesGroup
                     lLocationDataGroup.Add(aScenarioResults.DataSets.FindData("Location", lLocation))
+                    Logger.Status("Generating Constituent Balance Report for " & lLocation)
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""

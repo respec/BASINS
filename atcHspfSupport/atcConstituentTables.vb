@@ -153,7 +153,7 @@ Public Module atcConstituentTables
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    Logger.Status("Generating Reports for Water from " & LocationName)
+                    Logger.Status("Generating Land Loading Reports for Water from " & LocationName)
                     Logger.Dbg(LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
@@ -309,7 +309,7 @@ Public Module atcConstituentTables
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
+                    Logger.Status("Generating Land Loading Reports for " & aBalanceType & " from " & LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
@@ -455,7 +455,7 @@ Public Module atcConstituentTables
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     landUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
+                    Logger.Status("Generating Land Loading Reports for " & aBalanceType & " from " & LocationName)
                     If Not listLanduses.Contains(landUseNameForTheCollection) Then
                         listLanduses.Add(landUseNameForTheCollection)
                     End If
@@ -644,7 +644,7 @@ Public Module atcConstituentTables
                         (lOperation.Name = "IMPLND" AndAlso lOperation.Tables("ACTIVITY").Parms("IQALFG").Value = "1")) Then Continue For
                     'If lOperation.Name = "IMPLND" Then Stop
                     Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
-                    Logger.Status("Generating Reports for " & aBalanceType & " from " & LocationName)
+                    Logger.Status("Generating Land Loading Reports for " & aBalanceType & " from " & LocationName)
                     Dim lOperationIsConnected As Boolean = False
                     'If lOperation.Tables("ACTIVITY").Parms("PQUALFG").Value = "0" Then Continue For
 
@@ -1108,6 +1108,7 @@ Public Module atcConstituentTables
                     If Not lReach.Name = "RCHRES" Then Continue For
                     If Not lReach.Tables("ACTIVITY").Parms("OXFG").Value = "1" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                    Logger.Status("Generating Reach Budget Report for DO from " & LocationName)
                     'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
@@ -1263,6 +1264,7 @@ Public Module atcConstituentTables
                     If Not lReach.Name = "RCHRES" Then Continue For
                     If Not lReach.Tables("ACTIVITY").Parms("HTFG").Value = "1" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                    Logger.Status("Generating Reach Budget Report for Heat from " & LocationName)
                     'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
                     Dim AddTS As New atcDataGroup
@@ -1404,6 +1406,7 @@ Public Module atcConstituentTables
                     row = Reach_Budget_Table.NewRow
                     If Not lReach.Name = "RCHRES" Then Continue For
                     Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                    Logger.Status("Generating Reach Budget Report for BOD from " & LocationName)
 
                     'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                     Dim lTS As New atcTimeseries(Nothing)
@@ -1527,6 +1530,7 @@ Public Module atcConstituentTables
                             row = Reach_Budget_Table.NewRow
                             If Not lReach.Name = "RCHRES" Then Continue For
                             Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                            Logger.Status("Generating Reach Budget Report for " & lReachConstituent & " from " & LocationName)
 
                             'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                             Dim lTS As New atcTimeseries(Nothing)
@@ -1680,6 +1684,7 @@ Public Module atcConstituentTables
                             row = Reach_Budget_Table.NewRow
                             If Not lReach.Name = "RCHRES" Then Continue For
                             Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                            Logger.Status("Generating Reach Budget Report for " & lReachConstituent & " from " & LocationName)
 
                             'Dim lOutflowDataTypes1 As String() = ConstituentListRCHRES(aBalanceType)
                             Dim lTS As New atcTimeseries(Nothing)
@@ -1819,6 +1824,7 @@ Public Module atcConstituentTables
                         If Not lReach.Name = "RCHRES" Then Continue For
                         If Not lReach.Tables("ACTIVITY").Parms("GQALFG").Value = "1" Then Continue For
                         Dim LocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                        Logger.Status("Generating Reach Budget Report for " & lConstituent.ConstituentNameInUCI & " from " & LocationName)
                         'If lReach.Id = 106 Then Stop
                         Dim lTS As New atcTimeseries(Nothing)
                         Dim AddTS As New atcDataGroup

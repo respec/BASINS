@@ -227,10 +227,16 @@ Public Module ConstituentBudget
                         Dim lTotalPointVol As Double = 0.0
                         .CurrentRecord += 1
 
+                        Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                        Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
                                 Dim lPointVol As Double = 0.0
-                                Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                                Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                If lSource.Tran.ToString.Trim = "DIV" Then
+                                    TimeSeriesTransformaton = atcTran.TranSumDiv
+                                End If
                                 Dim VolName As String = lSource.Source.VolName
                                 Dim lDSN As Integer = lSource.Source.VolId
                                 Dim lMfact As Double = lSource.MFact
@@ -245,9 +251,10 @@ Public Module ConstituentBudget
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                         ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                        ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                         lPointVol += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                        lPointVol *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                                        'lPointVol *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                        'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                     End If
                                 Next
                                 lTotalPointVol += lPointVol
@@ -405,13 +412,19 @@ Public Module ConstituentBudget
                         End If
                         If lID.Tables("ACTIVITY").Parms("SEDFG").Value = 1 Then
 
+                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+
                             Dim lTotalPointTons As Double = 0.0
                             .CurrentRecord += 1
 
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
                                     Dim lPointTons As Double = 0.0
-                                    Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                    If lSource.Tran.ToString.Trim = "DIV" Then
+                                        TimeSeriesTransformaton = atcTran.TranSumDiv
+                                    End If
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
@@ -426,9 +439,10 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointTons += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                            lPointTons *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                                            'lPointTons *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                            'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
                                     lTotalPointTons += lPointTons
@@ -604,6 +618,9 @@ Public Module ConstituentBudget
                             .CurrentRecord += 1
 
                             Dim CVON As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
+                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
                                                                             (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) OrElse
@@ -614,7 +631,10 @@ Public Module ConstituentBudget
                                                                             (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                             (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                     Dim lPointlbs As Double = 0.0
-                                    Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                    If lSource.Tran.ToString.Trim = "DIV" Then
+                                        TimeSeriesTransformaton = atcTran.TranSumDiv
+                                    End If
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
@@ -632,9 +652,10 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                            lPointlbs *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                                            'lPointlbs *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                            'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
                                     lTotalPointlbs += lPointlbs
@@ -894,6 +915,9 @@ Public Module ConstituentBudget
                             .CurrentRecord += 1
 
                             Dim CVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
+                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) OrElse
                                                                             (lSource.Target.Member = "NUIF2" AndAlso lSource.Target.MemSub2 = 2) OrElse
@@ -902,7 +926,10 @@ Public Module ConstituentBudget
                                                                             (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                             (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                     Dim lPointlbs As Double = 0.0
-                                    Dim TimeSeriesTransformaton As String = lSource.Tran.ToString
+                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                    If lSource.Tran.ToString.Trim = "DIV" Then
+                                        TimeSeriesTransformaton = atcTran.TranSumDiv
+                                    End If
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
@@ -920,9 +947,10 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                            lPointlbs *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
-                                                                                                                                TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
+                                            'lPointlbs *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
+                                            'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
                                         End If
                                     Next
                                     lTotalPointlbs += lPointlbs
@@ -1707,7 +1735,7 @@ Public Module ConstituentBudget
 
     Private Function MultiFactorForPointSource(ByVal aTStep As Integer, ByVal aTimeUnit As String, ByVal aTransformation As String,
                                                ByVal aDelta As atcTimeUnit) As Double
-        Dim MultiFactor As Double = 0.0
+        Dim MultiFactor As Double = 1.0
         If Trim(aTransformation) = "DIV" Then
             MultiFactor = 1.0
         Else
@@ -1715,6 +1743,9 @@ Public Module ConstituentBudget
                 Case "SAME"
                     If aDelta / 60 = 1 AndAlso aTimeUnit = "TUDay" AndAlso aTStep = 1 Then
                         MultiFactor = 24.0
+                    End If
+                    If aDelta = 60 AndAlso aTimeUnit = "TUMonth" AndAlso aTStep = 1 Then
+                        MultiFactor = 24.0 * 365.25 / 12
                     End If
             End Select
         End If

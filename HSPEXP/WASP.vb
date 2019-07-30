@@ -344,6 +344,7 @@ Module WASP
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "SOSED", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)           'Solids
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PODOXM", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)          'Dissolved Oxygen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH4", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Ammonia Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH3+NH4", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Ammonia Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NO3", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Nitrate Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-ORTHO P", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Inorganic Phosphate
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-BOD", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'BOD for Total Organic Nitrogen, Phosphorus, and BOD
@@ -556,6 +557,8 @@ Module WASP
                         lConstituent = "SODOXM"
                     ElseIf aConstituent = "POQUAL-NH4" Then
                         lConstituent = "SOQUAL-NH4"
+                    ElseIf aConstituent = "POQUAL-NH3+NH4" Then
+                        lConstituent = "SOQUAL-NH3+NH4"
                     ElseIf aConstituent = "POQUAL-NO3" Then
                         lConstituent = "SOQUAL-NO3"
                     ElseIf aConstituent = "POQUAL-ORTHO P" Then
