@@ -83,7 +83,7 @@ Public Class frmDownload
         If pMapWin IsNot Nothing AndAlso pMapWin.Layers.NumLayers > 0 Then
             Try
                 lExtents = pMapWin.View.Extents
-                If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
+                If lExtents.xMin < lExtents.xMax AndAlso lExtents.yMin < lExtents.yMax Then
                     cboRegion.Items.Add(pRegionViewRectangle)
                 End If
             Catch
