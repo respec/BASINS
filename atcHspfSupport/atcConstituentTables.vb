@@ -709,19 +709,21 @@ Public Module atcConstituentTables
                                 lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                                 For Each lConnection As HspfConnection In lOperation.Targets
                                     If lConnection.Target.VolName = "RCHRES" Then
-                                        lOperationIsConnected = True
-                                        Dim aReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-                                        Dim aConversionFactor As Double = 0.0
-                                        If aBalanceType = "TN" Or aBalanceType = "TP" Then
-                                            aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, aReach)
-                                        End If
-                                        Dim lMassLinkID As Integer = lConnection.MassLink
-                                        If Not lMassLinkID = 0 Then
-                                            lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
+                                        Dim lReach As HspfOperation = aUCI.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                        If lReach IsNot Nothing Then
+                                            lOperationIsConnected = True
+
+                                            Dim aConversionFactor As Double = 0.0
+                                            If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                                aConversionFactor = ConversionFactorfromOxygen(aUCI, constituent.ReportType, lReach)
+                                            End If
+                                            Dim lMassLinkID As Integer = lConnection.MassLink
+                                            If Not lMassLinkID = 0 Then
+                                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lOutflowDataType,
                                                                              constituent.ReportType, aConversionFactor, lMultipleIndex, aGQALID)
-                                            Exit For
+                                                Exit For
+                                            End If
                                         End If
-                                        'End If
                                     End If
                                 Next lConnection
                                 If Not lOperationIsConnected Then Exit For
