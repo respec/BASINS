@@ -377,6 +377,7 @@ Friend Class frmAbout
             End Try
             Try
 #If ProgramName = "USGS GW Toolbox" Then
+                Me.Width += 30
 
 #ElseIf ProgramName = "USGS SW Toolbox" Then
                 Me.Width += 30
