@@ -106,7 +106,7 @@ Public Module AutomatedGraphs
 
                 Dim lRecordIndex As Integer = 0
                 Dim ListTypeOfGraph() As String = {"timeseries", "frequency", "scatter", "cumulative probability"}
-                Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "regression", "45-deg line"}
+                Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "x-axis", "y-axis"}
 
                 If lgraphRecordsNew.Count < 1 Then
                     Logger.Dbg("The" & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!")
@@ -661,8 +661,7 @@ Public Module AutomatedGraphs
             lPaneMain.YAxis.Type = AxisType.Log
         End If
 
-
-        Dim lGraphDataset() As String = aGraphRecords(aRecordIndex).split(",")
+        Dim lGraphDataset() As String = aGraphRecords(aRecordIndex)
 
         lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
         If Trim(lGraphDataset(4)).ToLower = "line" Then
@@ -717,10 +716,9 @@ Public Module AutomatedGraphs
         If Not Trim(lGraphDataset(9)) = "" Then
             lCurve.Label.Text = Trim(lGraphDataset(9))
         End If
-        aRecordIndex += 2
 
         For RecordIndex As Integer = 3 To lNumberofCurves
-            lGraphDataset = aGraphRecords(aRecordIndex).split(",")
+            lGraphDataset = aGraphRecords(RecordIndex)
             Select Case Trim(lGraphDataset(0)).ToLower
                 Case "regression"
                     Dim lACoef As Double
@@ -770,8 +768,6 @@ Public Module AutomatedGraphs
                     lLine.Label.Text = Trim(lGraphDataset(9))
             End Select
             lPaneMain.Legend.IsVisible = True
-
-            aRecordIndex += 1
 
         Next
         Return aZgc
