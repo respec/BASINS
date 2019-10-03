@@ -1748,7 +1748,7 @@ Public Module Utility
         Dim QUALName As String = ""
         Dim QUALUnit As String = ""
         Dim NQUALS As Integer = 0
-        Dim lOper As New HspfOperation
+        Dim lOper As HspfOperation = Nothing
         For Each Oper As HspfOperation In aUCI.OpnBlks("PERLND").Ids
             If Oper.Tables("ACTIVITY").Parms("PQALFG").Value = "1" Then
                 NQUALS = Oper.Tables("NQUALS").Parms("NQUAL").Value
@@ -1943,11 +1943,11 @@ Public Module Utility
             End Select
 
         Next lML
-        If QUALNames Is Nothing Then
+
+        If QUALNames Is Nothing And (aBalanceType = "BOD-Labile" Or aBalanceType = "TP" Or aBalanceType = "TN") Then
             Logger.Msg("No appropriate MASS-LINK connections were found for " & aBalanceType & ". The program will quit", vbOKOnly)
             Return Nothing
         End If
-
 
         Select Case aBalanceType
             Case "Water"
@@ -2040,37 +2040,38 @@ Public Module Utility
                 Dim lTempQual As String = ""
                 Dim lUnits As String = ""
 
-                If lOper.TableExists(lTableName) Then
-                    lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
-                    If aBalanceType = lTempQual Then
-                        'found it
-                        lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
-                    End If
-                End If
-                Do While lUnits.Length = 0
-                    For lIndex As Integer = 2 To 10
-                        If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
-                            lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
-                            If aBalanceType = lTempQual Then
-                                'found it
-                                lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
-                                Exit For
-                            End If
+                If lOper IsNot Nothing Then
+                    If lOper.TableExists(lTableName) Then
+                        lTempQual = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
+                        If aBalanceType = lTempQual Then
+                            'found it
+                            lUnits = Trim(lOper.Tables(lTableName).Parms("QTYID").Value)
                         End If
-                    Next
-                Loop
+                    End If
+                    Do While lUnits.Length = 0
+                        For lIndex As Integer = 2 To 10
+                            If lOper.TableExists(lTableName & ":" & lIndex.ToString) Then
+                                lTempQual = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QUALID").Value)
+                                If aBalanceType = lTempQual Then
+                                    'found it
+                                    lUnits = Trim(lOper.Tables(lTableName & ":" & lIndex.ToString).Parms("QTYID").Value)
+                                    Exit For
+                                End If
+                            End If
+                        Next
+                    Loop
 
-                If aUCI.GlobalBlock.EmFg = 1 Then
-                    QUALNames.ConstituentUnit = lUnits & "/ac"
-                Else
-                    QUALNames.ConstituentUnit = lUnits & "/ha"
+                    If aUCI.GlobalBlock.EmFg = 1 Then
+                        QUALNames.ConstituentUnit = lUnits & "/ac"
+                    Else
+                        QUALNames.ConstituentUnit = lUnits & "/ha"
+                    End If
+
+                    QUALNames.ReportType = aBalanceType
+                    QUALs.Add(QUALNames)
+                    Return QUALs
                 End If
-
-                QUALNames.ReportType = aBalanceType
-                QUALs.Add(QUALNames)
-                Return QUALs
         End Select
-
 
         Return QUALs
     End Function
