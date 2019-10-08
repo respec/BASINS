@@ -282,6 +282,16 @@ Public Module AutomatedGraphs
 
                             ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
                                     Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
+                                                       lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                'problem doing math operation if we can't check this -- for instance if both are obs from different days
+                                MsgBox("No time unit is defined, can't perform math operation for graph " & IO.Path.GetFileName(lOutFileName) & ". Mathematical operation will not take place.", vbOKOnly,
+                                       "Automated Graph: Time Series Issue")
+                                lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+                                skipGraph = True
+                                Exit Do
+
+                            ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
+                                    Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
                                                        lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.GetDefinedValue("TimeUnit").Value <> aTu Then
                                 'Checking if the time series read before has the same time steps as the current timeseries
                                 MsgBox("The time steps of timseries in the graph " & IO.Path.GetFileName(lOutFileName) & " are different. Mathematical operation will not take place.", vbOKOnly,
@@ -595,6 +605,12 @@ Public Module AutomatedGraphs
         For CurveNumber As Integer = 1 To lNumberofCurves
             Dim lGraphDataset() As String = aGraphRecords(aRecordIndex)
 
+            If (Trim(lGraphDataset(0)).ToLower = "add" Or
+                        Trim(lGraphDataset(0)).ToLower = "multiply" Or
+                        Trim(lGraphDataset(0)).ToLower = "subtract" Or
+                        Trim(lGraphDataset(0)).ToLower = "divide") Then
+                Continue For
+            End If
 
             lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
             If Trim(lGraphDataset(4)).ToLower = "line" Then
