@@ -338,6 +338,55 @@ Public Module AutomatedGraphs
                     Loop
                     If Not skipGraph Then
 
+                        If Trim(lGraphInit(0)).ToLower = "frequency" Or Trim(lGraphInit(0)).ToLower = "scatter" Then
+                            'if time units not set for either timeseries, this is sporadic data and more work must be done to match points
+                            'Dim lTimeseriesX As atcTimeseries = lTimeseriesGroup(0)
+                            'Dim lTimeseriesY As atcTimeseries = lTimeseriesGroup(1)
+                            Dim lNewTimeseries As New atcTimeseries
+                            Dim lBaseTimeseries As New atcTimeseries
+                            Dim lSporadicTimeseries As New atcTimeseries
+                            If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Or
+                               lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '0(x) is sporadic
+                                    lNewTimeseries = lTimeseriesGroup(0).Clone()
+                                    lBaseTimeseries = lTimeseriesGroup(1)
+                                    lSporadicTimeseries = lTimeseriesGroup(0)
+                                ElseIf lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '1(y) is sporadic
+                                    lNewTimeseries = lTimeseriesGroup(1).Clone()
+                                    lBaseTimeseries = lTimeseriesGroup(0)
+                                    lSporadicTimeseries = lTimeseriesGroup(1)
+                                End If
+                                For lIndex As Integer = 1 To lSporadicTimeseries.numValues
+                                    Dim lTargetDate As Double = lSporadicTimeseries.Dates.Values(lIndex)
+                                    'what value in base is closest in date?
+                                    Dim lMinDiff As Double = 999999999.9
+                                    Dim lDiff As Double = 0.0
+                                    Dim lMinIndex As Integer = 0
+                                    For lDateIndex As Integer = 1 To lBaseTimeseries.numValues
+                                        lDiff = Math.Abs(lTargetDate - lBaseTimeseries.Dates.Values(lDateIndex))
+                                        If lDiff < lMinDiff Then
+                                            lMinDiff = lDiff
+                                            lMinIndex = lDateIndex
+                                        End If
+                                    Next
+                                    lNewTimeseries.Values(lIndex) = lBaseTimeseries.Values(lMinIndex)
+                                Next
+                                lNewTimeseries.Attributes.SetValue("Location", lBaseTimeseries.Attributes.GetValue("Location"))
+                                lNewTimeseries.Attributes.SetValue("Scenario", lBaseTimeseries.Attributes.GetValue("Scenario"))
+                                lNewTimeseries.Attributes.SetValue("Constituent", lBaseTimeseries.Attributes.GetValue("Constituent"))
+                                lNewTimeseries.Attributes.SetValue("History 1", lBaseTimeseries.Attributes.GetValue("History 1"))
+                                lTimeseriesGroup(1) = lNewTimeseries
+                                If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '0(x) is sporadic
+                                    lTimeseriesGroup(1) = lNewTimeseries
+                                ElseIf lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '1(y) is sporadic
+                                    lTimeseriesGroup(0) = lNewTimeseries
+                                End If
+                            End If
+                        End If
 
                         Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
                         Select Case Trim(lGraphInit(0)).ToLower
