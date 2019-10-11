@@ -3,7 +3,6 @@ Imports atcData
 Imports MapWinUtility
 Imports atcTimeseriesBaseflow
 Imports atcBatchProcessing
-Imports System.Windows.Forms
 
 Public Class frmBatchMap
     Private pListStations As atcCollection
@@ -74,7 +73,7 @@ Public Class frmBatchMap
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
         Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
-        Dim lnewTreeNode As New Windows.Forms.TreeNode(lGroupName)
+        Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lGroupName)
         treeBFGroups.Nodes.Add(lnewTreeNode)
         For I As Integer = 0 To lstStations.RightCount - 1
             With lnewTreeNode
@@ -102,13 +101,13 @@ Public Class frmBatchMap
         ' Point where mouse is clicked
         Dim p As System.Drawing.Point = New System.Drawing.Point(e.X, e.Y)
         ' Go to the node that the user clicked
-        Dim node As TreeNode = treeBFGroups.GetNodeAt(p)
+        Dim node As System.Windows.Forms.TreeNode = treeBFGroups.GetNodeAt(p)
         If node IsNot Nothing Then
             treeBFGroups.SelectedNode = node
             ' Show menu only if Right Mouse button is clicked
-            If e.Button = Windows.Forms.MouseButtons.Right Then
+            If e.Button = System.Windows.Forms.MouseButtons.Right Then
                 cmsNode.Show(treeBFGroups, p)
-            ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
+            ElseIf e.Button = System.Windows.Forms.MouseButtons.Left Then
                 Dim lGroupName As String = node.Text
                 If Not lGroupName.StartsWith("BatchGroup") Then
                     lGroupName = node.Parent.Text
@@ -127,7 +126,7 @@ Public Class frmBatchMap
         'Dim p As System.Drawing.Point = New System.Drawing.Point(e.ClickedItem.Bounds.Location.X, e.ClickedItem.Bounds.Location.Y)
         '' Go to the node that the user clicked
         'Dim node As TreeNode = treeBFGroups.GetNodeAt(p)
-        Dim node As TreeNode = treeBFGroups.SelectedNode
+        Dim node As System.Windows.Forms.TreeNode = treeBFGroups.SelectedNode
         Dim lFullpath As String = node.FullPath
         Dim lGroupingName As String = "BatchGroup"
         Select Case lcmdName
@@ -173,7 +172,7 @@ Public Class frmBatchMap
                 If Not node.Text.StartsWith(lGroupingName) Then
                     node = node.Parent()
                 End If
-                For Each lStationNode As TreeNode In node.Nodes
+                For Each lStationNode As System.Windows.Forms.TreeNode In node.Nodes
                     Dim lstationId As String = lStationNode.Text
                     Dim lDataPath As String = GetDataFileFullPath(lstationId)
                     Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
@@ -189,7 +188,7 @@ Public Class frmBatchMap
                 End If
             Case "cmsGroupSetParm"
                 Dim lGroupName As String = ""
-                Dim lGroupNode As TreeNode
+                Dim lGroupNode As System.Windows.Forms.TreeNode
                 If node.Text.StartsWith(lGroupingName) Then
                     lGroupNode = node
                 Else
@@ -277,7 +276,7 @@ Public Class frmBatchMap
                 Dim lArgs As New atcDataAttributes()
                 lArgs.Add("Constituent", "streamflow,flow")
                 Dim lTsGroup As New atcTimeseriesGroup()
-                For Each lStationNode As TreeNode In lGroupNode.Nodes
+                For Each lStationNode As System.Windows.Forms.TreeNode In lGroupNode.Nodes
                     Dim lstationId As String = lStationNode.Text
 
                     Dim lDataLoaded As Boolean = False
@@ -286,7 +285,7 @@ Public Class frmBatchMap
                             Dim lTsCons As String = ""
                             For Each lTs As atcTimeseries In lDS.DataSets
                                 lTsCons = lTs.Attributes.GetValue("Constituent").ToString()
-                                If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                                If lTs.Attributes.GetValue("Location") = lstationId AndAlso
                                    (lTsCons.ToLower = "streamflow" OrElse lTsCons.ToLower() = "flow") Then
                                     lTsGroup.Add(lTs)
                                     lDataLoaded = True
@@ -330,7 +329,7 @@ Public Class frmBatchMap
     ''' </summary>
     ''' <param name="aBFGroupNode"></param>
     ''' <remarks></remarks>
-    Private Sub RemoveBFGroup(ByVal aBFGroupNode As TreeNode)
+    Private Sub RemoveBFGroup(ByVal aBFGroupNode As System.Windows.Forms.TreeNode)
         Dim lGroupingName As String = "BatchGroup"
         Dim lGroupNum As Integer = Integer.Parse(aBFGroupNode.Text.Substring(lGroupingName.Length + 1))
         pBFInputsGroups.RemoveByKey(aBFGroupNode.Text)
@@ -338,7 +337,7 @@ Public Class frmBatchMap
         pBatchGroupCount -= 1
         Dim loldNodeText As String = ""
         Dim loldNodeIndex As Integer
-        For Each lNode As TreeNode In treeBFGroups.Nodes
+        For Each lNode As System.Windows.Forms.TreeNode In treeBFGroups.Nodes
             If lNode.Text.StartsWith(lGroupingName) Then
                 loldNodeText = lNode.Text
                 loldNodeIndex = pBFInputsGroups.Keys.IndexOf(loldNodeText)
@@ -592,12 +591,12 @@ Public Class frmBatchMap
         If IO.Directory.Exists(txtDataDir.Text) Then
             lFolder.SelectedPath = txtDataDir.Text
             Try
-                SendKeys.Send("{TAB}{TAB}{RIGHT}")
+                System.Windows.Forms.SendKeys.Send("{TAB}{TAB}{RIGHT}")
             Catch ex As Exception
                 'it's ok to fail
             End Try
         End If
-        If lFolder.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If lFolder.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             txtDataDir.Text = lFolder.SelectedPath
             If IO.Directory.Exists(txtDataDir.Text) Then
                 pDataPath = txtDataDir.Text
@@ -845,7 +844,7 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnParmForm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnParmForm.Click
-        Dim lGroupNode As TreeNode = treeBFGroups.SelectedNode
+        Dim lGroupNode As System.Windows.Forms.TreeNode = treeBFGroups.SelectedNode
         If lGroupNode Is Nothing Then Return
 
         Dim lGroupName As String = lGroupNode.Text
@@ -857,14 +856,14 @@ Public Class frmBatchMap
         If lArgs IsNot Nothing Then
             lArgs.SetValue("Constituent", "streamflow")
             Dim lTsGroup As New atcTimeseriesGroup()
-            For Each lStationNode As TreeNode In lGroupNode.Nodes
+            For Each lStationNode As System.Windows.Forms.TreeNode In lGroupNode.Nodes
                 Dim lstationId As String = lStationNode.Text
 
                 Dim lDataLoaded As Boolean = False
                 For Each lDS As atcDataSource In atcDataManager.DataSources
                     If lDS.Name.ToString.Contains("USGS RDB") Then
                         For Each lTs As atcTimeseries In lDS.DataSets
-                            If lTs.Attributes.GetValue("Location") = lstationId AndAlso _
+                            If lTs.Attributes.GetValue("Location") = lstationId AndAlso
                                lTs.Attributes.GetValue("Constituent").ToString.ToLower = "streamflow" Then
                                 lTsGroup.Add(lTs)
                                 lDataLoaded = True
@@ -895,10 +894,10 @@ Public Class frmBatchMap
 
     Private Sub btnGroupGroup_Click(sender As Object, e As EventArgs) Handles btnGroupGroup.Click
         If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
-        Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        Dim lnode As System.Windows.Forms.TreeNode = treeBFGroups.SelectedNode
         Dim lGroupingName As String = "BatchGroup"
         Dim lGroupName As String = ""
-        Dim lGroupNode As TreeNode
+        Dim lGroupNode As System.Windows.Forms.TreeNode
         If lnode.Text.StartsWith(lGroupingName) Then
             lGroupNode = lnode
         Else
@@ -986,7 +985,7 @@ Public Class frmBatchMap
         Dim lArgs As New atcDataAttributes()
         lArgs.Add("Constituent", "streamflow,flow")
         Dim lTsGroup As New atcTimeseriesGroup()
-        For Each lStationNode As TreeNode In lGroupNode.Nodes
+        For Each lStationNode As System.Windows.Forms.TreeNode In lGroupNode.Nodes
             Dim lstationId As String = lStationNode.Text
 
             Dim lDataLoaded As Boolean = False
@@ -1023,7 +1022,7 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnGroupRemove_Click(sender As Object, e As EventArgs) Handles btnGroupRemove.Click
-        Dim node As TreeNode = treeBFGroups.SelectedNode
+        Dim node As System.Windows.Forms.TreeNode = treeBFGroups.SelectedNode
         If node Is Nothing Then Exit Sub
         Dim lGroupingName As String = "BatchGroup"
         If node.Text.StartsWith(lGroupingName) Then
@@ -1059,7 +1058,7 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnGroupPlot_Click(sender As Object, e As EventArgs) Handles btnGroupPlot.Click
-        Dim node As TreeNode = treeBFGroups.SelectedNode
+        Dim node As System.Windows.Forms.TreeNode = treeBFGroups.SelectedNode
         If node Is Nothing Then Exit Sub
         Dim lGroupingName As String = "BatchGroup"
         Dim lTsGroup As New atcTimeseriesGroup()
@@ -1068,7 +1067,7 @@ Public Class frmBatchMap
         If Not node.Text.StartsWith(lGroupingName) Then
             node = node.Parent()
         End If
-        For Each lStationNode As TreeNode In node.Nodes
+        For Each lStationNode As System.Windows.Forms.TreeNode In node.Nodes
             Dim lstationId As String = lStationNode.Text
             Dim lDataPath As String = GetDataFileFullPath(lstationId)
             Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)

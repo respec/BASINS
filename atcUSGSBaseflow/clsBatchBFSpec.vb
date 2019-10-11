@@ -2,6 +2,7 @@
 Imports atcData
 Imports atcBatchProcessing
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class BFBatchInputNames
     'Public Shared SDATE As String = "SDATE"
@@ -79,12 +80,12 @@ Public Class clsBatchBFSpec
     Public MessageParameters As String = ""
 
     Public Event StatusUpdate(ByVal aMsg As String)
-    Public gProgressBar As Windows.Forms.ProgressBar = Nothing
-    Public gTextStatus As Windows.Forms.TextBox = Nothing
+    Public gProgressBar As ProgressBar = Nothing
+    Public gTextStatus As TextBox = Nothing
 
     Public DownloadStations As atcCollection
 
-    Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
+    Public Sub New(ByVal aProgressbar As ProgressBar, ByVal aTextField As TextBox)
         gProgressBar = aProgressbar
         gTextStatus = aTextField
     End Sub
@@ -623,7 +624,7 @@ Public Class clsBatchBFSpec
                     If lDataDir = "" Then
                         Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
                         lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
-                        If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        If lOutDirDiag.ShowDialog = DialogResult.OK Then
                             lDataDir = lOutDirDiag.SelectedPath
                             GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
                         End If

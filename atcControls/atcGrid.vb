@@ -983,7 +983,7 @@ Public Class atcGrid
         If pRowBottom.Count > 0 Then
             ComputeCurrentRowColumn(e, lRow, lColumn)
             Select Case e.Button
-                Case Windows.Forms.MouseButtons.Left
+                Case System.Windows.Forms.MouseButtons.Left
                     pCurrentRow = lRow
                     pCurrentColumn = lColumn
 
@@ -1012,8 +1012,8 @@ Public Class atcGrid
                     Else  'start selected range on click if control or shift key is not pressed
                         SetStartSelectedRange(lRow, lColumn)
                     End If
-        
-                Case Windows.Forms.MouseButtons.Right 'on right mouse button set copy/paste in context menu
+
+                Case System.Windows.Forms.MouseButtons.Right 'on right mouse button set copy/paste in context menu
                     Me.ContextMenuStrip = GridContextMenuStrip
 
                     'decide if copy should be available 
@@ -1052,16 +1052,16 @@ Public Class atcGrid
     Protected Overrides Sub OnMouseMove(ByVal e As System.Windows.Forms.MouseEventArgs)
         'Debug.Print(e.X & " " & e.Y)
         If pSource IsNot Nothing AndAlso pSource.Columns > 0 Then
-            Dim newCursor As Windows.Forms.Cursor = Cursors.Default
+            Dim newCursor As System.Windows.Forms.Cursor = Cursors.Default
             Select Case e.Button
-                Case Windows.Forms.MouseButtons.None
+                Case System.Windows.Forms.MouseButtons.None
                     If ColumnEdgeToDrag(e.X) >= 0 Then
                         newCursor = Cursors.SizeWE
                     ElseIf ColumnDecimalToDrag(e.X, e.Y) >= 0 Then
                         newCursor = Cursors.SizeWE
                     End If
                     If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
-                Case Windows.Forms.MouseButtons.Left
+                Case System.Windows.Forms.MouseButtons.Left
                     If pColumnDragging >= 0 Then
                         ColumnWidth(pColumnDragging) += (e.X - pColumnRight.ItemByKey(pColumnDragging))
                         If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small

@@ -346,7 +346,7 @@ Friend Class frmSelectData
     Private Const CALCULATED_LABEL As String = "Calculated Attributes:"
     Private Const BLANK_LABEL As String = ""
 
-    Private pcboCriteria() As Windows.Forms.ComboBox
+    Private pcboCriteria() As System.Windows.Forms.ComboBox
     Private plstCriteria() As atcGrid
     Private pCriteriaFraction() As Single
     Private pCriteriaSearch As String = "" 'recently typed characters of incremental search in criteria list
@@ -825,7 +825,7 @@ NextTS:
         End If
     End Sub
 
-    Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As atcGrid)
+    Private Sub RemoveCriteria(ByVal cbo As System.Windows.Forms.ComboBox, ByVal lst As atcGrid)
         Dim iRemoving As Integer = GetIndex(cbo.Name)
         Dim newLastCriteria As Integer = pcboCriteria.GetUpperBound(0) - 1
         Dim OldToNew As Single = 1 / (1 - pCriteriaFraction(iRemoving))
@@ -887,7 +887,7 @@ NextTS:
             Next
         End If
 
-        pcboCriteria(iCriteria) = New Windows.Forms.ComboBox
+        pcboCriteria(iCriteria) = New System.Windows.Forms.ComboBox
         plstCriteria(iCriteria) = New atcGrid
 
         panelCriteria.Controls.Add(pcboCriteria(iCriteria))
@@ -900,7 +900,7 @@ NextTS:
 
         With pcboCriteria(iCriteria)
             .Name = "cboCriteria#" & iCriteria
-            .DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
+            .DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
             .MaxDropDownItems = 40
         End With
 
@@ -1257,7 +1257,7 @@ NextName:
     End Sub
 
     Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelpForSelect()
         End If
     End Sub
@@ -1298,13 +1298,13 @@ NextName:
     End Sub
 
     Private Sub mnuSaveFilters_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveFilters.Click
-        Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
         With lSaveDialog
             .Title = "Save filters as..."
             .DefaultExt = "txt"
             .Filter = "Text Files|*.txt|All Files|*.*"
             .FilterIndex = 0
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Dim lFileContents As New Text.StringBuilder
 
                 Dim attrName As String
@@ -1375,13 +1375,13 @@ NextName:
     End Sub
 
     Private Sub mnuLoadFilters_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadFilters.Click
-        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+        Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
         With lOpenDialog
             .Title = "Load filters from..."
             .DefaultExt = "txt"
             .Filter = "Text Files|*.txt|All Files|*.*"
             .FilterIndex = 0
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 LoadFilters(.FileName)
             End If
         End With

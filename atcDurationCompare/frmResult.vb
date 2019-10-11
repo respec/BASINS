@@ -277,7 +277,7 @@ Public Class frmResult
     End Sub
 
     Private Sub mnuSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSave.Click
-        Dim lSaveFileDialog As New Windows.Forms.SaveFileDialog
+        Dim lSaveFileDialog As New System.Windows.Forms.SaveFileDialog
         Dim lFileDialogTitle As String
         Select Case pAnalysis.ToLower
             Case "duration"
@@ -294,7 +294,7 @@ Public Class frmResult
             .DefaultExt = "txt"
             .Filter = "Text Files|*.txt|All Files|*.*"
             .FilterIndex = 0
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
                 IO.File.WriteAllText(.FileName, txtReport.Text)
                 OpenFile(.FileName)
             End If

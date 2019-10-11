@@ -565,7 +565,7 @@ FoundSameUntil:
 
         OrigDir = CurDir()
         If ChDriveDir(aDirName) Then
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
             If aFilenames Is Nothing Then aFilenames = New NameValueCollection
 
             'get all matching file names in this dir before changing into a subdirectory
@@ -618,9 +618,9 @@ FoundSameUntil:
         End If
     End Sub
 
-    Public Function ReportFilesInDir(ByVal aDirName As String, _
-                                     ByVal aSubdirs As Boolean, _
-                            Optional ByVal aFileFilter As String = "*", _
+    Public Function ReportFilesInDir(ByVal aDirName As String,
+                                     ByVal aSubdirs As Boolean,
+                            Optional ByVal aFileFilter As String = "*",
                             Optional ByVal aAttributes As Integer = 0) As String
         'Dim lLastDoEvents As Date = Now
         Dim lReport As New System.Text.StringBuilder
@@ -632,7 +632,7 @@ FoundSameUntil:
         For Each lFilename As String In lallFiles
             lReport.AppendLine(FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename))
             'If Now.Subtract(lLastDoEvents).TotalSeconds > 0.01 Then
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
             'lLastDoEvents = Now
             'End If
         Next
@@ -756,12 +756,12 @@ ErrorWriting:
 
     End Sub
 
-    Public Function FindFile(ByVal aFileDialogTitle As String, _
-                    Optional ByVal aDefaultFileName As String = " ", _
-                    Optional ByVal aDefaultExt As String = "", _
-                    Optional ByVal aFileFilter As String = "", _
-                    Optional ByVal aUserVerifyFileName As Boolean = False, _
-                    Optional ByVal aChangeIntoDir As Boolean = False, _
+    Public Function FindFile(ByVal aFileDialogTitle As String,
+                    Optional ByVal aDefaultFileName As String = " ",
+                    Optional ByVal aDefaultExt As String = "",
+                    Optional ByVal aFileFilter As String = "",
+                    Optional ByVal aUserVerifyFileName As Boolean = False,
+                    Optional ByVal aChangeIntoDir As Boolean = False,
                     Optional ByRef aFilterIndex As Integer = 1) As String
         'Becky changed function def above to make aUserVerifyFileName true - this way by default the user is asked
         'if a file is missing, rather than it just breaking the program silently
@@ -831,10 +831,10 @@ TryExePath:
 
                         'If we are in bin directory, also look in some other BASINS folders
                         If lFileName.Length = 0 AndAlso lExePath.IndexOf(g_PathChar & "bin" & g_PathChar) > 0 Then
-                            lFileName = FindRecursive(lBaseFileName, _
-                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "etc" & g_PathChar), _
-                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "models" & g_PathChar), _
-                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "docs" & g_PathChar), _
+                            lFileName = FindRecursive(lBaseFileName,
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "etc" & g_PathChar),
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "models" & g_PathChar),
+                                                      ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "docs" & g_PathChar),
                                                       ReplaceString(lExePath, g_PathChar & "bin" & g_PathChar, g_PathChar & "apr" & g_PathChar))
                         End If
 
@@ -860,7 +860,7 @@ TryExePath:
                 lFileName = "" 'If we don't have a dialog title, return a blank filename instead of asking the user
             ElseIf aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
                 Logger.Dbg("Asking user to find " & aDefaultFileName, aFileDialogTitle)
-                Dim cdlg As New Windows.Forms.OpenFileDialog
+                Dim cdlg As New System.Windows.Forms.OpenFileDialog
                 With cdlg
                     .Title = aFileDialogTitle
                     'lFileName = AbsolutePath(aDefaultFileName, CurDir)
@@ -871,7 +871,7 @@ TryExePath:
                     .Filter = aFileFilter
                     .FilterIndex = aFilterIndex
                     .DefaultExt = aDefaultExt
-                    If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                         lFileName = AbsolutePath(.FileName, CurDir)
                         aFilterIndex = .FilterIndex
                         Logger.Dbg("User specified file '" & lFileName & "'")

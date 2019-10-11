@@ -54,9 +54,9 @@ Public Class frmStations
         pStationList = aStationsList
         PopulateStationGrid()
 
-        If Me.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             If pFinalSelectedIndex >= 0 Then
-                If dgvStationEntries.Rows(pFinalSelectedIndex).Cells(0).EditedFormattedValue.ToString.Trim() = "" OrElse _
+                If dgvStationEntries.Rows(pFinalSelectedIndex).Cells(0).EditedFormattedValue.ToString.Trim() = "" OrElse
                    dgvStationEntries.Rows(pFinalSelectedIndex).Cells(1).EditedFormattedValue.ToString.Trim() = "" Then
                     pFinalSelectedIndex = -99
                 End If

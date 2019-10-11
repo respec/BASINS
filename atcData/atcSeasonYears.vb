@@ -97,7 +97,7 @@ Public Class atcSeasonYears
         End Set
     End Property
 
-    Private Function GetTextbox(ByVal aTextbox As Windows.Forms.TextBox) As Integer
+    Private Function GetTextbox(ByVal aTextbox As System.Windows.Forms.TextBox) As Integer
         If IsNumeric(aTextbox.Text) Then
             Return CInt(aTextbox.Text)
         Else
@@ -105,7 +105,7 @@ Public Class atcSeasonYears
         End If
     End Function
 
-    Private Sub SetTextbox(ByVal aTextbox As Windows.Forms.TextBox, ByVal aValue As Integer)
+    Private Sub SetTextbox(ByVal aTextbox As System.Windows.Forms.TextBox, ByVal aValue As Integer)
         If aValue = 0 Then
             aTextbox.Text = ""
         Else

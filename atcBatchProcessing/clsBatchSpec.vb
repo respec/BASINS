@@ -37,7 +37,7 @@ Public Class clsBatchSpec
 
     Public ListBatchBaseflowOpns As atcCollection
 
-    Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
+    Public Sub New(ByVal aProgressbar As System.Windows.Forms.ProgressBar, ByVal aTextField As System.Windows.Forms.TextBox)
         gProgressBar = aProgressbar
         gTextStatus = aTextField
     End Sub
@@ -151,7 +151,7 @@ Public Class clsBatchSpec
         'If Not IO.Directory.Exists(clsBatchUtil.SiteInfoDir) Then
         '    Dim lDirOpenDiag As New System.Windows.Forms.FolderBrowserDialog()
         '    lDirOpenDiag.Description = "Specify Directory To Save Downloaded Streamflow Data"
-        '    If lDirOpenDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+        '    If lDirOpenDiag.ShowDialog = System.Windows.Forms.DialogResult.OK Then
         '        clsBatchUtil.SiteInfoDir = lDirOpenDiag.SelectedPath
         '    Else
         '        Message = "Error: No data folder is specified for downloading data. Batch run stopped."

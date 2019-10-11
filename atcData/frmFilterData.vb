@@ -1,7 +1,6 @@
 ﻿Imports atcData
 Imports atcUtility
 Imports MapWinUtility
-
 Imports System.Windows.Forms
 
 Public Class frmFilterData
@@ -576,12 +575,12 @@ Public Class frmFilterData
         Return Nothing
     End Function
 
-    Private Function DoSplit(ByVal aSeasonType As Type, _
-                             ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
-                             ByVal aTimseriesGroup As atcTimeseriesGroup, _
-                             ByVal aCombineAllSelected As Boolean, _
-                             ByVal aEachSelected As Boolean, _
-                             ByVal aGroupEveryN As Integer, _
+    Private Function DoSplit(ByVal aSeasonType As Type,
+                             ByVal aSeasonsSelected As System.Windows.Forms.ListBox.SelectedObjectCollection,
+                             ByVal aTimseriesGroup As atcTimeseriesGroup,
+                             ByVal aCombineAllSelected As Boolean,
+                             ByVal aEachSelected As Boolean,
+                             ByVal aGroupEveryN As Integer,
                              ByVal aNewDatasets As atcTimeseriesGroup) As atcTimeseriesGroup
         If aSeasonType IsNot Nothing Then
             Dim lSeasonType As atcSeasonBase = aSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})

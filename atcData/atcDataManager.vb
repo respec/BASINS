@@ -508,7 +508,7 @@ Public Class atcDataManager
 #Else
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
 #End If
-                    Dim lForm As Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
+                    Dim lForm As System.Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
                     Exit Sub
                 End If
             Next

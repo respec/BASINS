@@ -10,7 +10,7 @@
 
         Clear()
         Me.ShowDialog()
-        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+        If Me.DialogResult = System.Windows.Forms.DialogResult.OK Then
             If radioSeasonsCombine.Checked Then
                 SaveSetting("atcSeasons", "SplitType", "Split", "Combine")
             End If
@@ -104,12 +104,12 @@
         Return Nothing
     End Function
 
-    Private Function DoSplit(ByVal aSeasonType As atcDefinedValue, _
-                             ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
-                             ByVal aTimseriesGroup As atcTimeseriesGroup, _
-                             ByVal aCombineAllSelected As Boolean, _
-                             ByVal aEachSelected As Boolean, _
-                             ByVal aGroupEveryN As Integer, _
+    Private Function DoSplit(ByVal aSeasonType As atcDefinedValue,
+                             ByVal aSeasonsSelected As System.Windows.Forms.ListBox.SelectedObjectCollection,
+                             ByVal aTimseriesGroup As atcTimeseriesGroup,
+                             ByVal aCombineAllSelected As Boolean,
+                             ByVal aEachSelected As Boolean,
+                             ByVal aGroupEveryN As Integer,
                              ByVal aNewDatasets As atcTimeseriesGroup) As atcTimeseriesGroup
         If aSeasonType IsNot Nothing Then
             Dim lType As Type = aSeasonType.Definition.DefaultValue
@@ -209,7 +209,7 @@
         If lstSeasons.SelectedIndices.Count = 0 Then
             MapWinUtility.Logger.Msg("At least one season must be selected.", MsgBoxStyle.OkOnly, "No seasons selected")
         Else
-            Me.DialogResult = Windows.Forms.DialogResult.OK
+            Me.DialogResult = System.Windows.Forms.DialogResult.OK
         End If
     End Sub
 End Class

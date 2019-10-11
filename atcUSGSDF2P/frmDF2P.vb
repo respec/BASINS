@@ -2268,7 +2268,7 @@ Public Class frmDF2P
     End Sub
 
     Private Sub frmDF2P_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
         End If
     End Sub

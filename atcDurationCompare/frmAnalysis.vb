@@ -16,7 +16,7 @@ Public Class frmAnalysis
     End Sub
 
     Private Sub frmAnalysis_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
         End If
     End Sub
@@ -148,10 +148,10 @@ Public Class frmAnalysis
         ElseIf pAnalysis = "" Then
             Exit Sub
         End If
-        Windows.Forms.Cursor.Current = Windows.Forms.Cursors.WaitCursor
+        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
         ResultForm.Initialize(pAnalysis, DataGroup, lstClassLimits.CurrentValues, "Report")
         ResultForm.Show()
-        Windows.Forms.Cursor.Current = Windows.Forms.Cursors.Default
+        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         ResultForm.txtReport.SelectionLength = 0
     End Sub
 

@@ -455,7 +455,7 @@ Public Class atcListForm
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With
@@ -570,7 +570,7 @@ Public Class atcListForm
         ShowHelpForList()
     End Sub
     Private Sub atcListForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelpForList()
         End If
     End Sub

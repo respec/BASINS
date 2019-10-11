@@ -120,9 +120,9 @@ Public Class frmSpecifyComputation
     Private pAttributes As atcData.atcDataAttributes
 
     Private pArgDefVal() As atcDefinedValue
-    Private pArgLabel() As Windows.Forms.Label
-    Private pArgText() As Windows.Forms.TextBox
-    Private pArgButton() As Windows.Forms.Button
+    Private pArgLabel() As System.Windows.Forms.Label
+    Private pArgText() As System.Windows.Forms.TextBox
+    Private pArgButton() As System.Windows.Forms.Button
 
     'Private pArgSource As atcControls.atcGridSource  ' atcDataAttributesGridSource
 
@@ -168,7 +168,7 @@ Public Class frmSpecifyComputation
                 pArgDefVal(iArg) = aDefVal
 
                 ReDim Preserve pArgLabel(iArg)
-                pArgLabel(iArg) = New Windows.Forms.Label
+                pArgLabel(iArg) = New System.Windows.Forms.Label
                 With pArgLabel(iArg)
                     If iArg = 0 Then
                         .Top = lblDescription.Top + lblDescription.Height * 1.5
@@ -182,12 +182,12 @@ Public Class frmSpecifyComputation
                 Controls.Add(pArgLabel(iArg))
 
                 ReDim Preserve pArgText(iArg)
-                pArgText(iArg) = New Windows.Forms.TextBox
+                pArgText(iArg) = New System.Windows.Forms.TextBox
                 With pArgText(iArg)
                     .Top = pArgLabel(iArg).Top
                     .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + LAYOUT_PADDING
                     .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - LAYOUT_PADDING * 2
-                    .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
+                    .Anchor = System.Windows.Forms.AnchorStyles.Right Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top
 
                     .Tag = iArg
                     .Text = ""
@@ -214,7 +214,7 @@ Public Class frmSpecifyComputation
                 End With
                 Controls.Add(pArgText(iArg))
 
-                'Dim lArgDescription As New Windows.Forms.Label
+                'Dim lArgDescription As New System.Windows.Forms.Label
                 'With lArgDescription
                 '    .Top = pArgText(iArg).Top + pArgText(iArg).Height + 2
                 '    .Left = pArgText(iArg).Left
@@ -224,7 +224,7 @@ Public Class frmSpecifyComputation
                 'Controls.Add(lArgDescription)
 
                 ReDim Preserve pArgButton(iArg)
-                pArgButton(iArg) = New Windows.Forms.Button
+                pArgButton(iArg) = New System.Windows.Forms.Button
                 With pArgButton(iArg)
                     .Top = pArgLabel(iArg).Top
                     .Width = ARG_BUTTON_WIDTH
@@ -232,7 +232,7 @@ Public Class frmSpecifyComputation
 
                     .Tag = iArg
                     .Text = "Select"
-                    .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
+                    .Anchor = System.Windows.Forms.AnchorStyles.Right Or System.Windows.Forms.AnchorStyles.Top
 
                     Select Case aDefVal.Definition.TypeString
                         Case "atcDataGroup", "atcTimeseriesGroup" : .Visible = True
