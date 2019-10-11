@@ -28,7 +28,7 @@ Public Class USGSBaseflowPlugin
         End If
         frmInteractive.WindowState = System.Windows.Forms.FormWindowState.Normal
         frmInteractive.InitializeDS(Me)
-        'frmInteractive.Initialize()
+        frmInteractive.Initialize()
         frmInteractive.Show()
     End Sub
 End Class
