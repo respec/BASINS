@@ -182,7 +182,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="USGSBaseflowPlugin.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmBatch.resx">

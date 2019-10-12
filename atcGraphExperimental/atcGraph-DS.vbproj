@@ -110,6 +110,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

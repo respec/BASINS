@@ -150,6 +150,30 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Data">
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Data.Forms">
+      <HintPath>..\bin\Debug\DotSpatial.Data.Forms.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Serialization">
+      <HintPath>..\bin\Debug\DotSpatial.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology">
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

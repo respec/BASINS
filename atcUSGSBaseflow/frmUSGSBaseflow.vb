@@ -15,7 +15,7 @@ Imports DotSpatial.Controls
 
 Public Class frmUSGSBaseflow
 #If GISProvider = "DotSpatial" Then
-    Private ProgressHandler As USGSBaseflowPlugin
+    Private ProgressHandler As clsUSGSBaseflowPlugin
 #End If
     Private pName As String = "Unnamed"
     Private pBasicAttributes As Generic.List(Of String)
@@ -61,7 +61,8 @@ Public Class frmUSGSBaseflow
     End Property
     Private _app As AppManager
 
-    Public Sub InitializeDS(ByVal wrapper As USGSBaseflowPlugin)
+    'Public Sub InitializeDS(ByVal wrapper As USGSBaseflowPlugin)
+    Public Sub InitializeDS(ByVal wrapper As clsUSGSBaseflowPlugin)
         App = wrapper.App
         ProgressHandler = wrapper
     End Sub
