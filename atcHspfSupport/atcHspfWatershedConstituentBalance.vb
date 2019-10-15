@@ -949,8 +949,8 @@ Public Module WatershedConstituentBalance
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) &
                                                                                 vbTab & "Ac-Ft".PadLeft(12))
                                 ElseIf aBalanceType = "Sediment" Then
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) &
-                                                                                vbTab & "tons/ac".PadLeft(12))
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) &
+                                                                                vbTab & "tons".PadLeft(12))
                                 ElseIf aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
                                                                                 vbTab & "10^9".PadLeft(12))

@@ -238,6 +238,17 @@ Module HSPFOutputReports
                     QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "DO"))
                     QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "Water Temperature"))
                     'note that qa reports for loading rate, land use comparison, and storage are done in the wq section
+
+                    'chuck likes the area report, we should still do it!
+                    Dim lLocations As New atcCollection
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                        lLocations.Add("R:" & lRCHRES.Id)
+                    Next
+                    Logger.Status(Now & " Producing Area Reports.", True)
+                    Logger.Dbg(Now & " Producing land use and area reports")
+                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, lLocations, True, pOutFolderName & "/AreaReports/")
+                    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+                    SaveFileString(pOutFolderName & "/AreaReports/AreaReport.txt", lReport.ToString)
                 End If
 
                 'Do automated graphs
