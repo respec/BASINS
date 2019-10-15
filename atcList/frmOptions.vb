@@ -39,7 +39,7 @@ Public Class frmOptions
         ShowHelpForListOptions()
     End Sub
     Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelpForListOptions()
         End If
     End Sub

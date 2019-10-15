@@ -761,21 +761,21 @@ Partial Class frmUSGSBaseflowBatch
     Friend WithEvents colDA As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colStationID As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents grdStations As System.Windows.Forms.DataGridView
-    Friend WithEvents chkMethodTwoPRDF As Windows.Forms.CheckBox
-    Friend WithEvents chkMethodBFLOW As Windows.Forms.CheckBox
-    Friend WithEvents gbDFParam As Windows.Forms.GroupBox
-    Friend WithEvents txtDFParamBFImax As Windows.Forms.TextBox
-    Friend WithEvents txtDFParamRC As Windows.Forms.TextBox
-    Friend WithEvents txtDFParamBeta As Windows.Forms.TextBox
-    Friend WithEvents lblBFImax As Windows.Forms.Label
-    Friend WithEvents lblRC As Windows.Forms.Label
-    Friend WithEvents lblBeta As Windows.Forms.Label
-    Friend WithEvents txt2PDefaultNotice As Windows.Forms.TextBox
-    Friend WithEvents rdo2PDefault As Windows.Forms.RadioButton
-    Friend WithEvents rdo2PSpecify As Windows.Forms.RadioButton
-    Friend WithEvents lblTwoParam As Windows.Forms.Label
-    Friend WithEvents gbduration As Windows.Forms.GroupBox
-    Friend WithEvents txtDurationNote As Windows.Forms.TextBox
-    Friend WithEvents rdoDurationNo As Windows.Forms.RadioButton
-    Friend WithEvents rdoDurationYes As Windows.Forms.RadioButton
+    Friend WithEvents chkMethodTwoPRDF As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMethodBFLOW As System.Windows.Forms.CheckBox
+    Friend WithEvents gbDFParam As System.Windows.Forms.GroupBox
+    Friend WithEvents txtDFParamBFImax As System.Windows.Forms.TextBox
+    Friend WithEvents txtDFParamRC As System.Windows.Forms.TextBox
+    Friend WithEvents txtDFParamBeta As System.Windows.Forms.TextBox
+    Friend WithEvents lblBFImax As System.Windows.Forms.Label
+    Friend WithEvents lblRC As System.Windows.Forms.Label
+    Friend WithEvents lblBeta As System.Windows.Forms.Label
+    Friend WithEvents txt2PDefaultNotice As System.Windows.Forms.TextBox
+    Friend WithEvents rdo2PDefault As System.Windows.Forms.RadioButton
+    Friend WithEvents rdo2PSpecify As System.Windows.Forms.RadioButton
+    Friend WithEvents lblTwoParam As System.Windows.Forms.Label
+    Friend WithEvents gbduration As System.Windows.Forms.GroupBox
+    Friend WithEvents txtDurationNote As System.Windows.Forms.TextBox
+    Friend WithEvents rdoDurationNo As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoDurationYes As System.Windows.Forms.RadioButton
 End Class

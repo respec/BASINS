@@ -107,7 +107,7 @@ Public Class atcDataSource
            (Not CanSave AndAlso Not (FileExists(aSpecification))) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
-            Dim lCdlg As New Windows.Forms.OpenFileDialog
+            Dim lCdlg As New System.Windows.Forms.OpenFileDialog
             With lCdlg
                 .Title = "Select " & lString & " file to open"
                 If aAttributes IsNot Nothing Then
@@ -116,7 +116,7 @@ Public Class atcDataSource
                 .Filter = Filter
                 .FilterIndex = 1
                 .CheckFileExists = Not CanSave
-                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                     aSpecification = AbsolutePath(.FileName, CurDir)
                     Logger.Dbg("User specified file '" & aSpecification & "'")
                 Else 'Return empty string if user clicked Cancel

@@ -130,7 +130,7 @@ Public Class atcSelectList
         pAvailable = aAvailable
         pSelected = aSelected
         Clear()
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             aSelected.Clear()
             For Each lName As String In lstAvailable.SelectedItems
                 aSelected.Add(lName)

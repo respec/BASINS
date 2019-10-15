@@ -28,11 +28,11 @@ Public Class frmArgs
                             Case "L" 'Just a label
                                 AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                             Case "T" 'Label and text box
-                                Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
+                                Dim lLabel As System.Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                                 AddTextbox(aArgs.ItemByIndex(lArgIndex).ToString, "txt" & lArgIndex)
                             Case "C" 'Label and checkbox
-                                Dim lLabel As Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
+                                Dim lLabel As System.Windows.Forms.Label = AddLabel(lKey.Substring(2), "lbl" & lArgIndex)
                                 If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                                 AddCheckbox(CBool(aArgs.ItemByIndex(lArgIndex)), "chk" & lArgIndex)
                             Case Else
@@ -40,7 +40,7 @@ Public Class frmArgs
                         End Select
                     Else
 AutoChooseControl:
-                        Dim lLabel As Windows.Forms.Label = AddLabel(lKey, "lbl" & lArgIndex)
+                        Dim lLabel As System.Windows.Forms.Label = AddLabel(lKey, "lbl" & lArgIndex)
                         If lLabel.Width > pLeftColumnWidth Then pLeftColumnWidth = lLabel.Width
                         Select Case aArgs.ItemByIndex(lArgIndex).GetType.Name
                             Case "Boolean" : AddCheckbox(lArgValue, "chk" & lArgIndex)
@@ -53,7 +53,7 @@ AutoChooseControl:
 
         Me.Width = (pLeftColumnWidth + pLeft) * 4 + pLeft
 
-        For Each lItem As Windows.Forms.Control In pRightColumnItems
+        For Each lItem As System.Windows.Forms.Control In pRightColumnItems
             lItem.Left = pLeftColumnWidth + pLeft * 2
             lItem.Width = Me.Width - lItem.Left - pLeft
         Next
@@ -72,14 +72,14 @@ AutoChooseControl:
                     '        Select Case lStr.Substring(0, 1).ToUpper
                     '            Case "L" 'Just a label
                     '            Case "T" 'Label and text box
-                    '                'Dim lLabel As Windows.Forms.Label = Me.Controls.Item(Me.Controls.IndexOfKey("lbl" & lArgIndex))
+                    '                'Dim lLabel As System.Windows.Forms.Label = Me.Controls.Item(Me.Controls.IndexOfKey("lbl" & lArgIndex))
                     '                lArgIndex += 1
-                    '                Dim lTextbox As Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
+                    '                Dim lTextbox As System.Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
                     '                aArgs.ItemByIndex(lArgIndex) = lTextbox.Text
                     '            Case "C" 'Label and checkbox
-                    '                'Dim lLabel As Windows.Forms.Label = AddLabel(lStr.Substring(2), "lbl" & lArgIndex)
+                    '                'Dim lLabel As System.Windows.Forms.Label = AddLabel(lStr.Substring(2), "lbl" & lArgIndex)
                     '                lArgIndex += 1
-                    '                Dim lCheckbox As Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
+                    '                Dim lCheckbox As System.Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
                     '                aArgs.ItemByIndex(lArgIndex) = lCheckbox.Checked
                     '            Case Else
                     '                Stop
@@ -87,18 +87,18 @@ AutoChooseControl:
                     '    Else
                     '        Select Case aArgs.ItemByIndex(lArgIndex).GetType.Name
                     '            Case "Boolean"
-                    '                Dim lCheckbox As Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
+                    '                Dim lCheckbox As System.Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
                     '                aArgs.ItemByIndex(lArgIndex) = lCheckbox.Checked
                     '            Case Else
-                    '                Dim lTextbox As Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
+                    '                Dim lTextbox As System.Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
                     '                aArgs.ItemByIndex(lArgIndex) = lTextbox.Text
                     '        End Select
                     '    End If
                     Case "Boolean"
-                        Dim lCheckbox As Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
+                        Dim lCheckbox As System.Windows.Forms.CheckBox = Me.Controls.Item(Me.Controls.IndexOfKey("chk" & lArgIndex))
                         aArgs.ItemByIndex(lArgIndex) = lCheckbox.Checked
                     Case Else
-                        Dim lTextbox As Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
+                        Dim lTextbox As System.Windows.Forms.TextBox = Me.Controls.Item(Me.Controls.IndexOfKey("txt" & lArgIndex))
                         aArgs.ItemByIndex(lArgIndex) = lTextbox.Text
                 End Select
                 SaveSetting("BASINS41", aTitle, lKey, aArgs.ItemByIndex(lArgIndex))
@@ -108,8 +108,8 @@ AutoChooseControl:
         Return pOk
     End Function
 
-    Private Function AddLabel(ByVal aText As String, ByVal aName As String) As Windows.Forms.Label
-        Dim lAddLabel As New Windows.Forms.Label
+    Private Function AddLabel(ByVal aText As String, ByVal aName As String) As System.Windows.Forms.Label
+        Dim lAddLabel As New System.Windows.Forms.Label
         With lAddLabel
             .AutoSize = True
             .Text = aText
@@ -117,32 +117,32 @@ AutoChooseControl:
             .Top = pTop
             pTop += pRowHeight
             .Left = pLeft
-            .Anchor = Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
+            .Anchor = System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top
             Me.Controls.Add(lAddLabel)
         End With
         Return lAddLabel
     End Function
 
-    Private Function AddTextbox(ByVal aText As String, ByVal aName As String) As Windows.Forms.TextBox
-        Dim lAddTextbox As New Windows.Forms.TextBox
+    Private Function AddTextbox(ByVal aText As String, ByVal aName As String) As System.Windows.Forms.TextBox
+        Dim lAddTextbox As New System.Windows.Forms.TextBox
         With lAddTextbox
             .Text = aText
             .Name = aName
             .Top = pTop - pRowHeight
-            .Anchor = Windows.Forms.AnchorStyles.Top Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Right
+            .Anchor = System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right
             Me.Controls.Add(lAddTextbox)
             pRightColumnItems.Add(lAddTextbox)
         End With
         Return lAddTextbox
     End Function
 
-    Private Function AddCheckbox(ByVal aChecked As Boolean, ByVal aName As String) As Windows.Forms.CheckBox
-        Dim lAddCheckbox As New Windows.Forms.CheckBox
+    Private Function AddCheckbox(ByVal aChecked As Boolean, ByVal aName As String) As System.Windows.Forms.CheckBox
+        Dim lAddCheckbox As New System.Windows.Forms.CheckBox
         With lAddCheckbox
             .Checked = aChecked
             .Name = aName
             .Top = pTop - pRowHeight
-            .Anchor = Windows.Forms.AnchorStyles.Top Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Right
+            .Anchor = System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right
             Me.Controls.Add(lAddCheckbox)
             pRightColumnItems.Add(lAddCheckbox)
         End With
@@ -150,12 +150,12 @@ AutoChooseControl:
     End Function
 
     'Private Sub AddButton()
-    '    Dim btn As Windows.Forms.Button = New Windows.Forms.Button
+    '    Dim btn As System.Windows.Forms.Button = New System.Windows.Forms.Button
     '    btn.Text = curLabel
     '    btn.Top = lTop
     '    btn.Left = 0
     '    btn.Width = Me.ClientSize.Width
-    '    btn.Anchor = Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
+    '    btn.Anchor = System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right Or System.Windows.Forms.AnchorStyles.Top
     '    lTop += btn.Height
 
     '    Me.Controls.Add(btn)

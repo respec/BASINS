@@ -112,12 +112,12 @@ Public Class frmButtons
             lblMessage.Text = aMessage
         End If
 
-        Dim lButtons As New Generic.List(Of Windows.Forms.Button)
+        Dim lButtons As New Generic.List(Of System.Windows.Forms.Button)
         Dim lSetHeight As Boolean = False
         Dim lMaxButtonWidth As Integer = 0
 
         For Each curLabel As String In aButtonLabels
-            Dim btn As Windows.Forms.Button = New Windows.Forms.Button
+            Dim btn As System.Windows.Forms.Button = New System.Windows.Forms.Button
             btn.Anchor = lButtonAnchor
             btn.AutoSize = True
             btn.Left = lButtonLeft
@@ -175,12 +175,12 @@ Public Class frmButtons
             Else
                 Me.Width = lblMessage.Left + lblMessage.Width + pMargin
 
-                For Each lButton As Windows.Forms.Button In lButtons
+                For Each lButton As System.Windows.Forms.Button In lButtons
                     lButton.Left += lMoveButtons
                 Next
             End If
         Else
-            For Each lButton As Windows.Forms.Button In lButtons
+            For Each lButton As System.Windows.Forms.Button In lButtons
                 lButton.Width = lMaxButtonWidth
             Next
             If lblMessage.Width > lMaxButtonWidth Then lMaxButtonWidth = lblMessage.Width
@@ -203,7 +203,7 @@ Public Class frmButtons
 
         Me.Visible = False
 
-        For Each lButton As Windows.Forms.Button In lButtons
+        For Each lButton As System.Windows.Forms.Button In lButtons
             Me.Controls.Remove(lButton)
         Next
 

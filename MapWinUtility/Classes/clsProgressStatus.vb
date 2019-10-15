@@ -135,7 +135,7 @@ Public Class MonitorProgressStatus
     Public Sub Progress(ByVal aCurrentPosition As Integer, _
                         ByVal aLastPosition As Integer) Implements IProgressStatus.Progress
         While pPaused
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
             Threading.Thread.Sleep(50)
         End While
         If InnerProgressStatus IsNot Nothing Then
@@ -251,8 +251,8 @@ Public Class MonitorProgressStatus
     ''' <param name="aArguments">Arguments to status monitor. If not specified, current process ID is used as only argument</param>
     ''' <returns>True if started or decided to use already running monitor, False if failed to start</returns>
     ''' <remarks>pMonitorProcess is set if monitor is successfully started</remarks>
-    Public Function StartMonitor(ByVal aMonitorFileName As String, _
-                         Optional ByVal aWorkingDirectory As String = Nothing, _
+    Public Function StartMonitor(ByVal aMonitorFileName As String,
+                         Optional ByVal aWorkingDirectory As String = Nothing,
                          Optional ByVal aArguments As String = Nothing) As Boolean
         Logger.Dbg("Start " & aMonitorFileName & " in " & aWorkingDirectory)
         Try
@@ -308,7 +308,7 @@ Public Class MonitorProgressStatus
                 pMonitorProcess = Nothing
             Else
                 pMonitorProcess.StandardInput.WriteLine("Exit")
-                Windows.Forms.Application.DoEvents()
+                System.Windows.Forms.Application.DoEvents()
                 Threading.Thread.Sleep(100)
                 If Not pMonitorProcess.HasExited Then pMonitorProcess.Kill()
                 Logger.Dbg("MonitorStopped")

@@ -278,7 +278,7 @@ Friend Class frmManager
     Public Sub Edit(Optional ByVal aNodeKey As Integer = -1)
         Populate(aNodeKey)
         Me.Show()
-        Windows.Forms.Application.DoEvents()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     Private Sub Populate(ByVal aNodeKey As Integer)
@@ -515,12 +515,12 @@ Friend Class frmManager
         Edit(atcDataManager.DataSources.Count - 1)
     End Sub
 
-    Private Sub Form_DragEnter( _
-        ByVal sender As Object, ByVal e As Windows.Forms.DragEventArgs) _
+    Private Sub Form_DragEnter(
+        ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) _
         Handles Me.DragEnter, treeFiles.DragEnter, txtDetails.DragEnter
 
-        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-            e.Effect = Windows.Forms.DragDropEffects.All
+        If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = System.Windows.Forms.DragDropEffects.All
         End If
     End Sub
 
@@ -528,8 +528,8 @@ Friend Class frmManager
         ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) _
         Handles Me.DragDrop, treeFiles.DragDrop, txtDetails.DragDrop
 
-        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-            Dim lFileNames() As String = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+        If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+            Dim lFileNames() As String = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)
             Dim lIndex As Integer = 0
             For Each lFileName As String In lFileNames
                 lIndex += 1
@@ -707,7 +707,7 @@ Friend Class frmManager
     End Sub
 
     Private Sub frmManager_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
         End If
     End Sub

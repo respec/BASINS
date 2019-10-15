@@ -14,7 +14,7 @@ Public Class frmDurationHydrographControl
     End Sub
 
     Private Sub frmDurationHydrographControl_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
         End If
     End Sub

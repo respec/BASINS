@@ -112,8 +112,8 @@ Partial Class frmSelectAttributes
     End Sub
 
     Friend WithEvents ctlSelect As atcControls.ATCoSelectListSortByProp
-    Friend WithEvents btnOk As Windows.Forms.Button
-    Friend WithEvents btnCancel As Windows.Forms.Button
-    Friend WithEvents chkCalculated As Windows.Forms.CheckBox
-    Friend WithEvents chkNotCalculated As Windows.Forms.CheckBox
+    Friend WithEvents btnOk As System.Windows.Forms.Button
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
+    Friend WithEvents chkCalculated As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNotCalculated As System.Windows.Forms.CheckBox
 End Class

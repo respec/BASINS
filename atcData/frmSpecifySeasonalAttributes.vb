@@ -277,7 +277,7 @@ Public Class frmSpecifySeasonalAttributes
         LoadListSelectedSeasons(lstSeasons)
     End Sub
 
-    Public Shared Sub SaveListSelectedSeasons(ByVal aListbox As Windows.Forms.ListBox)
+    Public Shared Sub SaveListSelectedSeasons(ByVal aListbox As System.Windows.Forms.ListBox)
         SaveSetting("atcSeasons", aListbox.Tag, "dummy", "")
         DeleteSetting("atcSeasons", aListbox.Tag)
         For Each lSelectedItem As String In aListbox.SelectedItems
@@ -285,7 +285,7 @@ Public Class frmSpecifySeasonalAttributes
         Next
     End Sub
 
-    Public Shared Sub LoadListSelectedSeasons(ByVal aListbox As Windows.Forms.ListBox)
+    Public Shared Sub LoadListSelectedSeasons(ByVal aListbox As System.Windows.Forms.ListBox)
         Dim lSelectedArray As String(,) = GetAllSettings("atcSeasons", aListbox.Tag)
         Dim lItemIndex As Integer
         Try
@@ -336,11 +336,11 @@ Public Class frmSpecifySeasonalAttributes
         Return Nothing
     End Function
 
-    Friend Shared Function CalculateAttributes(ByVal aSeasonType As String, _
-                                               ByVal aSeasonSource As atcTimeseriesSource, _
-                                               ByVal aSeasonsSelected As Windows.Forms.ListBox.SelectedObjectCollection, _
-                                               ByVal aTimseriesGroup As atcTimeseriesGroup, _
-                                               ByVal aAttributes As atcDataAttributes, _
+    Friend Shared Function CalculateAttributes(ByVal aSeasonType As String,
+                                               ByVal aSeasonSource As atcTimeseriesSource,
+                                               ByVal aSeasonsSelected As System.Windows.Forms.ListBox.SelectedObjectCollection,
+                                               ByVal aTimseriesGroup As atcTimeseriesGroup,
+                                               ByVal aAttributes As atcDataAttributes,
                                                ByVal aSetInTimeseries As Boolean) As atcDataAttributes
         Dim lCalculatedAttributes As New atcDataAttributes
         Dim lAllCalculatedAttributes As atcDataAttributes

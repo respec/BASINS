@@ -193,6 +193,9 @@ Public Class atcDataManager
     ''' <summary>Set of atcDataSets found in currently open DataSources</summary>
     Public Shared Function DataSets() As atcTimeseriesGroup
         Dim lAllData As New atcTimeseriesGroup
+        If DataSources Is Nothing OrElse DataSources.Count = 0 Then
+            Return lAllData
+        End If
         For Each lDataSource As atcTimeseriesSource In DataSources
             lAllData.AddRange(lDataSource.DataSets)
         Next
@@ -508,7 +511,7 @@ Public Class atcDataManager
 #Else
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
 #End If
-                    Dim lForm As Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
+                    Dim lForm As System.Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
                     Exit Sub
                 End If
             Next

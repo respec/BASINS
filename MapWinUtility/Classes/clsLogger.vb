@@ -288,9 +288,9 @@ Public Class Logger
         Return lResult
     End Function
 
-    Public Shared Function MsgCustomOwned(ByVal aMessage As String, _
-                                          ByVal aTitle As String, _
-                                          ByVal aOwner As Windows.Forms.Form, _
+    Public Shared Function MsgCustomOwned(ByVal aMessage As String,
+                                          ByVal aTitle As String,
+                                          ByVal aOwner As System.Windows.Forms.Form,
                                           ByVal ParamArray aButtonLabels() As String) As String
         Dbg("MsgCustomOwned:" & aMessage & ":Title:" & aTitle & ":Style:" & String.Join(",", aButtonLabels))
         Dim lResult As String = ""
@@ -472,7 +472,7 @@ Public Class Logger
         Flush()
         Dim lResult As DialogResult = DialogResult.OK
         If pDisplayMessageBoxes Then
-            lResult = Windows.Forms.MessageBox.Show(aText, aCaption, aButtons, aIcon, _
+            lResult = System.Windows.Forms.MessageBox.Show(aText, aCaption, aButtons, aIcon,
                                                     DialogResultToMessageBoxDefaultButton(aButtons, aDefaultResult))
             Dbg("MessageResult:" & lResult & ":" & System.Enum.GetName(lResult.GetType, lResult))
             pLastDbgText = ""

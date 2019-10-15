@@ -713,19 +713,19 @@ Partial Class frmDF2P
     Friend WithEvents lblPeriodOfRecord As System.Windows.Forms.Label
     Friend WithEvents gbDataType As System.Windows.Forms.GroupBox
     Friend WithEvents txtDataInfo As System.Windows.Forms.TextBox
-    Friend WithEvents btnEstRC As Windows.Forms.Button
-    Friend WithEvents lblRC As Windows.Forms.Label
-    Friend WithEvents txtRC As Windows.Forms.TextBox
-    Friend WithEvents txtRC2 As Windows.Forms.TextBox
-    Friend WithEvents lblRC2 As Windows.Forms.Label
-    Friend WithEvents txtBackDays As Windows.Forms.TextBox
-    Friend WithEvents lblMinRecessDays As Windows.Forms.Label
-    Friend WithEvents btnClear As Windows.Forms.Button
-    Friend WithEvents btnAllMonths As Windows.Forms.Button
-    Friend WithEvents gbStep2Inputs As Windows.Forms.GroupBox
-    Friend WithEvents lblEstimatedBFImax As Windows.Forms.Label
-    Friend WithEvents txtBFImax As Windows.Forms.TextBox
-    Friend WithEvents chkRCregression As Windows.Forms.CheckBox
-    Friend WithEvents btnSaveRC As Windows.Forms.Button
-    Friend WithEvents lbl_lstSegment As Windows.Forms.Label
+    Friend WithEvents btnEstRC As System.Windows.Forms.Button
+    Friend WithEvents lblRC As System.Windows.Forms.Label
+    Friend WithEvents txtRC As System.Windows.Forms.TextBox
+    Friend WithEvents txtRC2 As System.Windows.Forms.TextBox
+    Friend WithEvents lblRC2 As System.Windows.Forms.Label
+    Friend WithEvents txtBackDays As System.Windows.Forms.TextBox
+    Friend WithEvents lblMinRecessDays As System.Windows.Forms.Label
+    Friend WithEvents btnClear As System.Windows.Forms.Button
+    Friend WithEvents btnAllMonths As System.Windows.Forms.Button
+    Friend WithEvents gbStep2Inputs As System.Windows.Forms.GroupBox
+    Friend WithEvents lblEstimatedBFImax As System.Windows.Forms.Label
+    Friend WithEvents txtBFImax As System.Windows.Forms.TextBox
+    Friend WithEvents chkRCregression As System.Windows.Forms.CheckBox
+    Friend WithEvents btnSaveRC As System.Windows.Forms.Button
+    Friend WithEvents lbl_lstSegment As System.Windows.Forms.Label
 End Class

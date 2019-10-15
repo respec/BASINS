@@ -1,4 +1,7 @@
 Imports atcData.atcDataManager
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+#End If
 
 ''' <summary>
 '''     <para>Base class for plugins that can read, write, manipulate, or display atcData</para>
@@ -12,7 +15,7 @@ Imports atcData.atcDataManager
 Public Class atcDataPlugin
 
 #If GISProvider = "DotSpatial" Then
-
+    Inherits Extension
 #Else
     Implements MapWindow.Interfaces.IPlugin
 #End If
