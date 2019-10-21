@@ -314,7 +314,9 @@ Public Module ConstituentBalance
 
                                             If lSkipToindex > lSkipToindex2 Then lSkipToindex = lSkipToindex2
                                             If lSkipToindex > lConstituentIndex Then lConstituentIndex = lSkipToindex - 1
-                                            lPendingOutput = ""
+                                            If lSkipToindex > -1 Then
+                                                lPendingOutput = ""
+                                            End If
                                         End If
                                     End If
                                 End If
