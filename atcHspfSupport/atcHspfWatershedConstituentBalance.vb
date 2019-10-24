@@ -970,9 +970,9 @@ Public Module WatershedConstituentBalance
                         lFieldIndex = 1
                         Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
 
-                        If lConstituentName.Length > lRowIdLength Then
-                            lConstituentName = lConstituentName.Substring(0, lRowIdLength)
-                        End If
+                        'If lConstituentName.Length > lRowIdLength Then
+                        ' lConstituentName = lConstituentName.Substring(0, lRowIdLength)
+                        'End If
                         Dim lConstituentTotalIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
 
                         '.FieldLength(lFieldIndex) = 20

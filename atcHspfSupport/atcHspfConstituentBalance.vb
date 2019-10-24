@@ -64,12 +64,12 @@ Public Module ConstituentBalance
         End If
         lReport.AppendLine(vbCrLf)
         Dim lConstituentKey As String
-        Dim aLocations As New atcCollection
-        aLocations.AddRange(aScenarioResults.DataSets.SortedAttributeValues("Location"))
+        Dim lLocations As New atcCollection
+        lLocations.AddRange(aScenarioResults.DataSets.SortedAttributeValues("Location"))
         For Each lOperationKey As String In aOperationTypes.Keys
             Dim lLocationProgress As Integer = 0
-            Dim lLastLocation As Integer = aLocations.Count
-            For Each lLocation As String In aLocations
+            Dim lLastLocation As Integer = lLocations.Count
+            For Each lLocation As String In lLocations
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lLocationDataGroup As New atcTimeseriesGroup
@@ -190,7 +190,7 @@ Public Module ConstituentBalance
                                         Dim lMassLinkFactor As Double = 0
                                         Dim lTotalLoad As Double = 0.0
                                         Dim lTotalArea As Double = 0.0
-                                        Dim MassLinkExists As Boolean = True
+                                        Dim lMassLinkExists As Boolean = True
 
                                         If lConstituentDataName.ToUpper.Contains("QUAL") OrElse
                                            lConstituentDataName.ToUpper.Contains("SOQO") OrElse
@@ -199,8 +199,8 @@ Public Module ConstituentBalance
 
                                             For Each lConnection As HspfConnection In lOperation.Targets
                                                 If lConnection.Target.VolName = "RCHRES" Then
-                                                    Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
-                                                    If aReach Is Nothing Then
+                                                    Dim lReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
+                                                    If lReach Is Nothing Then
                                                         Continue For
                                                         'Anurag added the continue for here to take care of the cases when a PERLND
                                                         'or IMPLD connects to a reach that does not exist in OPN SEQUENCE
@@ -208,33 +208,33 @@ Public Module ConstituentBalance
                                                                     for Operation " & lOperation.Caption)
 
                                                     End If
-                                                    Dim aConversionFactor As Double = 0.0
+                                                    Dim lConversionFactor As Double = 0.0
                                                     If aBalanceType = "TN" Or aBalanceType = "TP" Then
-                                                        aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
+                                                        lConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, lReach)
                                                     End If
 
                                                     lMassLinkID = lConnection.MassLink
 
                                                     If Not lMassLinkID = 0 Then
 
-                                                        Dim ConstNameMassLink As String = lConstituentDataName.ToUpper
+                                                        Dim lConstNameMassLink As String = lConstituentDataName.ToUpper
                                                         If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
                                                                 lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
-                                                            ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
+                                                            lConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(1)
                                                             Dim ConstNameEXP As String = ""
                                                             For Each constt As ConstituentProperties In aConstProperties
-                                                                If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
+                                                                If constt.ConstituentNameInUCI.ToUpper = lConstNameMassLink Then
                                                                     ConstNameEXP = constt.ConstNameForEXPPlus
                                                                     If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
-                                                                    ConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
+                                                                    lConstNameMassLink = Split(lConstituentDataName.ToUpper, "-", 2)(0) & "-" & ConstNameEXP
                                                                 End If
                                                             Next
                                                         End If
 
-                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, ConstNameMassLink, aBalanceType,
-                                                                                       aConversionFactor, lMultipleIndex)
+                                                        lMassLinkFactor = FindMassLinkFactor(aUci, lMassLinkID, lConstNameMassLink, aBalanceType,
+                                                                                       lConversionFactor, lMultipleIndex)
                                                     Else
-                                                        MassLinkExists = False
+                                                        lMassLinkExists = False
                                                     End If
                                                     Dim lArea As Double = lConnection.MFact
                                                     If lArea = 0 Then lArea = 0.0000000001

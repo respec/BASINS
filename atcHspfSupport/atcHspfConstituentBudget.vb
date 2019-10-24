@@ -94,16 +94,16 @@ Public Module ConstituentBudget
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
                 If aConstProperties IsNot Nothing Then
-                    Dim ConstituentList As New List(Of String)
-                    For Each consituent As ConstituentProperties In aConstProperties
-                        Dim ConstituentName As String = consituent.ConstituentNameInUCI
-                        If Not ConstituentList.Contains(ConstituentName) Then
-                            ConstituentList.Add(ConstituentName)
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WASHQS-" & ConstituentName))
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRQS-" & ConstituentName))
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQO-" & ConstituentName))
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & ConstituentName))
-                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & ConstituentName))
+                    Dim lConstituentList As New List(Of String)
+                    For Each lConsituent As ConstituentProperties In aConstProperties
+                        Dim lConstituentName As String = lConsituent.ConstituentNameInUCI
+                        If Not lConstituentList.Contains(lConstituentName) Then
+                            lConstituentList.Add(lConstituentName)
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "WASHQS-" & lConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SCRQS-" & lConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SOQO-" & lConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "AOQUAL-" & lConstituentName))
+                            lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "IOQUAL-" & lConstituentName))
                         End If
                     Next
                 End If
@@ -227,21 +227,21 @@ Public Module ConstituentBudget
                         Dim lTotalPointVol As Double = 0.0
                         .CurrentRecord += 1
 
-                        Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
-                        Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+                        Dim lLocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                        Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & lLocationName)
 
                         For Each lSource As HspfPointSource In lID.PointSources
                             If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "IVOL" Then
                                 Dim lPointVol As Double = 0.0
-                                Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                Dim lTimeSeriesTransformaton As atcTran = atcTran.TranAverSame
                                 If lSource.Tran.ToString.Trim = "DIV" Then
-                                    TimeSeriesTransformaton = atcTran.TranSumDiv
+                                    lTimeSeriesTransformaton = atcTran.TranSumDiv
                                 End If
-                                Dim VolName As String = lSource.Source.VolName
+                                Dim lVolName As String = lSource.Source.VolName
                                 Dim lDSN As Integer = lSource.Source.VolId
                                 Dim lMfact As Double = lSource.MFact
                                 For i As Integer = 0 To aUci.FilesBlock.Count
-                                    If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                    If aUci.FilesBlock.Value(i).Typ = lVolName Then
                                         Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
                                         Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
                                         If lDataSource Is Nothing Then
@@ -251,7 +251,7 @@ Public Module ConstituentBudget
                                         End If
                                         Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                         ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                        ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
+                                        ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, lTimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                         lPointVol += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                         'lPointVol *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                         'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
@@ -274,10 +274,10 @@ Public Module ConstituentBudget
                                 If lSource.MassLink > 0 Then
                                     lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                     For Each lMassLink As HspfMassLink In aUci.MassLinks
-                                        Dim GENERMassLinkMFact As Double = 0
+                                        Dim lGENERMassLinkMFact As Double = 0
                                         If lMassLink.MassLinkId = lSource.MassLink AndAlso lMassLink.Target.Member = "IVOL" Then
-                                            GENERMassLinkMFact = lMassLink.MFact
-                                            lMfact += GENERMassLinkMFact
+                                            lGENERMassLinkMFact = lMassLink.MFact
+                                            lMfact += lGENERMassLinkMFact
 
                                         End If
                                     Next lMassLink
@@ -412,8 +412,8 @@ Public Module ConstituentBudget
                         End If
                         If lID.Tables("ACTIVITY").Parms("SEDFG").Value = 1 Then
 
-                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
-                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+                            Dim lLocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & lLocationName)
 
                             Dim lTotalPointTons As Double = 0.0
                             .CurrentRecord += 1
@@ -421,15 +421,15 @@ Public Module ConstituentBudget
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso lSource.Target.Member = "ISED" Then
                                     Dim lPointTons As Double = 0.0
-                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                    Dim lTimeSeriesTransformaton As atcTran = atcTran.TranAverSame
                                     If lSource.Tran.ToString.Trim = "DIV" Then
-                                        TimeSeriesTransformaton = atcTran.TranSumDiv
+                                        lTimeSeriesTransformaton = atcTran.TranSumDiv
                                     End If
-                                    Dim VolName As String = lSource.Source.VolName
+                                    Dim lVolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
                                     For i As Integer = 0 To aUci.FilesBlock.Count
-                                        If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                        If aUci.FilesBlock.Value(i).Typ = lVolName Then
                                             Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
                                             Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
                                             If lDataSource Is Nothing Then
@@ -439,7 +439,7 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
+                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, lTimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointTons += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                             'lPointTons *= MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                             'TimeSeriesTransformaton, aUci.OpnSeqBlock.Delt)
@@ -617,9 +617,9 @@ Public Module ConstituentBudget
                             Dim lTotalPointlbs As Double = 0.0
                             .CurrentRecord += 1
 
-                            Dim CVON As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
-                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
-                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+                            Dim lCVON As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
+                            Dim lLocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & lLocationName)
 
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
@@ -638,7 +638,7 @@ Public Module ConstituentBudget
                                     Dim VolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
-                                    If lSource.Target.Member = "OXIF" Then lMfact *= CVON
+                                    If lSource.Target.Member = "OXIF" Then lMfact *= lCVON
                                     If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
                                     For i As Integer = 0 To aUci.FilesBlock.Count
 
@@ -676,7 +676,7 @@ Public Module ConstituentBudget
                                     If lSource.MassLink > 0 Then
                                         lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                         For Each lMassLink As HspfMassLink In aUci.MassLinks
-                                            Dim GENERMassLinkMFact As Double = 0
+                                            Dim lGENERMassLinkMFact As Double = 0
                                             If lMassLink.MassLinkId = lSource.MassLink AndAlso
                                                                         ((lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
                                                                         (lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
@@ -686,10 +686,10 @@ Public Module ConstituentBudget
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
                                                                         (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
-                                                GENERMassLinkMFact = lMassLink.MFact
-                                                If lMassLink.Target.Member = "OXIF" Then GENERMassLinkMFact = lMassLink.MFact * CVON
-                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then GENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
-                                                lMfact += GENERMassLinkMFact
+                                                lGENERMassLinkMFact = lMassLink.MFact
+                                                If lMassLink.Target.Member = "OXIF" Then lGENERMassLinkMFact = lMassLink.MFact * lCVON
+                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then lGENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                                lMfact += lGENERMassLinkMFact
 
                                             End If
                                         Next lMassLink
@@ -704,7 +704,7 @@ Public Module ConstituentBudget
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                         (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                         Dim lGENERTSSourceMFact As Double = lSource.MFact
-                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= CVON
+                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= lCVON
                                         If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
                                         lGENERTSSum *= lGENERTSSourceMFact
                                         lGENERLoad += lGENERTSSum
@@ -814,7 +814,7 @@ Public Module ConstituentBudget
                                 Return Nothing
                             End Try
 
-                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVON, lTotalPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
+                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, lCVON, lTotalPointlbs, lGENERLoad, lTotalAtmDep, lDepScour, lTotalInflow, lUpstreamIn,
                                                          lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
@@ -914,9 +914,9 @@ Public Module ConstituentBudget
                             Dim lTotalPointlbs As Double = 0.0
                             .CurrentRecord += 1
 
-                            Dim CVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
-                            Dim LocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
-                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & LocationName)
+                            Dim lCVOP As Double = ConversionFactorfromOxygen(aUci, aBalanceType, lID)
+                            Dim lLocationName As String = lID.Name.Substring(0, 1) & ":" & lID.Id
+                            Logger.Status("Generating Constituent Budget Report for " & aBalanceType & " from " & lLocationName)
 
                             For Each lSource As HspfPointSource In lID.PointSources
                                 If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 4) OrElse
@@ -930,14 +930,14 @@ Public Module ConstituentBudget
                                     If lSource.Tran.ToString.Trim = "DIV" Then
                                         TimeSeriesTransformaton = atcTran.TranSumDiv
                                     End If
-                                    Dim VolName As String = lSource.Source.VolName
+                                    Dim lVolName As String = lSource.Source.VolName
                                     Dim lDSN As Integer = lSource.Source.VolId
                                     Dim lMfact As Double = lSource.MFact
-                                    If lSource.Target.Member = "OXIF" Then lMfact *= CVOP
+                                    If lSource.Target.Member = "OXIF" Then lMfact *= lCVOP
                                     If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
                                     For i As Integer = 0 To aUci.FilesBlock.Count
 
-                                        If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                        If aUci.FilesBlock.Value(i).Typ = lVolName Then
                                             Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
                                             Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
                                             If lDataSource Is Nothing Then
@@ -971,7 +971,7 @@ Public Module ConstituentBudget
                                     If lSource.MassLink > 0 Then
                                         lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                         For Each lMassLink As HspfMassLink In aUci.MassLinks
-                                            Dim GENERMassLinkMFact As Double = 0
+                                            Dim lGENERMassLinkMFact As Double = 0
                                             If lMassLink.MassLinkId = lSource.MassLink AndAlso
                                                                         ((lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4) OrElse
                                                                         (lMassLink.Target.Member = "NUIF2" AndAlso lMassLink.Target.MemSub2 = 2) OrElse
@@ -979,10 +979,10 @@ Public Module ConstituentBudget
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
                                                                         (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
-                                                GENERMassLinkMFact = lMassLink.MFact
-                                                If lMassLink.Target.Member = "OXIF" Then GENERMassLinkMFact = lMassLink.MFact * CVOP
-                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then GENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
-                                                lMfact += GENERMassLinkMFact
+                                                lGENERMassLinkMFact = lMassLink.MFact
+                                                If lMassLink.Target.Member = "OXIF" Then lGENERMassLinkMFact = lMassLink.MFact * lCVOP
+                                                If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then lGENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lID)
+                                                lMfact += lGENERMassLinkMFact
 
                                             End If
                                         Next lMassLink
@@ -995,7 +995,7 @@ Public Module ConstituentBudget
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                         (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                         Dim lGENERTSSourceMFact As Double = lSource.MFact
-                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= CVOP
+                                        If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= lCVOP
                                         If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lID)
                                         lGENERTSSum *= lGENERTSSourceMFact
                                         lGENERLoad += lGENERTSSum
@@ -1138,7 +1138,7 @@ Public Module ConstituentBudget
                             End Try
 
                             Dim lDepScour As Double = lOutflow - lTotalInflow - lDiversion
-                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, CVOP, lTotalPointlbs, lGENERLoad, lTotalAtmDep,
+                            With ConstituentLoadingByLanduse(aUci, lID, aBalanceType, lNonpointData, lCVOP, lTotalPointlbs, lGENERLoad, lTotalAtmDep,
                                                          lDepScour, lTotalInflow, lUpstreamIn, lDiversion, aSDateJ, aEDateJ, aConstProperties)
                                 lReport2.Append(.Item1)
                                 lNonpointlbs = .Item2
@@ -1215,16 +1215,16 @@ Public Module ConstituentBudget
             lLandusesHeader = lLandusesHeader.Replace("GENERSources", "GENER Sources")
             lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Differences/Additional Sources*")
 
-            Dim PointSourcesPlacesLocation As Integer = lLandusesHeader.IndexOf("PointSources")
-            Dim LandUsesList() As String = lLandusesHeader.Substring(1, PointSourcesPlacesLocation - 2).Split(vbTab)
+            Dim lPointSourcesPlacesLocation As Integer = lLandusesHeader.IndexOf("PointSources")
+            Dim lLandUsesList() As String = lLandusesHeader.Substring(1, lPointSourcesPlacesLocation - 2).Split(vbTab)
 
-            Dim LoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre/yr" & vbCrLf
+            Dim lLoadingRateSummary As String = "Loading Rate Summary for " & aBalanceType & " by Each Land Land Use: " & lUnits & "/acre/yr" & vbCrLf
 
-            LoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
-            For Each LandUse As String In LandUsesList
-                Dim LoadingRateLine1 As String = LandUse & vbTab
-                Dim LoadingRateLine2 As String = LandUse & vbTab
-                LoadingRateSummary &= LandUse & vbTab
+            lLoadingRateSummary &= "Landuse" & vbTab & "Mean" & vbTab & "Min" & vbTab & "Max" & vbCrLf
+            For Each LandUse As String In lLandUsesList
+                Dim lLoadingRateLine1 As String = LandUse & vbTab
+                Dim lLoadingRateLine2 As String = LandUse & vbTab
+                lLoadingRateSummary &= LandUse & vbTab
 
                 Dim max As Double = 0.0
                 Dim min As Double = 1.0E+30
@@ -1241,9 +1241,9 @@ Public Module ConstituentBudget
                     Dim loadingRate As Double = 0.0
                     If OperationType & ":" & LandUseFromKey = LandUse Then
                         count += 1
-                        LoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
+                        lLoadingRateLine1 &= OperationType & ":" & OperationNumber & vbTab
                         loadingRate = pOutputLoad.ItemByKey(Key) / pOutputConnectionArea.ItemByKey(Key)
-                        LoadingRateLine2 &= DoubleToString(loadingRate, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
+                        lLoadingRateLine2 &= DoubleToString(loadingRate, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab
 
                         sum += loadingRate
                         If loadingRate > max Then
@@ -1258,18 +1258,18 @@ Public Module ConstituentBudget
                     End If
                 Next Key
 
-                LoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
+                lLoadingRateSummary &= DoubleToString(sum / count, , lNumberFormat,,, lNumberOfSignificantDigits) & vbTab &
                     DoubleToString(min, , lNumberFormat,,, lNumberOfSignificantDigits) &
                     vbTab & DoubleToString(max, , lNumberFormat,,, lNumberOfSignificantDigits) & vbCrLf
 
-                lReportLoadingRate.AppendLine(LoadingRateLine1)
-                lReportLoadingRate.AppendLine(LoadingRateLine2)
+                lReportLoadingRate.AppendLine(lLoadingRateLine1)
+                lReportLoadingRate.AppendLine(lLoadingRateLine2)
 
             Next LandUse
 
             lReportLoadingRate.AppendLine()
             lReportLoadingRate.AppendLine()
-            lReportLoadingRate.AppendLine(LoadingRateSummary)
+            lReportLoadingRate.AppendLine(lLoadingRateSummary)
 
             lReport3.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
             lReport4.AppendLine("Reach" & lLandusesHeader & vbTab & "Total**")
@@ -1305,8 +1305,8 @@ Public Module ConstituentBudget
                 Dim lTotal As Double = 0.0
                 For Each lSourceDescription As String In lLandUses
 
-                    Dim Key As String = lReach & " " & lSourceDescription
-                    Dim lValue As Double = pRunningTotals.ItemByKey(Key)
+                    Dim lKey As String = lReach & " " & lSourceDescription
+                    Dim lValue As Double = pRunningTotals.ItemByKey(lKey)
 
                     lReport3.Append(vbTab & FormatNumber(lValue, 2, TriState.True, TriState.False, TriState.False))
                     If aOutputLocations.Count > 0 Then
@@ -1348,8 +1348,8 @@ Public Module ConstituentBudget
                 Dim lPercentTotal As Double = 0.0
                 For Each lSourceDescription As String In lLandUses
 
-                    Dim Key As String = lReach & " " & lSourceDescription
-                    Dim lValue As Double = pRunningTotals.ItemByKey(Key)
+                    Dim lKey As String = lReach & " " & lSourceDescription
+                    Dim lValue As Double = pRunningTotals.ItemByKey(lKey)
 
                     lReport4.Append(vbTab & FormatNumber(lValue * 100 / lTotal, 2, TriState.True, TriState.False, TriState.False))
                     If aOutputLocations.Count > 0 Then
@@ -1428,7 +1428,7 @@ Public Module ConstituentBudget
         Dim lTotalIndex As Integer = 0
         Dim lTotal As Double = 0
 
-        For Each landUse As String In aLandUses
+        For Each lLandUse As String In aLandUses
             Dim lFound As Boolean = False
             For Each lConnection As HspfConnection In aReach.Sources
                 If lConnection.Source.VolName = aVolName Then
@@ -1440,7 +1440,7 @@ Public Module ConstituentBudget
                             Continue For
                         End If
                     End If
-                    If lConnection.Source.Opn.Description = landUse Then
+                    If lConnection.Source.Opn.Description = lLandUse Then
                         'Need to add test to make sure that the operation was listed in the OPN SEQUENCE block.
                         lFound = True
                         Dim lConnectionArea As Double = lConnection.MFact
@@ -1456,23 +1456,23 @@ Public Module ConstituentBudget
                             lTs = SubsetByDate(lTs, aSDateJ, aEDateJ, Nothing)
                             Dim lMassLinkFactor As Double = 0.0
                             If lTs.Attributes.GetDefinedValue("SumAnnual").Value > 0 Then
-                                Dim ConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
+                                Dim lConstNameMassLink As String = lTs.Attributes.GetValue("Constituent")
                                 If Not (aConstProperties.Count = 0 OrElse (lConnection.Source.Opn.Name = "PERLND" AndAlso
                                         lConnection.Source.Opn.Tables("ACTIVITY").Parms("PQALFG").Value = "0")) Then
-                                    ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
+                                    lConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(1)
                                     Dim ConstNameEXP As String = ""
                                     For Each constt As ConstituentProperties In aConstProperties
-                                        If constt.ConstituentNameInUCI.ToUpper = ConstNameMassLink Then
+                                        If constt.ConstituentNameInUCI.ToUpper = lConstNameMassLink Then
                                             ConstNameEXP = constt.ConstNameForEXPPlus
                                             If ConstNameEXP = "TAM" Then ConstNameEXP = "NH3+NH4"
-                                            ConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(0) & "-" & ConstNameEXP
+                                            lConstNameMassLink = Split(lTs.Attributes.GetValue("Constituent"), "-", 2)(0) & "-" & ConstNameEXP
                                             Exit For
                                         End If
                                     Next
                                 End If
 
                                 'If ConstNameMassLink = "SOSLD" Then Stop
-                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, ConstNameMassLink, aBalanceType,
+                                lMassLinkFactor = FindMassLinkFactor(aUCI, lMassLinkID, lConstNameMassLink, aBalanceType,
                                                                                aConversionFactor, aMultipleIndex:=0)
                             End If
 
@@ -1484,7 +1484,7 @@ Public Module ConstituentBudget
                             'land use and then lTotal accumulates that load
                         Next
 
-                        felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, landUse, lTestLocation)
+                        felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, lTotal, lConnectionArea, lLandUse, lTestLocation)
 
                     End If
                 End If
@@ -1492,7 +1492,7 @@ Public Module ConstituentBudget
             Next
 
             If Not lFound Then
-                felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, 0, 0, landUse, "")
+                felu2(aUCI, aReach, aBalanceType, aVolName, aLandUses, aLoadingByLanduse, aReachTotal, aReporting, aContribPercent, 0, 0, lLandUse, "")
             End If
 
         Next
@@ -1512,14 +1512,14 @@ Public Module ConstituentBudget
                         ByVal aLandUse As String,
                         ByVal aTestLocation As String)
         Dim lVolPrefix As String = aVolName.Substring(0, 1) & ":"
-        Dim aTotal2 As Double = aTotal 'aTotal2 is used for reporting the loading from the local land area to the reach.
+        Dim lTotal2 As Double = aTotal 'aTotal2 is used for reporting the loading from the local land area to the reach.
         Dim lKey As String = "Reach" & aReach.Id & " " & lVolPrefix & aLandUse
         If aReporting Then
             'If aReach.Id = 113 Then Stop
             Dim lPercentContrib As Double = 0.0
             Dim lNumberofTributaries As Integer = 0
             Dim lCheckedTributary As Boolean = False
-            Dim UpstreamLoadByCategory As Double = 0.0
+            Dim lUpstreamLoadByCategory As Double = 0.0
             If aContribPercent.Keys.Contains(lKey) Then
                 lCheckedTributary = True
             Else
@@ -1528,43 +1528,43 @@ Public Module ConstituentBudget
                     If lTributary.Source.VolName = "RCHRES" Then
                         Dim lTributaryID As Integer = lTributary.Source.VolId
                         lNumberofTributaries += 1
-                        UpstreamLoadByCategory += pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
+                        lUpstreamLoadByCategory += pRunningTotals.ItemByKey("Reach" & lTributaryID & " " & lVolPrefix & aLandUse)
                     End If
                 Next
 
             End If
-            aTotal += UpstreamLoadByCategory
+            aTotal += lUpstreamLoadByCategory
             lPercentContrib = aTotal * 100 / aReachTotal
 
             aContribPercent.Increment(lKey, lPercentContrib)
 
             'If aConnectionArea > 0 Then
-            Dim lrate As Double = aTotal2 / aConnectionArea
+            Dim lrate As Double = lTotal2 / aConnectionArea
             If aConnectionArea = 1.0E-30 Then
                 aConnectionArea = 0
-                aTotal2 = 0
+                lTotal2 = 0
             End If
             If aTestLocation.Contains(":") Then
                 pOutputConnectionArea.Increment(aLandUse & aTestLocation, aConnectionArea)
-                pOutputLoad.Increment(aLandUse & aTestLocation, aTotal2)
+                pOutputLoad.Increment(aLandUse & aTestLocation, lTotal2)
 
                 aLoadingByLanduse &= aReach.Caption.ToString.Substring(10) & vbTab _
-            & aTestLocation & " " _
-            & aLandUse & vbTab _
-            & aConnectionArea & vbTab _
-            & DoubleToString(lrate, 15, "#,##0.###") & vbTab &
-                                DoubleToString(aTotal2, 15, "#,##0.###") & vbTab & vbCrLf
+                    & aTestLocation & " " _
+                    & aLandUse & vbTab _
+                    & aConnectionArea & vbTab _
+                    & DoubleToString(lrate, 15, "#,##0.###") & vbTab &
+                                      DoubleToString(lTotal2, 15, "#,##0.###") & vbTab & vbCrLf
             End If
         Else
             'If aReach.Id = 260 Then Stop
-            Dim checkedTheTributary As Boolean = False
+            Dim lCheckedTheTributary As Boolean = False
 
-            If pRunningTotals.Keys.Contains(lKey) Then checkedTheTributary = True
+            If pRunningTotals.Keys.Contains(lKey) Then lCheckedTheTributary = True
             pRunningTotals.Increment(lKey, aTotal)
             'A key of the land use type and downstream reach is made in pRunningTotals to save the total land from the specific land use.
             aReachTotal += aTotal
 
-            If Not checkedTheTributary Then
+            If Not lCheckedTheTributary Then
                 For Each lTributary As HspfConnection In aReach.Sources
                     If lTributary.Source.VolName = "RCHRES" Then
                         Dim lTributaryID As String = lTributary.Source.VolId
@@ -1595,25 +1595,25 @@ Public Module ConstituentBudget
                                                  ByVal aSDateJ As Double,
                                                  ByVal aEDateJ As Double,
                                                  Optional ByVal aConstProperties As List(Of ConstituentProperties) = Nothing) As Tuple(Of String, Double, Double)
-        Dim LoadingByLanduse As String = ""
+        Dim lLoadingByLanduse As String = ""
         Dim lReachTotal As Double = 0.0
-        Dim UpStreamDiversion As Double = 0.0
+        Dim lUpStreamDiversion As Double = 0.0
         Dim lContribPercent As New atcCollection
 
         'If aReach.Id = "148" Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, lLoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, lLoadingByLanduse, lReachTotal, False, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
 
         For Each lTributary As HspfConnection In aReach.Sources
             If lTributary.Source.VolName = "RCHRES" Then
                 Dim lTributaryId As String = lTributary.Source.VolId
-                UpStreamDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
+                lUpStreamDiversion += pRunningTotals.ItemByKey("Reach" & lTributaryId & " Diversion")
             End If
         Next
-        aTotalInflow += -UpStreamDiversion
+        aTotalInflow += -lUpStreamDiversion
         'If aReach.Id = 102 Then Stop
-        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
-        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, LoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "PERLND", pPERLND, aNonpointData, aConversionFactor, lLoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
+        felu(aUCI, aReach, aBalanceType, "IMPLND", pIMPLND, aNonpointData, aConversionFactor, lLoadingByLanduse, aTotalInflow, True, lContribPercent, aSDateJ, aEDateJ, aConstProperties)
         'If aReach.Id = 102 Then Stop
 
         'Dim GENERTSinWDM As Boolean = False
@@ -1667,7 +1667,7 @@ Public Module ConstituentBudget
 
 
         'aGENERLoad += TotalGENERLoad
-        Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERLoad + UpStreamDiversion
+        Dim lAdditionalSource As Double = aTotalInflow - lReachTotal - aAtmDep - aPoint - aUpstreamIn - aGENERLoad + lUpStreamDiversion
         '        If lGENERLoadingExists AndAlso (Not GENERTSinWDM) AndAlso (Not pMessageShown) Then
         '            Logger.Msg("GENER Loadings Issue: Some RCHRES operation have loadings input from GENER connections. Please make sure that these GENER operations output to a WDM dataset for accurate source accounting. 
         'This message box will not be shown again for." & aBalanceType)
@@ -1718,8 +1718,8 @@ Public Module ConstituentBudget
             For Each lKey As String In lContribPercent.Keys
                 'If lKey.Contains("Gain") Then Stop
                 For Each lTotalsKey As String In pRunningTotals.Keys
-                    Dim ReachIDLength As Integer = aReach.Id.ToString.Length
-                    If lTotalsKey.Contains("Reach" & aReach.Id & " ") AndAlso lTotalsKey.Contains(SafeSubstring(lKey, 6 + ReachIDLength)) Then
+                    Dim lReachIDLength As Integer = aReach.Id.ToString.Length
+                    If lTotalsKey.Contains("Reach" & aReach.Id & " ") AndAlso lTotalsKey.Contains(SafeSubstring(lKey, 6 + lReachIDLength)) Then
                         pRunningTotals.ItemByKey(lTotalsKey) = pRunningTotals.ItemByKey(lTotalsKey) + lContribPercent.ItemByKey(lKey) * GainLoss / 100
                         Exit For
                     End If
@@ -1729,39 +1729,39 @@ Public Module ConstituentBudget
 
         End If
 
-        Return New Tuple(Of String, Double, Double)(LoadingByLanduse, lReachTotal, aGENERLoad)
+        Return New Tuple(Of String, Double, Double)(lLoadingByLanduse, lReachTotal, aGENERLoad)
     End Function
 
 
     Private Function MultiFactorForPointSource(ByVal aTStep As Integer, ByVal aTimeUnit As String, ByVal aTransformation As String,
                                                ByVal aDelta As atcTimeUnit) As Double
-        Dim MultiFactor As Double = 1.0
+        Dim lMultiFactor As Double = 1.0
         If Trim(aTransformation) = "DIV" Then
-            MultiFactor = 1.0
+            lMultiFactor = 1.0
         Else
             Select Case aTransformation
                 Case "SAME"
                     If aDelta / 60 = 1 AndAlso aTimeUnit = "TUDay" AndAlso aTStep = 1 Then
-                        MultiFactor = 24.0
+                        lMultiFactor = 24.0
                     End If
                     If aDelta = 60 AndAlso aTimeUnit = "TUMonth" AndAlso aTStep = 1 Then
-                        MultiFactor = 24.0 * 365.25 / 12
+                        lMultiFactor = 24.0 * 365.25 / 12
                     End If
             End Select
         End If
 
-        Return MultiFactor
+        Return lMultiFactor
     End Function
 
     Private Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
-        Dim aGenerSum As Double = 0
-        Dim aGENERID As Integer = aSource.Source.VolId
-        Dim aGENEROperationisOutputtoWDM As Boolean = False
-        Dim aGENEROperation As HspfOperation = aSource.Source.Opn
-        If Not aGENEROperation Is Nothing Then
-            For Each EXTTarget As HspfConnection In aGENEROperation.Targets
+        Dim lGenerSum As Double = 0
+        Dim lGENERID As Integer = aSource.Source.VolId
+        Dim lGENEROperationisOutputtoWDM As Boolean = False
+        Dim lGENEROperation As HspfOperation = aSource.Source.Opn
+        If Not lGENEROperation Is Nothing Then
+            For Each EXTTarget As HspfConnection In lGENEROperation.Targets
                 If EXTTarget.Target.VolName.Contains("WDM") Then
-                    aGENEROperationisOutputtoWDM = True
+                    lGENEROperationisOutputtoWDM = True
                     Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
                     Dim lDSN As Integer = EXTTarget.Target.VolId
                     For i As Integer = 0 To aUCI.FilesBlock.Count
@@ -1775,7 +1775,7 @@ Public Module ConstituentBudget
                             End If
                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                            aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+                            lGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
 
                         End If
                     Next
@@ -1785,7 +1785,7 @@ Public Module ConstituentBudget
         End If
 
 
-        Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
+        Return New Tuple(Of Double, Boolean)(lGenerSum, lGENEROperationisOutputtoWDM)
     End Function
 
 
