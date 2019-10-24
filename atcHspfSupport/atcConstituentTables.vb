@@ -2758,17 +2758,18 @@ Public Module atcConstituentTables
         aDataTable.Columns.Add(lColumn)
         Return aDataTable
     End Function
+
     Private Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
         Dim aGenerSum As Double = 0
         Dim aGENERID As Integer = aSource.Source.VolId
         Dim aGENEROperationisOutputtoWDM As Boolean = False
         Dim aGENEROperation As HspfOperation = aSource.Source.Opn
         If Not aGENEROperation Is Nothing Then
-            For Each EXTTarget As HspfConnection In aGENEROperation.Targets
-                If EXTTarget.Target.VolName.Contains("WDM") Then
+            For Each lEXTTarget As HspfConnection In aGENEROperation.Targets
+                If lEXTTarget.Target.VolName.Contains("WDM") Then
                     aGENEROperationisOutputtoWDM = True
-                    Dim lWDMFile As String = EXTTarget.Target.VolName.ToString
-                    Dim lDSN As Integer = EXTTarget.Target.VolId
+                    Dim lWDMFile As String = lEXTTarget.Target.VolName.ToString
+                    Dim lDSN As Integer = lEXTTarget.Target.VolId
                     For i As Integer = 0 To aUCI.FilesBlock.Count
                         If aUCI.FilesBlock.Value(i).Typ = lWDMFile Then
                             Dim lFileName As String = AbsolutePath(aUCI.FilesBlock.Value(i).Name.Trim, CurDir())
@@ -2778,14 +2779,14 @@ Public Module atcConstituentTables
                                     lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
                                 End If
                             End If
-                            Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                            ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                            aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
+                            Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+                            aGenerSum = lTimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
 
                         End If
                     Next
                 End If
-            Next EXTTarget
+            Next lEXTTarget
         End If
 
         Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
