@@ -626,8 +626,6 @@ Module HSPFOutputReports
 
             If lScenarioResults.DataSets.Count > 0 Then
 
-                Dim lReportCons As New atcReport.ReportText
-                lReportCons = Nothing
                 Dim lOutFileName As String = ""
 
                 Logger.Status(Now & " Generating Reports for " & lConstituent)
@@ -650,50 +648,52 @@ Module HSPFOutputReports
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                 End If
 
-                lReportCons = Nothing
-
                 If (lConstituent = "TN" Or lConstituent = "TP" Or
                     lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
-                    With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                                                          lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties)
-                        lReportCons = .Item1
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
-                        If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
+                    Dim lReport1ReachBudget As New atcReport.ReportText
+                    Dim lReport2NPSLoads As New atcReport.ReportText
+                    Dim lReport3LoadAllocationAll As New atcReport.ReportText
+                    Dim lReport5LoadAllocationLocations As New atcReport.ReportText
+                    Dim lReport7LoadingRates As New atcReport.ReportText
+                    Dim lDataForBarGraphs As New atcCollection
 
-                        lReportCons = Nothing  'why was this commented out???  pbd 7/18/2019  replaced by _LoadAllocation report
-                        lReportCons = .Item2
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                        SaveFileString(lOutFileName, lReportCons.ToString)
+                    HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
+                                                         lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties,
+                                                         lReport1ReachBudget,
+                                                         lReport2NPSLoads,
+                                                         lReport3LoadAllocationAll,
+                                                         lReport5LoadAllocationLocations,
+                                                         lReport7LoadingRates,
+                                                         lDataForBarGraphs)
 
-                        lReportCons = Nothing
-                        lReportCons = .Item3
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
+                    If lReport1ReachBudget IsNot Nothing Then SaveFileString(lOutFileName, lReport1ReachBudget.ToString)
 
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
-                        If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
-                        lReportCons = Nothing
+                    'why was this commented out???  pbd 7/18/2019  replaced by _LoadAllocation report
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                    SaveFileString(lOutFileName, lReport2NPSLoads.ToString)
 
-                        lReportCons = .Item4
-                        If pOutputLocations.Count > 0 Then
-                            lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
-                            SaveFileString(lOutFileName, lReportCons.ToString)
-                        End If
-                        lReportCons = Nothing
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
+                    If lReport3LoadAllocationAll IsNot Nothing Then SaveFileString(lOutFileName, lReport3LoadAllocationAll.ToString)
 
-                        lReportCons = .Item5  'why was this commented out???  pbd 7/18/2019  
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                        SaveFileString(lOutFileName, lReportCons.ToString)
-                        lReportCons = Nothing
+                    If pOutputLocations.Count > 0 Then
+                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
+                        SaveFileString(lOutFileName, lReport5LoadAllocationLocations.ToString)
+                    End If
 
-                        If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
-                            For Each location As String In .Item6.Keys
-                                CreateGraph_BarGraph(.Item6.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
-                            Next location
-                        End If
+                    'why was this commented out???  pbd 7/18/2019  
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                    SaveFileString(lOutFileName, lReport7LoadingRates.ToString)
 
-                    End With
+                    If lDataForBarGraphs IsNot Nothing AndAlso lDataForBarGraphs.Keys.Count > 0 Then
+                        For Each location As String In lDataForBarGraphs.Keys
+                            CreateGraph_BarGraph(lDataForBarGraphs.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                        Next location
+                    End If
+
                     'Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
-
+                    Dim lReportCons As New atcReport.ReportText
                     lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
                     lScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
