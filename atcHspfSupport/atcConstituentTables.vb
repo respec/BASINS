@@ -845,7 +845,6 @@ Public Module atcConstituentTables
                     Next lOperation
                 End If
 
-
         End Select
 
         Dim lTextToWrite As String = ""
@@ -1898,7 +1897,6 @@ Public Module atcConstituentTables
                 Next lConstituent
 #End Region
 
-
         End Select
     End Sub
 
@@ -1939,9 +1937,10 @@ Public Module atcConstituentTables
 
         Return lNPSLoad
     End Function
+
     Private Function CalculatePSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation,
                                      ByVal aSDateJ As Double,
-                                      ByVal aEDateJ As Double, ByVal aConstituentName As String,
+                                     ByVal aEDateJ As Double, ByVal aConstituentName As String,
                                      Optional ByVal aGQALID As Integer = 0) As Double
         Dim lPSLoad As Double = 0.0
         Select Case aConstituentName
@@ -2165,8 +2164,6 @@ Public Module atcConstituentTables
 
         End Select
 
-
-
         Return lPSLoad
     End Function
 
@@ -2188,6 +2185,7 @@ Public Module atcConstituentTables
 
         Return lMultiFactor
     End Function
+
     Private Function CalculateDiversion(ByVal aUCI As HspfUci, ByVal aBinaryDataSource As atcDataSource, ByVal aReach As HspfOperation, ByRef aUpstreamInflows As atcCollection,
                                 ByVal aDownstreamReachID As Integer, ByVal aOutflow As Double, ByVal aConstituent As String, Optional ByVal aGQALID As Integer = 0) As Double
         Dim lDiversion As Double = 0.0
@@ -2303,6 +2301,7 @@ Public Module atcConstituentTables
 
         Return lDiversion
     End Function
+
     Private Function CalculateGENERLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String,
                                         ByVal aSDateJ As Double, ByVal aEDateJ As Double, Optional ByVal aGQALID As Integer = 0) As Double
         Dim lGENERLoad As Double = 0.0
@@ -2316,10 +2315,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2347,10 +2344,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2378,10 +2373,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2414,10 +2407,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2445,10 +2436,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2476,10 +2465,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2508,10 +2495,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2540,10 +2525,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2571,10 +2554,8 @@ Public Module atcConstituentTables
                     Dim lMfact As Double = 0.0
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
-                        With GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ)
-                            lGENERSum = .Item1
-                            lGENEROperationisOutputtoWDM = .Item2
-                        End With
+                        GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
                             For Each lMassLink As HspfMassLink In aUCI.MassLinks
@@ -2759,13 +2740,14 @@ Public Module atcConstituentTables
         Return aDataTable
     End Function
 
-    Private Function GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double) As Tuple(Of Double, Boolean)
-        Dim aGenerSum As Double = 0
-        Dim aGENERID As Integer = aSource.Source.VolId
-        Dim aGENEROperationisOutputtoWDM As Boolean = False
-        Dim aGENEROperation As HspfOperation = aSource.Source.Opn
-        If Not aGENEROperation Is Nothing Then
-            For Each lEXTTarget As HspfConnection In aGENEROperation.Targets
+    Private Sub GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                            ByRef aGenerSum As Double, ByRef aGENEROperationisOutputtoWDM As Boolean)
+        aGenerSum = 0
+        Dim lGENERID As Integer = aSource.Source.VolId
+        aGENEROperationisOutputtoWDM = False
+        Dim lGENEROperation As HspfOperation = aSource.Source.Opn
+        If Not lGENEROperation Is Nothing Then
+            For Each lEXTTarget As HspfConnection In lGENEROperation.Targets
                 If lEXTTarget.Target.VolName.Contains("WDM") Then
                     aGENEROperationisOutputtoWDM = True
                     Dim lWDMFile As String = lEXTTarget.Target.VolName.ToString
@@ -2782,14 +2764,10 @@ Public Module atcConstituentTables
                             Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                             lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
                             aGenerSum = lTimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
-
                         End If
                     Next
                 End If
             Next lEXTTarget
         End If
-
-        Return New Tuple(Of Double, Boolean)(aGenerSum, aGENEROperationisOutputtoWDM)
-    End Function
-
+    End Sub
 End Module
