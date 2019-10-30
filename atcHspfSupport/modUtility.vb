@@ -513,7 +513,7 @@ Public Module Utility
                                 .Add("P:Header6", "LabileOrgN (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Sediment Attached")
                                 .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Scoured Sediment Attached")
-                                .Add("P:SOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Surface Flow")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Surface Flow")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Groundwater Flow")
 
