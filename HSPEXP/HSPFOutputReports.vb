@@ -330,7 +330,12 @@ Module HSPFOutputReports
                 ' Do Water Quality Reports
                 If pConstituents.Count > 0 Then
                     'includes qa reports for loading rate, land use comparison, and storage 
+                    Dim lRet As Integer = InitializeMissingTimeseriesMessage()
                     DoWaterQualityReports(aHspfUci, lRunMade, lDateString, lOperationTypes, QAQCReportFile)
+                    Dim lMsg As String = MissingTimeseriesMessage()
+                    If lMsg.Length > 0 Then
+                        Logger.Msg(lMsg, "Missing HSPF Binary Output Timeseries")
+                    End If
                 End If
 
                 If pModelQAQC Then
@@ -632,6 +637,7 @@ Module HSPFOutputReports
                 Logger.Dbg(Now & " Generating Reports for " & lConstituent)
 
                 'LandLoadingReports generates a text file report as well as the info needed for the QA report
+                '    "_Land_Loadings.txt" and "_Monthly_Land_Loadings.txt"
                 Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
@@ -641,6 +647,7 @@ Module HSPFOutputReports
 
                 'ReachBudgetReports generates a text file report only
                 If Not pModelQAQC Then
+                    '    "_Reach_Budget.txt"
                     ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
                 End If
 
@@ -710,6 +717,7 @@ Module HSPFOutputReports
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
                     If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                        '    "_OvAll_Avg_By_Mult_Locs.txt", "_Grp_By_OPN_LU_Ann_Avg.txt", "_LU_AnnAvgs.txt", "_Oall_Avgd.txt"
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (aHspfUci, lConstituent, aOperationTypes, pBaseName,
                             lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ,

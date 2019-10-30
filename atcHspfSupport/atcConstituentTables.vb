@@ -6,6 +6,7 @@ Imports System.Data
 Public Module atcConstituentTables
     Public pLand_Constituent_Table As DataTable
     Public pReach_Budget_Table As DataTable
+    Public pMissingBinaryTimeseries As atcCollection
 
     Public Function LandLoadingReports(ByVal aoutfoldername As String,
                                        ByVal aBinaryData As atcDataSource,
@@ -21,6 +22,9 @@ Public Module atcConstituentTables
         Dim lReport As New atcReport.ReportText
         Dim lReport_Monthly As New atcReport.ReportText
         pLand_Constituent_Table = New DataTable("LandConstituentTable")
+        If pMissingBinaryTimeseries Is Nothing Then
+            pMissingBinaryTimeseries = New atcCollection
+        End If
         Dim lLand_Constituent_Monthly_Table As New DataTable("LandConstituentMonthlyTable")
         Dim lQualityConstituent As Boolean = False
         'Dim lOutflowDataTypes As String() = ConstituentList(aBalanceType, QualityConstituent)
@@ -151,10 +155,10 @@ Public Module atcConstituentTables
 
                 For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
-                    Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                    Dim lLocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     lLandUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    Logger.Status("Generating Land Loading Reports for Water from " & LocationName)
-                    Logger.Dbg(LocationName)
+                    Logger.Status("Generating Land Loading Reports for Water from " & lLocationName)
+                    Logger.Dbg(lLocationName)
                     If Not lListLanduses.Contains(lLandUseNameForTheCollection) Then
                         lListLanduses.Add(lLandUseNameForTheCollection)
                     End If
@@ -169,6 +173,7 @@ Public Module atcConstituentTables
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
                             If lTS Is Nothing Then Continue For
+                            If lTS.Values Is Nothing Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -179,7 +184,7 @@ Public Module atcConstituentTables
                             End If
                             lRow = lLand_Constituent_Monthly_Table.NewRow
 
-                            lRow("OpTypeNumber") = LocationName
+                            lRow("OpTypeNumber") = lLocationName
                             lRow("OpDesc") = lOperation.Description
                             'row("Unit") = lUnits
 
@@ -189,8 +194,13 @@ Public Module atcConstituentTables
                             lRow("SumAnnual") = lTS.Attributes.GetDefinedValue("SumAnnual").Value
                             lLand_Constituent_Monthly_Table.Rows.Add(lRow)
                         Else
-                            lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
-                            If lTS Is Nothing Then Continue For
+                            lTS = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", lOutflowDataType)(0)
+                            If lTS Is Nothing Then
+                                If lOutflowDataType = "SUPY" Then
+                                    pMissingBinaryTimeseries.Add(lLocationName & "|" & lOutflowDataType)
+                                End If
+                                Continue For
+                            End If
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
 
                             For Each lConnection As HspfConnection In lOperation.Targets
@@ -248,7 +258,7 @@ Public Module atcConstituentTables
                             End If
                             RowNumber += 1
                             If lTSNumber = 0 Then
-                                lRow("OpTypeNumber") = LocationName
+                                lRow("OpTypeNumber") = lLocationName
                                 lRow("OpDesc") = lOperation.Description
                                 lRow("Year") = lYear
                                 lRow("SUPY") = lValue
@@ -307,9 +317,9 @@ Public Module atcConstituentTables
 
                 For Each lOperation As HspfOperation In aUCI.OpnSeqBlock.Opns
                     If Not (lOperation.Name = "PERLND" OrElse lOperation.Name = "IMPLND") Then Continue For
-                    Dim LocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                    Dim lLocationName As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
                     lLandUseNameForTheCollection = lOperation.Name.Substring(0, 1) & ":" & lOperation.Description
-                    Logger.Status("Generating Land Loading Reports for " & aBalanceType & " from " & LocationName)
+                    Logger.Status("Generating Land Loading Reports for " & aBalanceType & " from " & lLocationName)
                     If Not lListLanduses.Contains(lLandUseNameForTheCollection) Then
                         lListLanduses.Add(lLandUseNameForTheCollection)
                     End If
@@ -323,7 +333,8 @@ Public Module atcConstituentTables
                         Dim lMasslinkFactor As Double = 1.0
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
-                            If lTS.numValues = 0 Then Continue For
+                            If lTS Is Nothing Then Continue For
+                            If lTS.Values Is Nothing Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -334,7 +345,7 @@ Public Module atcConstituentTables
                             End If
                             lRow = lLand_Constituent_Monthly_Table.NewRow
 
-                            lRow("OpTypeNumber") = LocationName
+                            lRow("OpTypeNumber") = lLocationName
                             lRow("OpDesc") = lOperation.Description
                             'row("Unit") = lUnits
 
@@ -344,8 +355,13 @@ Public Module atcConstituentTables
                             lRow("SumAnnual") = lTS.Attributes.GetDefinedValue("SumAnnual").Value
                             lLand_Constituent_Monthly_Table.Rows.Add(lRow)
                         Else
-                            lTS = aBinaryData.DataSets.FindData("Location", LocationName).FindData("Constituent", lOutflowDataType)(0)
-                            If lTS Is Nothing Then Continue For
+                            lTS = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", lOutflowDataType)(0)
+                            If lTS Is Nothing Then
+                                If lOutflowDataType = "SOHT" Then
+                                    pMissingBinaryTimeseries.Add(lLocationName & "|" & lOutflowDataType)
+                                End If
+                                Continue For
+                            End If
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                             For Each lConnection As HspfConnection In lOperation.Targets
                                 If lConnection.Target.VolName = "RCHRES" Then
@@ -399,7 +415,7 @@ Public Module atcConstituentTables
                             End If
                             RowNumber += 1
                             If lTSNumber = 0 Then
-                                lRow("OpTypeNumber") = LocationName
+                                lRow("OpTypeNumber") = lLocationName
                                 lRow("OpDesc") = lOperation.Description
                                 lRow("Year") = Year
                                 lRow("SO") = lValue
@@ -469,7 +485,8 @@ Public Module atcConstituentTables
                         Dim lMasslinkFactor As Double = 1.0
                         If lOutflowDataType = "TotalOutflow" Then
                             lTS = lTotalTS
-                            If lTS.numValues = 0 Then Continue For
+                            If lTS Is Nothing Then Continue For
+                            If lTS.Values Is Nothing Then Continue For
                             Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                             Dim lSeasons As New atcSeasonsMonth
                             Dim lSeasonalAttributes As New atcDataAttributes
@@ -492,7 +509,15 @@ Public Module atcConstituentTables
                             lLand_Constituent_Monthly_Table.Rows.Add(lRow)
                         Else
                             lTS = aBinaryData.DataSets.FindData("Location", lLocationName).FindData("Constituent", lOutflowDataType)(0)
-                            If lTS Is Nothing Then Continue For
+                            If lTS Is Nothing Then
+                                If lOperation.Name = "PERLND" And lOutflowDataType = "WSSD" Then
+                                    pMissingBinaryTimeseries.Add(lLocationName & "|" & lOutflowDataType)
+                                End If
+                                If lOperation.Name = "IMPLND" And lOutflowDataType = "SOSLD" Then
+                                    pMissingBinaryTimeseries.Add(lLocationName & "|" & lOutflowDataType)
+                                End If
+                                Continue For
+                            End If
                             lTS = SubsetByDate(lTS, aSDateJ, aEDateJ, Nothing)
                             For Each lConnection As HspfConnection In lOperation.Targets
                                 If lConnection.Target.VolName = "RCHRES" Or lConnection.Target.VolName = "BMPRAC" Then
@@ -678,7 +703,8 @@ Public Module atcConstituentTables
                             Dim lMassLinkFactor As Double = 1.0
                             If lOutflowDataType.StartsWith("TotalOutflow") And lTotalTS.Dates IsNot Nothing Then
                                 lTS = lTotalTS
-                                If lTS.numValues = 0 Then Continue For
+                                If lTS Is Nothing Then Continue For
+                                If lTS.Values Is Nothing Then Continue For
                                 'Start doing the montly calculations here.
                                 Dim lTsMonthly As atcTimeseries = Aggregate(lTS, atcTimeUnit.TUMonth, 1, atcTran.TranSumDiv)
                                 Dim lSeasons As New atcSeasonsMonth
@@ -1022,10 +1048,29 @@ Public Module atcConstituentTables
         pReach_Budget_Table = New DataTable("ReachBudgetTable")
 
         Dim lUnits As String = ""
+        If pMissingBinaryTimeseries Is Nothing Then
+            pMissingBinaryTimeseries = New atcCollection
+        End If
 
         Select Case aBalanceType
-            Case "Water", "Sediment"
+            Case "Water", "WAT"
                 'not generating reach budget report for water and sediment
+                '  but still useful to check for missing binary output
+                For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
+                    If Not lReach.Name = "RCHRES" Then Continue For
+                    Dim lLocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                    Dim lTmp As Double = 0.0
+                    lTmp = SafeSumAnnual(aBinaryData, lLocationName, "ROVOL", aSDateJ, aEDateJ)
+                Next
+            Case "Sediment", "SED"
+                'not generating reach budget report for water and sediment
+                '  but still useful to check for missing binary output
+                For Each lReach As HspfOperation In aUCI.OpnSeqBlock.Opns
+                    If Not lReach.Name = "RCHRES" Then Continue For
+                    Dim lLocationName As String = lReach.Name.Substring(0, 1) & ":" & lReach.Id
+                    Dim lTmp As Double = 0.0
+                    lTmp = SafeSumAnnual(aBinaryData, lLocationName, "ROSED-TOT", aSDateJ, aEDateJ)
+                Next
 #Region "DO Case"
             Case "DO"
 
@@ -1907,6 +1952,9 @@ Public Module atcConstituentTables
                                   aSDateJ, aEDateJ, Nothing).Attributes.GetDefinedValue("SumAnnual").Value
             Return lValue
         Catch
+            If aReachConstituent <> "DOXIN-PREC" Then
+                pMissingBinaryTimeseries.Add(aLocationName & "|" & aReachConstituent)
+            End If
             Return lValue
         End Try
     End Function
@@ -2770,4 +2818,29 @@ Public Module atcConstituentTables
             Next lEXTTarget
         End If
     End Sub
+
+    Public Function MissingTimeseriesMessage() As String
+        Dim lMsg As String = ""
+        If pMissingBinaryTimeseries.Count > 0 Then
+            lMsg = "Some HSPF Binary Output timeseries are not available for water quality reports." & vbCrLf &
+                   "Be sure to simulate using binary output at monthly or smaller time steps to get the most complete reporting." & vbCrLf & vbCrLf &
+                   "Missing Binary Output Timeseries:" & vbCrLf
+            Dim lWriteCount As Integer = pMissingBinaryTimeseries.Count - 1
+            If lWriteCount > 5 Then
+                lWriteCount = 4
+            End If
+            For lIndex As Integer = 0 To lWriteCount
+                lMsg = lMsg & pMissingBinaryTimeseries(lIndex) & vbCrLf
+            Next
+            If pMissingBinaryTimeseries.Count > 5 Then
+                lMsg = lMsg & "Plus " & (pMissingBinaryTimeseries.Count - 5).ToString & " more."
+            End If
+        End If
+        Return lMsg
+    End Function
+
+    Public Function InitializeMissingTimeseriesMessage() As Integer
+        pMissingBinaryTimeseries = New atcCollection
+        Return pMissingBinaryTimeseries.Count
+    End Function
 End Module
