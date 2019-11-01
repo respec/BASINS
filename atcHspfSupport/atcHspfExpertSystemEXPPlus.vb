@@ -58,6 +58,14 @@ Public Class atcExpertSystem
     Private pCountOfMissingData As Integer = 0
     Private pPercentOfMissingData As Double = 0.0
 
+    Private pObservedSnowPackTotalDepth() As Double
+    Private pSimulatedSnowPackTotalDepth() As Double
+    Private pObservedSnowPackPeakDepth() As Double
+    Private pSimulatedSnowPackPeakDepth() As Double
+    Private pObservedSnowPackDays() As Integer
+    Private pSimulatedSnowPackDays() As Integer
+    Private pSnowErrorCriteria As Integer = 50
+
     Public Sub New(ByVal aUci As atcUCI.HspfUci,
                    ByVal lExpertSystemFileName As String,
                    ByVal aSDateJ As Double,
@@ -164,13 +172,32 @@ Public Class atcExpertSystem
             'Read Site block
             For lSiteIndex As Integer = 1 To lNSites
                 lExsRecord = lExsRecords(lSiteIndex)
-                Dim lDsn(9) As Integer
+                Dim lDsn(11) As Integer
                 For lConsIndex As Integer = 0 To 9
                     lDsn(lConsIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
                     If lDsn(lConsIndex) = 0 Then Throw New ApplicationException(lConsIndex & "DSN is missing for site" & lSiteIndex & ". Program will quit!")
                 Next lConsIndex
                 Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
                 Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
+                If Len(lName) > 20 Then
+                    'appears we have snow data set numbers here too
+                    Dim lTmp As String = lName.Substring(20, 5)
+                    If IsInteger(lTmp) Then
+                        lDsn(10) = Int(lTmp)
+                    End If
+                    lTmp = lName.Substring(25, 5)
+                    If IsInteger(lTmp) Then
+                        lDsn(11) = Int(lTmp)
+                    End If
+                    If Len(lName) > 30 Then
+                        'also have snow error criteria here
+                        lTmp = lName.Substring(30, 5)
+                        If IsInteger(lTmp) Then
+                            pSnowErrorCriteria = Int(lTmp)
+                        End If
+                    End If
+                    lName = lName.Substring(0, 20).Trim
+                End If
                 'Dim lErrorTerms( As Double
                 Dim lSite As New HexSite(Me, lName, lStatDN, lDsn) ', lErrorTerms)
                 Sites.Add(lSite)
@@ -381,6 +408,7 @@ Public Class atcExpertSystem
                     "the calibration further, adjust the error criteria in your .exs file."
             End If
             'Next lSiteIndex
+            aString &= SnowAdvice(aSiteIndex, pUci)
         Catch ex As Exception
             aString &= "An error was encountered while attempting to produce advice.  Please consult the statistics file to make an " & _
                 "educated decision about your next step.  Error message: " & ex.Message
@@ -434,6 +462,44 @@ Public Class atcExpertSystem
             Case Else
                 ErrName = ""
         End Select
+    End Function
+
+    Private Function SnowAdvice(ByVal aSiteIndex As Integer, ByVal aUci As atcUCI.HspfUci) As String
+        Dim lSite As HexSite = Sites(aSiteIndex - 1)
+        SnowAdvice = ""
+        If lSite.DSN(10) > 0 And lSite.DSN(11) > 0 Then
+            Dim lDaysError As Double = Math.Abs(pSimulatedSnowPackDays(aSiteIndex) - pObservedSnowPackDays(aSiteIndex)) * 100 / Convert.ToDouble(pObservedSnowPackDays(aSiteIndex))
+            Dim lPeakDepthError As Double = Math.Abs(pSimulatedSnowPackPeakDepth(aSiteIndex) - pObservedSnowPackPeakDepth(aSiteIndex)) * 100 / pObservedSnowPackPeakDepth(aSiteIndex)
+            Dim lTotalDepthError As Double = Math.Abs(pSimulatedSnowPackTotalDepth(aSiteIndex) - pObservedSnowPackTotalDepth(aSiteIndex)) * 100 / pObservedSnowPackTotalDepth(aSiteIndex)
+            Dim lSnowOp As Integer = 0 'energy balance
+            For Each lOpn As atcUCI.HspfOperation In aUci.OpnBlks("PERLND").Ids
+                If lOpn.TableExists("SNOW-FLAGS") Then
+                    If lOpn.Tables.Item("SNOW-FLAGS").ParmValue("SNOPFG") > 0 Then
+                        lSnowOp = 1 'degree-day
+                    End If
+                End If
+            Next
+
+            If (lDaysError > pSnowErrorCriteria) Or
+               (lPeakDepthError > pSnowErrorCriteria) Or
+               (lTotalDepthError > pSnowErrorCriteria) Then
+                SnowAdvice = vbCrLf & vbCrLf & vbCrLf & vbCrLf & "Snow Simulation Advice" & vbCrLf &
+                                                                 "======================" & vbCrLf & vbCrLf & vbCrLf & vbCrLf
+                SnowAdvice &= "Analysis of snow statistics shows signficant differences in between simulated and " & vbCrLf &
+                              "observed snow depth data." & vbCrLf & vbCrLf
+
+                If lSnowOp = 0 Then
+                    SnowAdvice &= "Using energy balance method of snow simulation." & vbCrLf & vbCrLf
+                Else
+                    SnowAdvice &= "Using degree-day method of snow simulation." & vbCrLf & vbCrLf
+                End If
+
+                SnowAdvice &= "Keep in mind that the primary goal when modeling snow is to improve the hydrology " & vbCrLf &
+                              "simulation, so be sure to examine the effect of snow parameter changes on the " & vbCrLf &
+                              "overall hydrology calibration."
+            End If
+        End If
+        Return SnowAdvice
     End Function
 
     Private Sub CalcStats(ByVal aDataSource As atcDataSource)
@@ -764,6 +830,60 @@ Public Class atcExpertSystem
                 lDailyTSer = Nothing
             Next lDatasetType
         Next lSiteIndex
+
+        'also do snow stats
+        ReDim pObservedSnowPackTotalDepth(Sites.Count)
+        ReDim pSimulatedSnowPackTotalDepth(Sites.Count)
+        ReDim pObservedSnowPackPeakDepth(Sites.Count)
+        ReDim pSimulatedSnowPackPeakDepth(Sites.Count)
+        ReDim pObservedSnowPackDays(Sites.Count)
+        ReDim pSimulatedSnowPackDays(Sites.Count)
+        For lSiteIndex As Integer = 1 To Sites.Count
+            Dim lSite As HexSite = Sites(lSiteIndex - 1)
+            If lSite.DSN(10) > 0 And lSite.DSN(11) > 0 Then
+                Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lSite.DSN(10))) 'observed snow pack data
+                Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lSite.DSN(11))) 'simulated snow pack data
+
+                If lObsTSer.Attributes.GetDefinedValue("Start Date").Value > SDateJ Then
+                    AdjSDateJ = lObsTSer.Attributes.GetDefinedValue("Start Date").Value
+                End If
+                If lObsTSer.Attributes.GetDefinedValue("End Date").Value < EDateJ Then
+                    AdjEDateJ = lObsTSer.Attributes.GetDefinedValue("End Date").Value
+                End If
+
+                lObsTSer = SubsetByDate(lObsTSer, AdjSDateJ, AdjEDateJ, Nothing)
+                lObsTSer = Aggregate(lObsTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+
+                lSimTSer = SubsetByDate(lSimTSer, AdjSDateJ, AdjEDateJ, Nothing)
+                lSimTSer = Aggregate(lSimTSer, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+
+                pObservedSnowPackDays(lSiteIndex) = 0
+                pSimulatedSnowPackDays(lSiteIndex) = 0
+                pObservedSnowPackTotalDepth(lSiteIndex) = 0.0
+                pSimulatedSnowPackTotalDepth(lSiteIndex) = 0.0
+                pObservedSnowPackPeakDepth(lSiteIndex) = 0.0
+                pSimulatedSnowPackPeakDepth(lSiteIndex) = 0.0
+                For lIndex As Integer = 1 To lObsTSer.numValues
+                    If lObsTSer.Value(lIndex) > 0.0 Then
+                        pObservedSnowPackDays(lSiteIndex) += 1
+                        pObservedSnowPackTotalDepth(lSiteIndex) += lObsTSer.Value(lIndex)
+                        If lObsTSer.Value(lIndex) > pObservedSnowPackPeakDepth(lSiteIndex) Then
+                            pObservedSnowPackPeakDepth(lSiteIndex) = lObsTSer.Value(lIndex)
+                        End If
+                    End If
+                Next
+                For lIndex As Integer = 1 To lSimTSer.numValues
+                    If lSimTSer.Value(lIndex) > 0.0 And Not Double.IsNaN(lObsTSer.Value(lIndex)) Then
+                        pSimulatedSnowPackDays(lSiteIndex) += 1
+                        pSimulatedSnowPackTotalDepth(lSiteIndex) += lSimTSer.Value(lIndex)
+                        If lSimTSer.Value(lIndex) > pSimulatedSnowPackPeakDepth(lSiteIndex) Then
+                            pSimulatedSnowPackPeakDepth(lSiteIndex) = lSimTSer.Value(lIndex)
+                        End If
+                    End If
+                Next
+
+            End If
+        Next
     End Sub
 
     Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci, ByVal aRunmade As String) As String
@@ -973,6 +1093,31 @@ Public Class atcExpertSystem
             lStr &= vbCrLf & vbCrLf
         Next lSiteIndex
 
+        'also report snow stats
+        For lSiteIndex As Integer = 1 To Sites.Count
+            Dim lSite As HexSite = Sites(lSiteIndex - 1)
+            If lSite.DSN(10) > 0 And lSite.DSN(11) > 0 Then
+                lStr &= Space(30) & "Snow Statistics" & vbCrLf & vbCrLf
+                lStr &= Space(30) &
+                        "Observed".PadLeft(15) &
+                        "Simulated".PadLeft(15) & vbCrLf
+
+                lStr &= ("Days with Snow Pack =").PadLeft(30)
+                lStr &= DecimalAlign(pObservedSnowPackDays(lSiteIndex), 15)
+                lStr &= DecimalAlign(pSimulatedSnowPackDays(lSiteIndex), 15) & vbCrLf
+
+                lStr &= ("Total Depth (inch days) =").PadLeft(30)
+                lStr &= DecimalAlign(pObservedSnowPackTotalDepth(lSiteIndex), 15)
+                lStr &= DecimalAlign(pSimulatedSnowPackTotalDepth(lSiteIndex), 15) & vbCrLf
+
+                lStr &= ("Peak Depth (inches) =").PadLeft(30)
+                lStr &= DecimalAlign(pObservedSnowPackPeakDepth(lSiteIndex), 15)
+                lStr &= DecimalAlign(pSimulatedSnowPackPeakDepth(lSiteIndex), 15) & vbCrLf
+
+                lStr = lStr.TrimEnd & vbCrLf
+            End If
+        Next
+
         Return lStr
     End Function
 
@@ -1047,7 +1192,7 @@ Public Class HexSite
     Public Area As Double
     Public ReadOnly Name As String
     Public ReadOnly StatDN As Integer
-    Public ReadOnly DSN(9) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
+    Public ReadOnly DSN(11) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
     '0 = simulated total runoff (in)
     '1 = observed streamflow (cfs)
     '2 = simulated surface runoff (in)
@@ -1058,6 +1203,8 @@ Public Class HexSite
     '7 = actual evapotranspiration (in)
     '8 = upper zone storage (in)
     '9 = lower zone storage (in)
+    '10= observed snow depth (in)
+    '11= simulated snow depth (in)
     Public ErrorTerm(20) As Double
     Friend ErrorCriteria As HexErrorCriteria
 
