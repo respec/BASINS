@@ -64,6 +64,8 @@ Public Class atcExpertSystem
     Private pSimulatedSnowPackPeakDepth() As Double
     Private pObservedSnowPackDays() As Integer
     Private pSimulatedSnowPackDays() As Integer
+    Private pObservedSnowfallDays() As Integer
+    Private pSimulatedSnowfallDays() As Integer
     Private pSnowErrorCriteria As Integer = 50
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci,
@@ -468,7 +470,8 @@ Public Class atcExpertSystem
         Dim lSite As HexSite = Sites(aSiteIndex - 1)
         SnowAdvice = ""
         If lSite.DSN(10) > 0 And lSite.DSN(11) > 0 Then
-            Dim lDaysError As Double = Math.Abs(pSimulatedSnowPackDays(aSiteIndex) - pObservedSnowPackDays(aSiteIndex)) * 100 / Convert.ToDouble(pObservedSnowPackDays(aSiteIndex))
+            Dim lSnowPackDaysError As Double = Math.Abs(pSimulatedSnowPackDays(aSiteIndex) - pObservedSnowPackDays(aSiteIndex)) * 100 / Convert.ToDouble(pObservedSnowPackDays(aSiteIndex))
+            Dim lSnowfallDaysError As Double = Math.Abs(pSimulatedSnowfallDays(aSiteIndex) - pObservedSnowfallDays(aSiteIndex)) * 100 / Convert.ToDouble(pObservedSnowfallDays(aSiteIndex))
             Dim lPeakDepthError As Double = Math.Abs(pSimulatedSnowPackPeakDepth(aSiteIndex) - pObservedSnowPackPeakDepth(aSiteIndex)) * 100 / pObservedSnowPackPeakDepth(aSiteIndex)
             Dim lTotalDepthError As Double = Math.Abs(pSimulatedSnowPackTotalDepth(aSiteIndex) - pObservedSnowPackTotalDepth(aSiteIndex)) * 100 / pObservedSnowPackTotalDepth(aSiteIndex)
             Dim lSnowOp As Integer = 0 'energy balance
@@ -479,19 +482,92 @@ Public Class atcExpertSystem
                     End If
                 End If
             Next
+            Dim lTSnow As Double = 0.0
+            For Each lOpn As atcUCI.HspfOperation In aUci.OpnBlks("PERLND").Ids
+                If lOpn.TableExists("SNOW-PARM2") Then
+                    lTSnow = lOpn.Tables.Item("SNOW-PARM2").ParmValue("TSNOW")
+                End If
+            Next
+            Dim lSnowCF As Double = 0.0
+            For Each lOpn As atcUCI.HspfOperation In aUci.OpnBlks("PERLND").Ids
+                If lOpn.TableExists("SNOW-PARM1") Then
+                    lSnowCF = lOpn.Tables.Item("SNOW-PARM1").ParmValue("SNOWCF")
+                End If
+            Next
 
-            If (lDaysError > pSnowErrorCriteria) Or
+            If (lSnowPackDaysError > pSnowErrorCriteria) Or
+               (lSnowfallDaysError > pSnowErrorCriteria) Or
                (lPeakDepthError > pSnowErrorCriteria) Or
                (lTotalDepthError > pSnowErrorCriteria) Then
                 SnowAdvice = vbCrLf & vbCrLf & vbCrLf & vbCrLf & "Snow Simulation Advice" & vbCrLf &
                                                                  "======================" & vbCrLf & vbCrLf & vbCrLf & vbCrLf
-                SnowAdvice &= "Analysis of snow statistics shows signficant differences in between simulated and " & vbCrLf &
+                SnowAdvice &= "Analysis of snow statistics shows signficant differences between simulated and " & vbCrLf &
                               "observed snow depth data." & vbCrLf & vbCrLf
 
                 If lSnowOp = 0 Then
                     SnowAdvice &= "Using energy balance method of snow simulation." & vbCrLf & vbCrLf
                 Else
                     SnowAdvice &= "Using degree-day method of snow simulation." & vbCrLf & vbCrLf
+                End If
+
+                If lSnowfallDaysError > pSnowErrorCriteria And pSimulatedSnowfallDays(aSiteIndex) > pObservedSnowfallDays(aSiteIndex) And lTSnow > 31.0 Then
+                    SnowAdvice &= "The simulation shows many more days with snowfall than shown in the observed " & vbCrLf &
+                                  "data, and TSNOW is greater than 31 degrees F.  Try decreasing TSNOW to get fewer " & vbCrLf &
+                                  "snowfall events." & vbCrLf & vbCrLf
+                End If
+                If lSnowfallDaysError > pSnowErrorCriteria And pSimulatedSnowfallDays(aSiteIndex) < pObservedSnowfallDays(aSiteIndex) And lTSnow > 31.0 Then
+                    SnowAdvice &= "The simulation shows many fewer days with snowfall than shown in the observed " & vbCrLf &
+                                  "data, and TSNOW is less than 33 degrees F.  Try increasing TSNOW to get more " & vbCrLf &
+                                  "snowfall events." & vbCrLf & vbCrLf
+                End If
+
+                If lSnowOp = 1 And lSnowPackDaysError > pSnowErrorCriteria And pSimulatedSnowPackDays(aSiteIndex) > pObservedSnowPackDays(aSiteIndex) Then
+                    SnowAdvice &= "KMELT, the degree-day factor, is the primary calibration parameter for SNOW simulation " & vbCrLf &
+                                  "using the degree-day method.  KMELT controls the snow melt rate; an increase in snow " & vbCrLf &
+                                  "melt rate will result in fewer days with snow on the ground." & vbCrLf & vbCrLf
+                End If
+                If lSnowOp = 1 And lSnowPackDaysError > pSnowErrorCriteria And pSimulatedSnowPackDays(aSiteIndex) < pObservedSnowPackDays(aSiteIndex) Then
+                    SnowAdvice &= "KMELT, the degree-day factor, is the primary calibration parameter for SNOW simulation " & vbCrLf &
+                                  "using the degree-day method.  KMELT controls the snow melt rate; a decrease in snow " & vbCrLf &
+                                  "melt rate will result in more days with snow on the ground." & vbCrLf & vbCrLf
+                End If
+
+                If lSnowOp = 0 And lSnowPackDaysError > pSnowErrorCriteria And pSimulatedSnowPackDays(aSiteIndex) > pObservedSnowPackDays(aSiteIndex) Then
+                    SnowAdvice &= "CCFACT is a parameter that adapts the snow condensation/convection melt equation " & vbCrLf &
+                                  "to field conditions.  Try increasing CCFACT to increase the simulated rate of melt." & vbCrLf & vbCrLf
+                End If
+                If lSnowOp = 0 And lSnowPackDaysError > pSnowErrorCriteria And pSimulatedSnowPackDays(aSiteIndex) < pObservedSnowPackDays(aSiteIndex) Then
+                    SnowAdvice &= "CCFACT is a parameter that adapts the snow condensation/convection melt equation " & vbCrLf &
+                                  "to field conditions.  Try decreasing CCFACT to decrease the simulated rate of melt." & vbCrLf & vbCrLf
+                End If
+
+                If lSnowOp = 0 And lTotalDepthError > pSnowErrorCriteria And pSimulatedSnowPackTotalDepth(aSiteIndex) > pObservedSnowPackTotalDepth(aSiteIndex) Then
+                    SnowAdvice &= "MGMELT is the maximum rate of snowmelt by ground heat (depth of water per day). " & vbCrLf &
+                                  "Try increasing MGMELT to increase the simulated rate of melt." & vbCrLf & vbCrLf
+                End If
+                If lSnowOp = 0 And lTotalDepthError > pSnowErrorCriteria And pSimulatedSnowPackTotalDepth(aSiteIndex) < pObservedSnowPackTotalDepth(aSiteIndex) Then
+                    SnowAdvice &= "MGMELT is the maximum rate of snowmelt by ground heat (depth of water per day). " & vbCrLf &
+                                  "Try decreasing MGMELT to decrease the simulated rate of melt." & vbCrLf & vbCrLf
+                End If
+
+                If lSnowOp = 0 And lTotalDepthError > pSnowErrorCriteria And pSimulatedSnowPackTotalDepth(aSiteIndex) > pObservedSnowPackTotalDepth(aSiteIndex) Then
+                    SnowAdvice &= "MWATER is the maximum water content of the snow pack, in depth of water per depth " & vbCrLf &
+                                  "of water equivalent.  Try decreasing MWATER to allow less storage and speed runoff." & vbCrLf & vbCrLf
+                End If
+                If lSnowOp = 0 And lTotalDepthError > pSnowErrorCriteria And pSimulatedSnowPackTotalDepth(aSiteIndex) < pObservedSnowPackTotalDepth(aSiteIndex) Then
+                    SnowAdvice &= "MWATER is the maximum water content of the snow pack, in depth of water per depth " & vbCrLf &
+                                  "of water equivalent.  Try increasing MWATER to allow more storage and delay runoff." & vbCrLf & vbCrLf
+                End If
+
+                If lPeakDepthError > pSnowErrorCriteria And lSnowCF > 1.0 And pSimulatedSnowPackPeakDepth(aSiteIndex) > pObservedSnowPackPeakDepth(aSiteIndex) Then
+                    SnowAdvice &= "The simulation shows a higher peak snow depth than shown in the observed " & vbCrLf &
+                                  "data, and SNOWCF is greater than 1.0.  Try decreasing SNOWCF to get smaller " & vbCrLf &
+                                  "snowfall events." & vbCrLf & vbCrLf
+                End If
+                If lPeakDepthError > pSnowErrorCriteria And lSnowCF < 1.5 And pSimulatedSnowPackPeakDepth(aSiteIndex) < pObservedSnowPackPeakDepth(aSiteIndex) Then
+                    SnowAdvice &= "The simulation shows a lower peak snow depth than shown in the observed " & vbCrLf &
+                                  "data, and SNOWCF is less than 1.5.  Try increasing SNOWCF to get larger " & vbCrLf &
+                                  "snowfall events." & vbCrLf & vbCrLf
                 End If
 
                 SnowAdvice &= "Keep in mind that the primary goal when modeling snow is to improve the hydrology " & vbCrLf &
@@ -838,6 +914,8 @@ Public Class atcExpertSystem
         ReDim pSimulatedSnowPackPeakDepth(Sites.Count)
         ReDim pObservedSnowPackDays(Sites.Count)
         ReDim pSimulatedSnowPackDays(Sites.Count)
+        ReDim pObservedSnowfallDays(Sites.Count)
+        ReDim pSimulatedSnowfallDays(Sites.Count)
         For lSiteIndex As Integer = 1 To Sites.Count
             Dim lSite As HexSite = Sites(lSiteIndex - 1)
             If lSite.DSN(10) > 0 And lSite.DSN(11) > 0 Then
@@ -859,6 +937,8 @@ Public Class atcExpertSystem
 
                 pObservedSnowPackDays(lSiteIndex) = 0
                 pSimulatedSnowPackDays(lSiteIndex) = 0
+                pObservedSnowfallDays(lSiteIndex) = 0
+                pSimulatedSnowfallDays(lSiteIndex) = 0
                 pObservedSnowPackTotalDepth(lSiteIndex) = 0.0
                 pSimulatedSnowPackTotalDepth(lSiteIndex) = 0.0
                 pObservedSnowPackPeakDepth(lSiteIndex) = 0.0
@@ -870,6 +950,11 @@ Public Class atcExpertSystem
                         If lObsTSer.Value(lIndex) > pObservedSnowPackPeakDepth(lSiteIndex) Then
                             pObservedSnowPackPeakDepth(lSiteIndex) = lObsTSer.Value(lIndex)
                         End If
+                        If lIndex > 1 Then
+                            If lObsTSer.Value(lIndex) > lObsTSer.Value(lIndex - 1) Then
+                                pObservedSnowfallDays(lSiteIndex) += 1
+                            End If
+                        End If
                     End If
                 Next
                 For lIndex As Integer = 1 To lSimTSer.numValues
@@ -878,6 +963,11 @@ Public Class atcExpertSystem
                         pSimulatedSnowPackTotalDepth(lSiteIndex) += lSimTSer.Value(lIndex)
                         If lSimTSer.Value(lIndex) > pSimulatedSnowPackPeakDepth(lSiteIndex) Then
                             pSimulatedSnowPackPeakDepth(lSiteIndex) = lSimTSer.Value(lIndex)
+                        End If
+                        If lIndex > 1 Then
+                            If lSimTSer.Value(lIndex) > lSimTSer.Value(lIndex - 1) And Not Double.IsNaN(lObsTSer.Value(lIndex - 1)) Then
+                                pSimulatedSnowfallDays(lSiteIndex) += 1
+                            End If
                         End If
                     End If
                 Next
@@ -1101,6 +1191,10 @@ Public Class atcExpertSystem
                 lStr &= Space(30) &
                         "Observed".PadLeft(15) &
                         "Simulated".PadLeft(15) & vbCrLf
+
+                lStr &= ("Days with Snowfall =").PadLeft(30)
+                lStr &= DecimalAlign(pObservedSnowfallDays(lSiteIndex), 15)
+                lStr &= DecimalAlign(pSimulatedSnowfallDays(lSiteIndex), 15) & vbCrLf
 
                 lStr &= ("Days with Snow Pack =").PadLeft(30)
                 lStr &= DecimalAlign(pObservedSnowPackDays(lSiteIndex), 15)
