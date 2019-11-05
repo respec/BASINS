@@ -1143,7 +1143,7 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>HSPEXP+ Version </td>")
-        GeneralModelInfoText.AppendLine("    <td align=center>3.0 beta</td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>3.1</td>")
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")
