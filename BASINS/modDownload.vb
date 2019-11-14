@@ -672,7 +672,7 @@ StartOver:
 
         Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
         Select Case g_AppNameShort
-            Case "SW Toolbox", "GW Toolbox"
+            Case "SW Toolbox", "GW Toolbox", "Hydro Toolbox"
                 lBasinsDataTypes &= "<DataType>nhd</DataType>"
         End Select
 
@@ -752,7 +752,7 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
-                    Case "GW Toolbox"
+                    Case "GW Toolbox", "Hydro Toolbox"
                         'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
                         'With g_MapWin.View.Extents
                         '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)

@@ -98,6 +98,10 @@ Public Module modBasinsPlugin
         If g_BasinsDataDirs.Count = 0 Then
             If g_AppNameShort = "GW Toolbox" Then
                 g_BasinsDataDirs.Add("C:\USGS-GWToolbox\data\")
+            ElseIf g_AppNameShort = "SW Toolbox" Then
+                g_BasinsDataDirs.Add("C:\USGS-SWToolbox\data\")
+            ElseIf g_AppNameShort = "Hydro Toolbox" Then
+                g_BasinsDataDirs.Add("C:\USGS-HydroToolbox\data\")
             End If
             Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
             If lSavedPaths.Length > 0 Then
