@@ -5,12 +5,14 @@ Imports MapWinUtility
 Imports System.Drawing
 #If GISProvider = "DotSpatial" Then
 Imports DotSpatial.Controls.Header
+Imports BASINSDS
 #End If
 
 Public Class clsUSGSBaseflowPlugin
     Inherits atcData.atcDataDisplay
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
+    Private pStatusMonitor As MonitorProgressStatus
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -226,10 +228,42 @@ Public Class clsUSGSBaseflowPlugin
         If frmInteractive Is Nothing Or frmInteractive.IsDisposed Then
             frmInteractive = New frmUSGSBaseflow()
         End If
+        If atcDataManager.DataSources Is Nothing Then
+            atcDataManager.Clear()
+        End If
+        Dim att = New atcDataAttributes()
+        atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+        If atcDataManager.GetPlugins(GetType(atcTimeseriesRDB.atcTimeseriesRDB)).Count = 0 Then
+            Dim lRDB = New atcTimeseriesRDB.atcTimeseriesRDB()
+            atcDataManager.DataPlugins.Add(lRDB)
+        End If
         frmInteractive.WindowState = System.Windows.Forms.FormWindowState.Normal
         frmInteractive.InitializeDS(Me)
         frmInteractive.Initialize()
         'frmInteractive.Show()
+    End Sub
+
+    Private Sub LoadStatusMonitor()
+        Logger.StartToFile(clsPluginProperties.g_CacheDir & "log" & g_PathChar _
+                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & clsPluginProperties.g_AppNameShort.Replace(" ", "") & ".log")
+        'Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+            'Start running status monitor to give better progress and status indication during long-running processes
+            pStatusMonitor = New MonitorProgressStatus
+            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"),
+                                            clsPluginProperties.g_CacheDir & "log" & g_PathChar,
+                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
+                'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+                Logger.ProgressStatus = pStatusMonitor
+                Logger.Status("LABEL TITLE " & clsPluginProperties.g_AppNameShort & " Status")
+                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+                Logger.Status("")
+            Else
+                pStatusMonitor.StopMonitor()
+                pStatusMonitor = Nothing
+            End If
+        End If
     End Sub
 #End If
 End Class

@@ -3062,6 +3062,13 @@ Public Module modBaseflowUtil
         'Make sure graph can't find provisional attribute
 #If GISProvider = "DotSpatial" Then
         'need all values
+        Dim lDataMin As Double = Double.MaxValue
+        Dim lDataMax As Double = Double.MinValue
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", "X" & lTs.Attributes.GetValue("ProvisionalValueAttribute", ""))
+            If lTs.Attributes.GetValue("Min") < lDataMin Then lDataMin = lTs.Attributes.GetValue("Min")
+            If lTs.Attributes.GetValue("Max") > lDataMax Then lDataMax = lTs.Attributes.GetValue("Max")
+        Next
 #Else
         Dim lDataMin As Double = Double.MaxValue
         Dim lDataMax As Double = Double.MinValue
@@ -3109,6 +3116,10 @@ Public Module modBaseflowUtil
             End If
         End If
 #If GISProvider = "DotSpatial" Then
+        'Restore provisional attribute after graphing
+        For Each lTs As atcTimeseries In aDataGroup
+            lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
+        Next
 #Else
         'Restore provisional attribute after graphing
         For Each lTs As atcTimeseries In aDataGroup

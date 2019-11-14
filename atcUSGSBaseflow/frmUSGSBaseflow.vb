@@ -887,14 +887,18 @@ Public Class frmUSGSBaseflow
                 lTsGraphAll.Add(lTsGroupStock.FindData("Constituent", "FLOW")(0))
             End If
 
+            Dim lAttribs As New atcDataAttributes()
+            lAttribs.Add("ShowForm", True)
+            lAttribs.Add("SaveToFile", IO.Path.Combine(OutputDir, "plot_" & aGraphType & ".png"))
+
             Dim lTsGroupBf As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Baseflow")
             lTsGraphAll.AddRange(lTsGroupBf)
             If aGraphType = "Timeseries" Then
-                DisplayTsGraph(lTsGraphAll)
+                DisplayTsGraph(lTsGraphAll, lAttribs)
             ElseIf aGraphType = "Duration" Then
                 Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
                 lTsGraphAll.AddRange(lTsGroupRO)
-                DisplayDurGraph(lTsGraphAll, aPerUnitArea)
+                DisplayDurGraph(lTsGraphAll, aPerUnitArea, lAttribs)
             ElseIf aGraphType = "CDist" Then
                 Dim lTsGroupRO As atcTimeseriesGroup = lTsGroupStock.FindData("Constituent", "Runoff")
                 lTsGraphAll.AddRange(lTsGroupRO)
