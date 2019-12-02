@@ -718,7 +718,12 @@ Public Class frmGraphEditor
     'End Sub
 
     Private Sub btnTextAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextAdd.Click
-        AddTextFromControls()
+        If comboWhichText.Items.Contains(txtText.Text) Then 'Text exists, but was removed (now hidden)
+            Dim lText As TextObj = FindTextObject(txtText.Text)
+            lText.IsVisible = True
+        Else
+            AddTextFromControls()
+        End If
         RaiseEvent Apply()
     End Sub
 
@@ -758,7 +763,9 @@ Public Class frmGraphEditor
     Private Sub btnTextRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextRemove.Click
         Dim lText As TextObj = FindTextObject(comboWhichText.Text)
         If Not lText Is Nothing Then
-            pPane.GraphObjList.Remove(lText)
+            'pPane.GraphObjList.Remove(lText)
+            'just hide the text text object, don't remove it altogether (can then add it back if needed)
+            pPane.GraphObjList(pPane.GraphObjList.IndexOf(lText)).IsVisible = False
             SetComboFromTexts()
             If chkAutoApply.Checked Then RaiseEvent Apply()
         End If
