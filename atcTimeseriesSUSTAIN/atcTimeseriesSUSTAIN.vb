@@ -312,30 +312,18 @@ Public Class atcTimeseriesSUSTAIN
 
             Dim lSeasonal As Boolean = False
             If lDatasetsToWrite(0).Attributes.ContainsAttribute("seasbg") Then lSeasonal = True
+            Dim lSeasons As New atcSeasonsYearSubset(lDatasetsToWrite(0).Attributes.GetValue("seasbg"),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadbg"),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seasnd"),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadnd"))
 
             Dim lBodyLineStart As String = BodyLineStart.Replace("WatershedNumber", WatershedNumber)
             For lTimeStep As Integer = 1 To lLastTimeStep
                 Dim lDateArray(5) As Integer
                 modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval, lDateArray)
                 If lSeasonal Then 'make sure date is in seasonal range
-                    Dim lSDateArray(5) As Integer
-                    modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep), lSDateArray)
-                    lSDateArray(1) = lDatasetsToWrite(0).Attributes.GetValue("seasbg")
-                    lSDateArray(2) = lDatasetsToWrite(0).Attributes.GetValue("seadbg")
-                    lSDateArray(3) = 0
-                    Dim lSJDate As Double = Date2J(lSDateArray)
-                    If lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval < lSJDate Then
-                        'date precedes season, don't write it
-                        GoTo FinishedLine
-                    End If
-                    Dim lEDateArray(5) As Integer
-                    modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep), lEDateArray)
-                    lSDateArray(1) = lDatasetsToWrite(0).Attributes.GetValue("seasnd")
-                    lSDateArray(2) = lDatasetsToWrite(0).Attributes.GetValue("seadnd")
-                    lSDateArray(3) = 0
-                    Dim lEJDate As Double = Date2J(lEDateArray)
-                    If lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval > lEJDate Then
-                        'date is after season, don't write it
+                    Dim lIndex As Integer = lSeasons.SeasonIndex(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval)
+                    If lIndex = 0 Then 'outside of seasonal range, don't write it
                         GoTo FinishedLine
                     End If
                 End If
