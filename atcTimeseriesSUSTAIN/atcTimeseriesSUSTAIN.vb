@@ -312,10 +312,10 @@ Public Class atcTimeseriesSUSTAIN
 
             Dim lSeasonal As Boolean = False
             If lDatasetsToWrite(0).Attributes.ContainsAttribute("seasbg") Then lSeasonal = True
-            Dim lSeasons As New atcSeasonsYearSubset(lDatasetsToWrite(0).Attributes.GetValue("seasbg"),
-                                                     lDatasetsToWrite(0).Attributes.GetValue("seadbg"),
-                                                     lDatasetsToWrite(0).Attributes.GetValue("seasnd"),
-                                                     lDatasetsToWrite(0).Attributes.GetValue("seadnd"))
+            Dim lSeasons As New atcSeasonsYearSubset(lDatasetsToWrite(0).Attributes.GetValue("seasbg", 1),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadbg", 1),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seasnd", 12),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadnd", 31))
 
             Dim lBodyLineStart As String = BodyLineStart.Replace("WatershedNumber", WatershedNumber)
             For lTimeStep As Integer = 1 To lLastTimeStep
