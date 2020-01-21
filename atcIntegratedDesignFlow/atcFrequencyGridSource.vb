@@ -304,14 +304,11 @@ Public Class atcFrequencyGridSource
                 lArgs.SetValue("Return Period", lReturns)
 
                 If pConditions IsNot Nothing Then
-                    Dim lAttribute As String = "BoundaryMonth"
-                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
-                    lAttribute = "BoundaryDay"
-                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
-                    lAttribute = "EndMonth"
-                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
-                    lAttribute = "EndDay"
-                    If pConditions.ContainsAttribute(lAttribute) Then lArgs.SetValue(lAttribute, pConditions.GetValue(lAttribute))
+                    For Each lAttr As atcDefinedValue In pConditions
+                        If Not lArgs.ContainsAttribute(lAttr.Definition.Name) Then
+                            lArgs.SetValue(lAttr.Definition.Name, lAttr.Value)
+                        End If
+                    Next
                 End If
 
                 lCalculator.Open(lOperationName, lArgs)
