@@ -25,7 +25,7 @@ Public Class atcSynopticAnalysisPlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::Synoptic"
+            Return "Analysis::Event"
         End Get
     End Property
 

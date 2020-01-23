@@ -24,9 +24,15 @@ Public Class DFLOWAnalysisPlugin
 
     Inherits atcData.atcDataDisplay
 
+    Private pToolDisplayName As String = "DFLOW"
+
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.SWLegacyAnalysisMenuString & "::" & pToolDisplayName
+#Else
             Return "Analysis::DFLOW"
+#End If
         End Get
     End Property
 
@@ -204,5 +210,19 @@ Public Class DFLOWAnalysisPlugin
 
         Next
     End Sub
+
+#If Toolbox = "Hydro" Then
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName = atcDataManager.SWLegacyAnalysisMenuString & "::" & pToolDisplayName
+        If aItemName.EndsWith(lAnalysisMenuName) Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For Legacy DFLOW Analysis",
+                                          Nothing, Nothing, True, True, Me.Icon)
+            If lTimeseriesGroup.Count > 0 Then
+                Show(lTimeseriesGroup)
+            End If
+        End If
+    End Sub
+#End If
 End Class
 

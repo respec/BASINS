@@ -48,20 +48,20 @@ Public Class frmSpecifySeasonalAttributes
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifySeasonalAttributes))
-        Me.panelTop = New System.Windows.Forms.Panel
-        Me.grpSeasons = New System.Windows.Forms.GroupBox
-        Me.btnSeasonsNone = New System.Windows.Forms.Button
-        Me.btnSeasonsAll = New System.Windows.Forms.Button
-        Me.lstSeasons = New System.Windows.Forms.ListBox
-        Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.Splitter1 = New System.Windows.Forms.Splitter
-        Me.grpAttributes = New System.Windows.Forms.GroupBox
-        Me.btnAttributesNone = New System.Windows.Forms.Button
-        Me.btnAttributesAll = New System.Windows.Forms.Button
-        Me.lstAttributes = New System.Windows.Forms.ListBox
-        Me.panelBottom = New System.Windows.Forms.Panel
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
+        Me.panelTop = New System.Windows.Forms.Panel()
+        Me.grpSeasons = New System.Windows.Forms.GroupBox()
+        Me.btnSeasonsNone = New System.Windows.Forms.Button()
+        Me.btnSeasonsAll = New System.Windows.Forms.Button()
+        Me.lstSeasons = New System.Windows.Forms.ListBox()
+        Me.cboSeasons = New System.Windows.Forms.ComboBox()
+        Me.Splitter1 = New System.Windows.Forms.Splitter()
+        Me.grpAttributes = New System.Windows.Forms.GroupBox()
+        Me.btnAttributesNone = New System.Windows.Forms.Button()
+        Me.btnAttributesAll = New System.Windows.Forms.Button()
+        Me.lstAttributes = New System.Windows.Forms.ListBox()
+        Me.panelBottom = New System.Windows.Forms.Panel()
+        Me.btnCancel = New System.Windows.Forms.Button()
+        Me.btnOk = New System.Windows.Forms.Button()
         Me.panelTop.SuspendLayout()
         Me.grpSeasons.SuspendLayout()
         Me.grpAttributes.SuspendLayout()
@@ -71,14 +71,14 @@ Public Class frmSpecifySeasonalAttributes
         'panelTop
         '
         Me.panelTop.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelTop.Controls.Add(Me.grpSeasons)
         Me.panelTop.Controls.Add(Me.Splitter1)
         Me.panelTop.Controls.Add(Me.grpAttributes)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(408, 328)
+        Me.panelTop.Size = New System.Drawing.Size(408, 321)
         Me.panelTop.TabIndex = 14
         '
         'grpSeasons
@@ -88,9 +88,9 @@ Public Class frmSpecifySeasonalAttributes
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.cboSeasons)
         Me.grpSeasons.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.grpSeasons.Location = New System.Drawing.Point(208, 0)
+        Me.grpSeasons.Location = New System.Drawing.Point(250, 0)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(200, 328)
+        Me.grpSeasons.Size = New System.Drawing.Size(158, 321)
         Me.grpSeasons.TabIndex = 14
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Seasons"
@@ -98,51 +98,52 @@ Public Class frmSpecifySeasonalAttributes
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(128, 292)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(72, 280)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
+        Me.btnSeasonsNone.Size = New System.Drawing.Size(75, 26)
         Me.btnSeasonsNone.TabIndex = 12
         Me.btnSeasonsNone.Text = "None"
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(8, 292)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 280)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(64, 23)
+        Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 26)
         Me.btnSeasonsAll.TabIndex = 11
         Me.btnSeasonsAll.Text = "All"
         '
         'lstSeasons
         '
         Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.Location = New System.Drawing.Point(8, 40)
+        Me.lstSeasons.ItemHeight = 16
+        Me.lstSeasons.Location = New System.Drawing.Point(10, 46)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(183, 244)
+        Me.lstSeasons.Size = New System.Drawing.Size(137, 225)
         Me.lstSeasons.TabIndex = 7
         Me.lstSeasons.Tag = "Seasons"
         '
         'cboSeasons
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.Enabled = False
-        Me.cboSeasons.Location = New System.Drawing.Point(8, 16)
+        Me.cboSeasons.Location = New System.Drawing.Point(10, 18)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(183, 21)
+        Me.cboSeasons.Size = New System.Drawing.Size(137, 24)
         Me.cboSeasons.TabIndex = 6
         Me.cboSeasons.Tag = "SeasonType"
         '
         'Splitter1
         '
-        Me.Splitter1.Location = New System.Drawing.Point(200, 0)
+        Me.Splitter1.Location = New System.Drawing.Point(240, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(8, 328)
+        Me.Splitter1.Size = New System.Drawing.Size(10, 321)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -154,7 +155,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.grpAttributes.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpAttributes.Location = New System.Drawing.Point(0, 0)
         Me.grpAttributes.Name = "grpAttributes"
-        Me.grpAttributes.Size = New System.Drawing.Size(200, 328)
+        Me.grpAttributes.Size = New System.Drawing.Size(240, 321)
         Me.grpAttributes.TabIndex = 12
         Me.grpAttributes.TabStop = False
         Me.grpAttributes.Text = "Attributes"
@@ -162,31 +163,32 @@ Public Class frmSpecifySeasonalAttributes
         'btnAttributesNone
         '
         Me.btnAttributesNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesNone.Location = New System.Drawing.Point(128, 292)
+        Me.btnAttributesNone.Location = New System.Drawing.Point(154, 280)
         Me.btnAttributesNone.Name = "btnAttributesNone"
-        Me.btnAttributesNone.Size = New System.Drawing.Size(64, 23)
+        Me.btnAttributesNone.Size = New System.Drawing.Size(76, 26)
         Me.btnAttributesNone.TabIndex = 10
         Me.btnAttributesNone.Text = "None"
         '
         'btnAttributesAll
         '
         Me.btnAttributesAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesAll.Location = New System.Drawing.Point(8, 292)
+        Me.btnAttributesAll.Location = New System.Drawing.Point(10, 280)
         Me.btnAttributesAll.Name = "btnAttributesAll"
-        Me.btnAttributesAll.Size = New System.Drawing.Size(64, 23)
+        Me.btnAttributesAll.Size = New System.Drawing.Size(76, 26)
         Me.btnAttributesAll.TabIndex = 9
         Me.btnAttributesAll.Text = "All"
         '
         'lstAttributes
         '
         Me.lstAttributes.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstAttributes.IntegralHeight = False
-        Me.lstAttributes.Location = New System.Drawing.Point(8, 16)
+        Me.lstAttributes.ItemHeight = 16
+        Me.lstAttributes.Location = New System.Drawing.Point(10, 18)
         Me.lstAttributes.Name = "lstAttributes"
         Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstAttributes.Size = New System.Drawing.Size(184, 268)
+        Me.lstAttributes.Size = New System.Drawing.Size(220, 253)
         Me.lstAttributes.TabIndex = 7
         Me.lstAttributes.Tag = "Attributes"
         '
@@ -195,34 +197,34 @@ Public Class frmSpecifySeasonalAttributes
         Me.panelBottom.Controls.Add(Me.btnCancel)
         Me.panelBottom.Controls.Add(Me.btnOk)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 334)
+        Me.panelBottom.Location = New System.Drawing.Point(0, 328)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(408, 39)
+        Me.panelBottom.Size = New System.Drawing.Size(408, 45)
         Me.panelBottom.TabIndex = 15
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(335, 3)
+        Me.btnCancel.Location = New System.Drawing.Point(320, 3)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(65, 24)
+        Me.btnCancel.Size = New System.Drawing.Size(78, 28)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(265, 3)
+        Me.btnOk.Location = New System.Drawing.Point(236, 3)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(65, 24)
+        Me.btnOk.Size = New System.Drawing.Size(78, 28)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'frmSpecifySeasonalAttributes
         '
         Me.AcceptButton = Me.btnOk
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(408, 373)
         Me.Controls.Add(Me.panelTop)
@@ -245,6 +247,10 @@ Public Class frmSpecifySeasonalAttributes
     Private pOk As Boolean
 
     Public Function AskUser(ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSeasonsAvailable As atcDataAttributes) As Boolean
+#If Toolbox = "Hydro" Then
+        Me.Text = "Time-Series Attributes"
+        Me.grpSeasons.Text = "Time Periods"
+#End If
         pTimseriesGroup = aTimeseriesGroup
         pSeasonsAvailable = aSeasonsAvailable
         Clear()
@@ -254,7 +260,13 @@ Public Class frmSpecifySeasonalAttributes
             For Each lAttrName As String In lstAttributes.SelectedItems
                 lAttributesToCalculate.SetValue(lAttrName, Nothing)
             Next
-            CalculateAttributes(cboSeasons.Text, CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, lAttributesToCalculate, True)
+            Dim lSeasonTypeName As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Seasons" Then
+                lSeasonTypeName = "Traditional"
+            End If
+#End If
+            CalculateAttributes(lSeasonTypeName, CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, lAttributesToCalculate, True)
         End If
         Return pOk
     End Function
@@ -264,8 +276,21 @@ Public Class frmSpecifySeasonalAttributes
         cboSeasons.Items.Clear()
         lstSeasons.Items.Clear()
         lstAttributes.Items.Clear()
+        Dim lSeasonTypeName As String = ""
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
-            cboSeasons.Items.Add(lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::")))
+            If (lSeason.Definition.Name.IndexOf("::") >= 0) Then
+                lSeasonTypeName = lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::"))
+            Else
+                lSeasonTypeName = lSeason.Definition.Name
+            End If
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Traditional" Then
+                lSeasonTypeName = "Seasons"
+            End If
+            cboSeasons.Items.Add(lSeasonTypeName)
+#Else
+            cboSeasons.Items.Add(lSeasonTypeName)
+#End If
         Next
         For Each lDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions()
             If lDef.Calculated AndAlso atcDataAttributes.IsSimple(lDef) Then
@@ -314,8 +339,13 @@ Public Class frmSpecifySeasonalAttributes
             Dim lAttributes As New atcDataAttributes
             lAttributes.SetValue(lstAttributes.SelectedItems(0), 0)
             lArguments.Add("Attributes", lAttributes)
-
-            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(cboSeasons.Text, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
+            Dim lSeasonTypeName As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Seasons" Then
+                lSeasonTypeName = "Traditional"
+            End If
+#End If
+            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(lSeasonTypeName, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
                 Dim lSeasonName As String = lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
                 If lSeasonName IsNot Nothing AndAlso Not lstSeasons.Items.Contains(lSeasonName) Then
                     lstSeasons.Items.Add(lSeasonName)
@@ -328,8 +358,14 @@ Public Class frmSpecifySeasonalAttributes
     End Sub
 
     Private Function CurrentSeason() As atcTimeseriesSource
+        Dim lSeasonTypeName As String = cboSeasons.Text & "::SeasonalAttributes"
+#If Toolbox = "Hydro" Then
+        If lSeasonTypeName.StartsWith("Seasons::") Then
+            lSeasonTypeName = lSeasonTypeName.Replace("Seasons", "Traditional")
+        End If
+#End If
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
-            If lSeason.Definition.Name.Equals(cboSeasons.Text & "::SeasonalAttributes") Then
+            If lSeason.Definition.Name.Equals(lSeasonTypeName) Then
                 Return lSeason.Definition.Calculator
             End If
         Next

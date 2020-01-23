@@ -7,10 +7,16 @@ Public Class clsUSGSDF2PAnalysis
     Inherits atcData.atcDataDisplay
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
+    Private pCategoryDisplayName As String = "Estimate Hydrograph Parameters"
+    Private pToolDisplayName As String = "Two-Parameter Digital Filter"
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.GWAnalysisMenuString & "::" & pCategoryDisplayName & "::" & pToolDisplayName
+#Else
             Return "Analysis::Estimate Hydrograph Parameters::Two-Parameter Digital Filter"
+#End If
         End Get
     End Property
 
@@ -20,6 +26,21 @@ Public Class clsUSGSDF2PAnalysis
             Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
         End Get
     End Property
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+#If Toolbox = "Hydro" Then
+        lAnalysisMenuName = atcDataManager.GWAnalysisMenuName & "_" & pCategoryDisplayName & "_" & atcDataManager.GWAnalysisMenuString
+#End If
+        If aItemName = lAnalysisMenuName & "_" & pToolDisplayName Or aItemName = lAnalysisMenuName & "::" & pCategoryDisplayName & "::" & pToolDisplayName Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For " & pToolDisplayName,
+                                          Nothing, Nothing, True, True, Me.Icon)
+            If lTimeseriesGroup.Count > 0 Then
+                Show(lTimeseriesGroup)
+            End If
+        End If
+    End Sub
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Show = Nothing

@@ -7,11 +7,17 @@ Public Class clsUSGSRecessAnalysis
     Inherits atcData.atcDataDisplay
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
+    Private pCategoryDisplayName As String = "Estimate Hydrograph Parameters"
+    Private pToolDisplayName As String = "RECESS"
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.GWAnalysisMenuString & "::" & pCategoryDisplayName & "::" & pToolDisplayName
+#Else
             'Return "Analysis::USGS RECESS"
             Return "Analysis::Estimate Hydrograph Parameters::USGS RECESS"
+#End If
         End Get
     End Property
 
@@ -127,4 +133,21 @@ Public Class clsUSGSRecessAnalysis
         'Return lCalculator.DataSets
         Return Nothing
     End Function
+
+#If Toolbox = "Hydro" Then
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+#If Toolbox = "Hydro" Then
+        lAnalysisMenuName = atcDataManager.GWAnalysisMenuName & "_" & pCategoryDisplayName & "_" & atcDataManager.GWAnalysisMenuString
+#End If
+        If aItemName = lAnalysisMenuName & "_" & pToolDisplayName Or aItemName = lAnalysisMenuName & "::" & pCategoryDisplayName & "::" & pToolDisplayName Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For " & pToolDisplayName,
+                                          Nothing, Nothing, True, True, Me.Icon)
+            If lTimeseriesGroup.Count > 0 Then
+                Show(lTimeseriesGroup)
+            End If
+        End If
+    End Sub
+#End If
 End Class

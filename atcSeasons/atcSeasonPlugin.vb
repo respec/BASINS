@@ -1,4 +1,4 @@
-Imports atcdata
+Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 Imports MapWinUtility.Strings
@@ -23,7 +23,11 @@ Public Class atcSeasonPlugin
 
     Public Overrides ReadOnly Property Category() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return "Subset and Filter Time Series"
+#Else
             Return "Seasons"
+#End If
         End Get
     End Property
 
@@ -55,6 +59,27 @@ Public Class atcSeasonPlugin
                 pSeasons = atcSeasonBase.CreateSeasonObject("atcSeasons" & lSeasonName)
             End If
             Select Case aOperationName.ToLower
+                Case "split filter"
+                    If pSeasons Is Nothing Then
+                        Dim lForm As New frmFilterData
+                        Dim lTserProcessed As atcTimeseriesGroup = lForm.AskUser(lTimeSeriesGroup)
+                        If lTserProcessed IsNot Nothing Then
+                            DataSets.AddRange(lTserProcessed)
+                            If DataSets.Count < 1 Then
+                                Throw New ApplicationException("No data found in selected seasons")
+                            Else
+                                Me.Specification = "Split " & DataSets(0).Attributes.GetValue("SeasonDefinition").ToString
+                            End If
+                            Return True
+                        Else
+                            Return False
+                        End If
+                    Else
+                        For Each lts As atcTimeseries In lTimeSeriesGroup
+                            MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
+                        Next
+                        Return MyBase.DataSets.Count > 0
+                    End If
                 Case "split"
                     If pSeasons Is Nothing Then
                         Dim lForm As New frmSpecifySplit
@@ -139,7 +164,6 @@ Public Class atcSeasonPlugin
 
                         lOperations.SetValue(lSeasonalAttributes, Nothing, lArguments)
                     End If
-
                     If aIncludeSplits Then
                         Dim lSeasonalSplit As New atcAttributeDefinition
                         With lSeasonalSplit
@@ -189,6 +213,19 @@ Public Class atcSeasonPlugin
                 .TypeString = "atcTimeseries"
             End With
 
+#If Toolbox = "Hydro" Then
+            Dim lSplitFilter As New atcAttributeDefinition
+            With lSplitFilter
+                .Name = "Split Filter"
+                .Description = "Split and filter a timeseries"
+                .Editable = False
+                .TypeString = "atcDataGroup"
+                .Calculator = Me
+            End With
+            lArguments = New atcDataAttributes
+            lArguments.SetValue(defTimeSeriesOne, Nothing)
+            lOperations.SetValue(lSplitFilter, Nothing, lArguments)
+#Else
             Dim lSeasonalAttributes As New atcAttributeDefinition
             With lSeasonalAttributes
                 .Name = "Attributes"
@@ -210,12 +247,31 @@ Public Class atcSeasonPlugin
                 .TypeString = "atcDataGroup"
                 .Calculator = Me
             End With
-
             lArguments = New atcDataAttributes
             lArguments.SetValue(defTimeSeriesOne, Nothing)
             lOperations.SetValue(lSeasonalSplit, Nothing, lArguments)
+#End If
 
             Return lOperations
         End Get
     End Property
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+        If aItemName = lAnalysisMenuName & "_" & Category Then
+            Dim lOperationName As String = "split filter"
+            If Open(lOperationName) Then
+                Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(lOperationName)
+                atcDataManager.DataSources.Remove(Me)
+                If DataSets.Count > 0 Then
+                    atcDataManager.DataSources.Add(Me)
+                    'Dim lTitle As String = Me.ToString
+                    'atcDataManager.UserSelectDisplay(lTitle, DataSets)
+                    Logger.Dbg("DataSetCount:" & DataSets.Count & ":Specification:" & Me.Specification)
+                    'RaiseEvent atcData.atcDataManager.OpenedData(Me)
+                End If
+            End If
+        End If
+    End Sub
+
 End Class

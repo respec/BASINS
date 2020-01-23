@@ -6,12 +6,20 @@ Public Class clsIDFPlugin
     Inherits atcData.atcDataDisplay
 
     Private Const pTrendName As String = "Trend"
+#If Toolbox = "Hydro" Then
+    Private pBatchMenuName As String = atcDataManager.SWAnalysisMenuName & "_" & Name '& "_Batch"
+#Else
     Private pBatchMenuName As String = atcDataManager.AnalysisMenuName & "_" & Name '& "_Batch"
+#End If
     Private Const pIDFName As String = "USGS Integrated Design Flow (IDF)"
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.SWAnalysisMenuString & "::" & pIDFName
+#Else
             Return "Analysis::" & pIDFName
+#End If
         End Get
     End Property
 
@@ -133,7 +141,10 @@ Public Class clsIDFPlugin
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, lParentMenuName, lMenuName & "::Create DFLOW Batch", Me.Icon, , , True))
 
         'Dim lInteractiveMenuName As String = atcDataManager.AnalysisMenuName & "_" & Name
-
+#If Toolbox = "Hydro" Then
+        atcDataManager.AddMenuIfMissing(pBatchMenuName, "", atcDataManager.SWAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+        atcDataManager.AddMenuIfMissing(atcDataManager.SWAnalysisMenuName, "", atcDataManager.SWAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+#End If
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName & "::Interactive", pBatchMenuName, "Interactive", Me.Icon, , , True))
         'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(pBatchMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Batch", Me.Icon, lInteractiveMenuName, , True))
 
@@ -156,16 +167,21 @@ Public Class clsIDFPlugin
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
+#If Toolbox = "Hydro" Then
+        Dim lMenuKey As String = atcDataManager.SWAnalysisMenuName
+#Else
+        Dim lItemNameCheck As String = atcDataManager.AnalysisMenuName
+#End If
         If Not aHandled Then
             Select Case aItemName
-                Case atcDataManager.AnalysisMenuName
+                Case lMenuKey
                     'Do nothing
-                Case atcDataManager.AnalysisMenuName & "_" & Name & "::Interactive"
+                Case lMenuKey & "_" & Name & "::Interactive"
                     Show()
                     aHandled = True
-                Case atcDataManager.AnalysisMenuName & "_USGS Integrated Design Flow (IDF)_" & pTrendName
-                    Dim lTimeseriesGroup As atcTimeseriesGroup = _
-                      atcDataManager.UserSelectData("Select Data For Trend Analysis", _
+                Case lMenuKey & "_USGS Integrated Design Flow (IDF)_" & pTrendName
+                    Dim lTimeseriesGroup As atcTimeseriesGroup =
+                      atcDataManager.UserSelectData("Select Data For Trend Analysis",
                                                     Nothing, Nothing, True, True, Me.Icon)
                     If lTimeseriesGroup.Count > 0 Then
                         LoadPlugin("Timeseries::n-day high/low")
@@ -185,7 +201,7 @@ Public Class clsIDFPlugin
                     For Each lMapLayer In pMapWin.Layers
                         If lMapLayer.Name.ToLower.Contains("nwis daily discharge stations") Then
                             If lMapLayer.SelectedShapes.NumSelected < 2 Then
-                                Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf & _
+                                Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf &
                                            "Layer: " & lMapLayer.Name, lBatchTitle)
                             End If
                             lStationsAreSelected = True
@@ -228,8 +244,8 @@ Public Class clsIDFPlugin
                             Next
                         End If
                         If lSelectedStationIDs.Count > 0 Then
-                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf & _
-                                       StationListing(lSelectedStationIDs), _
+                            Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
+                                       StationListing(lSelectedStationIDs),
                                        lBatchTitle)
                         End If
                     End If

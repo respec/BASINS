@@ -8,10 +8,16 @@ Public Class clsUSGSRoraPlugin
     Inherits atcData.atcDataDisplay
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
+    Private pToolDisplayName As String = "Recharge Estimation with RORA"
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            'Return atcDataManager.GWAnalysisMenuString & "::USGS RORA"
+            Return atcDataManager.GWAnalysisMenuString & "::" & pToolDisplayName
+#Else
             Return "Analysis::USGS RORA"
+#End If
         End Get
     End Property
 
@@ -21,6 +27,21 @@ Public Class clsUSGSRoraPlugin
             Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
         End Get
     End Property
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+#If Toolbox = "Hydro" Then
+        lAnalysisMenuName = atcDataManager.GWAnalysisMenuName & "_" & atcDataManager.GWAnalysisMenuString
+#End If
+        If aItemName = lAnalysisMenuName & "_" & pToolDisplayName Or aItemName = lAnalysisMenuName & "::" & pToolDisplayName Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For Duration/Compare",
+                                          Nothing, Nothing, True, True, Me.Icon)
+            If lTimeseriesGroup.Count > 0 Then
+                Show(lTimeseriesGroup)
+            End If
+        End If
+    End Sub
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Show = Nothing
@@ -77,6 +98,10 @@ Public Class clsUSGSRoraPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
+#If Toolbox = "Hydro" Then
+        'atcDataManager.AddMenuIfMissing(atcDataManager.GWAnalysisMenuName, "", atcDataManager.GWAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.GWAnalysisMenuName & "_" & pToolDisplayName, atcDataManager.GWAnalysisMenuName, pToolDisplayName, Me.Icon, , , True))
+#End If
     End Sub
 
     Private Sub LoadPlugin(ByVal aPluginName As String)

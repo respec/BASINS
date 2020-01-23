@@ -59,7 +59,11 @@ Public Class atcDataPlugin
     Public Overridable Function ComputeClicked(ByVal aItemName As String) As atcDataSource
         Dim ds As atcDataSource = Me
         Dim lItemName As String = aItemName '.Replace(" ", "")
+#If Toolbox = "Hydro" Then
+        lItemName = lItemName.Substring(atcDataManager.AnalysisMenuName.Length + 1, lItemName.Length - atcDataManager.AnalysisMenuName.Length - Name.Length - 2)
+#Else
         lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - Name.Length - 2)
+#End If
         If lItemName.StartsWith(ds.Category & "_") Then
             Dim lNewSource As atcDataSource = Nothing
             lItemName = lItemName.Substring(ds.Category.Length + 1)
@@ -225,6 +229,7 @@ Public Class atcDataPlugin
         AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, ManageDataMenuName) '"mnuNew")
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, NewDataMenuName) '"mnuSaveAs")
         AddMenuIfMissing("mnuFileBreakData", FileMenuName, "-", SaveDataMenuName)
+        'AddMenuIfMissing(SWAnalysisMenuName, "", SWAnalysisMenuString, FileMenuName, )
         'End If
         Dim lSubMenus As New Generic.List(Of String)
         Dim lRest As String = Name.Clone
@@ -233,7 +238,7 @@ Public Class atcDataPlugin
         End While
         If lSubMenus.Count > 0 Then
             Select Case lSubMenus(0)
-                Case "Analysis"
+                Case "Analysis", "General Analysis"
                     'Add Analysis menu if it does not yet exist
                     Dim lParentMenuName As String = ""
                     Dim lMenuName As String = atcDataManager.AnalysisMenuName
@@ -256,15 +261,38 @@ Public Class atcDataPlugin
                     Try
                         Dim lDataSource As atcDataSource = Me
                         If lDataSource.Category <> "File" Then
+#If Toolbox = "Hydro" Then
+                            Dim lCategoryMenuName As String = atcDataManager.AnalysisMenuName & "_" & lDataSource.Category
+                            If lCategoryMenuName = AnalysisMenuName & "_" & "Events" Then
+                                Exit Select
+                            End If
+#Else
                             Dim lCategoryMenuName As String = atcDataManager.ComputeMenuName & "_" & lDataSource.Category
+#End If
                             Dim lOperations As atcDataAttributes = lDataSource.AvailableOperations
                             If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
                                 For Each lOperation As atcDefinedValue In lOperations
                                     Select Case lOperation.Definition.TypeString
                                         Case "atcTimeseries", "atcDataGroup", "atcTimeseriesGroup", "atcDataAttributes"
+#If Toolbox = "Hydro" Then
+                                            Dim lCat As String = lOperation.Definition.Category.ToLower()
+                                            Dim lName As String = lOperation.Definition.Name.ToLower()
+                                            If Not String.IsNullOrEmpty(lCat) AndAlso lCat = "n-day and frequency" Then
+                                                'Client doesn't want Statistics->N-day and Frequency menu under "General Time-Series Functions"
+                                                Continue For
+                                            End If
+                                            atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
+                                            pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.AnalysisMenuName, lDataSource.Category, , , True))
+#Else
                                             atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
                                             pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName, atcDataManager.ComputeMenuName, lDataSource.Category, , , True))
+#End If
                                             'Operations might have categories to further divide them
+#If Toolbox = "Hydro" Then
+                                            If Not String.IsNullOrEmpty(lName) AndAlso lName.StartsWith("split filter") Then
+                                                Exit Select
+                                            End If
+#End If
                                             If lOperation.Definition.Category.Length > 0 Then
                                                 Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
                                                 atcDataManager.AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
@@ -275,13 +303,45 @@ Public Class atcDataPlugin
                                     End Select
                                 Next
                             Else
+#If Toolbox = "Hydro" Then
+                                atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
+                                pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
+#Else
                                 atcDataManager.AddMenuIfMissing(atcDataManager.ComputeMenuName, "", atcDataManager.ComputeMenuString, atcDataManager.FileMenuName)
                                 pMenusAdded.Add(atcDataManager.AddMenuIfMissing(lCategoryMenuName & "_" & Name, lCategoryMenuName, lDataSource.Description, , , True))
+#End If
                             End If
                         End If
                     Catch
                         'Could not add to menu, probably wasn't an atcDataSource
                     End Try
+                Case SWAnalysisMenuString, SWLegacyAnalysisMenuString, GWAnalysisMenuString
+                    Dim lParentMenuName As String = ""
+                    Dim lMenuName As String = ""
+                    If lSubMenus(0).StartsWith("SW") Then
+                        lMenuName = atcDataManager.SWAnalysisMenuName
+                        atcDataManager.AddMenuIfMissing(lMenuName, "", atcDataManager.SWAnalysisMenuString, atcDataManager.FileMenuName)
+                    ElseIf lSubMenus(0).StartsWith("GW") Then
+                        lMenuName = atcDataManager.GWAnalysisMenuName
+                        atcDataManager.AddMenuIfMissing(lMenuName, "", atcDataManager.GWAnalysisMenuString, atcDataManager.FileMenuName, , True)
+                    ElseIf lSubMenus(0).StartsWith("Legacy") Then
+                        lMenuName = atcDataManager.SWLegacyAnalysisMenuName
+                        atcDataManager.AddMenuIfMissing(lMenuName, "", atcDataManager.SWLegacyAnalysisMenuString, atcDataManager.FileMenuName, , True)
+                    End If
+                    lParentMenuName = lMenuName
+
+                    'Add sub-menus if neeeded
+                    For lLevel As Integer = 1 To lSubMenus.Count - 1
+                        If lSubMenus(lLevel).Length > 0 Then
+                            lMenuName &= "_" & lSubMenus(lLevel)
+                            atcDataManager.AddMenuWithIcon(lMenuName, lParentMenuName, lSubMenus(lLevel), Me.Icon)
+                            lParentMenuName = lMenuName
+                        End If
+                    Next
+
+                    'Add menu item for this analysis
+                    pMenusAdded.Add(atcDataManager.AddMenuWithIcon(lMenuName & "_" & Name, lParentMenuName, lRest, Me.Icon, , , True))
+
             End Select
         End If
     End Sub
@@ -340,7 +400,11 @@ Public Class atcDataPlugin
                     Dim lNewObject As atcDataTool = Me.NewOne
                     lNewObject.Initialize(pMapWin, pMapWinWindowHandle)
                     lNewObject.Show()
+#If Toolbox = "Hydro" Then
+                ElseIf aItemName.StartsWith(atcDataManager.AnalysisMenuName & "_") AndAlso aItemName.EndsWith(Name) Then
+#Else
                 ElseIf aItemName.StartsWith(atcDataManager.ComputeMenuName & "_") AndAlso aItemName.EndsWith(Name) Then
+#End If
                     aHandled = True
                     Try
                         Dim lNewSource As atcDataSource = ComputeClicked(aItemName)

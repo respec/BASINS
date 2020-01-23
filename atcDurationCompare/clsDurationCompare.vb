@@ -6,13 +6,17 @@ Public Class clsDurationComparePlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.SWAnalysisMenuString & "::Duration/Compare"
+#Else
             Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Duration/Compare"
+#End If
         End Get
     End Property
 #If GISProvider = "DotSpatial" Then
 #Else
-    <CLSCompliant(False)> _
-    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+    <CLSCompliant(False)>
+    Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin,
                                     ByVal aParentHandle As Integer)
 
         pMapWin = aMapWin
@@ -21,11 +25,17 @@ Public Class clsDurationComparePlugin
 
         'Dim lSWSTATMenuName As String = atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)"
 
-        atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
         'atcDataManager.AddMenuWithIcon(lSWSTATMenuName, atcDataManager.AnalysisMenuName, "USGS Surface Water Statistics (SWSTAT)", Me.Icon)
 
+#If Toolbox = "Hydro" Then
+        atcDataManager.AddMenuIfMissing(atcDataManager.SWAnalysisMenuName, "", atcDataManager.SWAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.SWAnalysisMenuName & "_DurationCompare", atcDataManager.SWAnalysisMenuName, "Duration/Compare", Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.SWAnalysisMenuName & "_DurationHydrograph", atcDataManager.SWAnalysisMenuName, "Duration Hydrograph", Me.Icon, , , True))
+#Else
+        atcDataManager.AddMenuIfMissing(atcDataManager.AnalysisMenuName, "", atcDataManager.AnalysisMenuString, atcDataManager.FileMenuName)
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationCompare", atcDataManager.AnalysisMenuName, "Duration/Compare", Me.Icon, , , True))
         pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_DurationHydrograph", atcDataManager.AnalysisMenuName, "Duration Hydrograph", Me.Icon, , , True))
+#End If
     End Sub
 
     Public Overrides ReadOnly Property Icon() As System.Drawing.Icon
@@ -36,15 +46,19 @@ Public Class clsDurationComparePlugin
     End Property
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-         If aItemName = atcDataManager.AnalysisMenuName & "_DurationCompare" Then
-            Dim lTimeseriesGroup As atcTimeseriesGroup = _
-            atcDataManager.UserSelectData("Select Data For Duration/Compare", _
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+#If Toolbox = "Hydro" Then
+        lAnalysisMenuName = atcDataManager.SWAnalysisMenuName
+#End If
+        If aItemName = lAnalysisMenuName & "_DurationCompare" Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For Duration/Compare",
                                           Nothing, Nothing, True, True, Me.Icon)
             If lTimeseriesGroup.Count > 0 Then
                 Dim lFrmAnalysis As frmAnalysis = New frmAnalysis(lTimeseriesGroup)
                 lFrmAnalysis.Show()
             End If
-        ElseIf aItemName = atcDataManager.AnalysisMenuName & "_DurationHydrograph" Then
+        ElseIf aItemName = lAnalysisMenuName & "_DurationHydrograph" Then
             Dim lTimeseriesGroup As atcTimeseriesGroup = _
             atcDataManager.UserSelectData("Select Data For Duration Hydrograph", _
                                           Nothing, Nothing, True, True, Me.Icon)

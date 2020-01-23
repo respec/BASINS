@@ -13,10 +13,15 @@ Public Class clsUSGSBaseflowPlugin
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
     Private pStatusMonitor As MonitorProgressStatus
+    Private pToolDisplayName As String = "Base-Flow Separation"
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.GWAnalysisMenuString & "::" & pToolDisplayName
+#Else
             Return "Analysis::USGS Base-Flow Separation"
+#End If
         End Get
     End Property
 
@@ -26,6 +31,21 @@ Public Class clsUSGSBaseflowPlugin
             Return CType(lResources.GetObject("$this.Icon"), System.Drawing.Icon)
         End Get
     End Property
+
+    Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Dim lAnalysisMenuName As String = atcDataManager.AnalysisMenuName
+#If Toolbox = "Hydro" Then
+        lAnalysisMenuName = atcDataManager.GWAnalysisMenuName & "_" & atcDataManager.GWAnalysisMenuString
+#End If
+        If aItemName = lAnalysisMenuName & "_" & pToolDisplayName Or aItemName = lAnalysisMenuName & "::" & pToolDisplayName Then
+            Dim lTimeseriesGroup As atcTimeseriesGroup =
+            atcDataManager.UserSelectData("Select Data For Duration/Compare",
+                                          Nothing, Nothing, True, True, Me.Icon)
+            If lTimeseriesGroup.Count > 0 Then
+                Show(lTimeseriesGroup)
+            End If
+        End If
+    End Sub
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
@@ -192,6 +212,10 @@ Public Class clsUSGSBaseflowPlugin
 #Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
+#If Toolbox = "Hydro" Then
+        'atcDataManager.AddMenuIfMissing(atcDataManager.GWAnalysisMenuName, "", atcDataManager.GWAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.GWAnalysisMenuName & "_" & pToolDisplayName, atcDataManager.GWAnalysisMenuName, pToolDisplayName, Me.Icon, , , True))
+#End If
     End Sub
 #End If
 

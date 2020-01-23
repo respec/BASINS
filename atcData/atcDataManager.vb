@@ -776,7 +776,17 @@ Public Class atcDataManager
     Public Const ComputeMenuString As String = "Compute"
 
     Public Const AnalysisMenuName As String = "BasinsAnalysis"
+#If Toolbox = "Hydro" Then
+    Public Const AnalysisMenuString As String = "General Time-Series Tools"
+    Public Const SWAnalysisMenuName As String = "BasinsSurfaceWaterAnalysis"
+    Public Const SWAnalysisMenuString As String = "SW Tools"
+    Public Const GWAnalysisMenuName As String = "BasinsGroundWaterAnalysis"
+    Public Const GWAnalysisMenuString As String = "GW Tools"
+    Public Const SWLegacyAnalysisMenuName As String = "BasinsSurfaceWaterLegacyAnalysis"
+    Public Const SWLegacyAnalysisMenuString As String = "Legacy Tools"
+#Else
     Public Const AnalysisMenuString As String = "Analysis"
+#End If
 
     Public Const LaunchMenuName As String = "BasinsLaunch"
     Public Const LaunchMenuString As String = "Launch"

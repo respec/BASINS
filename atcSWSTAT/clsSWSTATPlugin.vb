@@ -7,9 +7,16 @@ Public Class clsSWSTATPlugin
 
     Private Const pTrendName As String = "Trend"
 
+    Private pCategoryDisplayName As String = "USGS Surface Water Statistics (SWSTAT)"
+    Private pToolDisplayName As String = "Integrated Frequency Analysis"
+
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return atcDataManager.SWLegacyAnalysisMenuString & "::" & pCategoryDisplayName & "::" & pToolDisplayName
+#Else
             Return "Analysis::USGS Surface Water Statistics (SWSTAT)::Integrated Frequency Analysis"
+#End If
         End Get
     End Property
 
@@ -196,8 +203,18 @@ Public Class clsSWSTATPlugin
 
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
-        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, _
+#If Toolbox = "Hydro" Then
+        'atcDataManager.AddMenuIfMissing(atcDataManager.SWLegacyAnalysisMenuName, "", atcDataManager.SWLegacyAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+        atcDataManager.AddMenuIfMissing(atcDataManager.SWLegacyAnalysisMenuName & "_" & pCategoryDisplayName, "", atcDataManager.SWLegacyAnalysisMenuString, atcDataManager.FileMenuName, "mnuHelp", True)
+
+        'pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.SWLegacyAnalysisMenuName & "_" & pCategoryDisplayName & "_" & pTrendName,
+        'atcDataManager.SWLegacyAnalysisMenuName & "_" & pCategoryDisplayName, pTrendName, Me.Icon, , , True))
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_" & pTrendName,
+                                                       atcDataManager.AnalysisMenuName, pTrendName, Me.Icon, , , True))
+#Else
+        pMenusAdded.Add(atcDataManager.AddMenuWithIcon(atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName,
                                                        atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)", pTrendName, Me.Icon, , , True))
+#End If
     End Sub
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
@@ -214,16 +231,22 @@ Public Class clsSWSTATPlugin
         MyBase.ItemClicked(aItemName, aHandled)
         If Not aHandled Then
             Select Case aItemName
-                Case atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName
-                    Dim lTimeseriesGroup As atcTimeseriesGroup = _
-                      atcDataManager.UserSelectData("Select Data For Trend Analysis", _
+                Case atcDataManager.AnalysisMenuName & "_USGS Surface Water Statistics (SWSTAT)_" & pTrendName, atcDataManager.AnalysisMenuName & "_" & pTrendName
+                    Dim lTimeseriesGroup As atcTimeseriesGroup =
+                      atcDataManager.UserSelectData("Select Data For " & pTrendName & " Analysis",
                                                     Nothing, Nothing, True, True, Me.Icon)
                     If lTimeseriesGroup.Count > 0 Then
                         LoadPlugin("Timeseries::n-day high/low")
                         Dim lForm As New frmTrend
                         lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
                     End If
-
+                Case atcDataManager.SWLegacyAnalysisMenuName & "_" & pCategoryDisplayName & "_" & atcDataManager.SWLegacyAnalysisMenuString & "::" & pCategoryDisplayName & "::" & pToolDisplayName
+                    Dim lTimeseriesGroup As atcTimeseriesGroup =
+                      atcDataManager.UserSelectData("Select Data For " & pToolDisplayName,
+                                                    Nothing, Nothing, True, True, Me.Icon)
+                    If lTimeseriesGroup.Count > 0 Then
+                        Show(lTimeseriesGroup)
+                    End If
             End Select
         End If
     End Sub

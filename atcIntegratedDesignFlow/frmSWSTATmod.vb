@@ -2671,7 +2671,7 @@ Public Class frmSWSTATmod
     ''' This function calculates Spearman's Rho, p at which rho = 0, and 
     ''' confidence limits for given Percent Confidence Interval (dPercentConfidenceInterval). 
     '''JEK: 
-    '''Outputs – If it returns TRUE, then mark it in the table as “FLAG”.  If it returns FALSE, then mark it in the table as “FALSE”.  Do Not show True/False in the SWToolbox table just FLAG Or PASS.
+    '''Outputs ?If it returns TRUE, then mark it in the table as “FLAG?  If it returns FALSE, then mark it in the table as “FALSE?  Do Not show True/False in the SWToolbox table just FLAG Or PASS.
     '''TRUE -> FLAG
     '''FALSE -> PASS
     ''' </summary>
@@ -2747,7 +2747,7 @@ Public Class frmSWSTATmod
     '''In order to do this, we would need to allow the user to select sites to include.  
     '''For those sites, we'd pass the lat/lon, the 7Q10.  
     '''So this would be done outside the integrated design frequency workflow.  
-    '''There’d have to be a separate menu item under analysis called “Compare station stats” or something like that.   
+    '''There’d have to be a separate menu item under analysis called “Compare station stats?or something like that.   
     ''' </summary>
     ''' <param name="aDataGroup">The selected group of time series that has the chosen flow stat calculated</param>
     ''' <param name="aStatName">7Low10</param>
@@ -2872,7 +2872,7 @@ Public Class frmSWSTATmod
     ''' ***** Spearman Section ****
     ''' fnGetTrend
     ''' calculates Spearman's Rho, p at which rho = 0, and confidence limits for given Percent Confidence Interval (dPercentConfidenceInterval). 
-    ''' Outputs – 
+    ''' Outputs ?
     ''' TRUE -> FLAG
     ''' FALSE -> PASS
     ''' ***** Spearman Section End ****
@@ -2884,9 +2884,9 @@ Public Class frmSWSTATmod
     '''JEK:
     '''Inputs:
     '''dlnArray = n-day minimum time series (in cfs)
-    '''intDistribution = 3, if “logarithmic” Is checked, 2 otherwise.
-    '''Note #1: I am assuming that SWToolbox fits a Pearson Type III distribution no matter what – that no other distributional choices are available To it, And the only difference Is whether it uses a log-transformed dataset Or Not.
-    '''Note #2: No need To pass it the last two vars, where defaults are provided – the defaults are what we want To use.
+    '''intDistribution = 3, if “logarithmic?Is checked, 2 otherwise.
+    '''Note #1: I am assuming that SWToolbox fits a Pearson Type III distribution no matter what ?that no other distributional choices are available To it, And the only difference Is whether it uses a log-transformed dataset Or Not.
+    '''Note #2: No need To pass it the last two vars, where defaults are provided ?the defaults are what we want To use.
     '''Outputs:
     '''TRUE -> PASS
     '''FALSE-> FLAG
@@ -2898,7 +2898,7 @@ Public Class frmSWSTATmod
     '''It does the test based On the 95-percent confidence interval 
     ''' Inputs:
     ''' dlnArray = n - Day minimum time series (In cfs)
-    ''' intDistribution = 3, If “logarithmic” Is checked, 2 otherwise.
+    ''' intDistribution = 3, If “logarithmic?Is checked, 2 otherwise.
     ''' Outputs:
     ''' TRUE -> PASS
     ''' FALSE -> FLAG

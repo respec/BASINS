@@ -6,7 +6,15 @@ Imports System.Windows.Forms
 Public Class atcTimeseriesMath
     Inherits atcTimeseriesSource
     Private pAvailableOperations As atcDataAttributes
-    Private Const pName As String = "Timeseries::Math"
+    Private Const pCategoryDisplayName As String = "Timeseries"
+#If Toolbox = "Hydro" Then
+    Private Const pToolDisplayName As String = "Math Functions"
+    Private Const pDateToolDisplayName As String = "Subset By Date"
+#Else
+    Private Const pToolDisplayName As String = "Math"
+    Private Const pDateToolDisplayName As String = "Date"
+#End If
+    Private Const pName As String = pCategoryDisplayName & "::" & pToolDisplayName
     Friend Shared pIcon As System.Drawing.Icon = Nothing
 
     Private pControls As Control.ControlCollection
@@ -121,45 +129,46 @@ Public Class atcTimeseriesMath
                     .Max = 31
                 End With
 
-                AddOperation("Add", "Add to each value", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Add", "Add to each value", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Subtract", "Subtract from each value of first timeseries", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Subtract", "Subtract from each value of first timeseries", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Multiply", "Multiply each value", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Multiply", "Multiply each value", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Divide", "Divide each value of first timeseries", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Divide", "Divide each value of first timeseries", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Mean Each Date", "Arithmetic Mean of values for each date", "Math", defTimeSeriesGroup)
+                AddOperation("Mean Each Date", "Arithmetic Mean of values for each date", pToolDisplayName, defTimeSeriesGroup)
 
-                AddOperation("Geometric Mean Each Date", "Geometric Mean of values for each date", "Math", defTimeSeriesGroup)
+                AddOperation("Geometric Mean Each Date", "Geometric Mean of values for each date", pToolDisplayName, defTimeSeriesGroup)
 
-                AddOperation("Max Each Date", "Maximum value at each date", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Max Each Date", "Maximum value at each date", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Min Each Date", "Minimum value at each date", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Min Each Date", "Minimum value at each date", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("Exponent", "Raise each value of first timeseries to a power", "Math", defTimeSeriesGroup, defDouble)
+                AddOperation("Exponent", "Raise each value of first timeseries to a power", pToolDisplayName, defTimeSeriesGroup, defDouble)
 
-                AddOperation("e ^ x", "e raised to the power of each value", "Math", defTimeSeriesOne)
+                AddOperation("e ^ x", "e raised to the power of each value", pToolDisplayName, defTimeSeriesOne)
 
-                AddOperation("10 ^ x", "10 raised to the power of each value", "Math", defTimeSeriesOne)
+                AddOperation("10 ^ x", "10 raised to the power of each value", pToolDisplayName, defTimeSeriesOne)
 
-                AddOperation("Log e", "The log base e of each value", "Math", defTimeSeriesOne)
+                AddOperation("Log e", "The log base e of each value", pToolDisplayName, defTimeSeriesOne)
 
-                AddOperation("Log 10", "The log base 10 of each value", "Math", defTimeSeriesOne)
+                AddOperation("Log 10", "The log base 10 of each value", pToolDisplayName, defTimeSeriesOne)
 
-                AddOperation("Absolute Value", "Change negative values to positive", "Math", defTimeSeriesOne)
-
+                AddOperation("Absolute Value", "Change negative values to positive", pToolDisplayName, defTimeSeriesOne)
+#If Toolbox = "Hydro" Then
+#Else
                 AddOperation("Celsius to F", "Celsius to Fahrenheit", "Unit Conversion", defTimeSeriesOne)
 
                 AddOperation("F to Celsius", "Fahrenheit to Celsius", "Unit Conversion", defTimeSeriesOne)
+#End If
+                AddOperation("Subset by date", "Choose start and end dates", pDateToolDisplayName, defTimeSeriesOne, defStartDate, defEndDate)
 
-                AddOperation("Subset by date", "Choose start and end dates", "Date", defTimeSeriesOne, defStartDate, defEndDate)
+                AddOperation("Subset by date boundary", "Choose boundary month and day", pDateToolDisplayName, defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
 
-                AddOperation("Subset by date boundary", "Choose boundary month and day", "Date", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
+                AddOperation("Merge", "Choose data to merge", pDateToolDisplayName, defTimeSeriesGroup)
 
-                AddOperation("Merge", "Choose data to merge", "Date", defTimeSeriesGroup)
-
-                AddOperation("Running Sum", "Accumulate Values", "Math", defTimeSeriesOne)
+                AddOperation("Running Sum", "Accumulate Values", pToolDisplayName, defTimeSeriesOne)
 
             End If
             Return pAvailableOperations

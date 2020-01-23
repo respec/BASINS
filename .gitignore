@@ -227,3 +227,7 @@ USGS.Baseflow/*
 BinDS/*
 BASINSDS/bin/*
 BASINSDS/obj/*
+.vs/*
+*/obj/*
+RunR/bin/x86/Debug/*
+RunR/packages/*

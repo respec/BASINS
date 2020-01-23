@@ -6,7 +6,11 @@ Public Class atcSeasonalAttributesPlugin
 
     Public Overrides ReadOnly Property Name() As String
         Get
+#If Toolbox = "Hydro" Then
+            Return "Analysis::Attributes"
+#Else
             Return "Analysis::Seasonal Attributes"
+#End If
         End Get
     End Property
 

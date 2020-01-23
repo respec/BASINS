@@ -65,6 +65,7 @@
     <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>Toolbox="Hydro"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineDebug>true</DefineDebug>
@@ -233,6 +234,10 @@
       <Name>atcTimeseriesBaseflow15</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath15.vbproj">
+      <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
+      <Name>atcTimeseriesMath15</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB15.vbproj">
       <Project>{82530A5B-FF39-4B9F-8A04-881468DFC662}</Project>
       <Name>atcTimeseriesRDB15</Name>
@@ -248,9 +253,9 @@
       <Name>atcUtility15</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\BASINS\GWToolbox15.vbproj">
+    <ProjectReference Include="..\BASINS\HydroToolbox15.vbproj">
       <Project>{37d44868-95ce-4a21-a43a-13e7e7f2ad09}</Project>
-      <Name>GWToolbox15</Name>
+      <Name>HydroToolbox15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
