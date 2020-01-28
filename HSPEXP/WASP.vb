@@ -107,9 +107,9 @@ Module WASP
             If lVolTimeseries IsNot Nothing Then
                 lVol = lVolTimeseries.Attributes.GetDefinedValue("Mean").Value
             End If
-            Dim lFlowTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "RO")(0)
-            If lFlowTimeseries IsNot Nothing Then
-                lFlow = lFlowTimeseries.Attributes.GetDefinedValue("Mean").Value
+            Dim lROTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "RO")(0)
+            If lROTimeseries IsNot Nothing Then
+                lFlow = lROTimeseries.Attributes.GetDefinedValue("Mean").Value
             End If
             lDepth_m = lDepth / 3.281      'depth in m
             lWidth_m = lTopWidth / 3.281   'width in m
@@ -280,9 +280,10 @@ Module WASP
         Dim lConvFactT As Double = 907.185      'tons to kg
         Dim lConvFactF As Double = 1 / 35.315   'from cfs to cms
         Dim lConvFactV As Double = 102.79 / (24 * 60 * 60)   'from ac.in/ivld To cms
+        Dim lConvFactVft As Double = 1233.48 / (24 * 60 * 60)   'from ac.ft/ivld To cms
         'Look for timeseries from contributing reaches -- write them out
         'Look for local inflows -- write them out
-        Dim lTimeseries As atcTimeseries = Nothing
+
         'For Each lSource As HspfConnection In lReach.Sources
         '    If Not lSource.Source.Opn Is Nothing AndAlso lSource.Source.VolName = "RCHRES" Then
         '        'here's a contributing reach
@@ -328,6 +329,7 @@ Module WASP
         'Next
         'alternate scheme to write individual and composite timeseries
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "RO", lConvFactF, aSDateJ, aEDateJ, lOutputFolder)           'Flow
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROVOL", lConvFactVft, aSDateJ, aEDateJ, lOutputFolder)        'Flow as volume
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "TAM-OUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Ammonia Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "NO3-OUTTOT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)   'Nitrate Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-TOTORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Dissolved Organic Nitrogen
@@ -340,6 +342,9 @@ Module WASP
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "N-REFORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "P-REFORG-OUT", lConvFactP, aSDateJ, aEDateJ, lOutputFolder) 'Detrital Phosphorus
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROSED-TOT", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROSED-SAND", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROSED-SILT", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "R", "ROSED-CLAY", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)    'Solids
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PERO", lConvFactV, aSDateJ, aEDateJ, lOutputFolder)            'Flow
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "SOSED", lConvFactT, aSDateJ, aEDateJ, lOutputFolder)           'Solids
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PODOXM", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)          'Dissolved Oxygen
@@ -373,89 +378,99 @@ Module WASP
         'Next
 
         'a lot more straightforward is just to use the ivol term from the bino file
-        lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "IVOL")(0)
-        If lTimeseries IsNot Nothing Then
+        Dim lFlowTimeseries As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "IVOL")(0)
+        If lFlowTimeseries IsNot Nothing Then
             'convert from ivol in ac.ft/ivld to cms
             Dim lConvFact As Double = 1233.48 / (24 * 60 * 60)
-            lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * lConvFact
-            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+            lFlowTimeseries = Aggregate(lFlowTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * lConvFact
+            lFlowTimeseries = SubsetByDate(lFlowTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
-        If lTimeseries IsNot Nothing Then
+        If lFlowTimeseries IsNot Nothing Then
             lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
-            lWaspProject.Segments(lNSegs - 1).FlowTimeSeries.ts = lTimeseries
+            lWaspProject.Segments(lNSegs - 1).FlowTimeSeries.ts = lFlowTimeseries
         End If
 
-        'also add loadings at the upstream boundary (needs to be kg/day)
+        'add concentrations at the upstream boundary (needs to be mg/l)
+        If lFlowTimeseries IsNot Nothing Then
+            'Ammonia Nitrogen               TAM-INTOT (lbs)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Ammonia Nitrogen               TAM-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TAM-INTOT", lConvFactP, 0, aSDateJ, aEDateJ)
+            'Nitrate Nitrogen               NO3-INTOT (lbs)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Nitrate Nitrogen               NO3-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "NO3-INTOT", lConvFactP, 1, aSDateJ, aEDateJ)
+            'Dissolved Organic Nitrogen     N-TOTORG-IN (lbs)  
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Dissolved Organic Nitrogen     N-TOTORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-TOTORG-IN", lConvFactP, 2, aSDateJ, aEDateJ)
+            'Inorganic Phosphate            PO4-INTOT (lbs)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Inorganic Phosphate            PO4-INTOT (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PO4-INTOT", lConvFactP, 3, aSDateJ, aEDateJ)
+            'Dissolved Organic Phosphorus   P-TOTORG-IN (lbs)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Dissolved Organic Phosphorus   P-TOTORG-IN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-TOTORG-IN", lConvFactP, 4, aSDateJ, aEDateJ)
+            'Inorganic Silica
+            'Diss Organic Silica
 
-        'Inorganic Silica
-        'Diss Organic Silica
+            'CBOD 1(Ultimate)               BODIN (lbs) 
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 7, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 7, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'CBOD 1(Ultimate)               BODIN (lbs) 
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "BODIN", lConvFactP, 7, aSDateJ, aEDateJ)
+            'CBOD 2(Ultimate)               *** 
+            'CBOD 3(Ultimate)               *** 
 
-        'CBOD 2(Ultimate)               *** 
-        'CBOD 3(Ultimate)               *** 
+            'Dissolved Oxygen               DOXIN (lbs)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 10, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 10, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Dissolved Oxygen               DOXIN (lbs)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "DOXIN", lConvFactP, 10, aSDateJ, aEDateJ)
+            'Detrital Carbon                C-REFORG-IN (lbs)  
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Detrital Carbon                C-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "C-REFORG-IN", lConvFactP, 11, aSDateJ, aEDateJ)
+            'Detrital Nitrogen              N-REFORG-IN (lbs)  
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Detrital Nitrogen              N-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "N-REFORG-IN", lConvFactP, 12, aSDateJ, aEDateJ)
+            'Detrital Phosphorus            P-REFORG-IN (lbs)  
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 13, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 13, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Detrital Phosphorus            P-REFORG-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "P-REFORG-IN", lConvFactP, 13, aSDateJ, aEDateJ)
+            'Detrital Silica
+            'Total Detritus
+            'Salinity                       ***
+            'Benthic Algae
+            'Periphyton Cell Quota Nitrogen
+            'Periphyton Cell Quota Phosphorous
 
-        'Detrital Silica
-        'Total Detritus
-        'Salinity                       ***
-        'Benthic Algae
-        'Periphyton Cell Quota Nitrogen
-        'Periphyton Cell Quota Phosphorous
+            'Solids                         ISED-TOT (tons)
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 20, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SAND", lConvFactT, 20, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Solids                         ISED-TOT (tons)
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-TOT", lConvFactT, 20, aSDateJ, aEDateJ)
+            'Inorganic Solids 2
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SILT", lConvFactT, 21, aSDateJ, aEDateJ, lFlowTimeseries)
+            'Inorganic Solids 3
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-CLAY", lConvFactT, 22, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Inorganic Solids 2
-        'Inorganic Solids 3
+            'Phytoplankton Chla             PHYTO-IN (lbs)  
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 23, aSDateJ, aEDateJ)
+            LinkBinoTimeseriesToWASPBoundaryTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 23, aSDateJ, aEDateJ, lFlowTimeseries)
 
-        'Phytoplankton Chla             PHYTO-IN (lbs)  
-        LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "PHYTO-IN", lConvFactP, 23, aSDateJ, aEDateJ)
+            'Phytoplankton 2
+            'Phytoplankton 3
 
-        'Phytoplankton 2
-        'Phytoplankton 3
+            'Total Inorganic C
+            'Alkalinity
 
-        'Total Inorganic C
-        'Alkalinity
-
-        ''if using heat model
-        ''Temperature (°C)     
-        'Dim lConvFactD As Double = 5 / 9  ' F to C conversion needed
-        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TW", lConvFactD, 0, aSDateJ, aEDateJ)
-        ''Salinity             ***
-        ''Bacteria (#/100 ml)  ***  map from gqual?
-        ''Silts and Fines
-        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SILT", lConvFactT, 3, aSDateJ, aEDateJ)
-        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-CLAY", lConvFactT, 3, aSDateJ, aEDateJ)
-        ''Sands 
-        'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "ISED-SAND", lConvFactT, 4, aSDateJ, aEDateJ)
+            ''if using heat model
+            ''Temperature (°C)     
+            'Dim lConvFactD As Double = 5 / 9  ' F to C conversion needed
+            'LinkBinoTimeseriesToWASPLoadTimeseries(lWaspProject, aBinaryData, aReachId, "TW", lConvFactD, 0, aSDateJ, aEDateJ)
+            ''Salinity             ***
+            ''Bacteria (#/100 ml)  ***  map from gqual?
+        End If
 
         'now ready to write
         lWaspProject.WriteINP(lFileName)
@@ -474,6 +489,23 @@ Module WASP
         If lTimeseries IsNot Nothing Then
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
             aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID).ts = lTimeseries
+        End If
+    End Sub
+
+    Sub LinkBinoTimeseriesToWASPBoundaryTimeseries(ByRef aWaspProject As atcWASPProject, ByVal aBinaryData As atcDataSource,
+                                                   ByVal aReachId As Integer, ByVal aConstituent As String,
+                                                   ByVal aConvFact As Double, ByVal aBoundID As Integer,
+                                                   ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal aFlowTimeseries As atcTimeseries)
+        Dim lTimeseries As atcTimeseries = Nothing
+        lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", aConstituent)(0)
+        If lTimeseries IsNot Nothing Then
+            lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+            'get conc by dividing the load in kg/day by cms and converting to mg/l
+            lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact * 1000 / (aFlowTimeseries * 60 * 60 * 24)
+        End If
+        If lTimeseries IsNot Nothing Then
+            aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+            aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID).ts = lTimeseries
         End If
     End Sub
 
