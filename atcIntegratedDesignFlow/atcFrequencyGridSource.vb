@@ -301,7 +301,6 @@ Public Class atcFrequencyGridSource
                 ReDim Preserve lReturns(lNextReturns - 1)
 
                 lArgs.SetValue("NDay", lNdays)
-                lArgs.SetValue("Return Period", lReturns)
 
                 If pConditions IsNot Nothing Then
                     For Each lAttr As atcDefinedValue In pConditions
@@ -311,6 +310,9 @@ Public Class atcFrequencyGridSource
                     Next
                 End If
 
+                ' It is important that the Return Periods that go into N-day calculation (i.e. PearsonType3/LGPSTX)
+                ' HAVE TO BE the full range of default return periods (28 entries), NOT the user selected return periods on the form.
+                lArgs.SetValue("Return Period", pConditions.GetValue("Return Period"))
                 lCalculator.Open(lOperationName, lArgs)
             Catch e As Exception
                 'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
