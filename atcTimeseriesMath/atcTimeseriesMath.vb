@@ -28,7 +28,7 @@ Public Class atcTimeseriesMath
 
     Public Overrides ReadOnly Property Category() As String
         Get
-            Return "Generate Timeseries"
+            Return "Generate Time Series"
         End Get
     End Property
 
