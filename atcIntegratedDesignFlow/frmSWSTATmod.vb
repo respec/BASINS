@@ -4703,7 +4703,13 @@ Public Class frmSWSTATmod
                 End If
                 .Item(4, I).Value = lFrom
                 .Item(5, I).Value = lTo
-                lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
+                With lTs.Attributes
+                    If .ContainsAttribute(lOTStatName & "Adj") Then
+                        lStatVal = .GetValue(lOTStatName & "Adj", Double.NaN)
+                    Else
+                        lStatVal = .GetValue(lOTStatName, Double.NaN)
+                    End If
+                End With
                 If Not Double.IsNaN(lStatVal) Then
                     .Item(6, I).Value = DoubleToString(lStatVal, 15, "0.##########", aSignificantDigits:=8)
                 Else
