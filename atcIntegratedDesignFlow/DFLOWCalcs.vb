@@ -145,6 +145,8 @@ Public Class DFLOWCalcs
             Dim lHigh As Boolean = False
             Dim lOperationName As String = "n-day low value"
 
+            'It seems start and end year are set when it gets here,
+            'so no need to set the "FirstYear" and "LastYear" attributes values
             Dim lBoundaryMonth As Integer = fStartMonth '4
             Dim lBoundaryDay As Integer = fStartDay '1
             Dim lEndMonth As Integer = fEndMonth '3
@@ -174,12 +176,18 @@ Public Class DFLOWCalcs
                 .SetValue("NDay", lNdays)
                 Dim lReturns(0) As Double
                 lReturns(0) = aYears
-                .SetValue("Return Period", lReturns)
+                .SetValue("Return Period", clsIDFPlugin.ListDefaultArray("Return Period"))
             End With
 
             Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
             If lCalculator.Open(lOperationName, lArgs) AndAlso lCalculator.DataSets.Count = 1 Then
-                lResult = lCalculator.DataSets(0).Attributes.GetValue(lAttrName, lResult)
+                With lCalculator.DataSets(0).Attributes
+                    If .ContainsAttribute(lAttrName & "adj") Then
+                        lResult = .GetValue(lAttrName & "adj")
+                    Else
+                        lResult = .GetValue(lAttrName, lResult)
+                    End If
+                End With
             Else
                 If lBatchMode Then
                     If DFLOWMessage Is Nothing Then

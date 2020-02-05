@@ -414,8 +414,8 @@ Public Module modUtil
 
             Dim lOutputDir As String = aArgs.GetValue(InputNames.OutputDir, "")
             Dim lOutputPrefix As String = aArgs.GetValue(InputNames.OutputPrefix, "")
-            if Not String.IsNullOrEmpty(lOutputDir) Then lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
-            if Not String.IsNullOrEmpty(lOutputPrefix) Then lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
+            If Not String.IsNullOrEmpty(lOutputDir) Then lText.AppendLine(InputNames.OutputDir & vbTab & lOutputDir)
+            If Not String.IsNullOrEmpty(lOutputPrefix) Then lText.AppendLine(InputNames.OutputPrefix & vbTab & lOutputPrefix)
 
             If loperation.ToLower = "groupsetparm" Then
                 lText.AppendLine("END DFLOW")
@@ -522,10 +522,10 @@ Public Module modUtil
             lMethodBlock.AppendLine("END " & Method)
             Return lMethodBlock.ToString()
         End Function
-        Public Shared Function CalculateNDayValues(ByVal aDataGroup As atcTimeseriesGroup, _
-                                           ByVal aGroupArgs As atcDataAttributes, _
-                                           ByVal aNDayDbl() As Double, _
-                                           ByVal aReturnPeriodDbl() As Double, _
+        Public Shared Function CalculateNDayValues(ByVal aDataGroup As atcTimeseriesGroup,
+                                           ByVal aGroupArgs As atcDataAttributes,
+                                           ByVal aNDayDbl() As Double,
+                                           ByVal aReturnPeriodDbl() As Double,
                                            ByVal aHighFlag As Boolean) As Boolean
 
             'ByVal aOperationName As String, ByVal aReturnPeriods() As Double
@@ -564,9 +564,9 @@ Public Module modUtil
             Return lNDayValuesCalculated
         End Function
 
-        Public Shared Function CalculateNDayTser(ByVal aDataGroup As atcTimeseriesGroup, _
-                                             ByVal aGroupArgs As atcDataAttributes, _
-                                             ByVal aNDayDbl() As Double, _
+        Public Shared Function CalculateNDayTser(ByVal aDataGroup As atcTimeseriesGroup,
+                                             ByVal aGroupArgs As atcDataAttributes,
+                                             ByVal aNDayDbl() As Double,
                                              ByVal aHighFlag As Boolean) As String
             Dim lTserListing As String = ""
             If (aNDayDbl IsNot Nothing AndAlso aNDayDbl.Length > 0) AndAlso aGroupArgs IsNot Nothing Then
@@ -619,8 +619,8 @@ Public Module modUtil
             End If
             Return lTserListing
         End Function
-        Public Shared Function SetInputsForAnalysis(ByVal aSetInputArgs As atcDataAttributes, _
-                                         ByRef aCalcArgs As atcDataAttributes, _
+        Public Shared Function SetInputsForAnalysis(ByVal aSetInputArgs As atcDataAttributes,
+                                         ByRef aCalcArgs As atcDataAttributes,
                                          Optional ByVal aHighFlow As Boolean = True) As Boolean
 
             Dim lStartDate As String = ""
@@ -727,11 +727,11 @@ Public Module modUtil
             End Try
         End Function
 
-        Public Shared Sub DoFrequencyGraph(ByVal aDirectory As String, _
-                                           ByVal aDataGroup As atcData.atcTimeseriesGroup, _
-                                           ByVal aInputArgs As atcDataAttributes, _
-                                           ByVal aNDaysDbl() As Double, _
-                                           ByVal aReturnPeriods() As Double, _
+        Public Shared Sub DoFrequencyGraph(ByVal aDirectory As String,
+                                           ByVal aDataGroup As atcData.atcTimeseriesGroup,
+                                           ByVal aInputArgs As atcDataAttributes,
+                                           ByVal aNDaysDbl() As Double,
+                                           ByVal aReturnPeriods() As Double,
                                            ByVal aHighFlag As Boolean)
 
             'Dim lHighLowText As String = "High"
@@ -906,8 +906,8 @@ Public Module modUtil
         '    End Try
         'End Function
 
-        Public Shared Sub GetNdayReturnPeriodAttributes(ByVal aInputs As atcDataAttributes, _
-                                                        ByRef aNDay() As Double, _
+        Public Shared Sub GetNdayReturnPeriodAttributes(ByVal aInputs As atcDataAttributes,
+                                                        ByRef aNDay() As Double,
                                                         ByRef aReturnPeriod() As Double)
             ReDim aNDay(0)
             ReDim aReturnPeriod(0)
@@ -1045,5 +1045,17 @@ Public Module modUtil
         '    'End If
         '    'Return lTrendGridText
         'End Function
+
+        Public Shared Function ListDefaultArray(ByVal aListTag As String) As Double()
+            Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+            Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
+            Dim lArgs As atcDataAttributes = lNDayHi.Arguments
+            Dim lDefault As Object = lArgs.GetDefinedValue(aListTag).Definition.DefaultValue
+            If IsArray(lDefault) Then
+                Return lDefault
+            Else
+                Return Nothing
+            End If
+        End Function
     End Class
 End Module
