@@ -726,9 +726,9 @@ Public Class DFLOWCalcs
             Dim lHydrologicTS As atcTimeseries = aDataGroup(lDSIndex)
             Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
             Dim lFirstDate As Double = lHydrologicTS2.Attributes.GetValue("start date")
-            Dim lHydrologicDS As atcTimeseries = lHydrologicTS2
-            Dim lSYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("start date"))).Substring(0, 4)
-            Dim lEYear As Integer = (lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))).Substring(0, 4)
+            'Dim lHydrologicDS As atcTimeseries = lHydrologicTS2
+            Dim lSYear As Integer = (lDateFormat.JDateToString(lHydrologicTS2.Attributes.GetValue("start date"))).Substring(0, 4)
+            Dim lEYear As Integer = (lDateFormat.JDateToString(lHydrologicTS2.Attributes.GetValue("end date"))).Substring(0, 4)
             Dim lYears As Integer = lEYear - lSYear
             lHydrologicTS.Attributes.SetValue("xBy start date", lFirstDate)
             lHydrologicTS.Attributes.SetValue("xBy start year", lSYear)
@@ -746,7 +746,7 @@ Public Class DFLOWCalcs
                     If aShowProgress Then lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - " & fAveragingPeriod & "Q" & fReturnPeriod
                     Application.DoEvents()
                     If lYears >= lReturnPeriod Then
-                        lxQy = xQy(lAveragingPeriod, lReturnPeriod, lHydrologicDS, aInputs)
+                        lxQy = xQy(lAveragingPeriod, lReturnPeriod, lHydrologicTS2, aInputs)
                     Else
                         lxQy = lNaN
                     End If
@@ -765,9 +765,10 @@ Public Class DFLOWCalcs
             lHydrologicTS.Attributes.SetValue(lxQyKey, lxQy)
 
             ' ===== Create 4-day running average for start of xBy excursion analysis - 
-            Dim lTimeSeries As atcTimeseries = SubsetByDateBoundary(aDataGroup(lDSIndex), lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
+            'Dim lTimeSeries As atcTimeseries = SubsetByDateBoundary(aDataGroup(lDSIndex), lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
+            'Dim lHydrologicTS2 As atcTimeseries = SubsetByDateBoundary(lHydrologicTS, lStartMonth, lStartDay, Nothing, lFirstyearDFLOW, lLastYearDFLOW, lEndMonthDFLOW, lEndDayDFLOW)
 
-            Dim lTS As Double() = lTimeSeries.Values
+            Dim lTS As Double() = lHydrologicTS2.Values
             lTS(0) = lNaN
 
             Dim lTSN As Double()
@@ -832,7 +833,8 @@ Public Class DFLOWCalcs
             Next
 
             ' ----- 2. Get initial guess
-            Dim lxBy As Double = xQy(lBioPeriod, lBioYears, aDataGroup(lDSIndex), aInputs)
+            'Dim lxBy As Double = xQy(lBioPeriod, lBioYears, aDataGroup(lDSIndex), aInputs)
+            Dim lxBy As Double = xQy(lBioPeriod, lBioYears, lHydrologicTS2, aInputs)
 
             ' ----- 3. Do xBy calculation
             Dim lExcursionCount As Integer
@@ -857,7 +859,8 @@ Public Class DFLOWCalcs
                 End If
                 Application.DoEvents()
 
-                lEquivalentxQy = xQy(lAveragingPeriod, lYears, aDataGroup(lDSIndex), aInputs)
+                'lEquivalentxQy = xQy(lAveragingPeriod, lYears, aDataGroup(lDSIndex), aInputs)
+                lEquivalentxQy = xQy(lAveragingPeriod, lYears, lHydrologicTS2, aInputs)
                 If lEquivalentxQy > lxBy Then
                     lReturnPeriodTry = lYears
                 Else
@@ -869,7 +872,8 @@ Public Class DFLOWCalcs
                     lEquivalentxQy = lxBy
                     While lEquivalentxQy >= lxBy And lReturnPeriodTry < lYears
                         lReturnPeriodTry += 1
-                        lEquivalentxQy = xQy(lAveragingPeriod, lReturnPeriodTry, aDataGroup(lDSIndex), aInputs)
+                        'lEquivalentxQy = xQy(lAveragingPeriod, lReturnPeriodTry, aDataGroup(lDSIndex), aInputs)
+                        lEquivalentxQy = xQy(lAveragingPeriod, lReturnPeriodTry, lHydrologicTS2, aInputs)
                         If aShowProgress Then
                             lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriodTry & " of up to " & lYears & ")"
                         End If
@@ -931,12 +935,12 @@ Public Class DFLOWCalcs
             Next
 
             ' ===== Store results
-            ladsResults.CellValue(lItemIdx + 1, 0) = lHydrologicDS.Attributes.GetFormattedValue("Location") & " - " & lHydrologicDS.Attributes.GetFormattedValue("STANAM")
+            ladsResults.CellValue(lItemIdx + 1, 0) = lHydrologicTS2.Attributes.GetFormattedValue("Location") & " - " & lHydrologicTS2.Attributes.GetFormattedValue("STANAM")
 
             ' ----- Next three values are corrected by one day to account for current (3/2008) behavior of time series trimming
 
-            ladsResults.CellValue(lItemIdx + 1, 1) = lDateFormat.JDateToString(1 + lHydrologicDS.Attributes.GetValue("start date")) & " - " &
-                                                     lDateFormat.JDateToString(lHydrologicDS.Attributes.GetValue("end date"))
+            ladsResults.CellValue(lItemIdx + 1, 1) = lDateFormat.JDateToString(1 + lHydrologicTS2.Attributes.GetValue("start date")) & " - " &
+                                                     lDateFormat.JDateToString(lHydrologicTS2.Attributes.GetValue("end date"))
             ladsResults.CellValue(lItemIdx + 1, 2) = Format(UBound(lTS) - 1, "#,##0") & " "
             ladsResults.Alignment(lItemIdx + 1, 2) = atcControls.atcAlignment.HAlignRight
             ladsResults.CellValue(lItemIdx + 1, 3) = Format(lNZero, "#,##0") & "/" & Format(lNMiss - 1, "#,##0") & " "
@@ -1011,17 +1015,18 @@ Public Class DFLOWCalcs
             lPct = lNExcHF / (UBound(lTS) - lNMiss)
             ladsResults.CellValue(lItemIdx + 1, 15) = Format(lPct, "percent")
             ladsResults.Alignment(lItemIdx + 1, 15) = atcControls.atcAlignment.HAlignDecimal
-            lHydrologicTS.Attributes.SetValue(lHMeanKey, lTimeSeries.Attributes.GetValue("Harmonic Mean") & vbTab & Format(lPct, "percent") & vbTab & "N/A")
+            lHydrologicTS.Attributes.SetValue(lHMeanKey, lHydrologicTS2.Attributes.GetValue("Harmonic Mean") & vbTab & Format(lPct, "percent") & vbTab & "N/A")
             Dim lHMeanAdjKey As String = "NONBIOFLOW-Harmonic Mean Adj"
             Dim lPctAdj As Double = lNExcHFAdj / (UBound(lTS) - lNMiss)
-            lHydrologicTS.Attributes.SetValue(lHMeanAdjKey, lTimeSeries.Attributes.GetValue("Harmonic Mean Adj") & vbTab & Format(lPctAdj, "percent") & vbTab & "N/A")
+            lHydrologicTS.Attributes.SetValue(lHMeanAdjKey, lHydrologicTS2.Attributes.GetValue("Harmonic Mean Adj") & vbTab & Format(lPctAdj, "percent") & vbTab & "N/A")
 
             If lAddSeason Then
                 ladsResults.CellValue(lItemIdx + 1, 16) = lHydrologicTS.Attributes.GetValue("seasonname")
             End If
             lItemIdx = lItemIdx + 1
-            lHydrologicTS2.Clear() : lHydrologicTS2 = Nothing
-            lTimeSeries.Clear() : lTimeSeries = Nothing
+            'lHydrologicTS2.Clear()
+            'lHydrologicTS2 = Nothing
+            lHydrologicTS2.numValues = 0
             Erase lTSN
             GC.Collect()
         Next 'lDSIndex}
