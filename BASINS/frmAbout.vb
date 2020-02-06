@@ -381,6 +381,8 @@ Friend Class frmAbout
 
 #ElseIf ProgramName = "USGS SW Toolbox" Then
                 Me.Width += 30
+#ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
+                Me.Width += 55
 #Else
 
 #End If
