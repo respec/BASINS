@@ -12,9 +12,6 @@ Public Class atcWASPProject
     Public Name As String = ""
     Public INPFileName As String = ""
     Public WASPTimeFunctions As New atcCollection
-
-    'list of time series pointers associated with each time function for version 2.0
-    Public TimeFunctionSeries() As clsTimeSeriesSelection
     Public WASPConstituents As Generic.List(Of clsWASPConstituent)
     Public WriteErrors As String = ""
 
@@ -511,28 +508,18 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpTFuncFile(ByRef aSW As IO.StreamWriter) As Boolean
-        Dim NumTimeFunc As Integer = 0
-        For i As Integer = 0 To WASPTimeFunctions.Count - 1
-            If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then NumTimeFunc += 1
-        Next
-
-        aSW.WriteLine("{0,5}               Number of Time Functions                      TFUNCFILE", NumTimeFunc)
+        aSW.WriteLine("{0,5}               Number of Time Functions                      TFUNCFILE", WASPTimeFunctions.Count)
 
         For i As Integer = 0 To WASPTimeFunctions.Count - 1
             With WASPTimeFunctions(i)
-                If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then
-                    aSW.WriteLine("{0,5}                Time Function ID Number", .FunctionID)
-                    aSW.WriteLine("  {0}", .Description)  'use to write time function name
-                    With TimeFunctionSeries(i).GetTimeSeries(Me, "Time Functions", .Description)
-                        If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
-                            WriteErrors &= String.Format("Empty time series was returned for {0}; specification was: {1}", WASPTimeFunctions(i).Description, TimeFunctionSeries(i).ToFullString) & vbCr
-                        End If
-                        aSW.WriteLine("{0,5}               Number of time-function values in {1}", .Count, TimeFunctionSeries(i).ToFullString)
-                        For t As Integer = 0 To .Count - 1
-                            aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t).Subtract(SDate).TotalDays, .Values(t))
-                        Next
-                    End With
-                End If
+                aSW.WriteLine("{0,5}                Time Function ID Number", .FunctionID)
+                aSW.WriteLine("  {0}", .Description)  'use to write time function name
+                With WASPTimeFunctions(i).Timeseries
+                    aSW.WriteLine("{0,5}               Number of time-function values in {1}", .ts.numValues, .ts.ToString)
+                    For t As Integer = 1 To .ts.numValues
+                        aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .ts.Dates.Values(t) - .ts.Dates.Values(1), .ts.Values(t))
+                    Next
+                End With
             End With
         Next
         aSW.Flush()
@@ -587,5 +574,20 @@ Public Class clsWASPConstituent
         Description = aDescription
         ConcUnits = aConcUnits
         LoadUnits = aLoadUnits
+    End Sub
+End Class
+
+''' <summary>
+''' Class to hold contents of "Time_Functions" table in WASP database which identifies all time functions for each model type
+''' Use in dictionary and select by ModelName
+''' </summary>
+Public Class clsWASPTimeFunction
+    Public Description As String
+    Public FunctionID As Integer
+    Public TimeSeries As clsTimeSeriesSelection 'atcTimeseries
+    Sub New(ByVal aDescription As String, ByVal aFunctionID As Integer, ByVal aTimeSeries As clsTimeSeriesSelection)
+        Description = aDescription
+        FunctionID = aFunctionID
+        TimeSeries = aTimeSeries
     End Sub
 End Class
