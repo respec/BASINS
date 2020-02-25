@@ -396,7 +396,11 @@ Public Module modUtil
             With lCalcArgs
                 .SetValue("Timeseries", lDataGroup)
                 .SetValue(NDay, aNDayDbl)
-                .SetValue(ReturnPeriod, aReturnPeriodDbl)
+                If aHighFlag Then
+                    .SetValue(ReturnPeriod, aReturnPeriodDbl)
+                Else
+                    .SetValue("Return Period", clsIDFPlugin.ListDefaultArray("Return Period"))
+                End If
             End With
 
             Dim lOperationName As String = "n-day high value"
