@@ -156,6 +156,7 @@ Module modWinHSPFLt
 
                     Dim lWdmUnit(4) As Integer
                     lOpt = -1
+                    Call F90_SCNDBG(10)
                     Logger.Dbg("Pre:  F90_ACTSCN (" & lOpt & ", " & lWdmUnit(1) & ", " & lMsgUnit & ", " & lRetcod & ", " & lUci & ", " & Len(lUci) & ")")
                     Call F90_ACTSCN(lOpt, lWdmUnit(1), lMsgUnit, lRetcod, lUci, Len(lUci))
                     Logger.Dbg("Post: F90_ACTSCN (" & lOpt & ", " & lWdmUnit(1) & ", " & lMsgUnit & ", " & lRetcod & ", " & lUci & ", " & Len(lUci) & ")")

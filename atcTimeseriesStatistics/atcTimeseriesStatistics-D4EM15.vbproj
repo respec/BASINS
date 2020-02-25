@@ -113,19 +113,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcControls\atcControls-D4EM15.vbproj">
-      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
-      <Name>atcControls-D4EM15</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcData\atcData-D4EM15.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
       <Name>atcData-D4EM15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-D4EM15.vbproj">
-      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
-      <Name>atcUtility-D4EM15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM15.vbproj">
