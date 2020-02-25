@@ -67,7 +67,7 @@ Partial Class frmSelect
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(3, 4)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(60, 15)
+        Me.Label1.Size = New System.Drawing.Size(53, 13)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Locations"
         '
@@ -76,7 +76,7 @@ Partial Class frmSelect
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(3, 3)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(74, 15)
+        Me.Label2.Size = New System.Drawing.Size(65, 13)
         Me.Label2.TabIndex = 3
         Me.Label2.Text = "Constituents"
         '
@@ -113,6 +113,7 @@ Partial Class frmSelect
         Me.btnSelectAllCons.TabIndex = 5
         Me.btnSelectAllCons.Text = "Select All"
         Me.btnSelectAllCons.UseVisualStyleBackColor = True
+        Me.btnSelectAllCons.Visible = False
         '
         'btnClearCons
         '
@@ -132,6 +133,7 @@ Partial Class frmSelect
         Me.btnSelectAllLoc.TabIndex = 6
         Me.btnSelectAllLoc.Text = "Select All"
         Me.btnSelectAllLoc.UseVisualStyleBackColor = True
+        Me.btnSelectAllLoc.Visible = False
         '
         'btnClearLoc
         '
@@ -181,7 +183,7 @@ Partial Class frmSelect
         Me.cbxSave.AutoSize = True
         Me.cbxSave.Location = New System.Drawing.Point(357, 420)
         Me.cbxSave.Name = "cbxSave"
-        Me.cbxSave.Size = New System.Drawing.Size(104, 19)
+        Me.cbxSave.Size = New System.Drawing.Size(96, 17)
         Me.cbxSave.TabIndex = 8
         Me.cbxSave.Text = "Save Selected"
         Me.cbxSave.UseVisualStyleBackColor = True

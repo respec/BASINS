@@ -103,10 +103,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=4.8.8.26967, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin-D4EM10\x86Debug\MapWinUtility.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -190,6 +186,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-D4EM10.vbproj">
+      <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
+      <Name>MapWinUtility-D4EM10</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

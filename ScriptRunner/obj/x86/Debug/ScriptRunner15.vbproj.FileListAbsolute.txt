@@ -8,13 +8,3 @@ C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner15.vbproj.GenerateRe
 C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.dll
 C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.xml
 C:\Dev\BASINS\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.pdb
-C:\dev\BASINS\Bin\Plugins\BASINS\ScriptRunner.dll
-C:\dev\BASINS\Bin\Plugins\BASINS\ScriptRunner.pdb
-C:\dev\BASINS\Bin\Plugins\BASINS\ScriptRunner.xml
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner15.vbprojResolveAssemblyReference.cache
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.frmSelectScript.resources
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.Resources.resources
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner15.vbproj.GenerateResource.Cache
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.dll
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.xml
-C:\dev\BASINS\ScriptRunner\obj\x86\Debug\ScriptRunner.pdb

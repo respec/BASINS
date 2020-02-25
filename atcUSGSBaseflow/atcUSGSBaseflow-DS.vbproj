@@ -274,6 +274,10 @@
       <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
       <Name>atcTimeseriesRDB-DS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DS.vbproj">
+      <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
+      <Name>atcTimeseriesStatistics-DS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DS.vbproj">
       <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>
       <Name>atcUSGSDF2P-DS</Name>
@@ -285,6 +289,10 @@
     <ProjectReference Include="..\atcUtility\atcUtility-DS.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-DS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINSDS\BASINSDS.csproj">
+      <Project>{6c957998-836e-4355-bf12-906a034ff609}</Project>
+      <Name>BASINSDS</Name>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-DS.vbproj">
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
