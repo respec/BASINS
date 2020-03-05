@@ -359,8 +359,8 @@ Friend Class frmDisplayFrequencyGrid
         End With
     End Sub
 
-    Public Function CreateReport() As String
-        Return pSource.CreateReport
+    Public Function CreateReport(Optional ByVal aExpFmt As Boolean = False) As String
+        Return pSource.CreateReport(aExpFmt)
     End Function
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
