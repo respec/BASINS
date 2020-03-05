@@ -756,7 +756,7 @@ Public Module modUtil
                                                  aNday:=aNDayDbl,
                                                  aReturns:=aReturnPeriodDbl,
                                                  aShowForm:=False)
-                Return lFreqForm.ToString()
+                Return lFreqForm.ToString() & vbCrLf & vbCrLf & "Export Report" & vbCrLf & vbCrLf & lFreqForm.CreateReport(True)
             Catch ex As Exception
                 Return ""
             End Try
