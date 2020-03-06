@@ -282,7 +282,7 @@ Public Class frmWCS
             SetDefault(cboSoilLayer, .SoilLayer)
             With cboLandUseType
                 .Items.Clear()
-                .Items.AddRange(New String() {"USGS GIRAS Shapefiles", "NLCD 1992 Grid", "NLCD 2001 Grid", "User Shapefile", "User Grid"})
+                .Items.AddRange(New String() {"USGS GIRAS Shapefiles", "NLCD Grid", "User Shapefile", "User Grid"})
                 .SelectedIndex = Project.LanduseType
             End With
             chkLanduseIDShown.Checked = .LanduseIDShown
