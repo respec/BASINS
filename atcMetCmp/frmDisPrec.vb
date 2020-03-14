@@ -315,13 +315,13 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub btnSummFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSummFile.Click
-        Dim cdlg As New Windows.Forms.SaveFileDialog
+        Dim cdlg As New System.Windows.Forms.SaveFileDialog()
         With cdlg
             .Title = "Summary Output File"
             .FileName = ""
             .Filter = "Summary Files (*.sum)|*.sum|All Files (*.*)|(*.*)"
             .OverwritePrompt = True
-            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 txtSummFile.Text = .FileName
             End If
         End With
@@ -329,7 +329,7 @@ Public Class frmDisPrec
     End Sub
 
     Private Sub frmDisPrec_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Compute\Disaggregations.html")
         End If
     End Sub

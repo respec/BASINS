@@ -4,12 +4,13 @@ Imports VB = Microsoft.VisualBasic
 Imports System.Drawing
 Imports MapWinUtility
 Imports MapWinUtility.Strings
+Imports System.Windows.Forms
 
 Friend Class frmInputWizard
     Inherits System.Windows.Forms.Form
     'Copyright 2002 by AQUA TERRA Consultants
 
-    Public txtSample As New Generic.List(Of Windows.Forms.TextBox)
+    Public txtSample As New Generic.List(Of TextBox)
 
     Private Const conNumSampleLines As Short = 50
 
@@ -49,7 +50,7 @@ Friend Class frmInputWizard
     Private pDataMappingRow As Integer = -1
 
     Private Sub frmKeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = Keys.F1 Then
             btnHelp_Click(Nothing, Nothing)
         End If
     End Sub
@@ -123,7 +124,7 @@ Friend Class frmInputWizard
         Dim BottomHeight As Integer
 
         If txtSample.Count = 0 Then txtSample.Add(_txtSample_0)
-        Dim lNewSampleTextbox As Windows.Forms.TextBox = txtSample(0)
+        Dim lNewSampleTextbox As TextBox = txtSample(0)
 
         BottomHeight = Me.Height - fraColSample.Top ' SashTop - fraSash.Height
 
@@ -132,7 +133,7 @@ Friend Class frmInputWizard
         EachSampleHeight = lNewSampleTextbox.Height * 0.95
 
         While lNewSampleTextbox.Top < SampleHeight
-            lNewSampleTextbox = New Windows.Forms.TextBox
+            lNewSampleTextbox = New TextBox()
             With lNewSampleTextbox
                 fraTextSample.Controls.Add(lNewSampleTextbox)
                 AddHandler .MouseDown, AddressOf txtSample_MouseDown
@@ -144,7 +145,7 @@ Friend Class frmInputWizard
                 .Anchor = _txtSample_0.Anchor
                 .Font = _txtSample_0.Font
                 .Height = _txtSample_0.Height
-                .BorderStyle = Windows.Forms.BorderStyle.None
+                .BorderStyle = BorderStyle.None
                 .HideSelection = False
                 txtSample.Add(lNewSampleTextbox)
             End With
@@ -356,7 +357,7 @@ Friend Class frmInputWizard
         dlgOpenFile.DefaultExt = "ws"
         dlgOpenFile.Title = "Open Script File"
 
-        If dlgOpenFile.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If dlgOpenFile.ShowDialog = DialogResult.OK Then
             txtScriptFile.Text = dlgOpenFile.FileName
             ReadScript()
         End If
@@ -1026,7 +1027,7 @@ ParseFixedDef:
     ''' Responds to press of "Save Script" button
     ''' </summary>
     Private Sub cmdSaveScript_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdSaveScript.Click
-        Dim dlgSaveScript As New Windows.Forms.SaveFileDialog
+        Dim dlgSaveScript As New SaveFileDialog()
         With dlgSaveScript
             .Filter = "Wizard Script Files (*.ws)|*.ws|All Files|*.*"
             .DefaultExt = "ws"
@@ -1042,7 +1043,7 @@ ParseFixedDef:
                     ' Ignore any error when trying to set InitialDirectory
                 End Try
             End If
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog = DialogResult.OK Then
                 txtScriptFile.Text = .FileName
                 If txtScriptDesc.Text.Trim.Length = 0 Then txtScriptDesc.Text = IO.Path.GetFileNameWithoutExtension(.FileName)
                 SaveFileString(.FileName, ScriptStringFromWizard)
@@ -1517,12 +1518,12 @@ ParseFixedDef:
     '           to obtain the input file name.
     '
     Private Sub cmdBrowseData_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles cmdBrowseData.Click
-        Dim dlgOpenFileOpen As New Windows.Forms.OpenFileDialog
+        Dim dlgOpenFileOpen As New OpenFileDialog()
         dlgOpenFileOpen.Filter = "All Files (*.*)|*.*"
         dlgOpenFileOpen.DefaultExt = ""
         dlgOpenFileOpen.Title = "Open Data File"
 
-        If dlgOpenFileOpen.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If dlgOpenFileOpen.ShowDialog = DialogResult.OK Then
             NameDataFile = dlgOpenFileOpen.FileName
             OpenUnitDataFile()
         End If
