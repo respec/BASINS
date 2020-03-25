@@ -1132,10 +1132,14 @@ Public Class clsBatchBFSpec
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
                             'lTmpGroup.Add(lTserFullDateRange)
+                            Logger.Dbg("mem0: " & MemUsage())
                             Dim lTsFlowFullRange As atcTimeseries = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
+                            Logger.Dbg("mem1: " & MemUsage())
                             If lTsFlowFullRange IsNot Nothing AndAlso lTsFlowFullRange.Attributes.GetValue("count positive") > 0 Then
                                 AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
+                                Logger.Dbg("mem2: " & MemUsage())
                                 ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                                Logger.Dbg("mem3: " & MemUsage())
                                 lGraphs = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.Graph, "")
                                 If Not String.IsNullOrEmpty(lGraphs) Then
                                     lArr = lGraphs.Split(",")
@@ -1146,6 +1150,7 @@ Public Class clsBatchBFSpec
                                         End Select
                                     Next
                                 End If
+                                Logger.Dbg("mem4: " & MemUsage())
                             Else
                                 Try
                                     lDateFormat.Midnight24 = False
@@ -1159,6 +1164,7 @@ Public Class clsBatchBFSpec
                             End If
                             lTsFlowFullRange.Clear()
                             lTsFlowFullRange = Nothing
+                            Logger.Dbg("mem5: " & MemUsage())
                         Catch ex As Exception
                             lStation.Message &= vbCrLf & "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
                             If ex.Message.Contains("out of range") Then
@@ -1171,6 +1177,7 @@ Public Class clsBatchBFSpec
                     'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                     'UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                     lStationCtr += 1
+                    Logger.Dbg("mem6: " & MemUsage())
                 Next 'lStation}
             End Using
             'If lStationFoundData IsNot Nothing Then Exit For
