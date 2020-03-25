@@ -32,7 +32,7 @@ Public Class frmBatch
             .DefaultExt = "txt"
             .Filter = ""
             .InitialDirectory = ""
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
                 txtSpecFile.Text = .FileName
             End If
         End With

@@ -76,7 +76,7 @@ Friend Class frmTrend
         cboYears.SelectedIndex = lLastSelectedIndex
     End Sub
 
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As System.Windows.Forms.ListBox)
         Dim lArgName As String = lst.Tag
         Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
         Dim lSelected As New ArrayList
@@ -656,7 +656,7 @@ Friend Class frmTrend
     End Sub
 
     Private Sub frmTrend_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = Keys.F1 Then
             ShowHelp(pHelpLocation)
         End If
     End Sub
@@ -935,7 +935,7 @@ Friend Class frmTrend
         LoadListDefaults(lstNday)
     End Sub
 
-    Private Sub LoadListDefaults(ByVal lst As Windows.Forms.ListBox)
+    Private Sub LoadListDefaults(ByVal lst As ListBox)
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
         Dim lArgs As atcDataAttributes = lNDayHi.Arguments
@@ -960,7 +960,7 @@ Friend Class frmTrend
         SaveList(lstNday)
     End Sub
 
-    Private Sub SaveList(ByVal lst As Windows.Forms.ListBox)
+    Private Sub SaveList(ByVal lst As ListBox)
         SaveSetting("atcFrequencyGrid", "List." & lst.Tag, "dummy", "")
         DeleteSetting("atcFrequencyGrid", "List." & lst.Tag)
         For lIndex As Integer = 0 To lst.Items.Count - 1

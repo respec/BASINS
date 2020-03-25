@@ -6,7 +6,7 @@ Imports MapWinUtility
 Public Class clsBatchSpec
     Inherits clsBatch
 
-    Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
+    Public Sub New(ByVal aProgressbar As System.Windows.Forms.ProgressBar, ByVal aTextField As System.Windows.Forms.TextBox)
         gProgressBar = aProgressbar
         gTextStatus = aTextField
     End Sub

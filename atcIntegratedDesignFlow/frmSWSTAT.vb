@@ -1508,7 +1508,7 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As System.Windows.Forms.ListBox)
         Dim lArgName As String = lst.Tag
         Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
         Dim lSelected As New ArrayList
@@ -1530,7 +1530,7 @@ Public Class frmSWSTAT
         End If
     End Sub
 
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox, ByVal attribs As atcDataAttributes)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As System.Windows.Forms.ListBox, ByVal attribs As atcDataAttributes)
         Dim lArgName As String = lst.Tag & "s"
         Dim listing As atcCollection = attribs.GetValue(lArgName, Nothing)
         If listing Is Nothing Then
@@ -1557,7 +1557,7 @@ Public Class frmSWSTAT
     End Sub
 
     Private Sub frmSWSTAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
         End If
     End Sub
@@ -1792,7 +1792,7 @@ Public Class frmSWSTAT
     End Sub
 
     'Return all selected items, or if none are selected then all items
-    Private Function ListToArray(ByVal aList As Windows.Forms.ListBox) As Double()
+    Private Function ListToArray(ByVal aList As System.Windows.Forms.ListBox) As Double()
         Dim lArray() As Double
         Dim lCollection As New ArrayList
         If aList.SelectedItems.Count > 0 Then
@@ -2040,7 +2040,7 @@ Public Class frmSWSTAT
         LoadListDefaults(lstNday)
     End Sub
 
-    Private Sub LoadListDefaults(ByVal aList As Windows.Forms.ListBox)
+    Private Sub LoadListDefaults(ByVal aList As System.Windows.Forms.ListBox)
         Dim lDefault() As Double = clsIDFPlugin.ListDefaultArray(aList.Tag)
         If Not lDefault Is Nothing Then
             aList.Items.Clear()
@@ -2159,7 +2159,7 @@ Public Class frmSWSTAT
         SaveList(lstRecurrence)
     End Sub
 
-    Private Sub SaveList(ByVal lst As Windows.Forms.ListBox)
+    Private Sub SaveList(ByVal lst As System.Windows.Forms.ListBox)
         SaveSetting("atcFrequencyGrid", "List." & lst.Tag, "dummy", "")
         DeleteSetting("atcFrequencyGrid", "List." & lst.Tag)
         For lIndex As Integer = 0 To lst.Items.Count - 1
@@ -2167,7 +2167,7 @@ Public Class frmSWSTAT
         Next
     End Sub
 
-    Private Function SaveListBatch(ByVal lst As Windows.Forms.ListBox) As String
+    Private Function SaveListBatch(ByVal lst As System.Windows.Forms.ListBox) As String
         Dim lMsg As String = ""
 
         'Dim listing0() As Double = pAttributes.GetValue(lst.Tag, Nothing)
@@ -2413,7 +2413,7 @@ Public Class frmSWSTAT
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
                 Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
