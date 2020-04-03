@@ -337,6 +337,8 @@ Friend Class frmAbout
 
     Public Sub ShowAbout()
         Try
+#If GISProvider = "DotSpatial" Then
+#Else
             Try
                 Me.Icon = g_MapWin.ApplicationInfo.FormIcon
             Catch
@@ -346,6 +348,7 @@ Friend Class frmAbout
                 picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
             Catch
             End Try
+#End If
 
             lblProgramName.Text = g_AppNameLong
             'If g_AppNameLong = "USGS GW Toolbox" Then lblProgramName.Text &= " (Beta)"
@@ -388,15 +391,21 @@ Friend Class frmAbout
             End Try
             Me.Show()
         Catch ex As System.Exception
+#If GISProvider = "DotSpatial" Then
+#Else
             g_MapWin.ShowErrorDialog(ex)
+#End If
         End Try
     End Sub
 
-    Private Sub OpenLinkURL(ByVal aLink As Windows.Forms.LinkLabel)
+    Private Sub OpenLinkURL(ByVal aLink As System.Windows.Forms.LinkLabel)
         Try
             Diagnostics.Process.Start(aLink.Text.Substring(aLink.LinkArea.Start, aLink.LinkArea.Length))
         Catch ex As System.Exception
+#If GISProvider = "DotSpatial" Then
+#Else
             g_MapWin.ShowErrorDialog(ex)
+#End If
         End Try
     End Sub
 
@@ -447,7 +456,7 @@ Friend Class frmAbout
 
     Private Sub frmAbout_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) _
         Handles MyBase.KeyDown
-        If e.KeyCode = Windows.Forms.Keys.F1 Then
+        If e.KeyCode = System.Windows.Forms.Keys.F1 Then
             atcUtility.ShowHelp("")
         End If
     End Sub

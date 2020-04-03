@@ -302,6 +302,31 @@ NextShape:
     End Property
 
 #If GISProvider = "DotSpatial" Then
+    Public Overridable Property HUC8s() As Generic.List(Of String)
+        Get
+            Try
+                If pHUC8s.Count = 0 Then
+                    Dim lLayerFilename As String = NationalHUC8shapefilename
+                    If FileExists(lLayerFilename) Then
+                        Logger.Status("Determining HUCs in region", True)
+#If GISProvider = "DotSpatial" Then
+#Else
+                        pHUC8s = GetKeysOfOverlappingShapes(lLayerFilename, NationalHUC8keyField, Nothing) ', "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs")
+#End If
+                        Logger.Status("Found " & pHUC8s.Count & " hucs", True)
+                    Else
+                        Logger.Dbg("HUC-8 layer not found for getting HUC-8s of region.")
+                    End If
+                End If
+            Catch e As Exception
+                Logger.Dbg("Exception getting HUC-8s of region: " & e.Message)
+            End Try
+            Return pHUC8s
+        End Get
+        Set(ByVal newValue As Generic.List(Of String))
+            pHUC8s = newValue
+        End Set
+    End Property
 #Else
     Public Overridable Property HUC8s() As Generic.List(Of String)
         Get

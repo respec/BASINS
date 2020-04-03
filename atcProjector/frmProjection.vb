@@ -664,7 +664,7 @@ Public Class frmProjection
         End If
     End Sub
 
-    Private Function lblD(ByVal index As Integer) As Windows.Forms.Label
+    Private Function lblD(ByVal index As Integer) As System.Windows.Forms.Label
         Select Case index
             Case 1 : Return lblD1
             Case 2 : Return lblD2
@@ -676,7 +676,7 @@ Public Class frmProjection
         End Select
     End Function
 
-    Private Function txtD(ByVal index As Integer) As Windows.Forms.TextBox
+    Private Function txtD(ByVal index As Integer) As System.Windows.Forms.TextBox
         Select Case index
             Case 1 : Return txtD1
             Case 2 : Return txtD2

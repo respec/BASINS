@@ -20,20 +20,34 @@
 '3/16/2005 - adapted for BASINS welcome
 '********************************************************************************************************
 Imports System.Windows.Forms.SendKeys
-Imports MapWindow.Interfaces
 Imports System.Windows.Forms
 Imports MapWinUtility
 Imports atcUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Compatibility
+#Else
+Imports MapWindow.Interfaces
+#End If
 
 Public Class frmWelcomeScreen
     Inherits System.Windows.Forms.Form
 
+#If GISProvider = "DotSpatial" Then
+    Private lProject As IProject
+    Private lAppInfo As AppInfo
+#Else
     Private lProject As Project
     Private lAppInfo As AppInfo
+#End If
 
 #Region " Windows Form Designer generated code "
-    <CLSCompliant(False)> _
+#If GISProvider = "DotSpatial" Then
+    <CLSCompliant(False)>
+    Public Sub New(ByVal aProject As IProject, ByVal aAppInfo As AppInfo)
+#Else
+    <CLSCompliant(False)>
     Public Sub New(ByVal aProject As Project, ByVal aAppInfo As AppInfo)
+#End If
         MyBase.New()
 
         'This call is required by the Windows Form Designer.
@@ -190,9 +204,9 @@ Public Class frmWelcomeScreen
             .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
             .CheckFileExists = True
             .InitialDirectory = lAppInfo.DefaultDir
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 lProject.Load(.FileName)
-                Me.DialogResult = Windows.Forms.DialogResult.OK
+                Me.DialogResult = System.Windows.Forms.DialogResult.OK
                 Me.Close()
             End If
         End With
@@ -209,7 +223,7 @@ Public Class frmWelcomeScreen
         Dim fileName As String = CStr(CType(sender, Label).Tag)
         If lProject.Load(fileName) Then
             Logger.Dbg("Loaded Project '" & fileName & "'")
-            Me.DialogResult = Windows.Forms.DialogResult.OK
+            Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Close()
         Else
             Logger.Msg("Could not load '" & fileName & "'", "Could Not Load Project")
@@ -218,13 +232,15 @@ Public Class frmWelcomeScreen
 
     Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         Me.Text = "Welcome to " & g_AppNameLong
-
+#If GISProvider = "DotSpatial" Then
+#Else
+        Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         If g_MapWin.ApplicationInfo.SplashPicture IsNot Nothing AndAlso g_MapWin.ApplicationInfo.SplashPicture.Width > 32 Then
             picProgramLogo.Width = g_MapWin.ApplicationInfo.SplashPicture.Width
             picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
         End If
+#End If
 
         cboShowDlg.Checked = lAppInfo.ShowWelcomeScreen
 
@@ -283,7 +299,7 @@ Public Class frmWelcomeScreen
     End Sub
 
     Private Sub frm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("")
         End If
     End Sub

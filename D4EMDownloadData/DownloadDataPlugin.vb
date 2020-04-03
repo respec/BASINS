@@ -1,14 +1,105 @@
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Extensions
+#End If
 
 Public Class DownloadDataPlugin
+#If GISProvider = "DotSpatial" Then
+    Private g_Menus As DotSpatial.Controls.LayoutMenuStrip
+    Friend Shared g_MapWin As AppManager
+    Public Shared DSProject As DotSpatial.Controls.SerializationManager = Nothing
+#Else
     Implements MapWindow.Interfaces.IPlugin
     Private g_Menus As MapWindow.Interfaces.Menus
     Friend Shared g_MapWin As MapWindow.Interfaces.IMapWin
+#End If
     Private g_MainForm As Integer
 
     Private Const pMenuLabel As String = "Download Data"
     Private Const pMenuName As String = "mnuDownloadDataD4EM"
 
+#If GISProvider = "DotSpatial" Then
+    Public Sub Initialize(ByVal MapWin As AppManager, ByVal ParentHandle As Integer)
+        g_MapWin = MapWin
+        g_Menus = Nothing
+        g_MainForm = ParentHandle
+        ' AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuFileBreak2")
+        Dim lSettingArgs As New atcData.atcDataAttributes()
+        Dim lcacheDir As String = MapWin.SerializationManager.CurrentProjectDirectory
+        If Not IO.Directory.Exists(lcacheDir) Then
+            lcacheDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        End If
+        With lSettingArgs
+            .SetValue("MapWin", MapWin)
+            .SetValue("CacheDir", lcacheDir)
+        End With
+        BASINS.Initialize(lSettingArgs)
+    End Sub
+    Public Sub Show(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Select Case aItemName
+            Case pMenuName
+                aHandled = True
+                'atcMwGisUtility.GisUtil.MappingObject = g_MapWin
+                'If BASINS.NationalProjectIsOpen() Then
+                'BASINS.SpecifyAndCreateNewProject()
+                'ElseIf g_MapWin.Layers.NumLayers < 1 AndAlso (g_MapWin.Project Is Nothing OrElse g_MapWin.Project.FileName Is Nothing) Then
+                'BASINS.LoadNationalProject()
+                'Else
+                Dim lDownloadForm As New frmDownload
+#If GISProvider = "DotSpatial" Then
+                Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)
+#Else
+                Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)
+#End If
+                If lQuery.Length > 0 Then
+                    If lQuery.Equals(frmDownload.CancelString) Then
+                        'User cancelled download form
+                    Else
+                        'g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
+                        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor 'Logger.Busy = True
+                        System.Windows.Forms.Application.DoEvents() 'refresh main form to get rid of vestiges of download form
+                        'Make sure all loaded plugins are available for DataManager
+                        'Dim lPlugins As New ArrayList
+                        'For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
+                        '    Try
+                        '        If Not g_MapWin.Plugins.Item(lPluginIndex) Is Nothing Then
+                        '            lPlugins.Add(g_MapWin.Plugins.Item(lPluginIndex))
+                        '        End If
+                        '    Catch ex As Exception
+                        '    End Try
+                        'Next
+                        'Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
+                        Logger.Status("LABEL TITLE BASINS Data Download")
+                        Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
+                        If lResult Is Nothing Then
+                            Logger.Dbg("QueryResult:Nothing")
+                        Else
+                            'Logger.Msg(lResult, "Result of Query from DataManager")
+                            Logger.Dbg("QueryResult:" & lResult)
+                            Dim lSilentSuccess As Boolean = lResult.ToLower.Contains("<success />")
+                            If lSilentSuccess Then
+                                lResult = lResult.Replace("<success />", "").Trim
+                                Logger.Dbg("QueryResultTrimmed:" & lResult)
+                            End If
+                            If lResult.Length = 0 Then
+                                If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
+                            ElseIf lResult.Contains("<success>") Then
+                                BASINS.ProcessDownloadResults(lResult)
+                            Else
+                                Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                            End If
+                        End If
+
+                        'g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
+                        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default 'Logger.Busy = False
+                        Logger.Status("LABEL TITLE BASINS Status")
+                    End If
+                End If
+                'End If
+        End Select
+    End Sub
+#Else
 #Region "Plug-in Information"
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
@@ -100,11 +191,11 @@ Public Class DownloadDataPlugin
 #End Region
 
 #Region "Copied from atcDataManager"
-    Private Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                  ByVal aParent As String, _
-                                  ByVal aMenuText As String, _
-                         Optional ByVal aAfter As String = "", _
-                         Optional ByVal aBefore As String = "", _
+    Private Function AddMenuIfMissing(ByVal aMenuName As String,
+                                  ByVal aParent As String,
+                                  ByVal aMenuText As String,
+                         Optional ByVal aAfter As String = "",
+                         Optional ByVal aBefore As String = "",
                          Optional ByVal aAlphabetical As Boolean = False) _
                                      As MapWindow.Interfaces.MenuItem
         Dim lMenu As MapWindow.Interfaces.MenuItem = g_Menus.Item(aMenuName)
@@ -120,8 +211,8 @@ Public Class DownloadDataPlugin
                 'First make sure we are after a particular item
                 While lSubmenuIndex < lParentMenu.NumSubItems
                     lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
-                    If Not lExistingMenu Is Nothing AndAlso _
-                       Not lExistingMenu.Name Is Nothing AndAlso _
+                    If Not lExistingMenu Is Nothing AndAlso
+                       Not lExistingMenu.Name Is Nothing AndAlso
                            lExistingMenu.Name.Equals(aAfter) Then
                         Exit While
                     End If
@@ -137,9 +228,9 @@ Public Class DownloadDataPlugin
             'Find alphabetical position for new menu item
             While lSubmenuIndex < lParentMenu.NumSubItems
                 lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
-                If Not lExistingMenu Is Nothing AndAlso _
+                If Not lExistingMenu Is Nothing AndAlso
                    Not lExistingMenu.Name Is Nothing Then
-                    If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
+                    If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse
                        lExistingMenu.Text > aMenuText Then
                         'Add before existing menu with alphabetically later text
                         Return g_Menus.AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
@@ -229,5 +320,5 @@ Public Class DownloadDataPlugin
                 End If
         End Select
     End Sub
-
+#End If
 End Class

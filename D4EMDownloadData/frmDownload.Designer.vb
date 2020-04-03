@@ -1218,22 +1218,22 @@ Partial Class frmDownload
     Friend WithEvents txtMinCount_GW As System.Windows.Forms.TextBox
     Friend WithEvents chkNWISStations_precipitation_GW As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISPrecipitation_GW As System.Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2011_Impervious As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2011_LandCover As Windows.Forms.CheckBox
-    Friend WithEvents chkGetNewest As Windows.Forms.CheckBox
-    Friend WithEvents grpNCDC As Windows.Forms.GroupBox
-    Friend WithEvents chkNCDC_MetData As Windows.Forms.CheckBox
-    Friend WithEvents chkNCDC_MetStations As Windows.Forms.CheckBox
-    Friend WithEvents lblTimeZone As Windows.Forms.Label
-    Friend WithEvents txtTimeZone As Windows.Forms.TextBox
-    Friend WithEvents grpNHDplus2 As Windows.Forms.GroupBox
-    Friend WithEvents chkNHDplus2_hydrography As Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus2_elev_cm As Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus2_All As Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus2_Catchment As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2013_LandCover As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2004_LandCover As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2008_LandCover As Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2011_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2011_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkGetNewest As System.Windows.Forms.CheckBox
+    Friend WithEvents grpNCDC As System.Windows.Forms.GroupBox
+    Friend WithEvents chkNCDC_MetData As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNCDC_MetStations As System.Windows.Forms.CheckBox
+    Friend WithEvents lblTimeZone As System.Windows.Forms.Label
+    Friend WithEvents txtTimeZone As System.Windows.Forms.TextBox
+    Friend WithEvents grpNHDplus2 As System.Windows.Forms.GroupBox
+    Friend WithEvents chkNHDplus2_hydrography As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_elev_cm As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_All As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNHDplus2_Catchment As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2013_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2004_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2008_LandCover As System.Windows.Forms.CheckBox
 End Class

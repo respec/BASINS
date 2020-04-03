@@ -3,9 +3,16 @@ Imports System.Windows.Forms.Application
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Extensions
+#Else
 Imports atcMwGisUtility
+#End If
 
 Public Class atcBasinsPlugIn
+#If GISProvider = "DotSpatial" Then
+#Else
     Implements MapWindow.Interfaces.IPlugin
 
 #Region "Plug-in Information"
@@ -47,18 +54,26 @@ Public Class atcBasinsPlugIn
         End Get
     End Property
 #End Region
-
+#End If
     Private pStatusMonitor As MonitorProgressStatus
-
+#If GISProvider = "DotSpatial" Then
+    <CLSCompliant(False)>
+    Public ReadOnly Property MapWin() As AppManager
+#Else
     <CLSCompliant(False)> _
     Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
+#End If
         Get
             Return g_MapWin
         End Get
     End Property
-
+#If GISProvider = "DotSpatial" Then
+    <CLSCompliant(False)>
+    Public Sub Initialize(ByVal aMapWin As AppManager, ByVal aParentHandle As Integer)
+#Else
     <CLSCompliant(False)> _
     Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+#End If
         'fired when 
         '   1) user loads plug-in through plug-in dialog or
         '      by checkmarking it in the plug-ins menu.
@@ -66,7 +81,10 @@ Public Class atcBasinsPlugIn
 
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
+#If GISProvider = "DotSpatial" Then
+#Else
         GisUtil.MappingObject = g_MapWin
+#End If
         atcDataManager.MapWindow = g_MapWin
 
         'These should match, but now g_AppNameLong is a constant and we do not set it here.
@@ -78,7 +96,10 @@ Public Class atcBasinsPlugIn
         OurHelpMenuString = g_AppNameShort & " Documentation"
 
         g_MapWinWindowHandle = aParentHandle
+#If GISProvider = "DotSpatial" Then
+#Else
         g_MapWin.ApplicationInfo.WelcomePlugin = "plugin" 'tell the main app to Plugins.BroadcastMessage("WELCOME_SCREEN") instead of showing default MW welcome screen
+#End If
         'Set g_ProgramDir to folder above the Bin folder where the app and plugins live
         g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
 
@@ -139,7 +160,10 @@ Public Class atcBasinsPlugIn
 
         Logger.StartToFile(g_CacheDir & "log" & g_PathChar _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & g_AppNameShort.Replace(" ", "") & ".log")
+#If GISProvider = "DotSpatial" Then
+#Else
         Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+#End If
         If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
             'Start running status monitor to give better progress and status indication during long-running processes
             pStatusMonitor = New MonitorProgressStatus
@@ -171,6 +195,8 @@ Public Class atcBasinsPlugIn
 
         FindBasinsDrives()
 
+#If GISProvider = "DotSpatial" Then
+#Else
         g_Menus = g_MapWin.Menus
         g_StatusBar = g_MapWin.StatusBar
         g_Toolbar = g_MapWin.Toolbar
@@ -181,6 +207,7 @@ Public Class atcBasinsPlugIn
 
         atcDataManager.AddMenuIfMissing(OurHelpMenuName, TopHelpMenuName, OurHelpMenuString, , "mnuOnlineDocs")
         atcDataManager.AddMenuIfMissing(ProgramWebPageMenuName, TopHelpMenuName, ProgramWebPageMenuString, , "mnuOnlineDocs")
+#End If
 
         Select Case g_AppNameShort
             Case "SW Toolbox"
@@ -189,9 +216,10 @@ Public Class atcBasinsPlugIn
                 'atcDataManager.AddMenuIfMissing(RegisterMenuName, TopHelpMenuName, RegisterMenuString, , "mnuShortcuts")
         End Select
 
+#If GISProvider = "DotSpatial" Then
+#Else
         g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
         g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
-
         'atcDataManager.AddMenuIfMissing(CheckForUpdatesMenuName, TopHelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
         atcDataManager.AddMenuIfMissing(ShowStatusMenuName, TopHelpMenuName, ShowStatusMenuString, CheckForUpdatesMenuName)
         'atcDataManager.AddMenuIfMissing(SendFeedbackMenuName, TopHelpMenuName, SendFeedbackMenuString, ShowStatusMenuName)
@@ -210,6 +238,7 @@ Public Class atcBasinsPlugIn
                 Next
             Next
         Next
+#End If
 
         pLoadedDataMenu = True
 
@@ -238,6 +267,8 @@ Public Class atcBasinsPlugIn
         'g_ProgressPanel.Visible = False
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         On Error Resume Next
         g_MapWin.Menus.Remove(ProjectsMenuName)
@@ -275,6 +306,7 @@ Public Class atcBasinsPlugIn
         'Logger.Dbg("Saving DisplayAttributes " & lDisplayAttributes)
         SaveSetting(g_AppNameRegistry, "DataManager", "DisplayAttributes", lDisplayAttributes)
     End Sub
+#End If
 
     Private Sub CloseForms()
         If pBuildFrm IsNot Nothing Then
@@ -285,6 +317,8 @@ Public Class atcBasinsPlugIn
         End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         'A menu item or toolbar button was clicked
         Logger.Dbg(aItemName)
@@ -308,40 +342,40 @@ Public Class atcBasinsPlugIn
                 Logger.Status("SHOW")
             Case OurHelpMenuName
                 ShowHelp("")
-            'Case atcDataManager.LaunchMenuName & "_ArcView3"
-            '    'create apr if it does not exist, then open it
-            '    Dim lAprFileName As String = lProgramFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
-            '    If Not FileExists(lAprFileName) Then 'build it
-            '        Dim lEmptyAprName As String = lProgramFolder & "\etc\buildapr.dat"
-            '        If FileExists(lEmptyAprName) Then
-            '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
-            '            IO.File.Copy(lEmptyAprName, lAprFileName)
-            '        Else
-            '            Logger.Msg("Unable to locate template apr file buildapr.dat", vbOKOnly, "Launch ArcView Problem")
-            '        End If
-            '    End If
-            '    Try
-            '        Process.Start(lAprFileName)
-            '    Catch
-            '        Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "Launch ArcView Problem")
-            '    End Try
-            'Case atcDataManager.LaunchMenuName & "_ArcGIS"
-            '    'create mxd if it does not exist, then open it
-            '    Dim lMxdFileName As String = lProgramFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
-            '    If Not FileExists(lMxdFileName) Then 'build it
-            '        Dim lEmptyMxdName As String = lProgramFolder & "\etc\buildmxd.dat"
-            '        If FileExists(lEmptyMxdName) Then
-            '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
-            '            IO.File.Copy(lEmptyMxdName, lMxdFileName)
-            '        Else
-            '            Logger.Msg("Unable to locate template mxd file buildmxd.dat", vbOKOnly, "Launch ArcGIS Problem")
-            '        End If
-            '    End If
-            '    Try
-            '        Process.Start(lMxdFileName)
-            '    Catch
-            '        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "Launch ArcGIS Problem")
-            '    End Try
+                'Case atcDataManager.LaunchMenuName & "_ArcView3"
+                '    'create apr if it does not exist, then open it
+                '    Dim lAprFileName As String = lProgramFolder & "\apr" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".apr"
+                '    If Not FileExists(lAprFileName) Then 'build it
+                '        Dim lEmptyAprName As String = lProgramFolder & "\etc\buildapr.dat"
+                '        If FileExists(lEmptyAprName) Then
+                '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lAprFileName))
+                '            IO.File.Copy(lEmptyAprName, lAprFileName)
+                '        Else
+                '            Logger.Msg("Unable to locate template apr file buildapr.dat", vbOKOnly, "Launch ArcView Problem")
+                '        End If
+                '    End If
+                '    Try
+                '        Process.Start(lAprFileName)
+                '    Catch
+                '        Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "Launch ArcView Problem")
+                '    End Try
+                'Case atcDataManager.LaunchMenuName & "_ArcGIS"
+                '    'create mxd if it does not exist, then open it
+                '    Dim lMxdFileName As String = lProgramFolder & "\mxd" & g_PathChar & IO.Path.GetFileNameWithoutExtension(g_Project.FileName) & ".mxd"
+                '    If Not FileExists(lMxdFileName) Then 'build it
+                '        Dim lEmptyMxdName As String = lProgramFolder & "\etc\buildmxd.dat"
+                '        If FileExists(lEmptyMxdName) Then
+                '            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(lMxdFileName))
+                '            IO.File.Copy(lEmptyMxdName, lMxdFileName)
+                '        Else
+                '            Logger.Msg("Unable to locate template mxd file buildmxd.dat", vbOKOnly, "Launch ArcGIS Problem")
+                '        End If
+                '    End If
+                '    Try
+                '        Process.Start(lMxdFileName)
+                '    Catch
+                '        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "Launch ArcGIS Problem")
+                '    End Try
             Case Else
                 If aItemName.StartsWith(atcDataManager.LaunchMenuName & "_") Then
                     Dim lExeName As String = ""
@@ -363,7 +397,7 @@ Public Class atcBasinsPlugIn
                 End If
         End Select
     End Sub
-
+#End If
     Private Sub CheckForUpdates(ByVal aQuiet As Boolean)
         Try
             Dim lQuiet As String = ""
@@ -436,9 +470,12 @@ FoundDir:
                 Logger.Dbg("Creating new project " & lPrjFileName)
                 ClearLayers()
                 RefreshView()
+#If GISProvider = "DotSpatial" Then
+#Else
                 g_MapWin.PreviewMap.GetPictureFromMap()
                 DoEvents()
                 AddAllShapesInDir(aDataDirName, aDataDirName)
+#End If
                 g_Project.Save(lPrjFileName)
                 g_Project.Modified = False
                 Return True
@@ -450,7 +487,11 @@ FoundDir:
     'TODO: merge with function of same name in MapWindow:frmMain
     Private Function PromptToSaveProject(ByVal aProjectFileName As String) As MsgBoxResult
         Dim lResult As MsgBoxResult
+#If GISProvider = "DotSpatial" Then
+        Dim lTitle As String = "Save Changes?"
+#Else
         Dim lTitle As String = g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?"
+#End If
 
         If aProjectFileName Is Nothing OrElse FilenameNoExt(aProjectFileName) = "" Then
             lResult = Logger.Msg("Do you want to save the changes to the currently open project?", _
@@ -527,7 +568,10 @@ FoundDir:
         End If
     End Sub
 
-    <CLSCompliant(False)> _
+#If GISProvider = "DotSpatial" Then
+
+#Else
+    <CLSCompliant(False)>
     Public Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
         For Each MWlay As MapWindow.Interfaces.Layer In Layers
             'If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
@@ -546,7 +590,10 @@ FoundDir:
             UpdateSelectedFeatures()
         End If
     End Sub
+#End If
 
+#If GISProvider = "DotSpatial" Then
+#Else
 #Region "Unused Plug-in Interface Elements"
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     End Sub
@@ -658,5 +705,6 @@ FoundDir:
             UpdateSelectedFeatures()
         End If
     End Sub
+#End If
 
 End Class

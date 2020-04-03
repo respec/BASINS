@@ -3,7 +3,12 @@ Imports System.Reflection
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Extensions
+#Else
 Imports atcMwGisUtility
+#End If
 
 ''' <summary>
 ''' 
@@ -12,6 +17,15 @@ Imports atcMwGisUtility
 Public Module modBasinsPlugin
     'Declare this as global so that it can be accessed throughout the plug-in project.
     'These variables are initialized in the plugin_Initialize event.
+#If GISProvider = "DotSpatial" Then
+    Friend g_MapWin As AppManager
+    Friend g_Menus As Menu
+    Friend g_StatusBar As StatusBar
+    Friend g_Toolbar As ToolBar
+    Friend g_Plugins As Object
+    Friend g_Project As Object
+    Friend g_MapWinWindowHandle As Integer
+#Else
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Friend g_Menus As MapWindow.Interfaces.Menus
     Friend g_StatusBar As MapWindow.Interfaces.StatusBar
@@ -19,6 +33,7 @@ Public Module modBasinsPlugin
     Friend g_Plugins As MapWindow.Interfaces.Plugins
     Friend g_Project As MapWindow.Interfaces.Project
     Friend g_MapWinWindowHandle As Integer
+#End If
 
 #If ProgramName = "USGS GW Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
@@ -49,7 +64,7 @@ Public Module modBasinsPlugin
     Friend g_BasinsDataDirs As New Generic.List(Of String)
     Friend g_ProgramDir As String = ""
     Public g_CacheDir As String = ""
-    Friend g_ProgressPanel As Windows.Forms.Panel
+    Friend g_ProgressPanel As System.Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 
     Friend pExistingMapWindowProjectName As String = ""
@@ -215,7 +230,11 @@ Public Module modBasinsPlugin
             End If
             If FileExists(lFileName) Then  'load national project
                 g_Project.Load(lFileName)
+#If GISProvider = "DotSpatial" Then
+
+#Else
                 g_MapWin.View.ClearSelectedShapes()
+#End If
                 g_Project.Modified = False
                 'See if we need to also process and load place names
                 'Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
@@ -233,6 +252,8 @@ Public Module modBasinsPlugin
 
         If NationalProjectIsOpen() Then
             'Select the Cataloging Units layer by default 
+#If GISProvider = "DotSpatial" Then
+#Else
             For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
                 If g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer)).Name = "Cataloging Units" Then
                     g_MapWin.Layers.CurrentLayer = g_MapWin.Layers.GetHandle(iLayer)
@@ -240,14 +261,15 @@ Public Module modBasinsPlugin
                 End If
             Next
             g_Toolbar.PressToolbarButton("tbbSelect")
+#End If
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             Try
                 pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
                 If pBuildFrm.Top < 0 Then
                     pBuildFrm.Top = 0
-                ElseIf pBuildFrm.Top + pBuildFrm.Height > Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
-                    pBuildFrm.Top = Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
+                ElseIf pBuildFrm.Top + pBuildFrm.Height > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
+                    pBuildFrm.Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
                 End If
             Catch
             End Try
@@ -256,8 +278,8 @@ Public Module modBasinsPlugin
                 pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
                 If pBuildFrm.Left < 0 Then
                     pBuildFrm.Left = 0
-                ElseIf pBuildFrm.Left + pBuildFrm.Width > Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
-                    pBuildFrm.Left = Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
+                ElseIf pBuildFrm.Left + pBuildFrm.Width > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
+                    pBuildFrm.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
                 End If
             Catch
             End Try
@@ -283,8 +305,16 @@ Public Module modBasinsPlugin
     Friend Function IsBASINSProject() As Boolean
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
+#If GISProvider = "DotSpatial" Then
+        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.GetLayers()
+#Else
         For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
+#End If
+#If GISProvider = "DotSpatial" Then
+            Select Case FilenameNoPath(lLayer.DataSet.Filename).ToLower
+#Else
             Select Case FilenameNoPath(lLayer.FileName).ToLower
+#End If
                 Case "st.shp" : lHaveStateLayer = True : If lHaveCatLayer Then Exit For
                 Case "cat.shp" : lHaveCatLayer = True : If lHaveStateLayer Then Exit For
             End Select
@@ -316,6 +346,8 @@ Public Module modBasinsPlugin
     End Function
 
     Friend Sub UpdateSelectedFeatures()
+#If GISProvider = "DotSpatial" Then
+#Else
         If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
             Dim lFieldDesc As String = ""
@@ -375,13 +407,33 @@ Public Module modBasinsPlugin
                 pBuildFrm.txtSelected.Text = ctext
             End If
         End If
+#End If
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+    Public Sub Initialize(ByVal aSettingArgs As atcData.atcDataAttributes)
+        If aSettingArgs IsNot Nothing Then
+            With aSettingArgs
+                g_MapWin = .GetValue("MapWin", Nothing)
+                g_CacheDir = .GetValue("CacheDir", "")
+            End With
+        End If
+    End Sub
+#End If
+
     Friend Sub ClearLayers()
+#If GISProvider = "DotSpatial" Then
+        g_MapWin.Map.Layers.Clear()
+#Else
         g_MapWin.Layers.Clear()
+#End If
     End Sub
 
     Friend Sub RefreshView()
+#If GISProvider = "DotSpatial" Then
+        g_MapWin.Map.Refresh()
+#Else
         g_MapWin.Refresh()
+#End If
     End Sub
 End Module
