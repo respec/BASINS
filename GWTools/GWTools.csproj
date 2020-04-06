@@ -65,7 +65,6 @@
     <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow-DS.vbproj">
       <Project>{9f09a31b-de05-4ff8-8e89-867affe0ace7}</Project>
       <Name>atcUSGSBaseflow-DS</Name>
-      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DS.vbproj">
       <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>

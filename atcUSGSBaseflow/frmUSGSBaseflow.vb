@@ -10,7 +10,7 @@ Imports MapWinUtility
 Imports System.Windows.Forms
 Imports System.Text.RegularExpressions
 #If GISProvider = "DotSpatial" Then
-Imports DotSpatial.Controls
+'Imports DotSpatial.Controls
 #End If
 
 Public Class frmUSGSBaseflow
@@ -51,21 +51,20 @@ Public Class frmUSGSBaseflow
     Public Opened As Boolean = False
     Private pDidBFSeparation As Boolean = False
 #If GISProvider = "DotSpatial" Then
-    Public Property App As AppManager
-        Get
-            Return _app
-        End Get
-        Set(ByVal Value As AppManager)
-            _app = Value
-        End Set
-    End Property
-    Private _app As AppManager
+    'Public Property App As AppManager
+    '    Get
+    '        Return _app
+    '    End Get
+    '    Set(ByVal Value As AppManager)
+    '        _app = Value
+    '    End Set
+    'End Property
+    'Private _app As AppManager
 
-    'Public Sub InitializeDS(ByVal wrapper As USGSBaseflowPlugin)
-    Public Sub InitializeDS(ByVal wrapper As clsUSGSBaseflowPlugin)
-        App = wrapper.App
-        ProgressHandler = wrapper
-    End Sub
+    'Public Sub InitializeDS(ByVal wrapper As clsUSGSBaseflowPlugin)
+    '    App = wrapper.App
+    '    ProgressHandler = wrapper
+    'End Sub
 #End If
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing,

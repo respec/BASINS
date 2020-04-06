@@ -4,8 +4,7 @@ Imports MapWinUtility
 
 Imports System.Drawing
 #If GISProvider = "DotSpatial" Then
-Imports DotSpatial.Controls.Header
-Imports BASINSDS
+'Imports DotSpatial.Controls.Header
 #End If
 
 Public Class clsUSGSBaseflowPlugin
@@ -64,6 +63,7 @@ Public Class clsUSGSBaseflowPlugin
             If lgisLayerFound Then
                 If lstnSelected = 0 Then
 #If GISProvider = "DotSpatial" Then
+                    'lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
 #Else
                     lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
 #End If
@@ -74,6 +74,7 @@ Public Class clsUSGSBaseflowPlugin
                     End If
                 ElseIf lstnSelected < 2 Then
 #If GISProvider = "DotSpatial" Then
+                    'Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
 #Else
                     Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
 #End If
@@ -209,61 +210,62 @@ Public Class clsUSGSBaseflowPlugin
     End Sub
 
 #If GISProvider = "DotSpatial" Then
-    Public Overrides Sub Activate()
-        App.HeaderControl.Add(New SimpleActionItem("Baseflow Separation", AddressOf USGSBaseflowTool_Clicked))
-        MyBase.Activate()
-    End Sub
+    'Could decide if DS plugins are going to the Extention menu
+    'Public Overrides Sub Activate()
+    '    App.HeaderControl.Add(New SimpleActionItem("Baseflow Separation", AddressOf USGSBaseflowTool_Clicked))
+    '    MyBase.Activate()
+    'End Sub
 
-    Public Overrides Sub Deactivate()
-        If frmInteractive IsNot Nothing AndAlso Not frmInteractive.IsDisposed Then frmInteractive.Close()
-        App.HeaderControl.RemoveAll()
-        MyBase.Deactivate()
-    End Sub
+    'Public Overrides Sub Deactivate()
+    '    If frmInteractive IsNot Nothing AndAlso Not frmInteractive.IsDisposed Then frmInteractive.Close()
+    '    App.HeaderControl.RemoveAll()
+    '    MyBase.Deactivate()
+    'End Sub
 
-    Private Sub DisplayMessage(ByVal message As String)
-        App.ProgressHandler.Progress(Nothing, 0, message)
-    End Sub
+    'Private Sub DisplayMessage(ByVal message As String)
+    '    App.ProgressHandler.Progress(Nothing, 0, message)
+    'End Sub
 
-    Private Sub USGSBaseflowTool_Clicked(ByVal sender As Object, ByVal e As EventArgs)
-        If frmInteractive Is Nothing Or frmInteractive.IsDisposed Then
-            frmInteractive = New frmUSGSBaseflow()
-        End If
-        If atcDataManager.DataSources Is Nothing Then
-            atcDataManager.Clear()
-        End If
-        Dim att = New atcDataAttributes()
-        atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
-        If atcDataManager.GetPlugins(GetType(atcTimeseriesRDB.atcTimeseriesRDB)).Count = 0 Then
-            Dim lRDB = New atcTimeseriesRDB.atcTimeseriesRDB()
-            atcDataManager.DataPlugins.Add(lRDB)
-        End If
-        frmInteractive.WindowState = System.Windows.Forms.FormWindowState.Normal
-        frmInteractive.InitializeDS(Me)
-        frmInteractive.Initialize()
-        'frmInteractive.Show()
-    End Sub
+    'Private Sub USGSBaseflowTool_Clicked(ByVal sender As Object, ByVal e As EventArgs)
+    '    If frmInteractive Is Nothing Or frmInteractive.IsDisposed Then
+    '        frmInteractive = New frmUSGSBaseflow()
+    '    End If
+    '    If atcDataManager.DataSources Is Nothing Then
+    '        atcDataManager.Clear()
+    '    End If
+    '    Dim att = New atcDataAttributes()
+    '    atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+    '    If atcDataManager.GetPlugins(GetType(atcTimeseriesRDB.atcTimeseriesRDB)).Count = 0 Then
+    '        Dim lRDB = New atcTimeseriesRDB.atcTimeseriesRDB()
+    '        atcDataManager.DataPlugins.Add(lRDB)
+    '    End If
+    '    frmInteractive.WindowState = System.Windows.Forms.FormWindowState.Normal
+    '    frmInteractive.InitializeDS(Me)
+    '    frmInteractive.Initialize()
+    '    'frmInteractive.Show()
+    'End Sub
 
     Private Sub LoadStatusMonitor()
-        Logger.StartToFile(clsPluginProperties.g_CacheDir & "log" & g_PathChar _
-                         & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & clsPluginProperties.g_AppNameShort.Replace(" ", "") & ".log")
-        'Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
-        If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
-            'Start running status monitor to give better progress and status indication during long-running processes
-            pStatusMonitor = New MonitorProgressStatus
-            If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"),
-                                            clsPluginProperties.g_CacheDir & "log" & g_PathChar,
-                                            System.Diagnostics.Process.GetCurrentProcess.Id) Then
-                'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
-                pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
-                Logger.ProgressStatus = pStatusMonitor
-                Logger.Status("LABEL TITLE " & clsPluginProperties.g_AppNameShort & " Status")
-                Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
-                Logger.Status("")
-            Else
-                pStatusMonitor.StopMonitor()
-                pStatusMonitor = Nothing
-            End If
-        End If
+        'Logger.StartToFile(clsPluginProperties.g_CacheDir & "log" & g_PathChar _
+        '                 & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-" & clsPluginProperties.g_AppNameShort.Replace(" ", "") & ".log")
+        ''Logger.Icon = g_MapWin.ApplicationInfo.FormIcon
+        'If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
+        '    'Start running status monitor to give better progress and status indication during long-running processes
+        '    pStatusMonitor = New MonitorProgressStatus
+        '    If pStatusMonitor.StartMonitor(FindFile("Find Status Monitor", "StatusMonitor.exe"),
+        '                                    clsPluginProperties.g_CacheDir & "log" & g_PathChar,
+        '                                    System.Diagnostics.Process.GetCurrentProcess.Id) Then
+        '        'put our status monitor (StatusMonitor.exe) between the Logger and the default MW status monitor
+        '        pStatusMonitor.InnerProgressStatus = Logger.ProgressStatus
+        '        Logger.ProgressStatus = pStatusMonitor
+        '        Logger.Status("LABEL TITLE " & clsPluginProperties.g_AppNameShort & " Status")
+        '        Logger.Status("PROGRESS TIME ON") 'Enable time-to-completion estimation
+        '        Logger.Status("")
+        '    Else
+        '        pStatusMonitor.StopMonitor()
+        '        pStatusMonitor = Nothing
+        '    End If
+        'End If
     End Sub
 #End If
 End Class

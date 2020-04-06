@@ -120,17 +120,17 @@ Public Class frmDownload
 
             Try
 #If GISProvider = "DotSpatial" Then
-                Dim lCurrentLayer As IMapFeatureLayer = Nothing
-                For Each lCurrentLayer In pMapWin.Map.Layers
-                    If lCurrentLayer.IsSelected Then
-                        Exit For
-                    End If
-                Next
+                Dim lCurrentLayer As IMapFeatureLayer = pMapWin.Map.Layers.SelectedLayer
                 If lCurrentLayer IsNot Nothing Then
                     lExtents = lCurrentLayer.Extent
                     If lExtents.MinX < lExtents.MaxY AndAlso lExtents.MinY < lExtents.MaxY Then
                         cboRegion.Items.Add(pRegionExtentSelectedLayer)
                     End If
+                End If
+#Else
+                lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
+                If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
+                    cboRegion.Items.Add(pRegionExtentSelectedLayer)
                 End If
 #End If
             Catch
@@ -188,7 +188,7 @@ Public Class frmDownload
         If Is64BitOperatingSystem Then 'Old self-extracting archives do not work on 64 bit
             chkBASINS_DEM.Visible = False
         End If
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             lGroups.Add(grpNWISStations_GW)
             lGroups.Add(grpNWIS_GW)
             lGroups.Add(grpBASINS)
@@ -539,7 +539,7 @@ Public Class frmDownload
             'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
         End If
 
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             chkNWIS_GetNWISDailyDischarge_GW.Visible = True
             chkNWIS_GetNWISIdaDischarge_GW.Visible = True
             chkNWIS_GetNWISDailyGW_GW.Visible = True
@@ -603,7 +603,7 @@ Public Class frmDownload
                     chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
                     chkBASINS_MetData.Checked = True
                     'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                ElseIf pApplicationName.StartsWith("USGS GW Toolbox") Then
+                ElseIf pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
                     Select Case lFilename
                         Case "nwis_stations_discharge"
                             chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
@@ -653,7 +653,7 @@ Public Class frmDownload
                 End If
             End If
         End If
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso
                Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso
                Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso
@@ -783,11 +783,15 @@ Public Class frmDownload
                     If lprojinfo.ToProj4String.Length() > 0 Then
                         lDesiredProjection = "<DesiredProjection>" & lprojinfo.ToProj4String & "</DesiredProjection>" & vbCrLf
                     End If
+                Else
+                    lDesiredProjection = "<DesiredProjection>+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </DesiredProjection>" & vbCrLf
                 End If
 
                 If Not DownloadDataPlugin.DSProject.CurrentProjectFile Is Nothing AndAlso DownloadDataPlugin.DSProject.CurrentProjectFile.Length > 0 Then
                     lSaveFolderOnly = IO.Path.GetDirectoryName(DownloadDataPlugin.DSProject.CurrentProjectFile)
                     lSaveFolder &= "<SaveIn>" & lSaveFolderOnly & "</SaveIn>" & vbCrLf
+                Else
+                    lSaveFolder &= "<SaveIn>" & IO.Path.Combine(BASINS.g_CacheDir, "DataDownload") & "</SaveIn>" & vbCrLf
                 End If
             End If
 #Else
@@ -831,7 +835,7 @@ Public Class frmDownload
                             End If
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
                                 Dim lWDMxml As String = ""
-                                If pApplicationName.StartsWith("USGS") Then
+                                If pApplicationName.StartsWith("USGS") OrElse pApplicationName.Contains("Hydro") Then
                                     'Don't offer to save in WDM for USGS versions, always add as individual files
                                 Else
                                     If lChild Is chkNWIS_GetNWISDailyDischarge Then
@@ -896,8 +900,7 @@ Public Class frmDownload
     Private Function CurrentLayer() As ILayer
         Try
             If pMapWin.Map.Layers.Count > 0 Then
-                Dim lCurrentLayer = pMapWin.Map.Layers()(0)
-                Return lCurrentLayer
+                Return pMapWin.Map.Layers.SelectedLayer
             Else
                 Return Nothing
             End If

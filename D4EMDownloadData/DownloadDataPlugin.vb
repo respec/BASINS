@@ -47,11 +47,7 @@ Public Class DownloadDataPlugin
                 'BASINS.LoadNationalProject()
                 'Else
                 Dim lDownloadForm As New frmDownload
-#If GISProvider = "DotSpatial" Then
                 Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)
-#Else
-                Dim lQuery As String = lDownloadForm.AskUser(g_MapWin, g_MainForm)
-#End If
                 If lQuery.Length > 0 Then
                     If lQuery.Equals(frmDownload.CancelString) Then
                         'User cancelled download form
