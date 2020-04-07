@@ -475,27 +475,25 @@ Public Class frmDownload
 #If GISProvider = "DotSpatial" Then
     Private Function StationsFromMap() As Generic.List(Of String)
         Dim lStations As New Generic.List(Of String)
-        Dim layers = pMapWin.Map.Layers
+        Dim layers As List(Of IMapFeatureLayer) = GetFeatureLayers(FeatureType.Point)
         For Each lyr As IMapFeatureLayer In layers
-            If lyr.IsSelected Then
-                If lyr.DataSet.FeatureType() = FeatureType.Point Then
-                    If lyr.Selection().Count > 0 Then
-                        Dim lKeyFld As DataColumn = Nothing
-                        Dim lKeyFldIndex As Integer = -1
-                        Dim lColumnArray = lyr.DataSet.GetColumns()
-                        For Each Fld As DataColumn In lColumnArray
-                            Select Case Fld.ColumnName.ToLower()
-                                Case "site_no", "locid", "location"
-                                    lKeyFld = Fld
-                                    lKeyFldIndex = Array.IndexOf(lColumnArray, lKeyFld)
-                                    Exit For 'TODO: use list of ID fields for layers from layers.dbf
-                            End Select
+            If lyr.Checked Then
+                If lyr.Selection().Count > 0 Then
+                    Dim lKeyFld As DataColumn = Nothing
+                    Dim lKeyFldIndex As Integer = -1
+                    Dim lColumnArray = lyr.DataSet.GetColumns()
+                    For Each Fld As DataColumn In lColumnArray
+                        Select Case Fld.ColumnName.ToLower()
+                            Case "site_no", "locid", "location"
+                                lKeyFld = Fld
+                                lKeyFldIndex = Array.IndexOf(lColumnArray, lKeyFld)
+                                Exit For 'TODO: use list of ID fields for layers from layers.dbf
+                        End Select
+                    Next
+                    If lKeyFld IsNot Nothing Then
+                        For Each lFeat As IFeature In lyr.Selection().ToFeatureList()
+                            lStations.Add(lFeat.DataRow.Item(lKeyFldIndex).ToString())
                         Next
-                        If lKeyFld IsNot Nothing Then
-                            For Each lFeat As IFeature In lyr.Selection().ToFeatureList()
-                                lStations.Add(lFeat.DataRow.Item(lKeyFldIndex).ToString())
-                            Next
-                        End If
                     End If
                 End If
             End If
@@ -779,7 +777,7 @@ Public Class frmDownload
 #If GISProvider = "DotSpatial" Then
             If pMapWin IsNot Nothing Then
                 If pMapWin.Map.Layers.Count > 0 Then
-                    Dim lprojinfo As DotSpatial.Projections.ProjectionInfo = pMapWin.Map.Layers()(0).Projection
+                    Dim lprojinfo As DotSpatial.Projections.ProjectionInfo = pMapWin.Map.Projection
                     If lprojinfo.ToProj4String.Length() > 0 Then
                         lDesiredProjection = "<DesiredProjection>" & lprojinfo.ToProj4String & "</DesiredProjection>" & vbCrLf
                     End If
@@ -910,13 +908,15 @@ Public Class frmDownload
     End Function
 
     Private Function HUC8Layer() As ILayer
-        If Not pMapWin Is Nothing AndAlso Not pMapWin.Map.Layers Is Nothing Then
-            Dim lIndex As Integer = 0
-            For Each lLayer As IMapFeatureLayer In pMapWin.Map.Layers
-                If lLayer IsNot Nothing AndAlso lLayer.DataSet.Filename.ToLower.EndsWith(g_PathChar & "cat.shp") Then
-                    Return lLayer
+        Dim layers As List(Of IMapFeatureLayer) = GetFeatureLayers(FeatureType.Polygon)
+        If layers.Count > 0 Then
+            For Each lyr As IMapFeatureLayer In layers
+                If lyr.DataSet.Filename.ToLower.EndsWith(g_PathChar & "cat.shp") Then
+                    Return lyr
                 End If
             Next
+        Else
+            Return Nothing
         End If
         Return Nothing
     End Function
@@ -941,6 +941,25 @@ Public Class frmDownload
             End If
         End If
         Return lHUC8s
+    End Function
+
+    Private Function GetFeatureLayers(ByVal fType As FeatureType) As List(Of IMapFeatureLayer)
+        Dim lFeatureLayers As New List(Of IMapFeatureLayer)()
+        If Not pMapWin Is Nothing AndAlso Not pMapWin.Map.Layers Is Nothing Then
+            For Each mg As MapGroup In pMapWin.Map.GetLayers()
+                For Each mglyr As IMapFeatureLayer In mg.GetLayers()
+                    If mglyr.DataSet.FeatureType = fType Then
+                        lFeatureLayers.Add(mglyr)
+                    End If
+                Next
+            Next
+            For Each lFlyr As IMapFeatureLayer In pMapWin.Map.GetFeatureLayers()
+                If lFlyr.DataSet.FeatureType = fType Then
+                    lFeatureLayers.Add(lFlyr)
+                End If
+            Next
+        End If
+        Return lFeatureLayers
     End Function
 #Else
     ''' <summary>

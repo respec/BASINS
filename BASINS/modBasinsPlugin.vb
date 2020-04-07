@@ -18,7 +18,7 @@ Public Module modBasinsPlugin
     'Declare this as global so that it can be accessed throughout the plug-in project.
     'These variables are initialized in the plugin_Initialize event.
 #If GISProvider = "DotSpatial" Then
-    Friend g_MapWin As AppManager
+    Public g_MapWin As AppManager
     Friend g_Menus As Menu
     Friend g_StatusBar As StatusBar
     Friend g_Toolbar As ToolBar
@@ -412,11 +412,18 @@ Public Module modBasinsPlugin
 
 #If GISProvider = "DotSpatial" Then
     Public Sub Initialize(ByVal aSettingArgs As atcData.atcDataAttributes)
+        Dim lMapWin As AppManager = Nothing
         If aSettingArgs IsNot Nothing Then
             With aSettingArgs
-                g_MapWin = .GetValue("MapWin", Nothing)
+                lMapWin = .GetValue("MapWin", Nothing)
                 g_CacheDir = .GetValue("CacheDir", "")
             End With
+        End If
+        If lMapWin IsNot Nothing Then
+            Dim lPlugin As atcBasinsPlugIn = New atcBasinsPlugIn()
+            lPlugin.Initialize(lMapWin, Nothing)
+        Else
+            Throw New ApplicationException("Map Control Cannot Be Found.")
         End If
     End Sub
 #End If

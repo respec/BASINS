@@ -58,7 +58,7 @@
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>ProgramName = "USGS Hydro Toolbox",GISProvider = "DotSpatial"</DefineConstants>
+    <DefineConstants>ProgramName = "USGS Hydrologic Toolbox",GISProvider = "DotSpatial"</DefineConstants>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <DebugSymbols>true</DebugSymbols>

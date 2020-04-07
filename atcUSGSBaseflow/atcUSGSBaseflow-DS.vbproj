@@ -43,7 +43,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\bin\Debug\Windows Extensions\atcUSGSBaseflow\</OutputPath>
+    <OutputPath>..\bin\Debug\BASINS\</OutputPath>
     <DocumentationFile>atcUSGSBaseflow.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
@@ -87,24 +87,8 @@
       <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Data">
-      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DotSpatial.Data.Forms">
-      <HintPath>..\bin\Debug\DotSpatial.Data.Forms.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DotSpatial.Extensions">
-      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DotSpatial.Serialization">
-      <HintPath>..\bin\Debug\DotSpatial.Serialization.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DotSpatial.Symbology">
-      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
+      <HintPath>..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -165,7 +149,6 @@
     <Compile Include="frmUSGSBaseflowBatch.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Globals.vb" />
     <Compile Include="modBaseflowUtil.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -289,10 +272,6 @@
     <ProjectReference Include="..\atcUtility\atcUtility-DS.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-DS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BASINSDS\BASINSDS.csproj">
-      <Project>{6c957998-836e-4355-bf12-906a034ff609}</Project>
-      <Name>BASINSDS</Name>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-DS.vbproj">
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>

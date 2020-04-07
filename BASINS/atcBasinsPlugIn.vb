@@ -494,10 +494,10 @@ FoundDir:
 #End If
 
         If aProjectFileName Is Nothing OrElse FilenameNoExt(aProjectFileName) = "" Then
-            lResult = Logger.Msg("Do you want to save the changes to the currently open project?", _
+            lResult = Logger.Msg("Do you want to save the changes to the currently open project?",
                              MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         Else
-            lResult = Logger.Msg("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?", _
+            lResult = Logger.Msg("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?",
                              MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         End If
 
