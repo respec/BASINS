@@ -1,4 +1,4 @@
-Friend Class frmAbout
+Public Class frmAbout
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -338,6 +338,10 @@ Friend Class frmAbout
     Public Sub ShowAbout()
         Try
 #If GISProvider = "DotSpatial" Then
+            picProgramLogo.Image = My.Resources.Images.header_graphic_usgsIdentifier_white
+            picProgramLogo.Width = picProgramLogo.Image.Width
+            picMapWindow.Image = My.Resources.Images.dotspatial_small
+            picMapWindow.Width = picMapWindow.Image.Width
 #Else
             Try
                 Me.Icon = g_MapWin.ApplicationInfo.FormIcon
@@ -374,18 +378,22 @@ Friend Class frmAbout
             Catch
             End Try
             Try
+#If GISProvider = "DotSpatial" Then
+                lblProjFile.Text = g_Project.CurrentProjectFile
+#Else
                 lblProjFile.Text = g_Project.FileName
                 lblConfigFile.Text = g_Project.ConfigFileName
+#End If
             Catch
             End Try
             Try
 #If ProgramName = "USGS GW Toolbox" Then
                 Me.Width += 30
-
 #ElseIf ProgramName = "USGS SW Toolbox" Then
                 Me.Width += 30
+#ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
+                Me.Width += 70
 #Else
-
 #End If
             Catch ex As Exception
             End Try

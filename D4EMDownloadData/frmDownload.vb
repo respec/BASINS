@@ -7,6 +7,7 @@ Imports DotSpatial.Controls
 Imports DotSpatial.Data
 Imports DotSpatial.Symbology
 Imports DotSpatial.Extensions
+Imports atcMwGisUtility
 #Else
 #End If
 
@@ -475,7 +476,7 @@ Public Class frmDownload
 #If GISProvider = "DotSpatial" Then
     Private Function StationsFromMap() As Generic.List(Of String)
         Dim lStations As New Generic.List(Of String)
-        Dim layers As List(Of IMapFeatureLayer) = GetFeatureLayers(FeatureType.Point)
+        Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Point)
         For Each lyr As IMapFeatureLayer In layers
             If lyr.Checked Then
                 If lyr.Selection().Count > 0 Then
@@ -908,7 +909,7 @@ Public Class frmDownload
     End Function
 
     Private Function HUC8Layer() As ILayer
-        Dim layers As List(Of IMapFeatureLayer) = GetFeatureLayers(FeatureType.Polygon)
+        Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Polygon)
         If layers.Count > 0 Then
             For Each lyr As IMapFeatureLayer In layers
                 If lyr.DataSet.Filename.ToLower.EndsWith(g_PathChar & "cat.shp") Then
@@ -943,24 +944,6 @@ Public Class frmDownload
         Return lHUC8s
     End Function
 
-    Private Function GetFeatureLayers(ByVal fType As FeatureType) As List(Of IMapFeatureLayer)
-        Dim lFeatureLayers As New List(Of IMapFeatureLayer)()
-        If Not pMapWin Is Nothing AndAlso Not pMapWin.Map.Layers Is Nothing Then
-            For Each mg As MapGroup In pMapWin.Map.GetLayers()
-                For Each mglyr As IMapFeatureLayer In mg.GetLayers()
-                    If mglyr.DataSet.FeatureType = fType Then
-                        lFeatureLayers.Add(mglyr)
-                    End If
-                Next
-            Next
-            For Each lFlyr As IMapFeatureLayer In pMapWin.Map.GetFeatureLayers()
-                If lFlyr.DataSet.FeatureType = fType Then
-                    lFeatureLayers.Add(lFlyr)
-                End If
-            Next
-        End If
-        Return lFeatureLayers
-    End Function
 #Else
     ''' <summary>
     ''' Returns index in pMapWin.Layers of the HUC8 layer cat.shp, or -1 if not found

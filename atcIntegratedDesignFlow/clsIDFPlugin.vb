@@ -161,6 +161,20 @@ Public Class clsIDFPlugin
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Function ShowFunction(ByVal aItemName As String) As Boolean
+        Select Case aItemName
+            Case pTrendName
+                Dim lTimeseriesGroup As atcTimeseriesGroup =
+                      atcDataManager.UserSelectData("Select Data For Trend Analysis",
+                                                    Nothing, Nothing, True, True, Me.Icon)
+                If lTimeseriesGroup.Count > 0 Then
+                    LoadPlugin("Timeseries::n-day high/low")
+                    Dim lForm As New frmTrend
+                    lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
+                End If
+        End Select
+        Return True
+    End Function
 #Else
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)

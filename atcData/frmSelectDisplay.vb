@@ -1,5 +1,7 @@
 Imports atcUtility
 Imports MapWinUtility
+Imports System.Collections.Generic
+Imports System.Linq
 
 Public Class frmSelectDisplay
     Inherits System.Windows.Forms.Form
@@ -236,9 +238,25 @@ Public Class frmSelectDisplay
 
     Private Sub btnDiscard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDiscard.Click
         Dim lDataSource As atcDataSource
+        Dim lGroupEqual As Boolean
+        Dim list2 As List(Of atcDataSet) = New List(Of atcDataSet)()
+        For Each lds As atcDataSet In pTimeseriesGroup
+            list2.Add(lds)
+        Next
         For iDataSource As Integer = 0 To atcDataManager.DataSources.Count - 1
             lDataSource = atcDataManager.DataSources.Item(iDataSource)
-            If lDataSource.DataSets.Equals(pTimeseriesGroup) Then
+#If GISProvider = "DotSpatial" Then
+            Dim list1 As List(Of atcDataSet) = New List(Of atcDataSet)()
+            For Each lds As atcDataSet In lDataSource.DataSets
+                list1.Add(lds)
+            Next
+            Dim oneintwo = list1.Except(list2).ToList()
+            Dim twoinone = list2.Except(list1).ToList()
+            lGroupEqual = (Not oneintwo.Count > 0) And (Not twoinone.Count > 0)
+#Else
+            lGroupEqual = lDataSource.DataSets.Equals(pTimeseriesGroup) 
+#End If
+            If lGroupEqual Then
                 If Logger.Msg("Discard " & lDataSource.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
                     pTimeseriesGroup.Dispose()
                     atcDataManager.RemoveDataSource(lDataSource)

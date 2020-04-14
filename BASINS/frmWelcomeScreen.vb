@@ -24,7 +24,7 @@ Imports System.Windows.Forms
 Imports MapWinUtility
 Imports atcUtility
 #If GISProvider = "DotSpatial" Then
-Imports DotSpatial.Compatibility
+Imports DotSpatial.Controls
 #Else
 Imports MapWindow.Interfaces
 #End If
@@ -33,8 +33,8 @@ Public Class frmWelcomeScreen
     Inherits System.Windows.Forms.Form
 
 #If GISProvider = "DotSpatial" Then
-    Private lProject As IProject
-    Private lAppInfo As AppInfo
+    Private lProject As SerializationManager
+    'Private lAppInfo As AppInfo
 #Else
     Private lProject As Project
     Private lAppInfo As AppInfo
@@ -43,7 +43,7 @@ Public Class frmWelcomeScreen
 #Region " Windows Form Designer generated code "
 #If GISProvider = "DotSpatial" Then
     <CLSCompliant(False)>
-    Public Sub New(ByVal aProject As IProject, ByVal aAppInfo As AppInfo)
+    Public Sub New(ByVal aProject As SerializationManager, ByVal aAppInfo As Object)
 #Else
     <CLSCompliant(False)>
     Public Sub New(ByVal aProject As Project, ByVal aAppInfo As AppInfo)
@@ -54,7 +54,10 @@ Public Class frmWelcomeScreen
         InitializeComponent()
 
         lProject = aProject
+#If GISProvider = "DotSpatial" Then
+#Else
         lAppInfo = aAppInfo
+#End If
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -203,17 +206,31 @@ Public Class frmWelcomeScreen
         With lOpenFileDialog
             .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
             .CheckFileExists = True
+#If GISProvider = "DotSpatial" Then
+            If lProject IsNot Nothing Then
+                .InitialDirectory = lProject.CurrentProjectDirectory
+                If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
+                    lProject.OpenProject(.FileName)
+                    Me.DialogResult = System.Windows.Forms.DialogResult.OK
+                    Me.Close()
+                End If
+            End If
+#Else
             .InitialDirectory = lAppInfo.DefaultDir
             If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 lProject.Load(.FileName)
                 Me.DialogResult = System.Windows.Forms.DialogResult.OK
                 Me.Close()
             End If
+#End If
         End With
     End Sub
 
     Private Sub cboShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboShowDlg.CheckedChanged
+#If GISProvider = "DotSpatial" Then
+#Else
         lAppInfo.ShowWelcomeScreen = cboShowDlg.Checked
+#End If
     End Sub
 
     Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
@@ -221,7 +238,18 @@ Public Class frmWelcomeScreen
         Handles lblProject1.LinkClicked, lblProject2.LinkClicked, lblProject3.LinkClicked, lblProject4.LinkClicked
 
         Dim fileName As String = CStr(CType(sender, Label).Tag)
-        If lProject.Load(fileName) Then
+        Dim lProjectOpenOK As Boolean
+#If GISProvider = "DotSpatial" Then
+        Try
+            lProject.OpenProject(fileName)
+            lProjectOpenOK = True
+        Catch ex As Exception
+            lProjectOpenOK = False
+        End Try
+#Else
+            lProjectOpenOK = lProject.Load(fileName) 
+#End If
+        If lProjectOpenOK Then
             Logger.Dbg("Loaded Project '" & fileName & "'")
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Close()
@@ -234,6 +262,8 @@ Public Class frmWelcomeScreen
 
         Me.Text = "Welcome to " & g_AppNameLong
 #If GISProvider = "DotSpatial" Then
+        picProgramLogo.Image = My.Resources.Images.header_graphic_usgsIdentifier_white
+        picProgramLogo.Width = picProgramLogo.Image.Width
 #Else
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
         If g_MapWin.ApplicationInfo.SplashPicture IsNot Nothing AndAlso g_MapWin.ApplicationInfo.SplashPicture.Width > 32 Then
@@ -242,7 +272,10 @@ Public Class frmWelcomeScreen
         End If
 #End If
 
+#If GISProvider = "DotSpatial" Then
+#Else
         cboShowDlg.Checked = lAppInfo.ShowWelcomeScreen
+#End If
 
         lblBuildNew.Text = "Build New Project"
         lblBuildNew.LinkArea = New LinkArea(0, lblBuildNew.Text.Length)
@@ -265,6 +298,8 @@ Public Class frmWelcomeScreen
         Dim lProjectName As String
         Dim lProjectId As String
         Dim lblProject As Label
+#If GISProvider = "DotSpatial" Then
+#Else
         While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
             lProjectName = CType(lProject.RecentProjects(lCurrent), String)
             lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
@@ -282,6 +317,7 @@ Public Class frmWelcomeScreen
             End If
             lCurrent += 1
         End While
+#End If
     End Sub
 
     Private Sub btnClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClose.Click
