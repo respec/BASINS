@@ -410,7 +410,7 @@ Public Class atcText
     End Sub
 
     Private Sub SetColorFromDialog()
-        Dim cdlg As New Windows.Forms.ColorDialog
+        Dim cdlg As New System.Windows.Forms.ColorDialog
 
         cdlg.Color = txtBox.BackColor
         If cdlg.ShowDialog() = DialogResult.OK Then
@@ -463,7 +463,7 @@ Public Class atcText
     End Sub
 
     Private Sub txtBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtBox.KeyDown
-        Dim lKeyCode As Windows.Forms.Keys = e.KeyCode
+        Dim lKeyCode As System.Windows.Forms.Keys = e.KeyCode
         'Logger.Dbg("txtBox:KeyDown: " & lKeyCode & " " & txtBox.SelectionLength)
         'Dim newName As String = ""
         'Dim newColor As Integer
@@ -516,7 +516,7 @@ Public Class atcText
     End Sub
 
     Private Sub txtBox_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBox.MouseDown
-        If e.Button = Windows.Forms.MouseButtons.Right Then
+        If e.Button = System.Windows.Forms.MouseButtons.Right Then
             ShowRange()
         End If
     End Sub

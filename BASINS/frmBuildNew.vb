@@ -124,7 +124,11 @@ Public Class frmBuildNew
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildTop", Me.Top)
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", Me.Left)
         Me.Close()
+#If GISProvider = "DotSpatial" Then
         SpecifyAndCreateNewProject()
+#Else
+        SpecifyAndCreateNewProject()
+#End If
     End Sub
 
     'Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
@@ -142,7 +146,7 @@ Public Class frmBuildNew
     'End Sub
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Project Creation and Management\Build BASINS Project.html")
         End If
     End Sub
@@ -152,7 +156,10 @@ Public Class frmBuildNew
     End Sub
 
     Private Sub frmBuildNew_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+#If GISProvider = "DotSpatial" Then
+#Else
         Me.Icon = g_MapWin.ApplicationInfo.FormIcon
+#End If
         Me.Text = "Build New " & g_AppNameLong & " Project"
     End Sub
 End Class

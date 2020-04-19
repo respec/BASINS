@@ -346,8 +346,8 @@ Public Class atcGraphForm
             .AllowSelection = False
             .ShowHelp = True
             .UseEXDialog = True
-            Dim lDialogResult As Windows.Forms.DialogResult = .ShowDialog(Me)
-            If (lDialogResult = Windows.Forms.DialogResult.OK) Then
+            Dim lDialogResult As System.Windows.Forms.DialogResult = .ShowDialog(Me)
+            If (lDialogResult = System.Windows.Forms.DialogResult.OK) Then
                 Dim lSaveRectangle As RectangleF = pMaster.Rect
                 lPrintDocument.Print()
                 ' Restore graph size to fit form's bounds. 
@@ -425,7 +425,7 @@ Public Class atcGraphForm
         ShowHelpForGraph()
     End Sub
     Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelpForGraph()
         End If
     End Sub
@@ -569,7 +569,7 @@ Public Class atcGraphForm
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Dim lStr As String = ""
                 Dim lSerial As String = ""
                 Dim ser As JavaScriptSerializer = New JavaScriptSerializer()
@@ -658,7 +658,7 @@ Public Class atcGraphForm
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
 
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 ApplySpecsFromJSON(.FileName, pZgc)
                 RefreshGraph()
             End If

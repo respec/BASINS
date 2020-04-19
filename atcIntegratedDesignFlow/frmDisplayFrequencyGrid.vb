@@ -337,7 +337,7 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With
@@ -352,15 +352,15 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, CreateReport)
                 OpenFile(.FileName)
             End If
         End With
     End Sub
 
-    Public Function CreateReport() As String
-        Return pSource.CreateReport
+    Public Function CreateReport(Optional ByVal aExpFmt As Boolean = False) As String
+        Return pSource.CreateReport(aExpFmt)
     End Function
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -470,7 +470,7 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, pSource.CreateReport(True))
                 OpenFile(.FileName)
             End If

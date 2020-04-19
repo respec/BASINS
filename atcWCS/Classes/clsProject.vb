@@ -44,8 +44,7 @@ Friend Class clsProject
 
     Friend Enum enumLandUseType
         GIRAS
-        NLCD_1992
-        NLCD_2001
+        NLCD
         UserShapefile
         UserGrid
     End Enum
@@ -136,7 +135,7 @@ Friend Class clsProject
         Dim sw As New IO.StreamWriter(Filename)
         Try
             For t As enumLandUseType = enumLandUseType.GIRAS To enumLandUseType.UserGrid
-                sw.WriteLine(Choose(t + 1, "GIRAS", "NLCD-1992", "NLCD-2001", "USER-SHAPEFILE", "USER-GRIDFILE") & vbTab & dictLanduse(t).Count)
+                sw.WriteLine(Choose(t + 1, "GIRAS", "NLCD", "USER-SHAPEFILE", "USER-GRIDFILE") & vbTab & dictLanduse(t).Count)
                 For Each kv As Generic.KeyValuePair(Of String, clsLanduse) In dictLanduse(t)
                     sw.WriteLine(kv.Key & vbTab & kv.Value.Name)
                 Next

@@ -48,8 +48,8 @@ Public Class clsBatch
     Public Message As String
 
     Public Event StatusUpdate(ByVal aMsg As String)
-    Public gProgressBar As Windows.Forms.ProgressBar = Nothing
-    Public gTextStatus As Windows.Forms.TextBox = Nothing
+    Public gProgressBar As System.Windows.Forms.ProgressBar = Nothing
+    Public gTextStatus As System.Windows.Forms.TextBox = Nothing
 
     Public DownloadStations As atcCollection
 
@@ -94,8 +94,8 @@ Public Class clsBatch
     ''' <param name="aPreserve">if work off the original Ts or off a clone</param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation, _
-                                             ByVal aListBatchUnitsData As atcCollection, _
+    Public Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation,
+                                             ByVal aListBatchUnitsData As atcCollection,
                                              Optional ByVal aPreserve As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
         If aListBatchUnitsData.Keys.Contains(aStation.StationID) Then
@@ -117,7 +117,7 @@ Public Class clsBatch
                     If lDataDir = "" Then
                         Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
                         lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
-                        If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        If lOutDirDiag.ShowDialog = System.Windows.Forms.DialogResult.OK Then
                             lDataDir = lOutDirDiag.SelectedPath
                             GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
                         End If

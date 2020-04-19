@@ -1356,5 +1356,5 @@ Partial Class frmGraphEditor
     Friend WithEvents lblAuxSize As System.Windows.Forms.Label
     Friend WithEvents txtAuxSize As System.Windows.Forms.TextBox
     Friend WithEvents btnNewColors As System.Windows.Forms.Button
-    Private WithEvents chkHoldOpposite As Windows.Forms.CheckBox
+    Private WithEvents chkHoldOpposite As System.Windows.Forms.CheckBox
 End Class

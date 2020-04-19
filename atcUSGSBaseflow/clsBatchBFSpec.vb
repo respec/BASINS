@@ -2,6 +2,7 @@
 Imports atcData
 Imports atcBatchProcessing
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class BFBatchInputNames
     'Public Shared SDATE As String = "SDATE"
@@ -79,12 +80,12 @@ Public Class clsBatchBFSpec
     Public MessageParameters As String = ""
 
     Public Event StatusUpdate(ByVal aMsg As String)
-    Public gProgressBar As Windows.Forms.ProgressBar = Nothing
-    Public gTextStatus As Windows.Forms.TextBox = Nothing
+    Public gProgressBar As ProgressBar = Nothing
+    Public gTextStatus As TextBox = Nothing
 
     Public DownloadStations As atcCollection
 
-    Public Sub New(ByVal aProgressbar As Windows.Forms.ProgressBar, ByVal aTextField As Windows.Forms.TextBox)
+    Public Sub New(ByVal aProgressbar As ProgressBar, ByVal aTextField As TextBox)
         gProgressBar = aProgressbar
         gTextStatus = aTextField
     End Sub
@@ -623,7 +624,7 @@ Public Class clsBatchBFSpec
                     If lDataDir = "" Then
                         Dim lOutDirDiag As New System.Windows.Forms.FolderBrowserDialog()
                         lOutDirDiag.Description = "Select Directory to Save All Downloaded Streamflow Data"
-                        If lOutDirDiag.ShowDialog = Windows.Forms.DialogResult.OK Then
+                        If lOutDirDiag.ShowDialog = DialogResult.OK Then
                             lDataDir = lOutDirDiag.SelectedPath
                             GlobalSettings.SetValue(BFBatchInputNames.DataDir, lDataDir)
                         End If
@@ -1131,10 +1132,14 @@ Public Class clsBatchBFSpec
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
                             'lTmpGroup.Add(lTserFullDateRange)
+                            Logger.Dbg("mem0: " & MemUsage())
                             Dim lTsFlowFullRange As atcTimeseries = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
+                            Logger.Dbg("mem1: " & MemUsage())
                             If lTsFlowFullRange IsNot Nothing AndAlso lTsFlowFullRange.Attributes.GetValue("count positive") > 0 Then
                                 AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
+                                Logger.Dbg("mem2: " & MemUsage())
                                 ASCIICommon(lTsFlowFullRange, lBFReportGroups)
+                                Logger.Dbg("mem3: " & MemUsage())
                                 lGraphs = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.Graph, "")
                                 If Not String.IsNullOrEmpty(lGraphs) Then
                                     lArr = lGraphs.Split(",")
@@ -1145,6 +1150,7 @@ Public Class clsBatchBFSpec
                                         End Select
                                     Next
                                 End If
+                                Logger.Dbg("mem4: " & MemUsage())
                             Else
                                 Try
                                     lDateFormat.Midnight24 = False
@@ -1158,6 +1164,7 @@ Public Class clsBatchBFSpec
                             End If
                             lTsFlowFullRange.Clear()
                             lTsFlowFullRange = Nothing
+                            Logger.Dbg("mem5: " & MemUsage())
                         Catch ex As Exception
                             lStation.Message &= vbCrLf & "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
                             If ex.Message.Contains("out of range") Then
@@ -1170,6 +1177,7 @@ Public Class clsBatchBFSpec
                     'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                     'UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                     lStationCtr += 1
+                    Logger.Dbg("mem6: " & MemUsage())
                 Next 'lStation}
             End Using
             'If lStationFoundData IsNot Nothing Then Exit For

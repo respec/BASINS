@@ -224,32 +224,32 @@ Public Class frmFeedback
         txtSystemInformation.Text = aSystemInformation
         Me.Show()
         Me.Refresh()
-        Windows.Forms.Application.DoEvents()
+        System.Windows.Forms.Application.DoEvents()
 
         If aAddGenericSystemInfo Then
             txtSystemInformation.Text &= GetSystemInfo()
             txtSystemInformation.Refresh()
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
         End If
 
         If aAddDebugInfo Then
             txtSystemInformation.Text &= GetDebugInfo()
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
         End If
 
         If aAddModuleInfo Then
             txtSystemInformation.Text &= GetModuleInfo()
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
         End If
 
         If FileExists(aAddFilesInFolder, True, False) Then
             txtSystemInformation.Text &= ReportFilesInDir(aAddFilesInFolder, True)
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
         End If
 
         While Me.Visible
             System.Threading.Thread.Sleep(50)
-            Windows.Forms.Application.DoEvents()
+            System.Windows.Forms.Application.DoEvents()
         End While
 
         If pSend Then
@@ -271,7 +271,7 @@ Public Class frmFeedback
         lFeedback &= "Email: " & txtEmail.Text & vbCrLf
         lFeedback &= "Message: " & txtMessage.Text & vbCrLf
         lFeedback &= vbCrLf & txtSystemInformation.Text & vbCrLf
-        Windows.Forms.Clipboard.SetDataObject(lFeedback)
+        System.Windows.Forms.Clipboard.SetDataObject(lFeedback)
     End Sub
 
     Private Sub btnSend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSend.Click
@@ -297,7 +297,7 @@ Public Class frmFeedback
             Try
                 lFeedback &= WholeFileString(Logger.FileName) & vbCrLf
             Catch e As Exception
-                lFeedback &= vbCrLf & "Logger file read failed, exception message:" & _
+                lFeedback &= vbCrLf & "Logger file read failed, exception message:" &
                              vbCrLf & e.ToString & vbCrLf & vbCrLf
             End Try
         End If
@@ -373,7 +373,7 @@ Public Class frmFeedback
             Dim myProcessModule As ProcessModule
             For Each myProcessModule In myProcessModuleCollection
                 Try
-                    Windows.Forms.Application.DoEvents()
+                    System.Windows.Forms.Application.DoEvents()
                     lInfo.Append("----Module Name:  ").AppendLine(myProcessModule.ModuleName)
                     lInfo.Append("    Path:  ").AppendLine(myProcessModule.FileName)
                     If myProcessModule.FileVersionInfo.FileVersion IsNot Nothing Then

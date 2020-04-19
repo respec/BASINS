@@ -1,6 +1,10 @@
 Imports atcUtility
 Imports MapWinUtility
 Imports System.Reflection
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+#Else
+#End If
 
 ''' <summary>Manages a set of currently open DataSources. 
 '''          Uses the set of plugins currently loaded to find ones that inherit atcTimeseriesSource
@@ -8,6 +12,20 @@ Imports System.Reflection
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
     Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
+    Private Shared pMapWin As AppManager
+    ''' <summary>Pointer to the root interface for MapWindow 4</summary>
+    <CLSCompliant(False)>
+    Public Shared WriteOnly Property MapWindow() As AppManager
+        Set(ByVal aMapWin As AppManager)
+            If pMapWin Is Nothing AndAlso aMapWin IsNot Nothing Then
+                pMapWin = aMapWin
+                'If aMapWin.ApplicationInfo.ApplicationName.StartsWith("USGS GW Toolbox") Then
+                '    pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
+                'End If
+                Clear()
+            End If
+        End Set
+    End Property
 #Else
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>
@@ -193,6 +211,9 @@ Public Class atcDataManager
     ''' <summary>Set of atcDataSets found in currently open DataSources</summary>
     Public Shared Function DataSets() As atcTimeseriesGroup
         Dim lAllData As New atcTimeseriesGroup
+        If DataSources Is Nothing OrElse DataSources.Count = 0 Then
+            Return lAllData
+        End If
         For Each lDataSource As atcTimeseriesSource In DataSources
             lAllData.AddRange(lDataSource.DataSets)
         Next
@@ -508,7 +529,7 @@ Public Class atcDataManager
 #Else
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
 #End If
-                    Dim lForm As Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
+                    Dim lForm As System.Windows.Forms.Form = lNewDisplay.Show(aTimeseriesGroup, aIcon)
                     Exit Sub
                 End If
             Next

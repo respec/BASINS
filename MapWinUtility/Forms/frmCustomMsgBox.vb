@@ -156,11 +156,11 @@ Public Class frmCustomMsgBox
 
         Text = aTitle
         lblMessage.Text = aMessage
-        Dim lButtons As New Generic.List(Of Windows.Forms.Button)
+        Dim lButtons As New Generic.List(Of System.Windows.Forms.Button)
         Dim lSetHeight As Boolean = False
 
         For Each curLabel As String In aButtonLabels
-            Dim btn As Windows.Forms.Button = New Windows.Forms.Button
+            Dim btn As System.Windows.Forms.Button = New System.Windows.Forms.Button
             btn.Anchor = AnchorStyles.Bottom + AnchorStyles.Left
             btn.AutoSize = True
             btn.Left = lButtonLeft
@@ -212,7 +212,7 @@ Public Class frmCustomMsgBox
 
         If lWidest > lButtonLeft Then
             Dim lMoveButtons As Integer = (lWidest - lButtonLeft) / 2
-            For Each lButton As Windows.Forms.Button In lButtons
+            For Each lButton As System.Windows.Forms.Button In lButtons
                 lButton.Left += lMoveButtons
             Next
         End If
@@ -236,7 +236,7 @@ Public Class frmCustomMsgBox
             Me.Visible = False
         End If
 
-        For Each lButton As Windows.Forms.Button In lButtons
+        For Each lButton As System.Windows.Forms.Button In lButtons
             Me.Controls.Remove(lButton)
         Next
 

@@ -8,13 +8,10 @@ Public Class atcWASPProject
     Public SDate As Date = Date.MinValue
     Public EDate As Date = Date.MaxValue
     Public ModelType As Integer = 11 '2
-    Public Version As Integer = 2
+    Public Version As Integer = 3
     Public Name As String = ""
     Public INPFileName As String = ""
     Public WASPTimeFunctions As New atcCollection
-
-    'list of time series pointers associated with each time function for version 2.0
-    Public TimeFunctionSeries() As clsTimeSeriesSelection
     Public WASPConstituents As Generic.List(Of clsWASPConstituent)
     Public WriteErrors As String = ""
 
@@ -126,7 +123,12 @@ Public Class atcWASPProject
         'Dim lStartDateString As String = SDate.Month.ToString.PadLeft(5) & SDate.Day.ToString.PadLeft(5) & SDate.Year.ToString.PadLeft(5)
         Dim lJulianEnd As String = EDate.Subtract(SDate).TotalDays.ToString.PadLeft(10)
 
-        aSW.WriteLine("{0,5}{1,7}               Module type               SYSFILE", ModelType, Version)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}{1,7}               Module type               SYSFILE", ModelType, Version)
+        Else
+            aSW.WriteLine("{0,5}{1,7}          Module Type, Version", ModelType, Version)
+            aSW.WriteLine(" ======================== Model Parameterization ===================================")
+        End If
         'aSW.WriteLine(lStartDateString & "    0    0    0     Start date and time")
         'aSW.WriteLine(lStartDateString & "    0    0    0     Skip date and time")
         aSW.WriteLine("{0,5:MM}{0,5:dd}{0,5:yyyy}    0    0    0     Start date and time", SDate)
@@ -141,22 +143,37 @@ Public Class atcWASPProject
         aSW.WriteLine("    0               WQ Module Linkage Option")
         aSW.WriteLine("    0.9000          TOPT Factor")
         aSW.WriteLine("0.003000  1.000     Min and Max Timestep")
-        aSW.WriteLine("    0               Number print intervals")
-        'aSW.WriteLine("      0.00  1.000   Time and Print Interval")
-        'aSW.WriteLine(lJulianEnd & "  1.000   Time and Print Interval")
-        Dim lTemp As String = " "
-        For lIndex As Integer = 1 To Me.WASPConstituents.Count
-            lTemp = lTemp & "  0"
-        Next
-        aSW.WriteLine(lTemp)
-        aSW.WriteLine("    0               Number output variables")
-        aSW.WriteLine("    0               Number csv files")   'new entry in INP file per Tim Wool for version 1.2
+        If Version < 3 Then
+            aSW.WriteLine("    0               Number print intervals")
+            'aSW.WriteLine("      0.00  1.000   Time and Print Interval")
+            'aSW.WriteLine(lJulianEnd & "  1.000   Time and Print Interval")
+        Else
+            aSW.WriteLine("    0.0000     Time and Print Interval")
+        End If
+        If Version < 3 Then
+            Dim lTemp As String = " "
+            For lIndex As Integer = 1 To Me.WASPConstituents.Count
+                lTemp = lTemp & "  0"
+            Next
+            aSW.WriteLine(lTemp)
+            aSW.WriteLine("    0               Number output variables")
+            aSW.WriteLine("    0               Number csv files")   'new entry in INP file per Tim Wool for version 1.2
+        Else
+            For Each lCons As clsWASPConstituent In Me.WASPConstituents
+                aSW.WriteLine("{0,5}     {1,-40}", lCons.Tag, lCons.Description)
+            Next
+        End If
         aSW.Flush()
         Return True
     End Function
 
     Private Function writeInpSegs(ByRef aSW As IO.StreamWriter) As Boolean
-        aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & "               Number of Segments                            SEGFILE")
+        If Version < 3 Then
+            aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & "               Number of Segments                            SEGFILE")
+        Else
+            aSW.WriteLine(" ======================== Segment Information ===================================")
+            aSW.WriteLine(Segments.Count.ToString.PadLeft(5) & "               Number of Segments")
+        End If
         aSW.WriteLine("    0               Bed Volume Option")
         aSW.WriteLine("     0.000          Bed Compaction Time Step")
         aSW.WriteLine("   1.000   1.000    Volume Scale & Conversion Factor")
@@ -174,7 +191,11 @@ Public Class atcWASPProject
         Next
 
         'Write out segment geometry information
-        aSW.WriteLine("   Segment    BotSeg     iType    Volume     VMult      Vexp     DMult      Dexp    Length     Slope     Width     Rough  Depth_Q0")
+        If Version < 3 Then
+            aSW.WriteLine("   Segment    BotSeg     iType    Volume     VMult      Vexp     DMult      Dexp    Length     Slope     Width     Rough  Depth_Q0")
+        Else
+            aSW.WriteLine("Seg BotSeg iType IQOPT     Volume          VMult          Vexp          DMult           Dexp         Length          Slope         Width           Rough         Depth_Q0       SurfElev      SegBotElev    SegSideSlope   SegInitDepth    WeirHeight       WeirType")
+        End If
 
         'print out segments in order of ID
         Dim lsegParams(12) As String
@@ -183,10 +204,18 @@ Public Class atcWASPProject
                 With lSegment
                     If .WaspID = i Then
                         Dim vol As Double = .Length * 1000.0 * .Width * .Depth * 0.5 ' crude assumption for Volume in m3
-                        aSW.WriteLine("{0,10}{1,10}{2,10}{3,15:0.00}{4,10:0.000000}{5,10:0.000000}{6,10:0.000000}" &
+                        If Version < 3 Then
+                            aSW.WriteLine("{0,10}{1,10}{2,10}{3,15:0.00}{4,10:0.000000}{5,10:0.000000}{6,10:0.000000}" &
                                       "{7,10:0.000000}{8,10:0.00}{9,10:0.00000}{10,10:0.0000}{11,10:0.0000}{12,10:0.0000}",
                                       .WaspID, 0, 1, vol, 0, 0, .Depth,
                                       0, .Length * 1000, .Slope, .Width, .Roughness, 0.001)
+                        Else
+                            aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
+                                      "{8,15:0.00000}{9,15:0.00000}{10,15:0.00000}{11,15:0.00000}{12,15:0.00000}{13,15:0.00000}" &
+                                      "{14,15:0.00000}{15,15:0.00000}{16,15:0.00000}{17,15:0.00000}{18,15:0.00000}{19,15:0.00000}",
+                                      .WaspID, 0, 1, 4, vol, 0, 0, .Depth,
+                                      0, .Length * 1000, .Slope, .Width, .Roughness, 0.001, 0, 0, 0, .Depth, 0, 0)
+                        End If
                         Exit For
                     End If
                 End With
@@ -361,8 +390,13 @@ Public Class atcWASPProject
 
     Private Function writeInpPath(ByRef aSW As IO.StreamWriter) As Boolean
         'TODO: flow field information, need interface
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Flow Pathways                                 PATHFILE", 4)
+        Else
+            aSW.WriteLine(" ======================== Flow Path Information ===================================")
+            aSW.WriteLine("               Flow Pathways")
+        End If
 
-        aSW.WriteLine("{0,5}               Flow Pathways                                 PATHFILE", 4)
         aSW.WriteLine("{0,5}               Number of flow fields", 6) ' this can be hardcoded here as only 6 constant fields
         aSW.WriteLine("     Flow Field   1")
 
@@ -386,7 +420,12 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpFlowFile(ByRef aSW As IO.StreamWriter) As Boolean
-        aSW.WriteLine("{0,5}               Number of Flow Fields                          FLOWFILE", 6)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Flow Fields                          FLOWFILE", 6)
+        Else
+            aSW.WriteLine(" ======================== Flow Time Series ===================================")
+            aSW.WriteLine("{0,5}               Number of Flow Fields", 6)
+        End If
         Dim linflowCat(5) As String
         linflowCat(0) = " Surface Water Flow Field      "
         linflowCat(1) = " Porewater Flow Field          "
@@ -403,7 +442,11 @@ Public Class atcWASPProject
             If NumFlowFunc(i) = 0 Then
                 Continue For
             End If
-            aSW.WriteLine("   1.000   1.000    Flow Scale & Conversion Factors")
+            If Version < 3 Then
+                aSW.WriteLine("   1.000   1.000    Flow Scale & Conversion Factors")
+            Else
+                aSW.WriteLine("      1.000000      1.000000  Flow Scale & Conversion Factors")
+            End If
 
             For j As Integer = 0 To FlowPathList.Count - 1
                 Dim seg As atcWASPSegment = Segments.Item(FlowPathList(j))
@@ -412,7 +455,11 @@ Public Class atcWASPProject
                     If seg.FlowTimeSeries.SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
                         WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", seg.Name, "flow", seg.FlowTimeSeries.ToFullString) & vbCr
                     End If
-                    aSW.WriteLine("{0,5}               Number of time-flow values in {1}", .Count - 1, seg.FlowTimeSeries.ToFullString)
+                    If Version < 3 Then
+                        aSW.WriteLine("{0,5}               Number of time-flow values in {1}", .Count - 1, seg.FlowTimeSeries.ToFullString)
+                    Else
+                        aSW.WriteLine("{0,5}               Number of Time Pairs", .Count - 1)
+                    End If
                     For t As Integer = 1 To .Count - 1
                         aSW.WriteLine(String.Format("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t)))
                     Next
@@ -425,13 +472,23 @@ Public Class atcWASPProject
 
     Private Function writeInpDispFile(ByRef aSW As IO.StreamWriter) As Boolean
         'TODO: deal with this part later
-        aSW.WriteLine("{0,5}               Number of Exchange Fields                     DISPFILE", 0)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Exchange Fields                     DISPFILE", 0)
+        Else
+            aSW.WriteLine(" ======================== Segment Dispersion/Exhange ===================================")
+            aSW.WriteLine("{0,5}               Number of Exchange Fields", 0)
+        End If
         aSW.Flush()
         Return True
     End Function
 
     Private Function writeInpBoundFile(ByRef aSW As IO.StreamWriter) As Boolean
-        aSW.WriteLine("{0,5}               Number of Systems                             BOUNDFILE", WASPConstituents.Count)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Systems                             BOUNDFILE", WASPConstituents.Count)
+        Else
+            aSW.WriteLine(" ======================== Boundary Information ===================================")
+            aSW.WriteLine("{0,5}               Number of Systems", WASPConstituents.Count)
+        End If
         'figure out the number of boundaries
         Dim NumBound As Integer = 0
         For Each lSegment As atcWASPSegment In Segments
@@ -442,7 +499,11 @@ Public Class atcWASPProject
         For c As Integer = 0 To WASPConstituents.Count - 1
             aSW.WriteLine("  {0,-30}", WASPConstituents(c).Description)
             aSW.WriteLine("{0,5}               Number of boundaries", NumBound)
-            aSW.WriteLine("   1.000   1.000    Boundary Scale & Conversion Factors")
+            If Version < 3 Then
+                aSW.WriteLine("   1.000   1.000    Boundary Scale & Conversion Factors")
+            Else
+                aSW.WriteLine("      1.000000      1.000000  Boundary Scale & Conversion Factors")
+            End If
             For i As Integer = 1 To Segments.Count
                 For Each Seg As atcWASPSegment In Segments
                     With Seg
@@ -453,14 +514,22 @@ Public Class atcWASPProject
                                     If Seg.BoundTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
                                         WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", Seg.Name, WASPConstituents(c), Seg.BoundTimeSeries(c).ToFullString) & vbCr
                                     End If
-                                    If .Count = 0 Then
-                                        aSW.WriteLine("{0,5}               Number of time-concentration values in {1}", 2, "--Empty Time Series--")
+                                    If .Count < 3 Then
+                                        If Version < 3 Then
+                                            aSW.WriteLine("{0,5}               Number of time-concentration values in {1}", 2, "--Empty Time Series--")
+                                        Else
+                                            aSW.WriteLine("{0,5}               Number of Time Pairs", 2)
+                                        End If
                                         aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", 0, 0)
                                         aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", EDate.Subtract(SDate).TotalDays, 0)
                                     Else
-                                        aSW.WriteLine("{0,5}               Number of time-concentration values in {1}", .Count, Seg.FlowTimeSeries.ToFullString)
-                                        For t As Integer = 0 To .Count - 1
-                                            aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t).Subtract(SDate).TotalDays, .Values(t))
+                                        If Version < 3 Then
+                                            aSW.WriteLine("{0,5}               Number of time-concentration values in {1}", .Count - 1, Seg.FlowTimeSeries.ToFullString)
+                                        Else
+                                            aSW.WriteLine("{0,5}               Number of Time Pairs", .Count - 1)
+                                        End If
+                                        For t As Integer = 1 To .Count - 1
+                                            aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t))
                                         Next
                                     End If
                                 End With
@@ -476,7 +545,12 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpLoadFile(ByRef aSW As IO.StreamWriter) As Boolean
-        aSW.WriteLine("{0,5}               NPS Input Option (0=No, 1=Yes)                LOADFILE", 0)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               NPS Input Option (0=No, 1=Yes)                LOADFILE", 0)
+        Else
+            aSW.WriteLine(" ======================== Load Information ===================================")
+            aSW.WriteLine("{0,5}               NPS Input Option (0=No, 1=Yes)                LOADFILE", 0)
+        End If
         aSW.WriteLine("{0,5}               Number of Systems", WASPConstituents.Count)
         For c As Integer = 0 To WASPConstituents.Count - 1
             aSW.WriteLine("  {0,-30}", WASPConstituents(c).Description)
@@ -487,7 +561,11 @@ Public Class atcWASPProject
             Next
             aSW.WriteLine("{0,5}               Number of Loadings", NumLoads)
             If NumLoads > 0 Then
-                aSW.WriteLine("   1.000   1.000    Loading Scale & Conversion Factors")
+                If Version < 3 Then
+                    aSW.WriteLine("   1.000   1.000    Loading Scale & Conversion Factors")
+                Else
+                    aSW.WriteLine("      1.000000      1.000000  Loading Scale & Conversion Factors")
+                End If
                 For Each Seg As atcWASPSegment In Segments
                     With Seg
                         If Seg.LoadTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then
@@ -496,7 +574,11 @@ Public Class atcWASPProject
                                 If Seg.LoadTimeSeries(c).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
                                     WriteErrors &= String.Format("Empty time series was returned for segment {0} for {1}; specification was: {2}", Seg.Name, WASPConstituents(c), Seg.LoadTimeSeries(c).ToFullString) & vbCr
                                 End If
-                                aSW.WriteLine("{0,5}               Number of time-loading values in {1}", .Count - 1, Seg.FlowTimeSeries.ToFullString)
+                                If Version < 3 Then
+                                    aSW.WriteLine("{0,5}               Number of time-loading values in {1}", .Count - 1, Seg.FlowTimeSeries.ToFullString)
+                                Else
+                                    aSW.WriteLine("{0,5}               Number of Time Pairs", .Count - 1)
+                                End If
                                 For t As Integer = 1 To .Count - 1
                                     aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t - 1).Subtract(SDate).TotalDays, .Values(t))
                                 Next
@@ -511,28 +593,31 @@ Public Class atcWASPProject
     End Function
 
     Private Function writeInpTFuncFile(ByRef aSW As IO.StreamWriter) As Boolean
-        Dim NumTimeFunc As Integer = 0
-        For i As Integer = 0 To WASPTimeFunctions.Count - 1
-            If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then NumTimeFunc += 1
-        Next
-
-        aSW.WriteLine("{0,5}               Number of Time Functions                      TFUNCFILE", NumTimeFunc)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Time Functions                      TFUNCFILE", WASPTimeFunctions.Count)
+        Else
+            aSW.WriteLine(" ======================== Time Functions ===================================")
+            aSW.WriteLine("{0,5}               Number of Time Functions", WASPTimeFunctions.Count)
+        End If
 
         For i As Integer = 0 To WASPTimeFunctions.Count - 1
             With WASPTimeFunctions(i)
-                If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None Then
+                If Version < 3 Then
                     aSW.WriteLine("{0,5}                Time Function ID Number", .FunctionID)
                     aSW.WriteLine("  {0}", .Description)  'use to write time function name
-                    With TimeFunctionSeries(i).GetTimeSeries(Me, "Time Functions", .Description)
-                        If TimeFunctionSeries(i).SelectionType <> clsTimeSeriesSelection.enumSelectionType.None And .Count = 0 Then
-                            WriteErrors &= String.Format("Empty time series was returned for {0}; specification was: {1}", WASPTimeFunctions(i).Description, TimeFunctionSeries(i).ToFullString) & vbCr
-                        End If
-                        aSW.WriteLine("{0,5}               Number of time-function values in {1}", .Count, TimeFunctionSeries(i).ToFullString)
-                        For t As Integer = 0 To .Count - 1
-                            aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .Keys(t).Subtract(SDate).TotalDays, .Values(t))
-                        Next
-                    End With
+                Else
+                    aSW.WriteLine("{0,8}       1     {1}", .FunctionID, .Description)
                 End If
+                With WASPTimeFunctions(i).Timeseries
+                    If Version < 3 Then
+                        aSW.WriteLine("{0,5}               Number of time-function values in {1}", .ts.numValues, .ts.ToString)
+                    Else
+                        aSW.WriteLine("{0,5}               NNumber of Time Pairs", .ts.numValues)
+                    End If
+                    For t As Integer = 1 To .ts.numValues
+                        aSW.WriteLine("{0,8:0.000} {1,9:0.00000}", .ts.Dates.Values(t) - .ts.Dates.Values(1), .ts.Values(t))
+                    Next
+                End With
             End With
         Next
         aSW.Flush()
@@ -541,22 +626,41 @@ Public Class atcWASPProject
 
     Private Function writeInpParamInfoFile(ByRef aSW As IO.StreamWriter) As Boolean
         'TODO: deal with this part later
-        aSW.WriteLine("{0,5}               Number of Segments                             PARAMINFO", Segments.Count)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Segments                             PARAMINFO", Segments.Count)
+        Else
+            aSW.WriteLine(" ======================== Segment Parameters ===================================")
+            aSW.WriteLine("{0,5}               Number of Segments", Segments.Count)
+        End If
         aSW.WriteLine("{0,5}               Number of Segment Parameters", 0)
+        If Not Version < 3 Then
+            aSW.WriteLine(" ===============================================================================")
+        End If
         aSW.Flush()
         Return True
     End Function
 
     Private Function writeInpConstFile(ByRef aSW As IO.StreamWriter) As Boolean
         'TODO: deal with this part later
-        aSW.WriteLine("{0,5}               Number of Constants                            CONSTFILE", 0)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Constants                            CONSTFILE", 0)
+        Else
+            aSW.WriteLine(" ======================== Constants ===================================")
+            aSW.WriteLine("{0,5}               Number of Constants", 0)
+        End If
         aSW.Flush()
         Return True
     End Function
 
     Private Function writeInpIcFile(ByRef aSW As IO.StreamWriter) As Boolean
-        aSW.WriteLine("{0,5}               Number of Systems                             ICFILE", WASPConstituents.Count)
-        aSW.WriteLine("{0,5}               Number of Segments", Segments.Count)
+        If Version < 3 Then
+            aSW.WriteLine("{0,5}               Number of Systems                             ICFILE", WASPConstituents.Count)
+            aSW.WriteLine("{0,5}               Number of Segments", Segments.Count)
+        Else
+            aSW.WriteLine(" ======================== Initial Conditions ===================================")
+            aSW.WriteLine("{0,5}               ", WASPConstituents.Count)
+            aSW.WriteLine("{0,5}               ", Segments.Count)
+        End If
         For lIndex As Integer = 1 To WASPConstituents.Count
             aSW.WriteLine("     Initial conditions for system" & lIndex.ToString.PadLeft(3) & " " & WASPConstituents(lIndex - 1).Description)
             aSW.WriteLine("    0               Solids Transport Field")
@@ -583,9 +687,26 @@ Public Class clsWASPConstituent
     Public Description As String
     Public ConcUnits As String
     Public LoadUnits As String
-    Sub New(ByVal aDescription As String, ByVal aConcUnits As String, ByVal aLoadUnits As String)
+    Public Tag As String
+    Sub New(ByVal aDescription As String, ByVal aConcUnits As String, ByVal aLoadUnits As String, ByVal aTag As String)
         Description = aDescription
         ConcUnits = aConcUnits
         LoadUnits = aLoadUnits
+        Tag = aTag
+    End Sub
+End Class
+
+''' <summary>
+''' Class to hold contents of "Time_Functions" table in WASP database which identifies all time functions for each model type
+''' Use in dictionary and select by ModelName
+''' </summary>
+Public Class clsWASPTimeFunction
+    Public Description As String
+    Public FunctionID As Integer
+    Public TimeSeries As clsTimeSeriesSelection 'atcTimeseries
+    Sub New(ByVal aDescription As String, ByVal aFunctionID As Integer, ByVal aTimeSeries As clsTimeSeriesSelection)
+        Description = aDescription
+        FunctionID = aFunctionID
+        TimeSeries = aTimeSeries
     End Sub
 End Class

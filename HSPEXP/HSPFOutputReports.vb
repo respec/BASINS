@@ -238,6 +238,17 @@ Module HSPFOutputReports
                     QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "DO"))
                     QAQCReportFile.AppendLine(QACheckDiurnalPattern(aHspfUci, "Water Temperature"))
                     'note that qa reports for loading rate, land use comparison, and storage are done in the wq section
+
+                    'chuck likes the area report, we should still do it!
+                    Dim lLocations As New atcCollection
+                    For Each lRCHRES As HspfOperation In aHspfUci.OpnBlks("RCHRES").Ids
+                        lLocations.Add("R:" & lRCHRES.Id)
+                    Next
+                    Logger.Status(Now & " Producing Area Reports.", True)
+                    Logger.Dbg(Now & " Producing land use and area reports")
+                    Dim lReport As atcReport.ReportText = HspfSupport.AreaReport(aHspfUci, lRunMade, lOperationTypes, lLocations, True, pOutFolderName & "/AreaReports/")
+                    lReport.MetaData.Insert(lReport.MetaData.ToString.IndexOf("Assembly"), lReport.AssemblyMetadata(System.Reflection.Assembly.GetExecutingAssembly) & vbCrLf)
+                    SaveFileString(pOutFolderName & "/AreaReports/AreaReport.txt", lReport.ToString)
                 End If
 
                 'Do automated graphs
@@ -319,7 +330,12 @@ Module HSPFOutputReports
                 ' Do Water Quality Reports
                 If pConstituents.Count > 0 Then
                     'includes qa reports for loading rate, land use comparison, and storage 
+                    Dim lRet As Integer = InitializeMissingTimeseriesMessage()
                     DoWaterQualityReports(aHspfUci, lRunMade, lDateString, lOperationTypes, QAQCReportFile)
+                    Dim lMsg As String = MissingTimeseriesMessage()
+                    If lMsg.Length > 0 Then
+                        Logger.Msg(lMsg, "Missing HSPF Binary Output Timeseries")
+                    End If
                 End If
 
                 If pModelQAQC Then
@@ -615,14 +631,13 @@ Module HSPFOutputReports
 
             If lScenarioResults.DataSets.Count > 0 Then
 
-                Dim lReportCons As New atcReport.ReportText
-                lReportCons = Nothing
                 Dim lOutFileName As String = ""
 
                 Logger.Status(Now & " Generating Reports for " & lConstituent)
                 Logger.Dbg(Now & " Generating Reports for " & lConstituent)
 
                 'LandLoadingReports generates a text file report as well as the info needed for the QA report
+                '    "_Land_Loadings.txt" and "_Monthly_Land_Loadings.txt"
                 Dim LandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
@@ -632,6 +647,7 @@ Module HSPFOutputReports
 
                 'ReachBudgetReports generates a text file report only
                 If Not pModelQAQC Then
+                    '    "_Reach_Budget.txt"
                     ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
                 End If
 
@@ -639,48 +655,52 @@ Module HSPFOutputReports
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                 End If
 
-                lReportCons = Nothing
-
                 If (lConstituent = "TN" Or lConstituent = "TP" Or
                     lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
-                    With HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                                                          lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties)
-                        lReportCons = .Item1
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
-                        If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
+                    Dim lReport1ReachBudget As New atcReport.ReportText
+                    Dim lReport2NPSLoads As New atcReport.ReportText
+                    Dim lReport3LoadAllocationAll As New atcReport.ReportText
+                    Dim lReport5LoadAllocationLocations As New atcReport.ReportText
+                    Dim lReport7LoadingRates As New atcReport.ReportText
+                    Dim lDataForBarGraphs As New atcCollection
 
-                        'lReportCons = Nothing
-                        'lReportCons = .Item2
-                        'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
-                        'SaveFileString(lOutFileName, lReportCons.ToString)
-                        lReportCons = Nothing
-                        lReportCons = .Item3
+                    HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
+                                                         lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties,
+                                                         lReport1ReachBudget,
+                                                         lReport2NPSLoads,
+                                                         lReport3LoadAllocationAll,
+                                                         lReport5LoadAllocationLocations,
+                                                         lReport7LoadingRates,
+                                                         lDataForBarGraphs)
 
-                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
-                        If lReportCons IsNot Nothing Then SaveFileString(lOutFileName, lReportCons.ToString)
-                        lReportCons = Nothing
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Ann_Avg_Budget.txt"
+                    If lReport1ReachBudget IsNot Nothing Then SaveFileString(lOutFileName, lReport1ReachBudget.ToString)
 
-                        lReportCons = .Item4
-                        If pOutputLocations.Count > 0 Then
-                            lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
-                            SaveFileString(lOutFileName, lReportCons.ToString)
-                        End If
-                        lReportCons = Nothing
-                        'lReportCons = .Item5
-                        'lOutFileName = loutfoldername & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
-                        'SaveFileString(lOutFileName, lReportCons.ToString)
-                        'lReportCons = Nothing
+                    'why was this commented out???  pbd 7/18/2019  replaced by _LoadAllocation report
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_RCH_Per_LU_Ann_Avg_NPS_Lds.txt"
+                    SaveFileString(lOutFileName, lReport2NPSLoads.ToString)
 
-                        If .Item6 IsNot Nothing AndAlso .Item6.Keys.Count > 0 Then
-                            For Each location As String In .Item6.Keys
-                                CreateGraph_BarGraph(.Item6.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
-                            Next location
-                        End If
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation.txt"
+                    If lReport3LoadAllocationAll IsNot Nothing Then SaveFileString(lOutFileName, lReport3LoadAllocationAll.ToString)
 
-                    End With
+                    If pOutputLocations.Count > 0 Then
+                        lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadAllocation_Locations.txt"
+                        SaveFileString(lOutFileName, lReport5LoadAllocationLocations.ToString)
+                    End If
+
+                    'why was this commented out???  pbd 7/18/2019  
+                    lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_LoadingRates.txt"
+                    SaveFileString(lOutFileName, lReport7LoadingRates.ToString)
+
+                    If lDataForBarGraphs IsNot Nothing AndAlso lDataForBarGraphs.Keys.Count > 0 Then
+                        For Each location As String In lDataForBarGraphs.Keys
+                            CreateGraph_BarGraph(lDataForBarGraphs.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                        Next location
+                    End If
+
                     'Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
-
+                    Dim lReportCons As New atcReport.ReportText
                     lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
                     lScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
@@ -697,6 +717,7 @@ Module HSPFOutputReports
                     SaveFileString(lOutFileName, lReportCons.ToString)
 
                     If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+                        '    "_OvAll_Avg_By_Mult_Locs.txt", "_Grp_By_OPN_LU_Ann_Avg.txt", "_LU_AnnAvgs.txt", "_Oall_Avgd.txt"
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (aHspfUci, lConstituent, aOperationTypes, pBaseName,
                             lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ,
@@ -1122,7 +1143,7 @@ Module HSPFOutputReports
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>HSPEXP+ Version </td>")
-        GeneralModelInfoText.AppendLine("    <td align=center>3.0 beta</td>")
+        GeneralModelInfoText.AppendLine("    <td align=center>3.1</td>")
         GeneralModelInfoText.AppendLine("  </tr>")
         GeneralModelInfoText.AppendLine("  <tr>")
         GeneralModelInfoText.AppendLine("    <td>Sections listed in this report</td>")

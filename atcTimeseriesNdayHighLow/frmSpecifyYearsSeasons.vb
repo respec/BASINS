@@ -59,7 +59,7 @@ Public Class frmSpecifyYearsSeasons
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
         End If
 
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             aStartMonth = cboStartMonth.SelectedIndex + 1
             If IsNumeric(txtStartDay.Text) Then
                 aStartDay = txtStartDay.Text
@@ -109,7 +109,7 @@ Public Class frmSpecifyYearsSeasons
         End If
         If IsInvalidDay(txtStartDay.Text, lblYearStart.Text) Then Exit Sub
         If IsInvalidDay(txtEndDay.Text, lblYearEnd.Text) Then Exit Sub
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
 

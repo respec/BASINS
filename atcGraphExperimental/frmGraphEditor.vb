@@ -555,22 +555,22 @@ Public Class frmGraphEditor
     Private Sub ChooseTextBoxBackColor(ByVal aTextBox As TextBox)
         Dim lColorDialog As ColorDialog = New ColorDialog()
         lColorDialog.Color = aTextBox.BackColor
-        If lColorDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If lColorDialog.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             aTextBox.BackColor = lColorDialog.Color
             If chkAutoApply.Checked Then ApplyAll()
         End If
     End Sub
 
     Private Sub chkAny_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
-        chkAxisMajorGridVisible.CheckedChanged, _
-        chkAxisMajorTicsVisible.CheckedChanged, _
-        chkAxisMinorGridVisible.CheckedChanged, _
-        chkAxisMinorTicsVisible.CheckedChanged, _
-        chkCurveLineVisible.CheckedChanged, _
-        chkCurveSymbolVisible.CheckedChanged, _
-        chkCurveSymbolFillVisible.CheckedChanged, _
-        chkLegendOutline.CheckedChanged, _
-        chkLegendOutlineAux.CheckedChanged, _
+        chkAxisMajorGridVisible.CheckedChanged,
+        chkAxisMajorTicsVisible.CheckedChanged,
+        chkAxisMinorGridVisible.CheckedChanged,
+        chkAxisMinorTicsVisible.CheckedChanged,
+        chkCurveLineVisible.CheckedChanged,
+        chkCurveSymbolVisible.CheckedChanged,
+        chkCurveSymbolFillVisible.CheckedChanged,
+        chkLegendOutline.CheckedChanged,
+        chkLegendOutlineAux.CheckedChanged,
         chkRangeReverse.CheckedChanged
 
         If chkAutoApply.Checked Then ApplyAll()
@@ -592,8 +592,8 @@ Public Class frmGraphEditor
     End Sub
 
     Private Sub radioGeneral_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles _
-            radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged, _
-            radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged, _
+            radioAxisLinear.CheckedChanged, radioAxisLogarithmic.CheckedChanged,
+            radioCurveYaxisLeft.CheckedChanged, radioCurveYaxisRight.CheckedChanged, radioCurveYaxisAuxiliary.CheckedChanged,
             radioProbablilityFraction.CheckedChanged, radioProbablilityPercent.CheckedChanged, radioProbablilityReturnPeriod.CheckedChanged ', chkProbabilityExceedance.CheckedChanged
 
         Dim lRadio As RadioButton = sender
@@ -623,7 +623,7 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub comboWhichCurve_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichCurve.SelectedIndexChanged        
+    Private Sub comboWhichCurve_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles comboWhichCurve.SelectedIndexChanged
         SetControlsFromSelectedCurve()
     End Sub
 
@@ -636,8 +636,8 @@ Public Class frmGraphEditor
             Case "Legend"
                 With pPane.Legend
                     .Position = LegendPos.Float
-                    .Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width, _
-                                             (e.Y - pPane.Rect.Top) / pPane.Rect.Height, _
+                    .Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width,
+                                             (e.Y - pPane.Rect.Top) / pPane.Rect.Height,
                                              CoordType.PaneFraction)
                     .IsVisible = True
                 End With
@@ -650,8 +650,8 @@ Public Class frmGraphEditor
                         lText = FindTextObject(txtText.Text)
                     End If
                     If lText IsNot Nothing Then
-                        lText.Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width, _
-                                                      (e.Y - pPane.Rect.Top) / pPane.Rect.Height, _
+                        lText.Location = New Location((e.X - pPane.Rect.Left) / pZgc.Width,
+                                                      (e.Y - pPane.Rect.Top) / pPane.Rect.Height,
                                                       CoordType.PaneFraction)
                         RaiseEvent Apply()
                     End If
@@ -718,7 +718,12 @@ Public Class frmGraphEditor
     'End Sub
 
     Private Sub btnTextAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextAdd.Click
-        AddTextFromControls()
+        If comboWhichText.Items.Contains(txtText.Text) Then 'Text exists, but was removed (now hidden)
+            Dim lText As TextObj = FindTextObject(txtText.Text)
+            lText.IsVisible = True
+        Else
+            AddTextFromControls()
+        End If
         RaiseEvent Apply()
     End Sub
 
@@ -758,7 +763,9 @@ Public Class frmGraphEditor
     Private Sub btnTextRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTextRemove.Click
         Dim lText As TextObj = FindTextObject(comboWhichText.Text)
         If Not lText Is Nothing Then
-            pPane.GraphObjList.Remove(lText)
+            'pPane.GraphObjList.Remove(lText)
+            'just hide the text text object, don't remove it altogether (can then add it back if needed)
+            pPane.GraphObjList(pPane.GraphObjList.IndexOf(lText)).IsVisible = False
             SetComboFromTexts()
             If chkAutoApply.Checked Then RaiseEvent Apply()
         End If
@@ -773,7 +780,7 @@ Public Class frmGraphEditor
         End If
     End Sub
 
-    Private Sub btnAxisFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAxisFont.Click        
+    Private Sub btnAxisFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAxisFont.Click
         If UserEditFontSpec(AxisFromCombo.Title.FontSpec) Then
             If chkAutoApply.Checked Then RaiseEvent Apply()
         End If
@@ -816,21 +823,21 @@ Public Class frmGraphEditor
     ''' <param name="aFontSpec"></param>
     ''' <returns>True if font was edited, false if user cancelled</returns>
     Private Function UserEditFontSpec(ByRef aFontSpec As FontSpec) As Boolean
-        Dim cdlg As New Windows.Forms.FontDialog
+        Dim cdlg As New System.Windows.Forms.FontDialog
         With cdlg
             .Font = aFontSpec.GetFont(1)
             .AllowSimulations = True
             .ShowEffects = True
             .ShowColor = True
-            .Color = aFontSpec.FontColor            
+            .Color = aFontSpec.FontColor
         End With
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If cdlg.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             With cdlg.Font
                 Dim lBorder As ZedGraph.Border = aFontSpec.Border.Clone
                 Dim lAngle As Single = aFontSpec.Angle
-                aFontSpec = New FontSpec( _
-                    .FontFamily.Name, .SizeInPoints * 1.333333, cdlg.Color, _
-                    .Bold, .Italic, .Underline, _
+                aFontSpec = New FontSpec(
+                    .FontFamily.Name, .SizeInPoints * 1.333333, cdlg.Color,
+                    .Bold, .Italic, .Underline,
                     aFontSpec.Fill.Color, aFontSpec.Fill.Brush, aFontSpec.Fill.Type)
                 aFontSpec.Border = lBorder
                 aFontSpec.Angle = lAngle

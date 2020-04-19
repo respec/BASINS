@@ -106,7 +106,7 @@ Public Module AutomatedGraphs
 
                 Dim lRecordIndex As Integer = 0
                 Dim ListTypeOfGraph() As String = {"timeseries", "frequency", "scatter", "cumulative probability"}
-                Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "regression", "45-deg line"}
+                Dim ListDatasetType() As String = {"left", "right", "aux", "add", "multiply", "divide", "subtract", "x-axis", "y-axis"}
 
                 If lgraphRecordsNew.Count < 1 Then
                     Logger.Dbg("The" & lGraphSpecificationFile & " file didn't have any useful data. Reading next CSV file!")
@@ -282,6 +282,16 @@ Public Module AutomatedGraphs
 
                             ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
                                     Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
+                                                       lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                'problem doing math operation if we can't check this -- for instance if both are obs from different days
+                                MsgBox("No time unit is defined, can't perform math operation for graph " & IO.Path.GetFileName(lOutFileName) & ". Mathematical operation will not take place.", vbOKOnly,
+                                       "Automated Graph: Time Series Issue")
+                                lRecordIndex = skipLines(lgraphRecordsNew, lRecordIndex, ListTypeOfGraph)
+                                skipGraph = True
+                                Exit Do
+
+                            ElseIf (Trim(lGraphDataset(0)).ToLower = "multiply" Or Trim(lGraphDataset(0)).ToLower = "add" Or
+                                    Trim(lGraphDataset(0)).ToLower = "subtract" Or Trim(lGraphDataset(0)).ToLower = "divide") AndAlso
                                                        lTimeseriesGroup(lTimeseriesGroup.Count - 1).Attributes.GetDefinedValue("TimeUnit").Value <> aTu Then
                                 'Checking if the time series read before has the same time steps as the current timeseries
                                 MsgBox("The time steps of timseries in the graph " & IO.Path.GetFileName(lOutFileName) & " are different. Mathematical operation will not take place.", vbOKOnly,
@@ -328,6 +338,55 @@ Public Module AutomatedGraphs
                     Loop
                     If Not skipGraph Then
 
+                        If Trim(lGraphInit(0)).ToLower = "frequency" Or Trim(lGraphInit(0)).ToLower = "scatter" Then
+                            'if time units not set for either timeseries, this is sporadic data and more work must be done to match points
+                            'Dim lTimeseriesX As atcTimeseries = lTimeseriesGroup(0)
+                            'Dim lTimeseriesY As atcTimeseries = lTimeseriesGroup(1)
+                            Dim lNewTimeseries As New atcTimeseries
+                            Dim lBaseTimeseries As New atcTimeseries
+                            Dim lSporadicTimeseries As New atcTimeseries
+                            If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Or
+                               lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '0(x) is sporadic
+                                    lNewTimeseries = lTimeseriesGroup(0).Clone()
+                                    lBaseTimeseries = lTimeseriesGroup(1)
+                                    lSporadicTimeseries = lTimeseriesGroup(0)
+                                ElseIf lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '1(y) is sporadic
+                                    lNewTimeseries = lTimeseriesGroup(1).Clone()
+                                    lBaseTimeseries = lTimeseriesGroup(0)
+                                    lSporadicTimeseries = lTimeseriesGroup(1)
+                                End If
+                                For lIndex As Integer = 1 To lSporadicTimeseries.numValues
+                                    Dim lTargetDate As Double = lSporadicTimeseries.Dates.Values(lIndex)
+                                    'what value in base is closest in date?
+                                    Dim lMinDiff As Double = 999999999.9
+                                    Dim lDiff As Double = 0.0
+                                    Dim lMinIndex As Integer = 0
+                                    For lDateIndex As Integer = 1 To lBaseTimeseries.numValues
+                                        lDiff = Math.Abs(lTargetDate - lBaseTimeseries.Dates.Values(lDateIndex))
+                                        If lDiff < lMinDiff Then
+                                            lMinDiff = lDiff
+                                            lMinIndex = lDateIndex
+                                        End If
+                                    Next
+                                    lNewTimeseries.Values(lIndex) = lBaseTimeseries.Values(lMinIndex)
+                                Next
+                                lNewTimeseries.Attributes.SetValue("Location", lBaseTimeseries.Attributes.GetValue("Location"))
+                                lNewTimeseries.Attributes.SetValue("Scenario", lBaseTimeseries.Attributes.GetValue("Scenario"))
+                                lNewTimeseries.Attributes.SetValue("Constituent", lBaseTimeseries.Attributes.GetValue("Constituent"))
+                                lNewTimeseries.Attributes.SetValue("History 1", lBaseTimeseries.Attributes.GetValue("History 1"))
+                                lTimeseriesGroup(1) = lNewTimeseries
+                                If lTimeseriesGroup(0).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '0(x) is sporadic
+                                    lTimeseriesGroup(1) = lNewTimeseries
+                                ElseIf lTimeseriesGroup(1).Attributes.GetDefinedValue("TimeUnit") Is Nothing Then
+                                    '1(y) is sporadic
+                                    lTimeseriesGroup(0) = lNewTimeseries
+                                End If
+                            End If
+                        End If
 
                         Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
                         Select Case Trim(lGraphInit(0)).ToLower
@@ -595,6 +654,12 @@ Public Module AutomatedGraphs
         For CurveNumber As Integer = 1 To lNumberofCurves
             Dim lGraphDataset() As String = aGraphRecords(aRecordIndex)
 
+            If (Trim(lGraphDataset(0)).ToLower = "add" Or
+                        Trim(lGraphDataset(0)).ToLower = "multiply" Or
+                        Trim(lGraphDataset(0)).ToLower = "subtract" Or
+                        Trim(lGraphDataset(0)).ToLower = "divide") Then
+                Continue For
+            End If
 
             lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
             If Trim(lGraphDataset(4)).ToLower = "line" Then
@@ -661,8 +726,7 @@ Public Module AutomatedGraphs
             lPaneMain.YAxis.Type = AxisType.Log
         End If
 
-
-        Dim lGraphDataset() As String = aGraphRecords(aRecordIndex).split(",")
+        Dim lGraphDataset() As String = aGraphRecords(aRecordIndex)
 
         lCurve = lPaneMain.CurveList.Item(lNumberOfMainPaneCurves)
         If Trim(lGraphDataset(4)).ToLower = "line" Then
@@ -717,10 +781,9 @@ Public Module AutomatedGraphs
         If Not Trim(lGraphDataset(9)) = "" Then
             lCurve.Label.Text = Trim(lGraphDataset(9))
         End If
-        aRecordIndex += 2
 
         For RecordIndex As Integer = 3 To lNumberofCurves
-            lGraphDataset = aGraphRecords(aRecordIndex).split(",")
+            lGraphDataset = aGraphRecords(RecordIndex)
             Select Case Trim(lGraphDataset(0)).ToLower
                 Case "regression"
                     Dim lACoef As Double
@@ -770,8 +833,6 @@ Public Module AutomatedGraphs
                     lLine.Label.Text = Trim(lGraphDataset(9))
             End Select
             lPaneMain.Legend.IsVisible = True
-
-            aRecordIndex += 1
 
         Next
         Return aZgc

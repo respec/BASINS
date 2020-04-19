@@ -9,7 +9,7 @@ Public Class frmSaveData
             End If
         Next
 
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             Select Case lstDataSources.SelectedIndex
                 Case -1 'Nothing selected
                 Case 0  'First item, browse for a file to save in
@@ -31,7 +31,7 @@ Public Class frmSaveData
     End Function
 
     Private Sub lstDataSources_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDataSources.DoubleClick
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
     End Sub
 
 End Class

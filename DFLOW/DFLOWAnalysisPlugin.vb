@@ -69,7 +69,7 @@ Public Class DFLOWAnalysisPlugin
             DFLOWCalcs.fReturnPeriod = 10
 
             Dim lForm As New frmDFLOWResults(aTimeseriesGroup)
-            If lForm.DialogResult <> Windows.Forms.DialogResult.Cancel Then
+            If lForm.DialogResult <> System.Windows.Forms.DialogResult.Cancel Then
                 SaveFileString(aFileName, lForm.ToString)
             End If
         End If
@@ -90,6 +90,8 @@ Public Class DFLOWAnalysisPlugin
             lfrmBatch.ShowDialog()
             Return Nothing
         ElseIf lChoice = "Batch Map" Then
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lStationsAreSelected As Boolean = False
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
@@ -149,6 +151,7 @@ Public Class DFLOWAnalysisPlugin
                 Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
                 'Return Nothing
             End If
+#End If
         End If
 
         Dim lTimeseriesGroup As atcTimeseriesGroup = aTimeseriesGroup
@@ -160,7 +163,7 @@ Public Class DFLOWAnalysisPlugin
 
         If lTimeseriesGroup.Count > 0 Then
             Dim lForm As New frmDFLOWResults(lTimeseriesGroup)
-            If lForm.DialogResult <> Windows.Forms.DialogResult.Cancel Then
+            If lForm.DialogResult <> System.Windows.Forms.DialogResult.Cancel Then
                 lForm.Show()
             End If
         End If

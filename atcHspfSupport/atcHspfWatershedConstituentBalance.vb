@@ -949,8 +949,8 @@ Public Module WatershedConstituentBalance
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "Inches".PadLeft(12) &
                                                                                 vbTab & "Ac-Ft".PadLeft(12))
                                 ElseIf aBalanceType = "Sediment" Then
-                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons".PadLeft(12) &
-                                                                                vbTab & "tons/ac".PadLeft(12))
+                                    lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "tons/ac".PadLeft(12) &
+                                                                                vbTab & "tons".PadLeft(12))
                                 ElseIf aBalanceType.ToUpper.Contains("F.COLIFORM") Or aBalanceType.ToUpper.StartsWith("FCOLI") Or aBalanceType.ToUpper.StartsWith("BACT") Then 'Assuming this is f.coli or bacteria
                                     lSummaryReport.AppendLine(Space(lRowIdLength) & vbTab & "10^9/ac".PadLeft(12) &
                                                                                 vbTab & "10^9".PadLeft(12))
@@ -970,9 +970,9 @@ Public Module WatershedConstituentBalance
                         lFieldIndex = 1
                         Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
 
-                        If lConstituentName.Length > lRowIdLength Then
-                            lConstituentName = lConstituentName.Substring(0, lRowIdLength)
-                        End If
+                        'If lConstituentName.Length > lRowIdLength Then
+                        ' lConstituentName = lConstituentName.Substring(0, lRowIdLength)
+                        'End If
                         Dim lConstituentTotalIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
 
                         '.FieldLength(lFieldIndex) = 20

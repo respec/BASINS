@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "HSPEXP+"
-#define MyAppVersion "3.00"
+#define MyAppVersion "3.1"
 #define MyAppPublisher "RESPEC"
 #define MyAppURL "http://www.respec.com/product/hspexp/"
 #define MyAppExeName "HSPEXP+.exe"
@@ -23,7 +23,7 @@ AppContact= {#MyAppURL}
 VersionInfoCopyright=Mozilla Public License (MPL) 1.1
 DefaultDirName={reg:HKLM\SOFTWARE\RESPEC\BASINS45,Base Directory|{pf}\HSPEXP+}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=HSPEXP+3.0SetUp
+OutputBaseFilename=HSPEXP+3.1SetUp
 Compression=lzma
 SolidCompression=yes
 InfoBeforeFile=install.txt

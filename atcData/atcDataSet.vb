@@ -1,5 +1,6 @@
 ''' <summary>Base class for data.</summary>
 Public Class atcDataSet
+    Implements IEquatable(Of atcDataSet)
 
     Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
     Private Shared pStringFormat As String = "{0} {1} {2}"
@@ -46,6 +47,21 @@ Public Class atcDataSet
             Return pSerial
         End Get
     End Property
+
+    Public Function EqualDatasets(ByVal otherDS As atcDataSet) As Boolean Implements IEquatable(Of atcDataSet).Equals
+        If otherDS Is Nothing Then
+            Return False
+        End If
+        Return Me.Serial = otherDS.Serial
+    End Function
+
+    Public Overrides Function Equals(obj As Object) As Boolean
+        Return EqualDatasets(obj)
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        Return (Serial).GetHashCode()
+    End Function
 
     ''' <summary>
     ''' Test for equality by testing whether these datasets have the same serial number

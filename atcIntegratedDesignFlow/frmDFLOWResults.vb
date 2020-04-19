@@ -81,7 +81,7 @@ Public Class frmDFLOWResults
         Else
             If pTimeseriesGroup.Count = 0 Or Not UserSpecifyDFLOWArgs() Then
                 'user declined to specify Data
-                Me.DialogResult = Windows.Forms.DialogResult.Cancel
+                Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
             Else
                 pInitializing = False
                 RefreshCalcs()
@@ -580,7 +580,7 @@ Public Class frmDFLOWResults
         atcDataManager.UserSelectData("Select flow time series for Design Flow calculation", pTimeseriesGroup, Nothing, False)
         If pTimeseriesGroup.Count = 0 Or Not UserSpecifyDFLOWArgs() Then
             'user declined to specify Data
-            Me.DialogResult = Windows.Forms.DialogResult.Cancel
+            Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Else
             RefreshCalcs()
         End If
@@ -831,7 +831,7 @@ Public Class frmDFLOWResults
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With

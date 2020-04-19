@@ -1821,7 +1821,7 @@ Public Class frmSWSTATmod
         End If
     End Sub
 
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As System.Windows.Forms.ListBox)
         Dim lArgName As String = lst.Tag
         Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
         Dim lSelected As New ArrayList
@@ -1843,7 +1843,7 @@ Public Class frmSWSTATmod
         End If
     End Sub
 
-    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox, ByVal attribs As atcDataAttributes)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As System.Windows.Forms.ListBox, ByVal attribs As atcDataAttributes)
         Dim lArgName As String = lst.Tag & "s"
         Dim listing As atcCollection = attribs.GetValue(lArgName, Nothing)
         If listing Is Nothing Then
@@ -1870,7 +1870,7 @@ Public Class frmSWSTATmod
     End Sub
 
     Private Sub frmSWSTAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp(pHelpLocation)
         End If
     End Sub
@@ -2118,7 +2118,7 @@ Public Class frmSWSTATmod
     End Sub
 
     'Return all selected items, or if none are selected then all items
-    Private Function ListToArray(ByVal aList As Windows.Forms.ListBox) As Double()
+    Private Function ListToArray(ByVal aList As System.Windows.Forms.ListBox) As Double()
         Dim lArray() As Double
         Dim lCollection As New ArrayList
         If aList.SelectedItems.Count > 0 Then
@@ -2377,7 +2377,7 @@ Public Class frmSWSTATmod
         LoadListDefaults(lstNday)
     End Sub
 
-    Private Sub LoadListDefaults(ByVal aList As Windows.Forms.ListBox)
+    Private Sub LoadListDefaults(ByVal aList As System.Windows.Forms.ListBox)
         Dim lDefault() As Double = clsIDFPlugin.ListDefaultArray(aList.Tag)
         If Not lDefault Is Nothing Then
             aList.Items.Clear()
@@ -2517,7 +2517,7 @@ Public Class frmSWSTATmod
         SaveList(lstRecurrence)
     End Sub
 
-    Private Sub SaveList(ByVal lst As Windows.Forms.ListBox)
+    Private Sub SaveList(ByVal lst As System.Windows.Forms.ListBox)
         SaveSetting("atcFrequencyGrid", "List." & lst.Tag, "dummy", "")
         DeleteSetting("atcFrequencyGrid", "List." & lst.Tag)
         For lIndex As Integer = 0 To lst.Items.Count - 1
@@ -2525,7 +2525,7 @@ Public Class frmSWSTATmod
         Next
     End Sub
 
-    Private Function SaveListBatch(ByVal lst As Windows.Forms.ListBox) As String
+    Private Function SaveListBatch(ByVal lst As System.Windows.Forms.ListBox) As String
         Dim lMsg As String = ""
 
         'Dim listing0() As Double = pAttributes.GetValue(lst.Tag, Nothing)
@@ -3266,7 +3266,11 @@ Public Class frmSWSTATmod
             Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
             ClearAttributes()
             SeasonsYearsFromForm() 'setup all inputs from form
-            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+            ' It is important that the Return Periods that go into N-day calculation (i.e. PearsonType3/LGPSTX) via "lAttrs"
+            ' HAVE TO BE the full range of default return periods (28 entries), NOT the user selected return periods on the form.
+            ' In fact, the atcTimeseriesNdayHighLow calculator should simply use its internally-defined default set of return periods
+            ' instead of potentially confusing with users selected return periods on the form!
+            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
             Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),
@@ -3301,7 +3305,7 @@ Public Class frmSWSTATmod
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 'Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
                 SaveFileString(.FileName, lFreqForm.CreateReport)
@@ -4699,7 +4703,13 @@ Public Class frmSWSTATmod
                 End If
                 .Item(4, I).Value = lFrom
                 .Item(5, I).Value = lTo
-                lStatVal = lTs.Attributes.GetValue(lOTStatName, Double.NaN)
+                With lTs.Attributes
+                    If .ContainsAttribute(lOTStatName & "Adj") Then
+                        lStatVal = .GetValue(lOTStatName & "Adj", Double.NaN)
+                    Else
+                        lStatVal = .GetValue(lOTStatName, Double.NaN)
+                    End If
+                End With
                 If Not Double.IsNaN(lStatVal) Then
                     .Item(6, I).Value = DoubleToString(lStatVal, 15, "0.##########", aSignificantDigits:=8)
                 Else

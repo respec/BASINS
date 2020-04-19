@@ -1,13 +1,17 @@
-Imports MapWinGIS
-Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
 Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports atcData
 Imports atcUtility
-Imports atcMwGisUtility
 Imports System.Net
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+#Else
+Imports MapWinGIS
+Imports MapWindow.Interfaces
+Imports atcMwGisUtility
+#End If
 
 ''' <summary>
 ''' 
@@ -16,6 +20,263 @@ Imports System.Net
 Public Module modDownload
 
     Private Const XMLappName As String = "BASINS System Application"
+#If GISProvider = "DotSpatial" Then
+    Public Sub ProcessDownloadResults(ByVal aInstructions As String)
+        Dim lXmlInstructions As New Xml.XmlDocument
+        lXmlInstructions.LoadXml("<AllInstructions>" & aInstructions & "</AllInstructions>")
+        Dim lMessage As String = ""
+        Application.DoEvents()
+        For Each lInstructionNode As Xml.XmlNode In lXmlInstructions.ChildNodes(0).ChildNodes
+            lMessage &= ProcessDownloadResult(lInstructionNode.OuterXml) & vbCrLf
+            Application.DoEvents()
+        Next
+        If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
+            Logger.Msg(lMessage, "Data Download")
+            If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "GW Toolbox" Then
+                atcDataManager.UserManage()
+            End If
+        End If
+    End Sub
+
+    Private Function ProcessDownloadResult(ByVal aInstructions As String) As String
+        Logger.Dbg("ProcessDownloadResult: " & aInstructions)
+        Dim lProjectorNode As Xml.XmlNode
+        Dim lOutputFileName As String
+        Dim InputFileList As New NameValueCollection
+        Dim lCurFilename As String
+        Dim lDefaultsXML As Xml.XmlDocument = Nothing
+        Dim lSuccess As Boolean
+        Dim lInputProjection As String
+        Dim lOutputProjection As String
+        Dim lLayersAdded As New ArrayList
+        Dim lDataAdded As New ArrayList
+        Dim lProjectDir As String = ""
+
+        ProcessDownloadResult = ""
+
+#If GISProvider = "DotSpatial" Then
+        Dim lProjectFileName As String = g_MapWin.SerializationManager.CurrentProjectFile
+        If g_MapWin IsNot Nothing AndAlso lProjectFileName IsNot Nothing AndAlso lProjectFileName.Contains(g_PathChar) Then
+            lProjectDir = IO.Path.GetDirectoryName(lProjectFileName)
+            If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
+        End If
+        If Not IO.Directory.Exists(lProjectDir) Then
+            lProjectDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        End If
+#Else
+        If g_MapWin IsNot Nothing AndAlso g_MapWin.Project IsNot Nothing AndAlso g_MapWin.Project.FileName IsNot Nothing AndAlso g_MapWin.Project.FileName.Contains(g_PathChar) Then
+            lProjectDir = IO.Path.GetDirectoryName(g_MapWin.Project.FileName)
+            If lProjectDir.Length > 0 AndAlso Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
+        End If
+#End If
+
+        If Not aInstructions.StartsWith("<") Then
+            If FileExists(aInstructions) Then
+                aInstructions = WholeFileString(aInstructions)
+            Else
+                Logger.Dbg("No instructions to process")
+                Exit Function
+            End If
+        End If
+
+        Dim lInstructionsXML As New Xml.XmlDocument
+        lInstructionsXML.LoadXml(aInstructions)
+        Dim lInstructionsNode As Xml.XmlNode = lInstructionsXML.FirstChild
+        If lInstructionsNode.Name.ToLower = "success" Then
+#If GISProvider = "DotSpatial" Then
+#Else
+            g_MapWin.View.LockLegend()
+#End If
+            'g_MapWin.View.MapCursor = tkCursor.crsrWait
+            For Each lProjectorNode In lInstructionsNode.ChildNodes
+                Logger.Dbg("Processing XML: " & lProjectorNode.OuterXml)
+                If lProjectorNode.Name <> "message" Then Logger.Status(ReadableFromXML(lProjectorNode.OuterXml))
+                Select Case lProjectorNode.Name.ToLower
+                    Case "add_data"
+                        Dim lDataType As String = lProjectorNode.Attributes.GetNamedItem("type").InnerText
+                        lOutputFileName = lProjectorNode.InnerText
+#If GISProvider = "DotSpatial" Then
+                        If Not FileExists(lOutputFileName) Then
+                            lOutputFileName = IO.Path.Combine(lProjectDir, lOutputFileName)
+                        End If
+#End If
+                        If lDataType.Length = 0 Then
+                            Logger.Dbg("Could not add data from '" & lOutputFileName & "' - no type specified")
+                        Else
+                            Dim lNewDataSource As atcData.atcTimeseriesSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                            If lNewDataSource Is Nothing Then 'Try loading needed plugin for this data type
+                                If atcData.atcDataManager.LoadPlugin("Timeseries::" & lDataType) Then
+                                    'Try again with newly loaded plugin
+                                    lNewDataSource = atcData.atcDataManager.DataSourceByName(lDataType)
+                                    If lNewDataSource IsNot Nothing Then Logger.Dbg("Successfully loaded plugin " & lDataType & " to read " & lOutputFileName)
+                                Else
+                                    Logger.Dbg("Could not add data from '" & lOutputFileName & "' - unknown type '" & lDataType & "'")
+                                End If
+                            End If
+                            If lNewDataSource IsNot Nothing Then
+                                If atcData.atcDataManager.OpenDataSource(lNewDataSource, lOutputFileName, Nothing) Then
+                                    lDataAdded.Add(lNewDataSource.Specification)
+                                End If
+                            End If
+                        End If
+                    Case "add_shape"
+                        lOutputFileName = lProjectorNode.InnerText
+#If GISProvider = "DotSpatial" Then
+                        Dim lUSGSApplication As Boolean = True
+                        If Not FileExists(lOutputFileName) Then
+                            lOutputFileName = IO.Path.Combine(lProjectDir, lOutputFileName)
+                        End If
+#Else
+                        Dim lUSGSApplication As Boolean = g_MapWin.ApplicationInfo.ApplicationName.StartsWith("USGS")
+#End If
+                        If lUSGSApplication Then
+                            Select Case IO.Path.GetFileNameWithoutExtension(lOutputFileName).ToLowerInvariant()
+                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad"
+                                    TryDeleteShapefile(lOutputFileName)
+                                    Continue For  'Skip trying to add this shapefile to the map
+                            End Select
+                        End If
+
+                        If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                        'Dim lLayer As IMapFeatureLayer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        'If lLayer Is Nothing Then
+                        'Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
+                        'Else
+                        'lLayersAdded.Add(lLayer.Name)
+                        'End If
+                    Case "add_grid"
+                        lOutputFileName = lProjectorNode.InnerText
+                        If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+                        'Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        'If lLayer Is Nothing Then
+                        '    Logger.Msg(lOutputFileName, "Failed add grid layer")
+                        'Else
+                        '    lLayersAdded.Add(lLayer.Name)
+                        'End If
+                        If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                            'create .prj file as work-around for bug
+                            SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+                        End If
+                    Case "remove_data"
+                        atcDataManager.RemoveDataSource(lProjectorNode.InnerText.ToLower)
+                    Case "remove_layer", "remove_shape", "remove_grid"
+                        Try
+                            'atcMwGisUtility.GisUtil.RemoveLayer(atcMwGisUtility.GisUtil.LayerIndex(lProjectorNode.InnerText))
+                        Catch ex As Exception
+                            Logger.Dbg("Error removing layer '" & lProjectorNode.InnerText & "': " & ex.Message)
+                        End Try
+                    Case "clip_grid"
+                        'lOutputFileName = lProjectorNode.Attributes.GetNamedItem("output").InnerText
+                        'lCurFilename = lProjectorNode.InnerText
+                        ''create extents shape to clip to, at the extents of the cat unit
+                        'Dim lShape As New DotSpatial.Data.Shape
+                        'Dim lExtentsSf As New DotSpatial.Data.PolygonShapefile
+                        ''lShape.Create(ShpfileType.SHP_POLYGON)
+                        'Dim lSf As New DotSpatial.Data.PolygonShapefile
+                        'lSf.Open(lProjectDir & "cat.shp")
+                        'Dim lPoint1 As New MapWinGIS.Point
+                        'lPoint1.x = lSf.Extents.xMin
+                        'lPoint1.y = lSf.Extents.yMin
+                        'lSuccess = lShape.InsertPoint(lPoint1, 0)
+                        'Dim lPoint2 As New MapWinGIS.Point
+                        'lPoint2.x = lSf.Extents.xMax
+                        'lPoint2.y = lSf.Extents.yMin
+                        'lSuccess = lShape.InsertPoint(lPoint2, 0)
+                        'Dim lPoint3 As New MapWinGIS.Point
+                        'lPoint3.x = lSf.Extents.xMax
+                        'lPoint3.y = lSf.Extents.yMax
+                        'lSuccess = lShape.InsertPoint(lPoint3, 0)
+                        'Dim lPoint4 As New MapWinGIS.Point
+                        'lPoint4.x = lSf.Extents.xMin
+                        'lPoint4.y = lSf.Extents.yMax
+                        'lSuccess = lShape.InsertPoint(lPoint4, 0)
+                        'Dim lPoint5 As New MapWinGIS.Point
+                        'lPoint5.x = lSf.Extents.xMin
+                        'lPoint5.y = lSf.Extents.yMin
+                        'lSuccess = lShape.InsertPoint(lPoint5, 0)
+                        'If lOutputFileName.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                        '    'project the extents into the albers projection for nlcd
+                        '    MkDirPath(lProjectDir & "nlcd")
+                        '    TryDeleteShapefile(lProjectDir & "nlcd\catextent.shp")
+                        '    lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
+                        '    lSuccess = lExtentsSf.StartEditingShapes(True)
+                        '    lSuccess = lExtentsSf.EditInsertShape(lShape, 0)
+                        '    lSuccess = lExtentsSf.Close()
+                        '    lInputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        '    lInputProjection = CleanUpUserProjString(lInputProjection)
+                        '    lOutputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                        '    If lInputProjection <> lOutputProjection Then
+                        '        lSuccess = MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
+                        '        lSuccess = lExtentsSf.Open(lProjectDir & "nlcd\catextent.shp")
+                        '        lShape = lExtentsSf.Shape(0)
+                        '    End If
+                        'End If
+                        ''clip to cat extents
+                        'g_StatusBar(1).Text = "Clipping Grid..."
+                        'RefreshView()
+                        'DoEvents()
+                        'If Not FileExists(FilenameNoExt(lCurFilename) & ".prj") Then
+                        '    'create .prj file as work-around for clipping bug
+                        '    SaveFileString(FilenameNoExt(lCurFilename) & ".prj", "")
+                        'End If
+                        'Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
+                        'lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
+                        'lSuccess = lExtentsSf.Close
+                        'g_StatusBar(1).Text = ""
+                    Case "project_dir"
+                        lProjectDir = lProjectorNode.InnerText
+                        If Not lProjectDir.EndsWith(g_PathChar) Then lProjectDir &= g_PathChar
+                    Case "message"
+                        Logger.Msg(lProjectorNode.InnerText)
+                    Case "select_layer"
+                        Dim lLayerName As String = lProjectorNode.InnerText
+                        Try
+                            Dim lLayerIndex As Integer = -1
+                            For Each layer As IMapFeatureLayer In g_MapWin.Map.GetLayers()
+                                lLayerIndex += 1
+                                If layer.DataSet.Name = lLayerName Then
+                                    Exit For
+                                End If
+                            Next
+                            'atcMwGisUtility.GisUtil.CurrentLayer = lLayerIndex
+                            Logger.Dbg("Selected layer '" & lLayerName & "'")
+                        Catch
+                            Logger.Dbg("Failed to select layer '" & lLayerName & "'")
+                        End Try
+                    Case Else
+                        Logger.Msg("Cannot follow directive:" & vbCr & lProjectorNode.Name, "ProcessProjectorFile")
+                End Select
+            Next
+
+            'RemoveEmptyGroups()
+
+            If lLayersAdded.Count = 1 Then
+                ProcessDownloadResult &= "Downloaded Layer: " & lLayersAdded(0).ToString
+            ElseIf lLayersAdded.Count > 1 Then
+                ProcessDownloadResult &= "Downloaded " & lLayersAdded.Count & " Layers"
+            End If
+
+            If lLayersAdded.Count > 0 AndAlso lDataAdded.Count > 0 Then
+                ProcessDownloadResult &= vbCrLf
+            End If
+
+            If lDataAdded.Count = 1 Then
+                ProcessDownloadResult &= "Downloaded Data file: " & lDataAdded(0).ToString
+            ElseIf lDataAdded.Count > 1 Then
+                ProcessDownloadResult &= "Downloaded " & lDataAdded.Count & " Data files"
+            End If
+
+#If GISProvider = "DotSpatial" Then
+#Else
+            'g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
+            g_MapWin.View.UnlockLegend()
+#End If
+        Else
+            ProcessDownloadResult &= lInstructionsNode.Name & ": " & lInstructionsNode.InnerXml
+        End If
+        Logger.Status("")
+    End Function
+#Else
 
     ''' <summary>
     ''' 
@@ -672,7 +933,7 @@ StartOver:
 
         Dim lBasinsDataTypes As String = "<DataType>core31</DataType>"
         Select Case g_AppNameShort
-            Case "SW Toolbox", "GW Toolbox"
+            Case "SW Toolbox", "GW Toolbox", "Hydro Toolbox"
                 lBasinsDataTypes &= "<DataType>nhd</DataType>"
         End Select
 
@@ -752,7 +1013,7 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
-                    Case "GW Toolbox"
+                    Case "GW Toolbox", "Hydro Toolbox"
                         'Dim lRegion As D4EMDataManager.Region 'Use the view extents to include some stations in a buffer outside the original region
                         'With g_MapWin.View.Extents
                         '    lRegion = New D4EMDataManager.Region(.yMax, .yMin, .xMin, .xMax, g_MapWin.Project.ProjectProjection)
@@ -1310,6 +1571,7 @@ StartOver:
         '        Logger.Msg(curStep & vbCr & Err.Description, MsgBoxStyle.OKOnly, "BASINS Data Download Main")
     End Function
 
+#End If
     Private Function GetDefaultsXML() As Xml.XmlDocument
         Dim lDefaultsXML As Xml.XmlDocument = Nothing
         Dim lDefaultsPath As String 'full file name of defaults XML
@@ -1322,6 +1584,27 @@ StartOver:
         Return lDefaultsXML
     End Function
 
+    Private Function GetDefaultsFor(ByVal Filename As String,
+                                    ByVal aProjectDir As String,
+                                    ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
+        Dim lName As String = Filename.ToLower
+        If lName.StartsWith(aProjectDir.ToLower) Then
+            lName = lName.Substring(aProjectDir.Length)
+        End If
+
+        If Not aDefaultsXml Is Nothing Then
+            For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes
+                'Debug.Print("Testing " & lName & " Like " & "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*")
+                If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText.ToLower & "*" Then
+                    Return lChild
+                End If
+            Next
+        End If
+        Return Nothing
+    End Function
+
+#If GISProvider = "DotSpatial" Then
+#Else
     'Adds all shape files found in aPath to the current MapWindow project
     Public Function AddAllShapesInDir(ByVal aPath As String, ByVal aProjectDir As String) As atcCollection
         Dim lLayer As Integer
@@ -2096,25 +2379,6 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
         Return 0
     End Function
 
-    Private Function GetDefaultsFor(ByVal Filename As String,
-                                    ByVal aProjectDir As String,
-                                    ByRef aDefaultsXml As Xml.XmlDocument) As Xml.XmlNode
-        Dim lName As String = Filename.ToLower
-        If lName.StartsWith(aProjectDir.ToLower) Then
-            lName = lName.Substring(aProjectDir.Length)
-        End If
-
-        If Not aDefaultsXml Is Nothing Then
-            For Each lChild As Xml.XmlNode In aDefaultsXml.FirstChild.ChildNodes
-                'Debug.Print("Testing " & lName & " Like " & "*" & lChild.Attributes.GetNamedItem("Filename").InnerText & "*")
-                If lName Like "*" & lChild.Attributes.GetNamedItem("Filename").InnerText.ToLower & "*" Then
-                    Return lChild
-                End If
-            Next
-        End If
-        Return Nothing
-    End Function
-
     Public Function CheckAddress(ByVal URL As String) As Boolean
         Try
             Logger.Dbg("CheckAddress " & URL)
@@ -2207,5 +2471,5 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
         End If
         Return lHUC8BoundaryOnly
     End Function
-
+#End If
 End Module

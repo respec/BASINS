@@ -112,7 +112,7 @@ Public Class atcGraphPlugin
                     If lItemIndex > -1 Then .SetItemChecked(lItemIndex, True)
                 Next
 
-                If lChooseForm.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                If lChooseForm.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                     Dim lTimeseriesGroups As New Collection
                     If lChooseForm.cbxMultiple.Checked Then
                         'need multiple wq plots, split ltimeseriesgroup into groups by constituent

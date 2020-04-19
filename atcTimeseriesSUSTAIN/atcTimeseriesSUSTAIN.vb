@@ -310,17 +310,30 @@ Public Class atcTimeseriesSUSTAIN
                 lWriter.WriteLine(HeaderLineStart)
             End If
 
+            Dim lSeasonal As Boolean = False
+            If lDatasetsToWrite(0).Attributes.ContainsAttribute("seasbg") Then lSeasonal = True
+            Dim lSeasons As New atcSeasonsYearSubset(lDatasetsToWrite(0).Attributes.GetValue("seasbg", 1),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadbg", 1),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seasnd", 12),
+                                                     lDatasetsToWrite(0).Attributes.GetValue("seadnd", 31))
+
             Dim lBodyLineStart As String = BodyLineStart.Replace("WatershedNumber", WatershedNumber)
             For lTimeStep As Integer = 1 To lLastTimeStep
-                lWriter.Write(lBodyLineStart)
                 Dim lDateArray(5) As Integer
                 modDate.J2Date(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval, lDateArray)
+                If lSeasonal Then 'make sure date is in seasonal range
+                    Dim lIndex As Integer = lSeasons.SeasonIndex(lDatasetsToWrite(0).Dates.Value(lTimeStep) - lInterval)
+                    If lIndex = 0 Then 'outside of seasonal range, don't write it
+                        GoTo FinishedLine
+                    End If
+                End If
+                lWriter.Write(lBodyLineStart)
                 If Delimiter = " " Then
-                    lWriter.Write(lDateArray(0).ToString.PadLeft(6) & _
-                                  lDateArray(1).ToString.PadLeft(3) & _
+                    lWriter.Write(lDateArray(0).ToString.PadLeft(6) &
+                                  lDateArray(1).ToString.PadLeft(3) &
                                   lDateArray(2).ToString.PadLeft(3))
                     If IncludeTimeWhenSaving Then
-                        lWriter.Write(lDateArray(3).ToString.PadLeft(3) & _
+                        lWriter.Write(lDateArray(3).ToString.PadLeft(3) &
                                       lDateArray(4).ToString.PadLeft(3))
                     End If
 
@@ -340,6 +353,7 @@ Public Class atcTimeseriesSUSTAIN
                     Next
                 End If
                 lWriter.WriteLine()
+FinishedLine:
             Next
 
             lWriter.Close()

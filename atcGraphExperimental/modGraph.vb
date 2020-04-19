@@ -718,7 +718,7 @@ FoundMatch:
         Dim lPaneMain As GraphPane = aMasterPane.PaneList(aMasterPane.PaneList.Count - 1)
         Dim lPaneAux As GraphPane = Nothing
         If aMasterPane.PaneList.Count > 1 Then lPaneAux = aMasterPane.PaneList(0)
-        Dim lDummyForm As New Windows.Forms.Form
+        Dim lDummyForm As New System.Windows.Forms.Form
         Dim lGraphics As Graphics
         Try
             lGraphics = lDummyForm.CreateGraphics()
@@ -767,11 +767,11 @@ FoundMatch:
                 Dim lTotalPaneHeight As Single = lPaneMain.Rect.Height + lOrigAuxHeight
                 Dim lPaneX As Single = Math.Max(lPaneAux.Rect.X, lPaneMain.Rect.X)
                 Dim lPaneWidth As Single = Math.Min(lPaneAux.Rect.Width, lPaneMain.Rect.Width)
-                lPaneAux.Rect = New System.Drawing.Rectangle( _
-                        lPaneX, lPaneAux.Rect.Y, _
+                lPaneAux.Rect = New System.Drawing.Rectangle(
+                        lPaneX, lPaneAux.Rect.Y,
                         lPaneWidth, lTotalPaneHeight * aAuxFraction)
-                lPaneMain.Rect = New System.Drawing.Rectangle( _
-                        lPaneX, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height, _
+                lPaneMain.Rect = New System.Drawing.Rectangle(
+                        lPaneX, lPaneMain.Rect.Y - lOrigAuxHeight + lPaneAux.Rect.Height,
                         lPaneWidth, lTotalPaneHeight - lPaneAux.Rect.Height)
             End With
         Else
@@ -784,7 +784,7 @@ FoundMatch:
         Return lPaneAux
     End Function
 
-    <CLSCompliant(False)> _
+    <CLSCompliant(False)>
     Public Function CreateZgc(Optional ByVal aZgc As ZedGraphControl = Nothing, Optional ByVal aWidth As Integer = 600, Optional ByVal aHeight As Integer = 500) As ZedGraphControl
         InitMatchingColors(FindFile("", "GraphColors.txt")) 'Becky commented this out because now we're calling
         'InitMatchingColors ONCE for the entire program in the HSPFSupport version of modGraph.  The only thing
@@ -821,9 +821,9 @@ FoundMatch:
         Return aZgc
     End Function
 
-    <CLSCompliant(False)> _
-    Public Sub SetGraphSpecs(ByRef aZgc As ZedGraphControl, _
-                             Optional ByRef aLabel1 As String = "Simulated", _
+    <CLSCompliant(False)>
+    Public Sub SetGraphSpecs(ByRef aZgc As ZedGraphControl,
+                             Optional ByRef aLabel1 As String = "Simulated",
                              Optional ByRef aLabel2 As String = "Observed")
         With aZgc.MasterPane.PaneList(aZgc.MasterPane.PaneList.Count - 1)
             .YAxis.MajorGrid.IsVisible = True
@@ -838,7 +838,7 @@ FoundMatch:
                 .Color = System.Drawing.Color.Blue
             End With
         End With
-        Windows.Forms.Application.DoEvents()
+        System.Windows.Forms.Application.DoEvents()
     End Sub
 
     <CLSCompliant(False)> _

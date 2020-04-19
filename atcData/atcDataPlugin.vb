@@ -1,4 +1,7 @@
 Imports atcData.atcDataManager
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+#End If
 
 ''' <summary>
 '''     <para>Base class for plugins that can read, write, manipulate, or display atcData</para>
@@ -12,7 +15,7 @@ Imports atcData.atcDataManager
 Public Class atcDataPlugin
 
 #If GISProvider = "DotSpatial" Then
-
+    Inherits Extension
 #Else
     Implements MapWindow.Interfaces.IPlugin
 #End If
@@ -56,7 +59,10 @@ Public Class atcDataPlugin
     Public Overridable Function ComputeClicked(ByVal aItemName As String) As atcDataSource
         Dim ds As atcDataSource = Me
         Dim lItemName As String = aItemName '.Replace(" ", "")
+#If GISProvider = "DotSpatial" Then
+#Else
         lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - Name.Length - 2)
+#End If
         If lItemName.StartsWith(ds.Category & "_") Then
             Dim lNewSource As atcDataSource = Nothing
             lItemName = lItemName.Substring(ds.Category.Length + 1)

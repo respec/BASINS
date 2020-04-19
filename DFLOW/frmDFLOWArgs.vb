@@ -97,7 +97,7 @@ Public Class frmDFLOWArgs
 
     Private Function SaveBatchSettings(ByVal aChoice As atcDataAttributes, Optional ByVal aDataGroup As atcTimeseriesGroup = Nothing) As String
         Dim lMessage As String = ""
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             'aCBList = Me.clbDataSets
             DFLOWCalcs.fStartMonth = cboStartMonth.SelectedIndex + 1
             If IsNumeric(tbStartDay.Text) Then
@@ -156,7 +156,7 @@ Public Class frmDFLOWArgs
         DFLOWCalcs.fBioCluster = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 2)
         DFLOWCalcs.fBioExcursions = DFLOWCalcs.fBioFPArray(DFLOWCalcs.fBioType, 3)
 
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
 
@@ -198,7 +198,7 @@ Public Class frmDFLOWArgs
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
         End If
 
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
 
             aCBList = Me.clbDataSets
             DFLOWCalcs.fStartMonth = cboStartMonth.SelectedIndex + 1
@@ -570,7 +570,7 @@ Public Class frmDFLOWArgs
     End Sub
 
     Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
-        Me.DialogResult = Windows.Forms.DialogResult.Cancel
+        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Close()
 
     End Sub

@@ -59,7 +59,7 @@ Public Class frmSelectAttributes
 
             RefreshAvailable()
 
-            If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 aSelected.Clear()
                 For Each lName In ctlSelect.RightItems
                     aSelected.Add(lName)

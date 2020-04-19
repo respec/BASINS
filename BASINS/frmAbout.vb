@@ -1,4 +1,4 @@
-Friend Class frmAbout
+Public Class frmAbout
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -337,6 +337,12 @@ Friend Class frmAbout
 
     Public Sub ShowAbout()
         Try
+#If GISProvider = "DotSpatial" Then
+            picProgramLogo.Image = My.Resources.Images.header_graphic_usgsIdentifier_white
+            picProgramLogo.Width = picProgramLogo.Image.Width
+            picMapWindow.Image = My.Resources.Images.dotspatial_small
+            picMapWindow.Width = picMapWindow.Image.Width
+#Else
             Try
                 Me.Icon = g_MapWin.ApplicationInfo.FormIcon
             Catch
@@ -346,6 +352,7 @@ Friend Class frmAbout
                 picProgramLogo.Image = g_MapWin.ApplicationInfo.SplashPicture
             Catch
             End Try
+#End If
 
             lblProgramName.Text = g_AppNameLong
             'If g_AppNameLong = "USGS GW Toolbox" Then lblProgramName.Text &= " (Beta)"
@@ -371,31 +378,42 @@ Friend Class frmAbout
             Catch
             End Try
             Try
+#If GISProvider = "DotSpatial" Then
+                lblProjFile.Text = g_Project.CurrentProjectFile
+#Else
                 lblProjFile.Text = g_Project.FileName
                 lblConfigFile.Text = g_Project.ConfigFileName
+#End If
             Catch
             End Try
             Try
 #If ProgramName = "USGS GW Toolbox" Then
-
+                Me.Width += 30
 #ElseIf ProgramName = "USGS SW Toolbox" Then
                 Me.Width += 30
+#ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
+                Me.Width += 70
 #Else
-
 #End If
             Catch ex As Exception
             End Try
             Me.Show()
         Catch ex As System.Exception
+#If GISProvider = "DotSpatial" Then
+#Else
             g_MapWin.ShowErrorDialog(ex)
+#End If
         End Try
     End Sub
 
-    Private Sub OpenLinkURL(ByVal aLink As Windows.Forms.LinkLabel)
+    Private Sub OpenLinkURL(ByVal aLink As System.Windows.Forms.LinkLabel)
         Try
             Diagnostics.Process.Start(aLink.Text.Substring(aLink.LinkArea.Start, aLink.LinkArea.Length))
         Catch ex As System.Exception
+#If GISProvider = "DotSpatial" Then
+#Else
             g_MapWin.ShowErrorDialog(ex)
+#End If
         End Try
     End Sub
 
@@ -446,7 +464,7 @@ Friend Class frmAbout
 
     Private Sub frmAbout_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) _
         Handles MyBase.KeyDown
-        If e.KeyCode = Windows.Forms.Keys.F1 Then
+        If e.KeyCode = System.Windows.Forms.Keys.F1 Then
             atcUtility.ShowHelp("")
         End If
     End Sub

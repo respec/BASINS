@@ -678,5 +678,5 @@ Partial Class frmRecess
     Friend WithEvents lblRisePct As System.Windows.Forms.Label
     Friend WithEvents txtPeakAheadDays As System.Windows.Forms.TextBox
     Friend WithEvents txtPeakRisePct As System.Windows.Forms.TextBox
-    Friend WithEvents btnViewMRCs As Windows.Forms.Button
+    Friend WithEvents btnViewMRCs As System.Windows.Forms.Button
 End Class

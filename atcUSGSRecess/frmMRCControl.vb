@@ -156,9 +156,9 @@ Public Class frmMRCControl
             '.Legend.IsVisible = False
             '.CurveList.Item(1).Color = Drawing.Color.DarkBlue
             'CType(.CurveList.Item(1), LineItem).Line.Width = 2
-            For I As Integer = 0 To pGrapher.ZedGraphCtrl.GraphPane.CurveList.Count - 1
-                .CurveList.Item(I).Color = pGrapher.ZedGraphCtrl.GraphPane.CurveList.Item(I).Color
-            Next
+            'For I As Integer = 0 To pGrapher.ZedGraphCtrl.GraphPane.CurveList.Count - 1
+            '.CurveList.Item(I).Color = pGrapher.ZedGraphCtrl.GraphPane.CurveList.Item(I).Color
+            'Next
         End With
         pZgcUA.Refresh()
 

@@ -10,6 +10,19 @@ Public Class clsDurationComparePlugin
         End Get
     End Property
 #If GISProvider = "DotSpatial" Then
+    Public Function ShowDH(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
+        Dim lTimeseriesGroup = aTimeseriesGroup
+        If aTimeseriesGroup Is Nothing OrElse aTimeseriesGroup.Count = 0 Then
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration Hydrograph",
+                                          Nothing, Nothing, True, True, Me.Icon)
+        End If
+        If lTimeseriesGroup.Count > 0 Then
+            Dim lfrmDHControl As New frmDurationHydrographControl(lTimeseriesGroup)
+            lfrmDHControl.Show()
+            Return lfrmDHControl
+        End If
+        Return Nothing
+    End Function
 #Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
@@ -54,15 +67,19 @@ Public Class clsDurationComparePlugin
             End If
         End If
     End Sub
+#End If
 
     Public Overrides Function Show(ByVal aTimeseriesGroup As atcData.atcDataGroup) As Object
-        If aTimeseriesGroup.Count > 0 Then
-            Dim lFrmAnalysis As frmAnalysis = New frmAnalysis(aTimeseriesGroup)
+        Dim lTimeseriesGroup = aTimeseriesGroup
+        If aTimeseriesGroup Is Nothing OrElse aTimeseriesGroup.Count = 0 Then
+            lTimeseriesGroup = atcDataManager.UserSelectData("Select Data For Duration/Compare",
+                                          Nothing, Nothing, True, True, Me.Icon)
+        End If
+        If lTimeseriesGroup IsNot Nothing AndAlso lTimeseriesGroup.Count > 0 Then
+            Dim lFrmAnalysis As frmAnalysis = New frmAnalysis(lTimeseriesGroup)
             lFrmAnalysis.Show()
             Return lFrmAnalysis
         End If
         Return Nothing
     End Function
-
-#End If
 End Class

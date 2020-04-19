@@ -234,7 +234,11 @@ Public Class HspfGlobalBlk
             pEDate(4) = 0
         End If
 
-        GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        'Allow room for comments
+        lRecordType = -1
+        While lRecordType < 0 And lRecordIndex < 100 '(100 is arbitrary to prevent an endless loop)
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+        End While
         lField = lRecord.Substring(25, 5)
         If lField.Length > 0 AndAlso IsInteger(lField) Then
             lOutLev = lField

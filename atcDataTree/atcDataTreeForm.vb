@@ -314,13 +314,13 @@ Friend Class atcDataTreeForm
 
     Friend Sub Save(ByVal aFileName As String)
         If aFileName.Length = 0 Then 'prompt user
-            Dim lCdlg As New Windows.Forms.SaveFileDialog
+            Dim lCdlg As New System.Windows.Forms.SaveFileDialog
             With lCdlg
                 .Title = "Select File to Save Into"
                 .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
                 .FilterIndex = 1
                 .DefaultExt = "txt"
-                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                     aFileName = AbsolutePath(.FileName, CurDir)
                 Else 'Return empty string if user clicked Cancel
                     aFileName = ""
@@ -461,7 +461,7 @@ Friend Class atcDataTreeForm
         ShowHelpForTree()
     End Sub
     Private Sub atcGraphForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelpForTree()
         End If
     End Sub

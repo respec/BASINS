@@ -31,7 +31,7 @@ Public Class frmWDM
             End If
         End If
 
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             atcUtility.ChDriveDir(lSaveDir)
             If RadioIndividual.Checked Then
                 Return ""
@@ -48,7 +48,7 @@ Public Class frmWDM
     End Function
 
     Private Sub btnBrowseNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseNew.Click
-        Dim lDialog As New Windows.Forms.SaveFileDialog
+        Dim lDialog As New System.Windows.Forms.SaveFileDialog
         With lDialog
             .Title = "Save new WDM file as..."
             .FileName = txtFilenameNew.Text
@@ -61,14 +61,14 @@ Public Class frmWDM
             .OverwritePrompt = False
             .ValidateNames = True
             .CreatePrompt = False
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
                 txtFilenameNew.Text = .FileName
             End If
         End With
     End Sub
 
     Private Sub btnBrowseExisting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseExisting.Click
-        Dim lDialog As New Windows.Forms.OpenFileDialog
+        Dim lDialog As New System.Windows.Forms.OpenFileDialog
         With lDialog
             .Title = "Save data in..."
             .FileName = txtFilenameExisting.Text
@@ -79,7 +79,7 @@ Public Class frmWDM
             .DefaultExt = ".wdm"
             .CheckFileExists = False
             .ValidateNames = True
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
                 txtFilenameExisting.Text = .FileName
             End If
         End With
@@ -95,8 +95,8 @@ Public Class frmWDM
 
     Private Sub frmWDM_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
         Me.Activate()
-        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(Windows.Forms.DataFormats.FileDrop)) Then
-            txtFilenameExisting.Text = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)(0)
+        If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)) Then
+            txtFilenameExisting.Text = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)(0)
             RadioAddExisting.Checked = True
         End If
     End Sub
@@ -106,8 +106,8 @@ Public Class frmWDM
     End Function
 
     Private Sub frmWDM_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
-        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(Windows.Forms.DataFormats.FileDrop)) Then
-            e.Effect = Windows.Forms.DragDropEffects.All
+        If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) AndAlso IsWdmFileName(e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)) Then
+            e.Effect = System.Windows.Forms.DragDropEffects.All
         End If
     End Sub
 End Class

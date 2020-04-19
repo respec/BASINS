@@ -1,10 +1,20 @@
-Date: 3/13/2019
+Date: 11/5/2019
+
+HSPEXP+3.1
+
+New Features:
+1. New option to support SNOW calibration. See HSPEXP+ documentation.
+2. Complete documentation of all constituent balance reports in Appendix A.
+
+
+Date: 10/15/2019
 
 HSPEXP+3.0 
 
 New Features:
 1. Added Model QA/QC report. See HSPEXP+ documentation.
 2. Added instream model setup for BATHTUB and WASP.  See HSPEXP+ documentation.
+3. Automated graphs for sparse data scatter plots and frequency graphs now use only paired data points.
 
 Bugs Fixed:
 1. The expert statistic calculated the years of simulation as an integer. This skewed calculations for models with very small model span. That has been fixed.
@@ -12,6 +22,9 @@ Bugs Fixed:
 3. The reports did not include adsorption/desorption and scour/deposition of TAM and PO4. That has been fixed.
 4. The reports did not output labile and refractory organic P data for impervious areas. That has been fixed.
 5. The expert system statistics computation for percentiles now excludes missing observed values.
+6. Regan plots and Diurnal QA reports now use 'subset by date' 
+7. Better curve labeling on storm plots with non-daily data
+
 
 Date: 06/15/2018
 
