@@ -12,20 +12,6 @@ Imports DotSpatial.Controls
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
     Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
-    Private Shared pMapWin As AppManager
-    ''' <summary>Pointer to the root interface for MapWindow 4</summary>
-    <CLSCompliant(False)>
-    Public Shared WriteOnly Property MapWindow() As AppManager
-        Set(ByVal aMapWin As AppManager)
-            If pMapWin Is Nothing AndAlso aMapWin IsNot Nothing Then
-                pMapWin = aMapWin
-                'If aMapWin.ApplicationInfo.ApplicationName.StartsWith("USGS GW Toolbox") Then
-                '    pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
-                'End If
-                Clear()
-            End If
-        End Set
-    End Property
 #Else
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>

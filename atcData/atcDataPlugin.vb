@@ -15,7 +15,6 @@ Imports DotSpatial.Controls
 Public Class atcDataPlugin
 
 #If GISProvider = "DotSpatial" Then
-    Inherits Extension
 #Else
     Implements MapWindow.Interfaces.IPlugin
 #End If
