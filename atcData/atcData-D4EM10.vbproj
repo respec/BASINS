@@ -266,6 +266,8 @@
     <Compile Include="frmSpecifyYearSubset.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="IDataManagement.vb" />
+    <Compile Include="IDataMemory.vb" />
     <Compile Include="modMetData.vb" />
     <Compile Include="modTimeseriesMath.vb">
       <SubType>Code</SubType>
