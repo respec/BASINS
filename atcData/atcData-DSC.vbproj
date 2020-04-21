@@ -219,12 +219,8 @@
     <Compile Include="atcDataGroup.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcDataManager.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="atcDataPlugin.vb">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="atcDataManagerDS.vb" />
+    <Compile Include="atcDataPluginDS.vb" />
     <Compile Include="atcDataSet.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -298,6 +294,8 @@
     <Compile Include="frmSpecifyYearSubset.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="IDataManagement.vb" />
+    <Compile Include="IDataMemory.vb" />
     <Compile Include="modMetData.vb" />
     <Compile Include="modTimeseriesMath.vb">
       <SubType>Code</SubType>

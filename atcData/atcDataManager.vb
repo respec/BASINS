@@ -12,20 +12,6 @@ Imports DotSpatial.Controls
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
     Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
-    Private Shared pMapWin As AppManager
-    ''' <summary>Pointer to the root interface for MapWindow 4</summary>
-    <CLSCompliant(False)>
-    Public Shared WriteOnly Property MapWindow() As AppManager
-        Set(ByVal aMapWin As AppManager)
-            If pMapWin Is Nothing AndAlso aMapWin IsNot Nothing Then
-                pMapWin = aMapWin
-                'If aMapWin.ApplicationInfo.ApplicationName.StartsWith("USGS GW Toolbox") Then
-                '    pDefaultSelectionAttributes = pDefaultSelectionAttributesGW
-                'End If
-                Clear()
-            End If
-        End Set
-    End Property
 #Else
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>
@@ -460,7 +446,23 @@ Public Class atcDataManager
     Private Shared Sub RemovedDataSource(ByVal aDataSource As atcDataSource)
         Try
             RaiseEvent ClosedData(aDataSource)
-            aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+            If aDataSource.Category.ToLower().StartsWith("season") Then
+                Dim lCleanUpMode As IDataManagement.ECleanUpMode
+                Try
+                    lCleanUpMode = CType(aDataSource, IDataManagement).CleanUpMode()
+                Catch ex As Exception
+                End Try
+                Select Case lCleanUpMode
+                    Case IDataManagement.ECleanUpMode.ALL
+                        aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+                    Case IDataManagement.ECleanUpMode.ATTRIBUTES
+                        aDataSource.ClearAttributes()
+                    Case IDataManagement.ECleanUpMode.CALCULATED
+                        aDataSource.ClearCalculated("season")
+                End Select
+            Else
+                aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+            End If
         Catch e As Exception
             Logger.Dbg("RaiseEvent ClosedData: " & e.Message)
         End Try

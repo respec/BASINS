@@ -15,7 +15,6 @@ Imports DotSpatial.Controls
 Public Class atcDataPlugin
 
 #If GISProvider = "DotSpatial" Then
-    Inherits Extension
 #Else
     Implements MapWindow.Interfaces.IPlugin
 #End If
@@ -80,6 +79,9 @@ Public Class atcDataPlugin
                 lNewSource = ds.NewOne
             End If
             If lNewSource IsNot Nothing Then
+                If lNewSource.Name = "Timeseries::Math" Then
+                    CType(lNewSource, IDataMemory).ShareDates = CType(ds, IDataMemory).ShareDates
+                End If
                 If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                     If lNewSource.DataSets.Count > 0 Then
                         Return lNewSource

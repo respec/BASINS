@@ -137,21 +137,28 @@ Public Module modDownload
                         End If
 
                         If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                        'Dim lLayer As IMapFeatureLayer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
-                        'If lLayer Is Nothing Then
-                        'Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
-                        'Else
-                        'lLayersAdded.Add(lLayer.Name)
-                        'End If
+                        Dim lLayer As IMapFeatureLayer = AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg("Failed add shape layer '" & lOutputFileName & "'")
+                        Else
+#If GISProvider = "DotSpatial" Then
+                            lLayersAdded.Add(lLayer.DataSet.Name)
+#Else
+                            lLayersAdded.Add(lLayer.Name)
+#End If
+                        End If
                     Case "add_grid"
                         lOutputFileName = lProjectorNode.InnerText
                         If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
-                        'Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
-                        'If lLayer Is Nothing Then
-                        '    Logger.Msg(lOutputFileName, "Failed add grid layer")
-                        'Else
-                        '    lLayersAdded.Add(lLayer.Name)
-                        'End If
+#If GISProvider = "DotSpatial" Then
+#Else
+                        Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg(lOutputFileName, "Failed add grid layer")
+                        Else
+                            lLayersAdded.Add(lLayer.Name)
+                        End If
+#End If
                         If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                             'create .prj file as work-around for bug
                             SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
@@ -1790,7 +1797,9 @@ StartOver:
                     GisUtilDS.ZoomToLayer(MWlay)
                 End If
                 If Group.Length > 0 Then
-                    AddLayerToGroup(MWlay, Group)
+                    If Not GisUtilDS.IsLayer(MWlay.LegendText) Then
+                        AddLayerToGroup(MWlay, Group)
+                    End If
                 End If
                 If MWlay.IsVisible Then
                     g_MapWin.Map.Refresh()

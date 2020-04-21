@@ -277,9 +277,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\header_graphic_usgsIdentifier_white.jpg" />
   </ItemGroup>
   <ItemGroup>
