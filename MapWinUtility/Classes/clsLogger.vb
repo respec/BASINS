@@ -80,21 +80,25 @@ Public Class Logger
 
             pFileName = aLogFileName
 
-            If pFileName.Length > 0 Then
-                MkDirPath(PathNameOnly(pFileName))
+            Try
+                If pFileName.Length > 0 Then
+                    MkDirPath(PathNameOnly(pFileName))
 
-                If FileExists(pFileName) Then
-                    If Not aAppend Then
-                        If aRenameExisting Then
-                            Rename(pFileName, MakeLogName(pFileName))
-                        Else
-                            Kill(pFileName)
+                    If FileExists(pFileName) Then
+                        If Not aAppend Then
+                            If aRenameExisting Then
+                                Rename(pFileName, MakeLogName(pFileName))
+                            Else
+                                Kill(pFileName)
+                            End If
                         End If
                     End If
+                    pFileStream = New StreamWriter(pFileName, aAppend)
+                    Dbg("StartToFile " & Format(Now, "yyyy-MM-dd hh:mm:ss"))
                 End If
-                pFileStream = New StreamWriter(pFileName, aAppend)
-                Dbg("StartToFile " & Format(Now, "yyyy-MM-dd hh:mm:ss"))
-            End If
+            Catch ex As Exception
+
+            End Try
         End If
     End Sub
 

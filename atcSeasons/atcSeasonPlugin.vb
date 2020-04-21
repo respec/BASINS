@@ -6,6 +6,7 @@ Imports System.Reflection
 
 Public Class atcSeasonPlugin
     Inherits atcTimeseriesSource
+    Implements IDataManagement
 
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pName As String = "Timeseries::Seasons"
@@ -38,6 +39,8 @@ Public Class atcSeasonPlugin
             Return True
         End Get
     End Property
+
+    Public Property CleanUpMode() As IDataManagement.ECleanUpMode Implements IDataManagement.CleanUpMode
 
     'The only element of aArgs is an atcDataGroup or atcTimeseries
     'The attribute(s) will be set to the result(s) of calculation(s)

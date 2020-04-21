@@ -243,6 +243,7 @@ Public Class frmSelectDisplay
         For Each lds As atcDataSet In pTimeseriesGroup
             list2.Add(lds)
         Next
+        Dim lDSRemove As New List(Of atcDataSource)
         For iDataSource As Integer = 0 To atcDataManager.DataSources.Count - 1
             lDataSource = atcDataManager.DataSources.Item(iDataSource)
 #If GISProvider = "DotSpatial" Then
@@ -250,22 +251,23 @@ Public Class frmSelectDisplay
             For Each lds As atcDataSet In lDataSource.DataSets
                 list1.Add(lds)
             Next
-            Dim oneintwo = list1.Except(list2).ToList()
-            Dim twoinone = list2.Except(list1).ToList()
+            Dim oneintwo As List(Of atcDataSet) = list1.Except(list2).ToList()
+            Dim twoinone As List(Of atcDataSet) = list2.Except(list1).ToList()
             lGroupEqual = (Not oneintwo.Count > 0) And (Not twoinone.Count > 0)
 #Else
             lGroupEqual = lDataSource.DataSets.Equals(pTimeseriesGroup) 
 #End If
             If lGroupEqual Then
-                If Logger.Msg("Discard " & lDataSource.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
-                    pTimeseriesGroup.Dispose()
-                    atcDataManager.RemoveDataSource(lDataSource)
-                    Me.Close()
-                Else
-                    Exit Sub
-                End If
+                lDSRemove.Add(lDataSource)
             End If
         Next
+        For Each lDS As atcDataSource In lDSRemove
+            If Logger.Msg("Discard " & lDS.ToString, MsgBoxStyle.YesNo, "Discard Data") = MsgBoxResult.Yes Then
+                atcDataManager.RemoveDataSource(lDS)
+                pTimeseriesGroup.Dispose()
+            End If
+        Next
+        Me.Close()
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
