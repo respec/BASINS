@@ -124,11 +124,7 @@ Public Class frmBuildNew
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildTop", Me.Top)
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", Me.Left)
         Me.Close()
-#If GISProvider = "DotSpatial" Then
         SpecifyAndCreateNewProject()
-#Else
-        SpecifyAndCreateNewProject()
-#End If
     End Sub
 
     'Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated

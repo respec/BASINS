@@ -64,7 +64,7 @@ Public Class GisUtilDS
 
     Public Shared Function GetFeatureLayers(ByVal fType As FeatureType, Optional ByVal aLayerName As String = "") As List(Of IMapFeatureLayer)
         Dim lScreenGeometryType As Boolean = True
-        If fType = Nothing Then lScreenGeometryType = False
+        If fType = Nothing OrElse fType = FeatureType.Unspecified Then lScreenGeometryType = False
         Dim lScreenLayerName As Boolean = False
         If Not String.IsNullOrEmpty(aLayerName) Then lScreenLayerName = True
         Dim lFeatureLayers As New List(Of IMapFeatureLayer)()

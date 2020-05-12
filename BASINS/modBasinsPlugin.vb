@@ -108,6 +108,7 @@ Public Module modBasinsPlugin
     Private Const Basins42DataPath As String = "Basins42\data\"
     Friend BasinsDataPath As String = Basins41DataPath
     Private Const NationalProjectFilename As String = "national.mwprj"
+    Private Const NationalProjectFilenameDS As String = "national.dspx"
 
     ''' <summary>
     ''' Find all of the data paths for this application on this system and add them to g_BasinsDataDirs
@@ -119,7 +120,14 @@ Public Module modBasinsPlugin
             ElseIf g_AppNameShort = "SW Toolbox" Then
                 g_BasinsDataDirs.Add("C:\USGS-SWToolbox\data\")
             ElseIf g_AppNameShort = "Hydro Toolbox" Then
+#If GISProvider = "DotSpatial" Then
+                If String.IsNullOrEmpty(g_ProgramDir) Then
+                    g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
+                End If
+                g_BasinsDataDirs.Add(IO.Path.Combine(g_ProgramDir, "data") & g_PathChar)
+#Else
                 g_BasinsDataDirs.Add("C:\USGS-HydroToolbox\data\")
+#End If
             End If
             Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
             If lSavedPaths.Length > 0 Then
@@ -307,7 +315,8 @@ Public Module modBasinsPlugin
 #If GISProvider = "DotSpatial" Then
         Return (g_Project IsNot Nothing) _
             AndAlso (g_Project.CurrentProjectFile IsNot Nothing) _
-            AndAlso g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower)
+            AndAlso (g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower) OrElse
+            g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilenameDS.ToLower))
 #Else
         Return (g_Project IsNot Nothing) _
             AndAlso (g_Project.FileName IsNot Nothing) _

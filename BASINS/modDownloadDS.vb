@@ -130,7 +130,7 @@ Public Module modDownload
 #End If
                         If lUSGSApplication Then
                             Select Case IO.Path.GetFileNameWithoutExtension(lOutputFileName).ToLowerInvariant()
-                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad"
+                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad", "catpt", "cntypt"
                                     TryDeleteShapefile(lOutputFileName)
                                     Continue For  'Skip trying to add this shapefile to the map
                             End Select
@@ -1686,7 +1686,7 @@ StartOver:
                 Case FeatureType.Point, FeatureType.MultiPoint
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    MWlay.DataSet.Name = LayerName
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
                     'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
@@ -1713,7 +1713,7 @@ StartOver:
                 Case FeatureType.Line
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    MWlay.DataSet.Name = LayerName
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
                     'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
@@ -1721,7 +1721,7 @@ StartOver:
                 Case FeatureType.Polygon
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    'MWlay.DataSet.Name = LayerName 'no need here
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
                     'RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)

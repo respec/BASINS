@@ -136,13 +136,17 @@
       <HintPath>..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Projections, Version=2.0.0.465, Culture=neutral, PublicKeyToken=272632bddd08a38b" />
+    <Reference Include="DotSpatial.Projections, Version=2.0.0.465, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Projections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DotSpatial.Serialization, Version=2.0.0.465, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotSpatial.Symbology, Version=2.0.0.465, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Symbology, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
       <Private>False</Private>
