@@ -331,7 +331,7 @@ Public Module modBasinsPlugin
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
 #If GISProvider = "DotSpatial" Then
-        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.GetLayers()
+        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.MapFrame().GetAllFeatureLayers()
 #Else
         For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
 #End If

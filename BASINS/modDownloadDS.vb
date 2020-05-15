@@ -1970,7 +1970,8 @@ StartOver:
                 ClearLayers()
                 AddAllShapesInDir(aNewDataDir, aNewDataDir)
                 'g_MapWin.PreviewMap.GetPictureFromMap()
-                g_Project.SaveProject(aProjectFileName)
+                Dim lProjectFileName As String = IO.Path.ChangeExtension(aProjectFileName, "dspx")
+                g_Project.SaveProject(lProjectFileName)
             Else
                 lHUC8BoundaryOnly = False
             End If

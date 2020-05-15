@@ -490,6 +490,11 @@ Public Class frmFilterData
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
             Dim SeasonTypeLabel As String = atcSeasonBase.SeasonClassNameToLabel(typ.Name)
             If SeasonTypeLabel <> "Year Subset" Then
+#If Toolbox = "Hydro" Then
+                If SeasonTypeLabel = "Traditional" Then
+                    SeasonTypeLabel = "Seasons"
+                End If
+#End If
                 cboSeasons.Items.Add(SeasonTypeLabel)
             End If
         Next
@@ -567,8 +572,14 @@ Public Class frmFilterData
     End Sub
 
     Private Function CurrentSeason() As Type
+        Dim lSeasonTypeLabel As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+        If lSeasonTypeLabel = "Seasons" Then
+            lSeasonTypeLabel = "Traditional"
+        End If
+#End If
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
-            If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = cboSeasons.Text Then
+            If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = lSeasonTypeLabel Then
                 Return typ
             End If
         Next

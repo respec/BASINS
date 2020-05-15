@@ -12,6 +12,7 @@ Imports DotSpatial.Controls
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
     Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
+    Public Shared UserSelectDataOptions As New atcDataAttributes
     Private Shared pMapWin As AppManager
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>
     <CLSCompliant(False)>
@@ -620,6 +621,14 @@ Public Class atcDataManager
 
         'Try automatically selecting data based on what is selected on the map
 #If GISProvider = "DotSpatial" Then
+        Dim lAllowFilterOptionKey As String = "ShowFilterOption"
+        Dim lAllowFilterOption As Boolean = UserSelectDataOptions.GetValue(lAllowFilterOptionKey, True)
+        If lAllowFilterOption Then
+            lForm.chkFilter.Visible = True
+        Else
+            lForm.chkFilter.Visible = False
+        End If
+        UserSelectDataOptions.RemoveByKey(lAllowFilterOptionKey)
 #Else
         If aSelected Is Nothing Then
             aSelected = DatasetsAtMapSelectedLocations()
@@ -746,10 +755,7 @@ Public Class atcDataManager
                             Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
                         Else
                             Dim lNewDataSource As atcTimeseriesSource = Nothing
-#If GISProvider = "DotSpatial" Then
-#Else
                             lNewDataSource = DataSourceByName(lDataSourceType)
-#End If
                             If lNewDataSource Is Nothing Then
                                 Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                             ElseIf lNewDataSource.Category = "File" Then

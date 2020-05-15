@@ -238,7 +238,11 @@ Public Class GisUtilDS
     ''' <param name="aAddToMap"></param>
     Public Shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String,
                                            Optional ByVal aAddToMap As Boolean = True)
-        Dim lSourceLayer As IMapFeatureLayer = GetFeatureLayers(Nothing, aInputLayerName)
+        Dim layerList = GetFeatureLayers(Nothing, aInputLayerName)
+        If layerList Is Nothing OrElse layerList.Count = 0 Then
+            Exit Sub
+        End If
+        Dim lSourceLayer As IMapFeatureLayer = layerList(0)
         If lSourceLayer Is Nothing Then Exit Sub
 
         Dim lOutLayer As Shapefile = Nothing

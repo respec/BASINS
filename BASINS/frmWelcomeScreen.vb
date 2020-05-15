@@ -299,6 +299,30 @@ Public Class frmWelcomeScreen
         Dim lProjectId As String
         Dim lblProject As Label
 #If GISProvider = "DotSpatial" Then
+        Dim recentFiles As New ArrayList()
+        For Each lfile As String In DotSpatial.Data.Properties.Settings.Default.RecentFiles
+            If Not String.IsNullOrEmpty(lfile) Then
+                recentFiles.Add(lfile)
+            End If
+        Next
+
+        While lRecentCount < 4 And lCurrent < recentFiles.Count
+            lProjectName = recentFiles(lCurrent)
+            lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
+            If FileExists(lProjectName) AndAlso LCase(lProjectId) <> "national" Then
+                Select Case lRecentCount
+                    Case 0 : lblProject = lblProject1
+                    Case 1 : lblProject = lblProject2
+                    Case 2 : lblProject = lblProject3
+                    Case Else : lblProject = lblProject4
+                End Select
+                lblProject.Text = lProjectId
+                lblProject.Tag = lProjectName
+                lblProject.Visible = True
+                lRecentCount += 1
+            End If
+            lCurrent += 1
+        End While
 #Else
         While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
             lProjectName = CType(lProject.RecentProjects(lCurrent), String)

@@ -404,6 +404,7 @@ Public Class atcBasinsPlugIn
                     End If
                 ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
 #If GISProvider = "DotSpatial" Then
+                    aHandled = UserOpenProject(aItemName)
 #Else
                     aHandled = UserOpenProject(g_Menus(aItemName).Text)
 #End If
@@ -790,6 +791,29 @@ FoundDir:
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub ProjectLoadingDS(sender As Object, evt As SerializingEventArgs)
+        Dim lSettingsString As String = ""
+        Dim lProjectFile As String = sender.CurrentProjectFile
+        If lProjectFile.EndsWith("mwprj") Then
+            Dim lxmlDoc As New Xml.XmlDocument()
+            lxmlDoc.Load(lProjectFile)
+            Dim nodes As Xml.XmlNodeList = lxmlDoc.DocumentElement.SelectNodes("/Mapwin/MapWindow4/Plugins")
+            For Each node As Xml.XmlNode In nodes(0).ChildNodes
+                If node IsNot Nothing Then
+                    lSettingsString = node.Attributes(0).InnerText
+                    If lSettingsString.StartsWith("<BASINS><DataManager>") Then
+                        Exit For
+                    End If
+                End If
+            Next
+        ElseIf lProjectFile.EndsWith("dspx") Then
+            lSettingsString = sender.GetCustomSetting("ProjectData", "")
+        End If
+        If Not String.IsNullOrEmpty(lSettingsString) Then
+            ProjectLoading(lProjectFile, lSettingsString)
+        End If
+    End Sub
+
     Public Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
 #Else
 
@@ -824,6 +848,14 @@ FoundDir:
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub ProjectSavingDS(sender As Object, evt As SerializingEventArgs)
+        Dim manager As SerializationManager = CType(sender, SerializationManager)
+        Dim lProjectFile As String = manager.CurrentProjectFile
+        Dim lSettingsString As String = ""
+        ProjectSaving(lProjectFile, lSettingsString)
+        manager.SetCustomSetting("ProjectData", lSettingsString)
+    End Sub
+
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String)
 #Else
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
