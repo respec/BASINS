@@ -12,7 +12,7 @@ Public Class frmSpecifyRegion
             .txtRight.Text = GetSetting(pAppName, "Defaults", "BoxRight", .txtRight.Text)
             .txtRegionProjection.Text = GetSetting(pAppName, "Defaults", "BoxProjection", .txtRegionProjection.Text)
 
-            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 Dim lRegion As New atcD4EMLauncher.Region(.txtTop.Text, .txtBottom.Text, .txtLeft.Text, .txtRight.Text, .txtRegionProjection.Text)
                 Try
                     lRegion.Validate()

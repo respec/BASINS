@@ -19,7 +19,7 @@ Friend Class frmSelectScript
     End Sub
 
     Private Sub frmKeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             btnHelp_Click(Nothing, Nothing)
         End If
     End Sub

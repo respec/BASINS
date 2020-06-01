@@ -108,7 +108,7 @@ Public Class frmBatchMap
         End If
         Dim listStations As New List(Of String)
         Dim lNewNodeText As String = "BatchGroup_" & lAnalysis & "_" & lCount
-        Dim lnewTreeNode As New Windows.Forms.TreeNode(lNewNodeText)
+        Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lNewNodeText)
         treeBFGroups.Nodes.Add(lnewTreeNode)
         For I As Integer = 0 To lstStations.RightCount - 1
             With lnewTreeNode
@@ -131,9 +131,9 @@ Public Class frmBatchMap
         If node IsNot Nothing Then
             treeBFGroups.SelectedNode = node
             ' Show menu only if Right Mouse button is clicked
-            If e.Button = Windows.Forms.MouseButtons.Right Then
+            If e.Button = System.Windows.Forms.MouseButtons.Right Then
                 cmsNode.Show(treeBFGroups, p)
-            ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
+            ElseIf e.Button = System.Windows.Forms.MouseButtons.Left Then
                 Dim lGroupName As String = node.Text
                 If Not lGroupName.StartsWith("BatchGroup") Then
                     lGroupName = node.Parent.Text
@@ -389,7 +389,7 @@ Public Class frmBatchMap
 
     Private Sub btnBrowseDataDir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseDataDir.Click
         Dim lFolder As New System.Windows.Forms.FolderBrowserDialog()
-        If lFolder.ShowDialog = Windows.Forms.DialogResult.OK Then
+        If lFolder.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             txtDataDir.Text = lFolder.SelectedPath
             If IO.Directory.Exists(txtDataDir.Text) Then
                 pDataPath = txtDataDir.Text

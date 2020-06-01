@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5CADF1DB-6F23-40C4-A718-ADD510F58722}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DataManager</RootNamespace>
+    <AssemblyName>DataManager</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\Debug\Plugins\DataManager\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Compatibility">
+      <HintPath>..\bin\Debug\DotSpatial.Compatibility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Data">
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataManagerPlugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcControls\atcControls-DS.vbproj">
+      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
+      <Name>atcControls-DS</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-DS.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData-DS</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMetCmp\atcMetCmp-DS.vbproj">
+      <Project>{72264bdc-23f5-4a55-b53d-0752099cb263}</Project>
+      <Name>atcMetCmp-DS</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DS.vbproj">
+      <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
+      <Name>atcTimeseriesRDB-DS</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-DS.vbproj">
+      <Project>{40de1f29-3531-4bc2-9d7e-324dc92689df}</Project>
+      <Name>atcTimeseriesScript-DS</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DS.vbproj">
+      <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
+      <Name>atcTimeseriesStatistics-DS</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-DS.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility-DS</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\D4EMDownloadData\D4EMDownloadData-DS.vbproj">
+      <Project>{add48409-fc1f-4a92-b07c-6b9a9a5bac72}</Project>
+      <Name>D4EMDownloadData-DS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

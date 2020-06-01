@@ -3,6 +3,12 @@ Imports System.Reflection
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Data
+Imports DotSpatial.Extensions
+#Else
+#End If
 Imports atcMwGisUtility
 
 ''' <summary>
@@ -12,6 +18,16 @@ Imports atcMwGisUtility
 Public Module modBasinsPlugin
     'Declare this as global so that it can be accessed throughout the plug-in project.
     'These variables are initialized in the plugin_Initialize event.
+#If GISProvider = "DotSpatial" Then
+    Public g_MapWin As AppManager
+    Public g_MainWin As Form
+    Friend g_Menus As Menu
+    Friend g_StatusBar As StatusBar
+    Friend g_Toolbar As ToolBar
+    Friend g_Plugins As Object
+    Friend g_Project As SerializationManager
+    Friend g_MapWinWindowHandle As Integer
+#Else
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Friend g_Menus As MapWindow.Interfaces.Menus
     Friend g_StatusBar As MapWindow.Interfaces.StatusBar
@@ -19,6 +35,7 @@ Public Module modBasinsPlugin
     Friend g_Plugins As MapWindow.Interfaces.Plugins
     Friend g_Project As MapWindow.Interfaces.Project
     Friend g_MapWinWindowHandle As Integer
+#End If
 
 #If ProgramName = "USGS GW Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-GW" 'For preferences in registry
@@ -36,7 +53,8 @@ Public Module modBasinsPlugin
     Public Const g_AppNameRegistry As String = "USGS-Hydro" 'For preferences in registry
     Friend Const g_AppNameShort As String = "Hydro Toolbox"
     Friend Const g_AppNameLong As String = "USGS Hydro Toolbox 1.0.0"
-    Friend Const g_URL_Home As String = "https://water.usgs.gov/ogw/gwtoolbox/"
+    'Friend Const g_URL_Home As String = "https://water.usgs.gov/ogw/gwtoolbox/"
+    Friend Const g_URL_Home As String = "https://www.usgs.gov/software/groundwater-toolbox-a-graphical-and-mapping-interface-analysis-hydrologic-data"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
     Public Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
@@ -49,7 +67,7 @@ Public Module modBasinsPlugin
     Friend g_BasinsDataDirs As New Generic.List(Of String)
     Friend g_ProgramDir As String = ""
     Public g_CacheDir As String = ""
-    Friend g_ProgressPanel As Windows.Forms.Panel
+    Friend g_ProgressPanel As System.Windows.Forms.Panel
     Friend pBuildFrm As frmBuildNew
 
     Friend pExistingMapWindowProjectName As String = ""
@@ -90,6 +108,7 @@ Public Module modBasinsPlugin
     Private Const Basins42DataPath As String = "Basins42\data\"
     Friend BasinsDataPath As String = Basins41DataPath
     Private Const NationalProjectFilename As String = "national.mwprj"
+    Private Const NationalProjectFilenameDS As String = "national.dspx"
 
     ''' <summary>
     ''' Find all of the data paths for this application on this system and add them to g_BasinsDataDirs
@@ -101,7 +120,14 @@ Public Module modBasinsPlugin
             ElseIf g_AppNameShort = "SW Toolbox" Then
                 g_BasinsDataDirs.Add("C:\USGS-SWToolbox\data\")
             ElseIf g_AppNameShort = "Hydro Toolbox" Then
+#If GISProvider = "DotSpatial" Then
+                If String.IsNullOrEmpty(g_ProgramDir) Then
+                    g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
+                End If
+                g_BasinsDataDirs.Add(IO.Path.Combine(g_ProgramDir, "data") & g_PathChar)
+#Else
                 g_BasinsDataDirs.Add("C:\USGS-HydroToolbox\data\")
+#End If
             End If
             Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
             If lSavedPaths.Length > 0 Then
@@ -214,9 +240,13 @@ Public Module modBasinsPlugin
                 lFileName = FindFile("Please locate BASINS national project", NationalProjectFilename, , , True)
             End If
             If FileExists(lFileName) Then  'load national project
+#If GISProvider = "DotSpatial" Then
+                g_Project.OpenProject(lFileName)
+#Else
                 g_Project.Load(lFileName)
                 g_MapWin.View.ClearSelectedShapes()
                 g_Project.Modified = False
+#End If
                 'See if we need to also process and load place names
                 'Dim lInstructions As String = D4EMDataManager.SpatialOperations.CheckPlaceNames(IO.Path.GetDirectoryName(lFileName), g_Project.ProjectProjection)
                 'If lInstructions.Length > 0 Then
@@ -233,6 +263,15 @@ Public Module modBasinsPlugin
 
         If NationalProjectIsOpen() Then
             'Select the Cataloging Units layer by default 
+#If GISProvider = "DotSpatial" Then
+            Dim lCatLayer As IMapFeatureLayer = GisUtilDS.GetLayerByName("Cataloging Units")
+            If lCatLayer IsNot Nothing Then
+                RefreshView()
+                g_MapWin.Map.Layers.SelectedLayer = lCatLayer
+                'Dim lSelectIndex As Integer = g_MapWin.Map.Layers.IndexOf(lCatLayer)
+                'g_MapWin.Map.Layers.SelectLayer(lSelectIndex)
+            End If
+#Else
             For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
                 If g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer)).Name = "Cataloging Units" Then
                     g_MapWin.Layers.CurrentLayer = g_MapWin.Layers.GetHandle(iLayer)
@@ -240,14 +279,15 @@ Public Module modBasinsPlugin
                 End If
             Next
             g_Toolbar.PressToolbarButton("tbbSelect")
+#End If
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             Try
                 pBuildFrm.Top = GetSetting(g_AppNameRegistry, "Window Positions", "BuildTop", "300")
                 If pBuildFrm.Top < 0 Then
                     pBuildFrm.Top = 0
-                ElseIf pBuildFrm.Top + pBuildFrm.Height > Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
-                    pBuildFrm.Top = Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
+                ElseIf pBuildFrm.Top + pBuildFrm.Height > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height Then
+                    pBuildFrm.Top = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - pBuildFrm.Height
                 End If
             Catch
             End Try
@@ -256,8 +296,8 @@ Public Module modBasinsPlugin
                 pBuildFrm.Left = GetSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", "0")
                 If pBuildFrm.Left < 0 Then
                     pBuildFrm.Left = 0
-                ElseIf pBuildFrm.Left + pBuildFrm.Width > Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
-                    pBuildFrm.Left = Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
+                ElseIf pBuildFrm.Left + pBuildFrm.Width > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width Then
+                    pBuildFrm.Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width - pBuildFrm.Width
                 End If
             Catch
             End Try
@@ -272,9 +312,16 @@ Public Module modBasinsPlugin
     ''' True if the national project is currently open, False if it is not
     ''' </summary>
     Public Function NationalProjectIsOpen() As Boolean
+#If GISProvider = "DotSpatial" Then
+        Return (g_Project IsNot Nothing) _
+            AndAlso (g_Project.CurrentProjectFile IsNot Nothing) _
+            AndAlso (g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower) OrElse
+            g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilenameDS.ToLower))
+#Else
         Return (g_Project IsNot Nothing) _
             AndAlso (g_Project.FileName IsNot Nothing) _
             AndAlso g_Project.FileName.ToLower.EndsWith(NationalProjectFilename.ToLower)
+#End If
     End Function
 
     ''' <summary>
@@ -283,8 +330,16 @@ Public Module modBasinsPlugin
     Friend Function IsBASINSProject() As Boolean
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
+#If GISProvider = "DotSpatial" Then
+        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.MapFrame().GetAllFeatureLayers()
+#Else
         For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
+#End If
+#If GISProvider = "DotSpatial" Then
+            Select Case FilenameNoPath(lLayer.DataSet.Filename).ToLower
+#Else
             Select Case FilenameNoPath(lLayer.FileName).ToLower
+#End If
                 Case "st.shp" : lHaveStateLayer = True : If lHaveCatLayer Then Exit For
                 Case "cat.shp" : lHaveCatLayer = True : If lHaveStateLayer Then Exit For
             End Select
@@ -315,6 +370,79 @@ Public Module modBasinsPlugin
         End If
     End Function
 
+#If GISProvider = "DotSpatial" Then
+    Friend Sub UpdateSelectedFeatures()
+        Dim lNumLayers As Integer = GisUtilDS.GetFeatureLayers(Nothing).Count
+        Dim lCurrentLayer As IMapFeatureLayer = GisUtilDS.CurrentLayer
+        Dim lNumSelected As Integer = -1
+        If lCurrentLayer IsNot Nothing Then
+            lNumSelected = GisUtilDS.NumSelectedFeatures(lCurrentLayer)
+        End If
+        If Not pBuildFrm Is Nothing AndAlso lNumLayers > 0 AndAlso lCurrentLayer IsNot Nothing Then
+            Dim lFieldName As String = ""
+            Dim lFieldDesc As String = ""
+            Dim lField As Integer
+            Dim lNameIndex As Integer = -1
+            Dim lDescIndex As Integer = -1
+            'Dim lCurLayer As MapWinGIS.Shapefile
+            Dim ctext As String
+
+            RefreshView()
+            ctext = "Selected Features:" & vbCrLf & "  <none>"
+            If lCurrentLayer.DataSet.FeatureType = FeatureType.Polygon Then
+                'lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+                If lNumSelected > 0 Then
+                    ctext = "Selected Features:"
+                    Select Case IO.Path.GetFileNameWithoutExtension(lCurrentLayer.DataSet.Filename).ToLower
+                        Case "cat", "huc", "huc250d3"
+                            lFieldName = "CU"
+                            lFieldDesc = "catname"
+                        Case "cnty"
+                            lFieldName = "FIPS"
+                            lFieldDesc = "cntyname"
+                        Case "st"
+                            lFieldName = "ST"
+                            lFieldDesc = "name"
+                    End Select
+
+                    lFieldName = lFieldName.ToLower
+                    lFieldDesc = lFieldDesc.ToLower
+                    Dim lDataTable As System.Data.DataTable = lCurrentLayer.DataSet.DataTable
+                    Dim lColumnName As String = ""
+                    For lField = 0 To lDataTable.Columns.Count - 1
+                        lColumnName = lDataTable.Columns.Item(lField).ColumnName
+                        If lColumnName.ToLower = lFieldName Then
+                            lNameIndex = lField
+                        End If
+                        If lColumnName.ToLower = lFieldDesc Then
+                            lDescIndex = lField
+                        End If
+                    Next
+
+                    Dim lSelected As Integer
+                    Dim lShape As Integer
+                    Dim lname As String
+                    Dim ldesc As String
+                    'Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+                    'Dim lRows As Integer = lCurrentLayer.DataSet.NumRows()
+                    'lCurrentLayer.DataSet.GetFeature(0)
+                    For Each lFeat As IFeature In lCurrentLayer.Selection.ToFeatureList()
+                        lname = ""
+                        ldesc = ""
+                        If lNameIndex > -1 Then
+                            lname = lFeat.DataRow.Item(lNameIndex).ToString()
+                        End If
+                        If lDescIndex > -1 Then
+                            ldesc = lFeat.DataRow.Item(lDescIndex).ToString()
+                        End If
+                        ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
+                    Next
+                End If
+                pBuildFrm.txtSelected.Text = ctext
+            End If
+        End If
+    End Sub
+#Else
     Friend Sub UpdateSelectedFeatures()
         If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
@@ -376,12 +504,39 @@ Public Module modBasinsPlugin
             End If
         End If
     End Sub
+#End If
+
+#If GISProvider = "DotSpatial" Then
+    Public Sub Initialize(ByVal aSettingArgs As atcData.atcDataAttributes)
+        Dim lMapWin As AppManager = Nothing
+        If aSettingArgs IsNot Nothing Then
+            With aSettingArgs
+                lMapWin = .GetValue("MapWin", Nothing)
+                g_CacheDir = .GetValue("CacheDir", "")
+            End With
+        End If
+        If lMapWin IsNot Nothing Then
+            Dim lPlugin As atcBasinsPlugIn = New atcBasinsPlugIn()
+            lPlugin.Initialize(lMapWin, Nothing)
+        Else
+            Throw New ApplicationException("Map Control Cannot Be Found.")
+        End If
+    End Sub
+#End If
 
     Friend Sub ClearLayers()
+#If GISProvider = "DotSpatial" Then
+        g_MapWin.Map.Layers.Clear()
+#Else
         g_MapWin.Layers.Clear()
+#End If
     End Sub
 
     Friend Sub RefreshView()
+#If GISProvider = "DotSpatial" Then
+        g_MapWin.Map.Refresh()
+#Else
         g_MapWin.Refresh()
+#End If
     End Sub
 End Module

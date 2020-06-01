@@ -243,7 +243,7 @@ Public Class frmDisTemp
     End Sub
 
     Private Sub frmDisTemp_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Compute\Disaggregations.html")
         End If
     End Sub

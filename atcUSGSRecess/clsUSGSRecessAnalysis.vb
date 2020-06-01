@@ -74,16 +74,21 @@ Public Class clsUSGSRecessAnalysis
             'lForm.Dispose()
         End If
     End Sub
-
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
+#End If
 
     Private Sub LoadPlugin(ByVal aPluginName As String)
         Try
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
             pMapWin.Plugins.StartPlugin(lKey)
+#End If
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try

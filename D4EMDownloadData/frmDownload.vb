@@ -2,11 +2,23 @@ Imports atcUtility
 Imports MapWinUtility
 Imports System.Runtime.InteropServices
 Imports System.Net
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Data
+Imports DotSpatial.Symbology
+Imports DotSpatial.Extensions
+Imports atcMwGisUtility
+#Else
+#End If
 
 Public Class frmDownload
 
     Public Const CancelString As String = "<Cancel>"
+#If GISProvider = "DotSpatial" Then
+    Private pMapWin As AppManager
+#Else
     Private pMapWin As MapWindow.Interfaces.IMapWin
+#End If
     Private pApplicationName As String = ""
     Private pOk As Boolean = False
 
@@ -29,7 +41,7 @@ Public Class frmDownload
     ''' <summary>Determine if a process is running on a 64 bit Operating System but in 32 bit emulation mode (WOW64)</summary>
     ''' <param name="hProcess">A handle to the process to check</param>
     ''' <param name="Wow64Process">Output parameter. A boolean that will be set to True if the process is running in WOW64 mode</param>
-    <System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint:="IsWow64Process")> _
+    <System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint:="IsWow64Process")>
     Public Shared Function IsWow64Process(<System.Runtime.InteropServices.InAttribute()> ByVal hProcess As System.IntPtr, <System.Runtime.InteropServices.OutAttribute()> ByRef Wow64Process As Boolean) As <System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)> Boolean
     End Function
 
@@ -46,14 +58,14 @@ Public Class frmDownload
 
     ''' <summary>Gets a handle to a specified DLL</summary>
     ''' <param name="moduleName">The module to return a handle for</param>
-    <Runtime.ConstrainedExecution.ReliabilityContract(Runtime.ConstrainedExecution.Consistency.WillNotCorruptState, Runtime.ConstrainedExecution.Cer.MayFail), DllImport("kernel32.dll", CharSet:=CharSet.Auto, SetLastError:=True)> _
+    <Runtime.ConstrainedExecution.ReliabilityContract(Runtime.ConstrainedExecution.Consistency.WillNotCorruptState, Runtime.ConstrainedExecution.Cer.MayFail), DllImport("kernel32.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
     Public Shared Function GetModuleHandle(ByVal moduleName As String) As IntPtr
     End Function
 
     ''' <summary>Retrieves the address of an exported function or variable from the specified dynamic-link library (DLL)</summary>
     ''' <param name="hModule">A handle to the DLL to look for the method in</param>
     ''' <param name="methodName">The method to look for</param>
-    <DllImport("kernel32.dll", CharSet:=CharSet.Ansi, SetLastError:=True, ExactSpelling:=True)> _
+    <DllImport("kernel32.dll", CharSet:=CharSet.Ansi, SetLastError:=True, ExactSpelling:=True)>
     Public Shared Function GetProcAddress(ByVal hModule As IntPtr, ByVal methodName As String) As IntPtr
     End Function
 
@@ -72,36 +84,71 @@ Public Class frmDownload
         End Get
     End Property
 
+#If GISProvider = "DotSpatial" Then
+    Public Function AskUser(ByVal aMapWin As AppManager, ByVal aParentHandle As Integer) As String
+        pApplicationName = "Hydro Toolbox"
+#Else
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
-        pMapWin = aMapWin
         pApplicationName = pMapWin.ApplicationInfo.ApplicationName
+#End If
+        pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
+#If GISProvider = "DotSpatial" Then
+        Dim lExtents As Extent
+        Dim lNumLayers = pMapWin.Map.Layers.Count
+#Else
         Dim lExtents As MapWinGIS.Extents = Nothing
-        If pMapWin IsNot Nothing AndAlso pMapWin.Layers.NumLayers > 0 Then
+        Dim lNumLayers = pMapWin.Layers.NumLayers
+#End If
+        If pMapWin IsNot Nothing AndAlso lNumLayers > 0 Then
             Try
+#If GISProvider = "DotSpatial" Then
+                lExtents = pMapWin.Map.Extent
+                If lExtents.MinX < lExtents.MaxX AndAlso lExtents.MinY < lExtents.MaxY Then
+                    cboRegion.Items.Add(pRegionViewRectangle)
+                End If
+#Else
                 lExtents = pMapWin.View.Extents
                 If lExtents.xMin < lExtents.xMax AndAlso lExtents.yMin < lExtents.yMax Then
                     cboRegion.Items.Add(pRegionViewRectangle)
                 End If
+#End If
             Catch
             End Try
 
             Try
+#If GISProvider = "DotSpatial" Then
+                Dim lCurrentLayer As IMapFeatureLayer = pMapWin.Map.Layers.SelectedLayer
+                If lCurrentLayer IsNot Nothing Then
+                    lExtents = lCurrentLayer.Extent
+                    If lExtents.MinX < lExtents.MaxY AndAlso lExtents.MinY < lExtents.MaxY Then
+                        cboRegion.Items.Add(pRegionExtentSelectedLayer)
+                    End If
+                End If
+#Else
                 lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
                 If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
                     cboRegion.Items.Add(pRegionExtentSelectedLayer)
                 End If
+#End If
             Catch
             End Try
 
             Try
+#If GISProvider = "DotSpatial" Then
+                lExtents = pMapWin.Map.Extent
+                If lExtents.MinX < lExtents.MaxY AndAlso lExtents.MinY < lExtents.MaxY Then
+                    cboRegion.Items.Add(pRegionExtentSelectedShapes)
+                End If
+#Else
                 lExtents = pMapWin.View.SelectedShapes.SelectBounds
                 If lExtents.xMin < lExtents.yMax AndAlso lExtents.yMin < lExtents.yMax Then
                     cboRegion.Items.Add(pRegionExtentSelectedShapes)
                 End If
+#End If
             Catch
             End Try
         End If
@@ -138,11 +185,11 @@ Public Class frmDownload
         Dim lGroupMargin As Integer = 6
         Dim lGroupY As Integer = cboRegion.Top + cboRegion.Height + lGroupMargin
 
-        Dim lGroups As New List(Of Windows.Forms.GroupBox) '  Dictionary(Of String, Windows.Forms.GroupBox)
+        Dim lGroups As New List(Of System.Windows.Forms.GroupBox) '  Dictionary(Of String, Windows.Forms.GroupBox)
         If Is64BitOperatingSystem Then 'Old self-extracting archives do not work on 64 bit
             chkBASINS_DEM.Visible = False
         End If
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             lGroups.Add(grpNWISStations_GW)
             lGroups.Add(grpNWIS_GW)
             lGroups.Add(grpBASINS)
@@ -166,7 +213,7 @@ Public Class frmDownload
             lGroups.Add(grpNLDAS)
         End If
 
-        For Each lGroup As Windows.Forms.GroupBox In lGroups
+        For Each lGroup As System.Windows.Forms.GroupBox In lGroups
             lGroup.Top = lGroupY
             lGroup.Visible = True
             lGroupY += lGroup.Height + lGroupMargin
@@ -244,7 +291,7 @@ Public Class frmDownload
                             lMessage = "Choose a different region type or close the Download window and select one or more shapes."
                         Case Else
                     End Select
-                    If MapWinUtility.Logger.Msg(lMessage & vbCrLf & "Return to Download window?", _
+                    If MapWinUtility.Logger.Msg(lMessage & vbCrLf & "Return to Download window?",
                                                          MsgBoxStyle.YesNo, "Region Not Specified") = MsgBoxResult.No Then
                         Return CancelString
                     End If
@@ -254,18 +301,17 @@ Public Class frmDownload
             End If
         Loop
     End Function
-
 #Region "ManagePreCheckedBoxes"
     'Keep track of which check box(es) were checked automatically at startup (for example because a station was selected on the map)
     'Automatically un-check when another is manually checked since that indicates user wanted different data
-    Private PreChecked As New List(Of Windows.Forms.CheckBox)
-    Private PreUnChecked As New List(Of Windows.Forms.CheckBox)
-    Private Sub TallyPreChecked(aGroups As List(Of Windows.Forms.GroupBox))
-        Dim lAllChecked As New List(Of Windows.Forms.CheckBox)
-        For Each lGroup As Windows.Forms.GroupBox In aGroups
-            For Each lChild As Windows.Forms.Control In lGroup.Controls
+    Private PreChecked As New List(Of System.Windows.Forms.CheckBox)
+    Private PreUnChecked As New List(Of System.Windows.Forms.CheckBox)
+    Private Sub TallyPreChecked(aGroups As List(Of System.Windows.Forms.GroupBox))
+        Dim lAllChecked As New List(Of System.Windows.Forms.CheckBox)
+        For Each lGroup As System.Windows.Forms.GroupBox In aGroups
+            For Each lChild As System.Windows.Forms.Control In lGroup.Controls
                 If lChild.GetType.Name = "CheckBox" Then
-                    Dim lChk As Windows.Forms.CheckBox = lChild
+                    Dim lChk As System.Windows.Forms.CheckBox = lChild
                     If lChk.Checked Then
                         PreChecked.Add(lChk)
                     Else
@@ -275,7 +321,7 @@ Public Class frmDownload
             Next
         Next
         If PreChecked.Count > 0 Then
-            For Each lChk As Windows.Forms.CheckBox In PreUnChecked
+            For Each lChk As System.Windows.Forms.CheckBox In PreUnChecked
                 AddHandler lChk.CheckedChanged, AddressOf PreUncheckedChanged
             Next
         End If
@@ -283,10 +329,10 @@ Public Class frmDownload
 
     Private Sub PreUncheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Try
-            For Each lChk As Windows.Forms.CheckBox In PreChecked
+            For Each lChk As System.Windows.Forms.CheckBox In PreChecked
                 lChk.Checked = False
             Next
-            For Each lChk As Windows.Forms.CheckBox In PreUnChecked
+            For Each lChk As System.Windows.Forms.CheckBox In PreUnChecked
                 RemoveHandler lChk.CheckedChanged, AddressOf PreUncheckedChanged
             Next
         Catch
@@ -314,6 +360,66 @@ Public Class frmDownload
         Me.Close()
     End Sub
 
+#If GISProvider = "DotSpatial" Then
+    Public Function SelectedRegion() As atcD4EMLauncher.Region
+        Dim lRegion As atcD4EMLauncher.Region = Nothing
+        Dim lPreferredFormat As String = "box"
+        Try
+            Dim lProjection As DotSpatial.Projections.ProjectionInfo = Nothing
+            Dim lProjectionString As String = ""
+#If GISProvider = "DotSpatial" Then
+            If pMapWin.Map.Layers.Count > 0 Then
+                lProjectionString = pMapWin.Map.GetLayers()(0).ProjectionString
+            End If
+            Dim lMapExtent = pMapWin.Map.Extent
+#Else
+            If pMapWin.Layers.Count() > 0 Then
+                lProjectionString = pMapWin.Layers()(0).ProjectionString
+            End If
+            Dim lMapExtent = pMapWin.Extent
+#End If
+            Dim lExtents As Extent = Nothing
+            Select Case cboRegion.SelectedItem
+                Case pRegionViewRectangle
+                    lExtents = lMapExtent 'pMapWin.View.Extents
+                Case pRegionExtentSelectedLayer
+                    lExtents = lMapExtent 'pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
+                Case pRegionExtentSelectedShapes
+                    lExtents = lMapExtent 'pMapWin.View.SelectedShapes.SelectBounds
+                Case pRegionEnterCoordinates
+                    lRegion = frmSpecifyRegion.AskUser(Me.Icon)
+                    'Case pRegionStationIDs
+                    'lRegion = frmSpecifyStations.AskUser(Me.Icon, StationsFromMap)
+                Case Else
+                    Dim lHuc8Layer As IMapFeatureLayer = HUC8Layer()
+                    If lHuc8Layer IsNot Nothing Then
+                        lExtents = lHuc8Layer.Extent
+                        lPreferredFormat = "huc8"
+                    End If
+            End Select
+
+            If lExtents IsNot Nothing Then
+                lRegion = New atcD4EMLauncher.Region(lExtents.MaxY, lExtents.MinY, lExtents.MinX, lExtents.MaxX, lProjectionString)
+            End If
+
+        Catch ex As Exception
+            lRegion = frmSpecifyRegion.AskUser(Me.Icon)
+        End Try
+
+        If lRegion Is Nothing Then
+            Return Nothing
+        Else
+            lRegion.HUC8s = HUC8s()
+            lRegion.PreferredFormat = lPreferredFormat
+#If GISProvider = "DotSpatial" Then
+            Return lRegion
+#Else
+            Return lRegion.GetProjected(atcD4EMLauncher.SpatialOperations.GeographicProjection)
+#End If
+        End If
+        Return Nothing
+    End Function
+#Else
     Public Function SelectedRegion() As atcD4EMLauncher.Region
         Dim lRegion As atcD4EMLauncher.Region = Nothing
         Dim lPreferredFormat As String = "box"
@@ -356,6 +462,7 @@ Public Class frmDownload
         Return Nothing
     End Function
 
+#End If
     'Dim pStationIDs() As String = {}
 
     Private Function StationsXML(ByVal aStations As Generic.List(Of String)) As String
@@ -366,6 +473,35 @@ Public Class frmDownload
         Return lStationsXML
     End Function
 
+#If GISProvider = "DotSpatial" Then
+    Private Function StationsFromMap() As Generic.List(Of String)
+        Dim lStations As New Generic.List(Of String)
+        Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Point)
+        For Each lyr As IMapFeatureLayer In layers
+            If lyr.Checked Then
+                If lyr.Selection().Count > 0 Then
+                    Dim lKeyFld As DataColumn = Nothing
+                    Dim lKeyFldIndex As Integer = -1
+                    Dim lColumnArray = lyr.DataSet.GetColumns()
+                    For Each Fld As DataColumn In lColumnArray
+                        Select Case Fld.ColumnName.ToLower()
+                            Case "site_no", "locid", "location"
+                                lKeyFld = Fld
+                                lKeyFldIndex = Array.IndexOf(lColumnArray, lKeyFld)
+                                Exit For 'TODO: use list of ID fields for layers from layers.dbf
+                        End Select
+                    Next
+                    If lKeyFld IsNot Nothing Then
+                        For Each lFeat As IFeature In lyr.Selection().ToFeatureList()
+                            lStations.Add(lFeat.DataRow.Item(lKeyFldIndex).ToString())
+                        Next
+                    End If
+                End If
+            End If
+        Next
+        Return lStations
+    End Function
+#Else
     Private Function StationsFromMap() As Generic.List(Of String)
         Dim lStations As New Generic.List(Of String)
         If pMapWin.View IsNot Nothing Then
@@ -388,6 +524,7 @@ Public Class frmDownload
         End If
         Return lStations
     End Function
+#End If
 
     Private Sub SetCheckboxVisibilityFromMapOrRegion()
         chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.GrayText
@@ -401,7 +538,7 @@ Public Class frmDownload
             'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
         End If
 
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             chkNWIS_GetNWISDailyDischarge_GW.Visible = True
             chkNWIS_GetNWISIdaDischarge_GW.Visible = True
             chkNWIS_GetNWISDailyGW_GW.Visible = True
@@ -429,17 +566,43 @@ Public Class frmDownload
             chkNWIS_GetNWISMeasurements.Enabled = lStationsRegion
         End If
 
-        If pMapWin.View IsNot Nothing Then
+        Dim lHasMapWin As Boolean
+#If GISProvider = "DotSpatial" Then
+        If pMapWin Is Nothing Then
+            lHasMapWin = False
+        Else
+            lHasMapWin = True
+        End If
+#Else
+        If pMapWin.View Is Nothing Then
+            lHasMapWin = False
+        Else
+            lHasMapWin = True
+        End If
+#End If
+        If lHasMapWin Then
+#If GISProvider = "DotSpatial" Then
+            Dim lLayer As ILayer = CurrentLayer()
+            Dim lFilename As String = ""
+            Dim lSelectedCount As Integer = 0
+            If lLayer IsNot Nothing Then
+                lFilename = IO.Path.GetFileNameWithoutExtension(lLayer.DataSet.Filename).ToLower
+                lSelectedCount = CType(lLayer, IMapFeatureLayer).Selection().Count
+            Else
+                lFilename = ""
+            End If
+#Else
+            Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
+            Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
             Dim lSelected As MapWindow.Interfaces.SelectInfo = pMapWin.View.SelectedShapes
-            If lSelected.NumSelected > 0 Then
-                Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer)
-                Dim lFilename As String = IO.Path.GetFileNameWithoutExtension(lLayer.FileName).ToLower
-
+            Dim lSelectedCount As Integer = lSelected.NumSelected
+#End If
+            If lSelectedCount > 0 Then
                 If lFilename.StartsWith("met") Then
                     chkBASINS_MetData.ForeColor = System.Drawing.SystemColors.ControlText
                     chkBASINS_MetData.Checked = True
                     'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
-                ElseIf pApplicationName.StartsWith("USGS GW Toolbox") Then
+                ElseIf pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
                     Select Case lFilename
                         Case "nwis_stations_discharge"
                             chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
@@ -489,11 +652,11 @@ Public Class frmDownload
                 End If
             End If
         End If
-        If pApplicationName.StartsWith("USGS GW Toolbox") Then
-            If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso _
-               Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso _
-               Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso _
-               Not chkNWIS_GetNWISPeriodicGW_GW.Enabled AndAlso _
+        If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
+            If Not chkNWIS_GetNWISDailyDischarge_GW.Enabled AndAlso
+               Not chkNWIS_GetNWISIdaDischarge_GW.Enabled AndAlso
+               Not chkNWIS_GetNWISDailyGW_GW.Enabled AndAlso
+               Not chkNWIS_GetNWISPeriodicGW_GW.Enabled AndAlso
                Not chkNWIS_GetNWISPrecipitation_GW.Enabled Then
                 panelNWISnoStations_GW.Visible = True
                 panelNWISnoStations_GW.BringToFront()
@@ -505,11 +668,11 @@ Public Class frmDownload
                 chkNWIS_GetNWISPrecipitation_GW.Visible = False
             End If
         Else
-            If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso _
-               Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso _
-               Not chkNWIS_GetNWISDailyGW.Enabled AndAlso _
-               Not chkNWIS_GetNWISPeriodicGW.Enabled AndAlso _
-               Not chkNWIS_GetNWISWQ.Enabled AndAlso _
+            If Not chkNWIS_GetNWISDailyDischarge.Enabled AndAlso
+               Not chkNWIS_GetNWISIdaDischarge.Enabled AndAlso
+               Not chkNWIS_GetNWISDailyGW.Enabled AndAlso
+               Not chkNWIS_GetNWISPeriodicGW.Enabled AndAlso
+               Not chkNWIS_GetNWISWQ.Enabled AndAlso
                Not chkNWIS_GetNWISMeasurements.Enabled Then
                 panelNWISnoStations.Visible = True
                 panelNWISnoStations.BringToFront()
@@ -612,6 +775,25 @@ Public Class frmDownload
 
             Dim lSaveFolderOnly As String = ""
             Dim lSaveFolder As String = ""
+#If GISProvider = "DotSpatial" Then
+            If pMapWin IsNot Nothing Then
+                If pMapWin.Map.Layers.Count > 0 Then
+                    Dim lprojinfo As DotSpatial.Projections.ProjectionInfo = pMapWin.Map.Projection
+                    If lprojinfo.ToProj4String.Length() > 0 Then
+                        lDesiredProjection = "<DesiredProjection>" & lprojinfo.ToProj4String & "</DesiredProjection>" & vbCrLf
+                    End If
+                Else
+                    lDesiredProjection = "<DesiredProjection>+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </DesiredProjection>" & vbCrLf
+                End If
+
+                If Not DownloadDataPlugin.DSProject.CurrentProjectFile Is Nothing AndAlso DownloadDataPlugin.DSProject.CurrentProjectFile.Length > 0 Then
+                    lSaveFolderOnly = IO.Path.GetDirectoryName(DownloadDataPlugin.DSProject.CurrentProjectFile)
+                    lSaveFolder &= "<SaveIn>" & lSaveFolderOnly & "</SaveIn>" & vbCrLf
+                Else
+                    lSaveFolder &= "<SaveIn>" & IO.Path.Combine(BASINS.g_CacheDir, "DataDownload") & "</SaveIn>" & vbCrLf
+                End If
+            End If
+#Else
             If Not pMapWin.Project Is Nothing Then
                 If Not pMapWin.Project.ProjectProjection Is Nothing AndAlso pMapWin.Project.ProjectProjection.Length > 0 Then
                     lDesiredProjection = "<DesiredProjection>" & pMapWin.Project.ProjectProjection & "</DesiredProjection>" & vbCrLf
@@ -621,6 +803,8 @@ Public Class frmDownload
                     lSaveFolder &= "<SaveIn>" & lSaveFolderOnly & "</SaveIn>" & vbCrLf
                 End If
             End If
+#End If
+
 
             Dim lXMLcommon As String = lSaveFolder _
                                      & lCacheFolder _
@@ -635,22 +819,22 @@ Public Class frmDownload
                                      & "</arguments>" & vbCrLf _
                                      & "</function>" & vbCrLf
 
-            For Each lControl As Windows.Forms.Control In Me.Controls
+            For Each lControl As System.Windows.Forms.Control In Me.Controls
                 Dim lControlName As String = lControl.Name
                 If lControlName.EndsWith("_GW") Then 'Treat Groundwater version of controls the same as the BASINS version
                     lControlName = lControlName.Substring(0, lControlName.Length - 3)
                 End If
                 If lControlName.StartsWith("grp") AndAlso lControl.HasChildren Then
                     Dim lCheckedChildren As String = ""
-                    For Each lChild As Windows.Forms.Control In lControl.Controls
-                        If lChild.GetType.Name = "CheckBox" AndAlso CType(lChild, Windows.Forms.CheckBox).Checked Then
+                    For Each lChild As System.Windows.Forms.Control In lControl.Controls
+                        If lChild.GetType.Name = "CheckBox" AndAlso CType(lChild, System.Windows.Forms.CheckBox).Checked Then
                             Dim lChildName As String = lChild.Name.Substring(lControlName.Length + 1)
                             If lChildName.EndsWith("_GW") Then
                                 lChildName = lChildName.Substring(0, lChildName.Length - 3)
                             End If
                             If lChildName.ToLower.StartsWith("get") Then 'this checkbox has its own function name
                                 Dim lWDMxml As String = ""
-                                If pApplicationName.StartsWith("USGS") Then
+                                If pApplicationName.StartsWith("USGS") OrElse pApplicationName.Contains("Hydro") Then
                                     'Don't offer to save in WDM for USGS versions, always add as individual files
                                 Else
                                     If lChild Is chkNWIS_GetNWISDailyDischarge Then
@@ -691,7 +875,7 @@ Public Class frmDownload
                         Dim lWDMxml As String = ""
                         If lCheckedChildren.Contains("<DataType>MetData</DataType>") Then
                             Dim lWDMfrm As New frmWDM
-                            lWDMxml = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"), _
+                            lWDMxml = lWDMfrm.AskUser(Me.Icon, "Met", IO.Path.Combine(lSaveFolderOnly, "met"),
                                                       "Met Data Processing Options")
                         End If
                         If lWDMxml IsNot Nothing Then
@@ -711,6 +895,56 @@ Public Class frmDownload
         End Set
     End Property
 
+#If GISProvider = "DotSpatial" Then
+    Private Function CurrentLayer() As ILayer
+        Try
+            If pMapWin.Map.Layers.Count > 0 Then
+                Return pMapWin.Map.Layers.SelectedLayer
+            Else
+                Return Nothing
+            End If
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Private Function HUC8Layer() As ILayer
+        Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Polygon)
+        If layers.Count > 0 Then
+            For Each lyr As IMapFeatureLayer In layers
+                If lyr.DataSet.Filename.ToLower.EndsWith(g_PathChar & "cat.shp") Then
+                    Return lyr
+                End If
+            Next
+        Else
+            Return Nothing
+        End If
+        Return Nothing
+    End Function
+
+    Private Function HUC8s() As Generic.List(Of String)
+        'First check for a cat layer that contains the list of HUC-8s
+        Dim lcatLayer As IMapFeatureLayer = HUC8Layer()
+        If lcatLayer Is Nothing Then Return Nothing
+        Dim lHUC8s As New Generic.List(Of String)
+        If pMapWin IsNot Nothing AndAlso lcatLayer IsNot Nothing Then
+            Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(lcatLayer.DataSet.Filename), "cat.dbf")
+            If IO.File.Exists(lCatDbfName) Then
+                Dim lCatDbf As New atcUtility.atcTableDBF
+                lCatDbf.OpenFile(lCatDbfName)
+                Dim lHucField As Integer = lCatDbf.FieldNumber("CU")
+                If lHucField > 0 Then
+                    For lRecord As Integer = 1 To lCatDbf.NumRecords
+                        lCatDbf.CurrentRecord = lRecord
+                        lHUC8s.Add(lCatDbf.Value(lHucField))
+                    Next
+                End If
+            End If
+        End If
+        Return lHUC8s
+    End Function
+
+#Else
     ''' <summary>
     ''' Returns index in pMapWin.Layers of the HUC8 layer cat.shp, or -1 if not found
     ''' </summary>
@@ -745,6 +979,7 @@ Public Class frmDownload
         End If
         Return lHUC8s
     End Function
+#End If
 
     '''' <summary>
     '''' Synchronous HTTP download
@@ -835,7 +1070,7 @@ Public Class frmDownload
     'End Function
 
     Private Sub frmDownload_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp()
         End If
     End Sub
@@ -849,7 +1084,10 @@ Public Class frmDownload
     End Sub
 
     Private Function RegionValid(ByVal aRegionType As String, ByRef aReason As String) As Boolean
-        Try
+#If GISProvider = "DotSpatial" Then
+        Return True
+#Else
+                Try
             Select Case cboRegion.SelectedItem
                 Case pRegionEnterCoordinates, pRegionStationIDs
                     Return True 'Always an option
@@ -907,6 +1145,7 @@ Public Class frmDownload
             aReason = e.Message
             Return False
         End Try
+#End If
     End Function
 
     Private Sub cboRegion_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboRegion.SelectedIndexChanged

@@ -54,7 +54,7 @@ Public Class frmGraphBar
         printdlg.ShowHelp = True
 
         ' If the result is OK then print the document.
-        If (printdlg.ShowDialog = Windows.Forms.DialogResult.OK) Then
+        If (printdlg.ShowDialog = System.Windows.Forms.DialogResult.OK) Then
             Dim saveRect As RectangleF = Pane.Rect
             printdoc.Print()
             ' Restore graph size to fit form's bounds. 

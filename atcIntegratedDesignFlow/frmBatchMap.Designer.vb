@@ -306,8 +306,8 @@ Partial Class frmBatchMap
     Friend WithEvents cmsGroupSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsGlobalSetParm As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnDownload As System.Windows.Forms.Button
-    Friend WithEvents btnGroupGlobal As Windows.Forms.Button
-    Friend WithEvents btnGroupGroup As Windows.Forms.Button
-    Friend WithEvents btnGroupRemove As Windows.Forms.Button
-    Friend WithEvents btnGroupPlot As Windows.Forms.Button
+    Friend WithEvents btnGroupGlobal As System.Windows.Forms.Button
+    Friend WithEvents btnGroupGroup As System.Windows.Forms.Button
+    Friend WithEvents btnGroupRemove As System.Windows.Forms.Button
+    Friend WithEvents btnGroupPlot As System.Windows.Forms.Button
 End Class

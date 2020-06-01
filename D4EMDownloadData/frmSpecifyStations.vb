@@ -46,7 +46,7 @@
                 .txtStations.Text = GetSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
             End If
 
-            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
                 Dim lStations As New Generic.List(Of String)
                 Dim lArray As String() = lForm.txtStations.Text.Replace(vbCr, vbLf).Replace(vbLf & vbLf, vbLf).Split(vbLf)
                 For Each lStation As String In lArray

@@ -1,6 +1,9 @@
 Public MustInherit Class clsBaseDataExtension
+#If GISProvider = "DotSpatial" Then
+#Else
     Implements MapWindow.Interfaces.IPlugin
     Implements IDataExtension
+#End If
 
 #If GISProvider = "DotSpatial" Then
 #Else
@@ -13,7 +16,6 @@ Public MustInherit Class clsBaseDataExtension
         pMapWin = MapWin
         pMapWinWindowHandle = ParentHandle
     End Sub
-#End If
 
     Public Overridable Function Execute(ByVal aQuerySchema As String) As String Implements IDataExtension.Execute
         Throw New ApplicationException("Execute not defined")
@@ -24,7 +26,6 @@ Public MustInherit Class clsBaseDataExtension
             Throw New ArgumentException("QuerySchema not defined")
         End Get
     End Property
-
     Public Overridable ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author, IDataExtension.Author
         Get
             Return "AQUA TERRA Consultants"
@@ -119,5 +120,6 @@ Public MustInherit Class clsBaseDataExtension
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
     End Sub
+#End If
 
 End Class

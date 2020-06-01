@@ -5,6 +5,7 @@ Imports System.Windows.Forms
 
 Public Class atcTimeseriesMath
     Inherits atcTimeseriesSource
+    Implements IDataMemory
     Private pAvailableOperations As atcDataAttributes
     Private Const pName As String = "Timeseries::Math"
     Friend Shared pIcon As System.Drawing.Icon = Nothing
@@ -42,6 +43,16 @@ Public Class atcTimeseriesMath
         Get
             Return True
         End Get
+    End Property
+
+    Private _sharedates As Boolean = True
+    Public Property ShareDates() As Boolean Implements IDataMemory.ShareDates
+        Get
+            Return _sharedates
+        End Get
+        Set(value As Boolean)
+            _sharedates = value
+        End Set
     End Property
 
     'Operations supported
@@ -280,6 +291,7 @@ Public Class atcTimeseriesMath
         End If
 
         Try
+            lArgs.Add("ShareDates", Me.ShareDates)
             Dim lNewTS As atcTimeseries = DoMath(aOperationName, lArgs)
             If lNewTS IsNot Nothing Then
                 AddDataSet(lNewTS)

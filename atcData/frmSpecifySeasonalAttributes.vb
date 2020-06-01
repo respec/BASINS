@@ -245,6 +245,10 @@ Public Class frmSpecifySeasonalAttributes
     Private pOk As Boolean
 
     Public Function AskUser(ByVal aTimeseriesGroup As atcTimeseriesGroup, ByVal aSeasonsAvailable As atcDataAttributes) As Boolean
+#If Toolbox = "Hydro" Then
+        Me.Text = "Time-Series Attributes"
+        Me.grpSeasons.Text = "Time Periods"
+#End If
         pTimseriesGroup = aTimeseriesGroup
         pSeasonsAvailable = aSeasonsAvailable
         Clear()
@@ -254,7 +258,13 @@ Public Class frmSpecifySeasonalAttributes
             For Each lAttrName As String In lstAttributes.SelectedItems
                 lAttributesToCalculate.SetValue(lAttrName, Nothing)
             Next
-            CalculateAttributes(cboSeasons.Text, CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, lAttributesToCalculate, True)
+            Dim lSeasonTypeName As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Seasons" Then
+                lSeasonTypeName = "Traditional"
+            End If
+#End If
+            CalculateAttributes(lSeasonTypeName, CurrentSeason, lstSeasons.SelectedItems, pTimseriesGroup, lAttributesToCalculate, True)
         End If
         Return pOk
     End Function
@@ -264,8 +274,21 @@ Public Class frmSpecifySeasonalAttributes
         cboSeasons.Items.Clear()
         lstSeasons.Items.Clear()
         lstAttributes.Items.Clear()
+        Dim lSeasonTypeName As String = ""
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
-            cboSeasons.Items.Add(lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::")))
+            If (lSeason.Definition.Name.IndexOf("::") >= 0) Then
+                lSeasonTypeName = lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::"))
+            Else
+                lSeasonTypeName = lSeason.Definition.Name
+            End If
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Traditional" Then
+                lSeasonTypeName = "Seasons"
+            End If
+            cboSeasons.Items.Add(lSeasonTypeName)
+#Else
+            cboSeasons.Items.Add(lSeasonTypeName)
+#End If
         Next
         For Each lDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions()
             If lDef.Calculated AndAlso atcDataAttributes.IsSimple(lDef) Then
@@ -314,8 +337,13 @@ Public Class frmSpecifySeasonalAttributes
             Dim lAttributes As New atcDataAttributes
             lAttributes.SetValue(lstAttributes.SelectedItems(0), 0)
             lArguments.Add("Attributes", lAttributes)
-
-            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(cboSeasons.Text, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
+            Dim lSeasonTypeName As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+            If lSeasonTypeName = "Seasons" Then
+                lSeasonTypeName = "Traditional"
+            End If
+#End If
+            For Each lSeasonalAttribute As atcDefinedValue In CalculateAttributes(lSeasonTypeName, lSeasonSource, lstSeasons.SelectedItems, pTimseriesGroup, lAttributes, False)
                 Dim lSeasonName As String = lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
                 If lSeasonName IsNot Nothing AndAlso Not lstSeasons.Items.Contains(lSeasonName) Then
                     lstSeasons.Items.Add(lSeasonName)
@@ -328,8 +356,14 @@ Public Class frmSpecifySeasonalAttributes
     End Sub
 
     Private Function CurrentSeason() As atcTimeseriesSource
+        Dim lSeasonTypeName As String = cboSeasons.Text & "::SeasonalAttributes"
+#If Toolbox = "Hydro" Then
+        If lSeasonTypeName.StartsWith("Seasons::") Then
+            lSeasonTypeName = lSeasonTypeName.Replace("Seasons", "Traditional")
+        End If
+#End If
         For Each lSeason As atcDefinedValue In pSeasonsAvailable
-            If lSeason.Definition.Name.Equals(cboSeasons.Text & "::SeasonalAttributes") Then
+            If lSeason.Definition.Name.Equals(lSeasonTypeName) Then
                 Return lSeason.Definition.Calculator
             End If
         Next

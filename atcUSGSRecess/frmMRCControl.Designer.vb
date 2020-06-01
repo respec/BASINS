@@ -546,11 +546,11 @@ Partial Class frmMRCControl
     Friend WithEvents btnMRCClear As System.Windows.Forms.Button
     Friend WithEvents rbSelectNoneEqns As System.Windows.Forms.RadioButton
     Friend WithEvents rbSelectAllEqns As System.Windows.Forms.RadioButton
-    Friend WithEvents btnClearRecSum As Windows.Forms.Button
-    Friend WithEvents tabPlotMRCunitarea As Windows.Forms.TabPage
-    Friend WithEvents panelGraphUA As Windows.Forms.Panel
-    Friend WithEvents txtYearEnd As Windows.Forms.TextBox
-    Friend WithEvents lblYearEnd As Windows.Forms.Label
-    Friend WithEvents txtYearStart As Windows.Forms.TextBox
-    Friend WithEvents lblYearStart As Windows.Forms.Label
+    Friend WithEvents btnClearRecSum As System.Windows.Forms.Button
+    Friend WithEvents tabPlotMRCunitarea As System.Windows.Forms.TabPage
+    Friend WithEvents panelGraphUA As System.Windows.Forms.Panel
+    Friend WithEvents txtYearEnd As System.Windows.Forms.TextBox
+    Friend WithEvents lblYearEnd As System.Windows.Forms.Label
+    Friend WithEvents txtYearStart As System.Windows.Forms.TextBox
+    Friend WithEvents lblYearStart As System.Windows.Forms.Label
 End Class

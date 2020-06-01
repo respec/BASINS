@@ -1,6 +1,10 @@
 Imports atcUtility
 Imports MapWinUtility
 Imports System.Reflection
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+#Else
+#End If
 
 ''' <summary>Manages a set of currently open DataSources. 
 '''          Uses the set of plugins currently loaded to find ones that inherit atcTimeseriesSource
@@ -442,7 +446,23 @@ Public Class atcDataManager
     Private Shared Sub RemovedDataSource(ByVal aDataSource As atcDataSource)
         Try
             RaiseEvent ClosedData(aDataSource)
-            aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+            If aDataSource.Category.ToLower().StartsWith("season") Then
+                Dim lCleanUpMode As IDataManagement.ECleanUpMode
+                Try
+                    lCleanUpMode = CType(aDataSource, IDataManagement).CleanUpMode()
+                Catch ex As Exception
+                End Try
+                Select Case lCleanUpMode
+                    Case IDataManagement.ECleanUpMode.ALL
+                        aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+                    Case IDataManagement.ECleanUpMode.ATTRIBUTES
+                        aDataSource.ClearAttributes()
+                    Case IDataManagement.ECleanUpMode.CALCULATED
+                        aDataSource.ClearCalculated("season")
+                End Select
+            Else
+                aDataSource.Clear() 'TODO: dispose and/or close to get rid of everything
+            End If
         Catch e As Exception
             Logger.Dbg("RaiseEvent ClosedData: " & e.Message)
         End Try

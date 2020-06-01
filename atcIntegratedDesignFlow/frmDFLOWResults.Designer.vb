@@ -273,7 +273,7 @@ Partial Class frmDFLOWResults
     Friend WithEvents DFLOWHelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents AboutDFLOWToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents SaveOutputReportToolStripMenuItem As Windows.Forms.ToolStripMenuItem
-    Friend WithEvents cboDisplay As Windows.Forms.ComboBox
-    Friend WithEvents lblDisplay As Windows.Forms.Label
+    Friend WithEvents SaveOutputReportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cboDisplay As System.Windows.Forms.ComboBox
+    Friend WithEvents lblDisplay As System.Windows.Forms.Label
 End Class

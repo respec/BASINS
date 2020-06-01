@@ -630,7 +630,7 @@ BadCoeff:
     End Sub
 
     Private Sub frmCmpJPET_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Compute\Computations.html")
         End If
     End Sub

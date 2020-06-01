@@ -22,6 +22,7 @@ Partial Class frmFilterData
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFilterData))
         Me.tabFilters = New System.Windows.Forms.TabControl()
         Me.tabSubsetByDate = New System.Windows.Forms.TabPage()
         Me.atcSelectedDates = New atcData.atcChooseDataGroupDates()
@@ -140,7 +141,7 @@ Partial Class frmFilterData
         Me.tabSeasons.Name = "tabSeasons"
         Me.tabSeasons.Size = New System.Drawing.Size(587, 487)
         Me.tabSeasons.TabIndex = 2
-        Me.tabSeasons.Text = "Seasons"
+        Me.tabSeasons.Text = "Split Into Time Periods"
         Me.tabSeasons.UseVisualStyleBackColor = True
         '
         'chkEnableSeasons
@@ -149,9 +150,9 @@ Partial Class frmFilterData
         Me.chkEnableSeasons.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.chkEnableSeasons.Location = New System.Drawing.Point(8, 6)
         Me.chkEnableSeasons.Name = "chkEnableSeasons"
-        Me.chkEnableSeasons.Size = New System.Drawing.Size(111, 17)
+        Me.chkEnableSeasons.Size = New System.Drawing.Size(131, 17)
         Me.chkEnableSeasons.TabIndex = 47
-        Me.chkEnableSeasons.Text = "Split Into Seasons"
+        Me.chkEnableSeasons.Text = "Split Into Time Periods"
         Me.chkEnableSeasons.UseVisualStyleBackColor = True
         '
         'lblGroupSeasons
@@ -160,9 +161,9 @@ Partial Class frmFilterData
         Me.lblGroupSeasons.AutoSize = True
         Me.lblGroupSeasons.Location = New System.Drawing.Point(264, 466)
         Me.lblGroupSeasons.Name = "lblGroupSeasons"
-        Me.lblGroupSeasons.Size = New System.Drawing.Size(46, 13)
+        Me.lblGroupSeasons.Size = New System.Drawing.Size(63, 13)
         Me.lblGroupSeasons.TabIndex = 46
-        Me.lblGroupSeasons.Text = "seasons"
+        Me.lblGroupSeasons.Text = "time periods"
         '
         'txtGroupSeasons
         '
@@ -191,9 +192,9 @@ Partial Class frmFilterData
         Me.radioSeasonsCombine.Location = New System.Drawing.Point(8, 422)
         Me.radioSeasonsCombine.Margin = New System.Windows.Forms.Padding(2)
         Me.radioSeasonsCombine.Name = "radioSeasonsCombine"
-        Me.radioSeasonsCombine.Size = New System.Drawing.Size(304, 17)
+        Me.radioSeasonsCombine.Size = New System.Drawing.Size(321, 17)
         Me.radioSeasonsCombine.TabIndex = 38
-        Me.radioSeasonsCombine.Text = "One time series containing all values from selected seasons"
+        Me.radioSeasonsCombine.Text = "One time series containing all values from selected time periods"
         Me.radioSeasonsCombine.UseVisualStyleBackColor = True
         '
         'radioSeasonsSeparate
@@ -204,10 +205,10 @@ Partial Class frmFilterData
         Me.radioSeasonsSeparate.Location = New System.Drawing.Point(8, 443)
         Me.radioSeasonsSeparate.Margin = New System.Windows.Forms.Padding(2)
         Me.radioSeasonsSeparate.Name = "radioSeasonsSeparate"
-        Me.radioSeasonsSeparate.Size = New System.Drawing.Size(242, 17)
+        Me.radioSeasonsSeparate.Size = New System.Drawing.Size(259, 17)
         Me.radioSeasonsSeparate.TabIndex = 39
         Me.radioSeasonsSeparate.TabStop = True
-        Me.radioSeasonsSeparate.Text = "Separate time series for each selected season"
+        Me.radioSeasonsSeparate.Text = "Separate time series for each selected time period"
         Me.radioSeasonsSeparate.UseVisualStyleBackColor = True
         '
         'lblSeasons
@@ -216,9 +217,9 @@ Partial Class frmFilterData
         Me.lblSeasons.Location = New System.Drawing.Point(5, 69)
         Me.lblSeasons.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblSeasons.Name = "lblSeasons"
-        Me.lblSeasons.Size = New System.Drawing.Size(100, 13)
+        Me.lblSeasons.Size = New System.Drawing.Size(119, 13)
         Me.lblSeasons.TabIndex = 45
-        Me.lblSeasons.Text = "Seasons to include:"
+        Me.lblSeasons.Text = "Time periods to include:"
         '
         'lblSeasonType
         '
@@ -226,9 +227,9 @@ Partial Class frmFilterData
         Me.lblSeasonType.Location = New System.Drawing.Point(5, 31)
         Me.lblSeasonType.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblSeasonType.Name = "lblSeasonType"
-        Me.lblSeasonType.Size = New System.Drawing.Size(141, 13)
+        Me.lblSeasonType.Size = New System.Drawing.Size(68, 13)
         Me.lblSeasonType.TabIndex = 44
-        Me.lblSeasonType.Text = "Type of seasons to split into:"
+        Me.lblSeasonType.Text = "Time Periods"
         '
         'btnSeasonsNone
         '
@@ -720,6 +721,7 @@ Partial Class frmFilterData
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.tabFilters)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmFilterData"
         Me.Text = "Filter Data"
         Me.tabFilters.ResumeLayout(False)

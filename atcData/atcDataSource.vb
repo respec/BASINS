@@ -88,6 +88,57 @@ Public Class atcDataSource
         pSpecification = ""
     End Sub
 
+    Public Overridable Sub ClearAttributes()
+        If pAttributes IsNot Nothing Then
+            pAttributes.Clear()
+            pAttributes = Nothing
+        End If
+        If pData IsNot Nothing Then
+            For Each lDataSet As atcDataSet In pData
+                lDataSet.Attributes.Clear()
+            Next
+            pData.Clear()
+        End If
+    End Sub
+
+    Public Overridable Sub ClearCalculated(Optional ByVal aCategory As String = "")
+        If pAttributes IsNot Nothing Then
+            pAttributes.Clear()
+            pAttributes = Nothing
+        End If
+        If pData IsNot Nothing Then
+            For Each lDataSet As atcDataSet In pData
+                Dim lAttributesRemove As New ArrayList()
+                For Each lAttrib As atcDefinedValue In lDataSet.Attributes
+                    If lAttrib.Definition.Calculated Then
+                        If Not String.IsNullOrEmpty(aCategory) Then
+                            Dim lAttribName As String = lAttrib.Definition.Name.ToLower()
+                            If lAttribName = aCategory.ToLower() OrElse lAttribName.Contains(aCategory.ToLower()) Then
+                                lAttributesRemove.Add(lAttrib)
+                            Else
+                                For Each lArg As atcDefinedValue In lAttrib.Arguments
+                                    Dim lArgName As String = lArg.Definition.Name.ToLower()
+                                    If lArgName = aCategory.ToLower() OrElse lArgName.Contains(aCategory.ToLower()) Then
+                                        lAttributesRemove.Add(lAttrib)
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+                        Else
+                            lAttributesRemove.Add(lAttrib)
+                        End If
+                    End If
+                Next
+                If lAttributesRemove.Count > 0 Then
+                    For Each lAttrib As atcDefinedValue In lAttributesRemove
+                        lDataSet.Attributes.Remove(lAttrib)
+                    Next
+                End If
+            Next
+            pData.Clear()
+        End If
+    End Sub
+
     ''' <summary>
     ''' Opens source and reads enough to determine whether it is correct type.
     ''' </summary>

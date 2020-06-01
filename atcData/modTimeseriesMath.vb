@@ -1612,6 +1612,10 @@ Finished:
                 lNumberFirst = aArgs.ItemByIndex(0).Definition.Name.ToLower = "number"
             End If
         End If
+        Dim lShareDates As Boolean = True
+        If aArgs.ContainsAttribute("ShareDates") Then
+            lShareDates = aArgs.GetValue("ShareDates", True)
+        End If
 
         Dim lTSgroup As atcTimeseriesGroup = TimeseriesGroupFromArguments(aArgs)
         If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
@@ -1867,7 +1871,13 @@ Finished:
             lNewTS.Values = lNewVals
 
             If Not lTSFirst Is Nothing Then
-                lNewTS.Dates = lTSFirst.Dates
+                If lShareDates Then
+                    lNewTS.Dates = lTSFirst.Dates
+                Else
+                    lNewTS.Dates = New atcTimeseries(Nothing)
+                    lNewTS.Dates.numValues = lTSFirst.Dates.numValues
+                    Array.Copy(lTSFirst.Dates.Values, lNewTS.Dates.Values, lTSFirst.Dates.numValues)
+                End If
             Else
                 Err.Raise(vbObjectError + 512, , "Did not get dates for new computed timeseries " & aOperationName)
             End If

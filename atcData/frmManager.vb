@@ -327,6 +327,9 @@ Friend Class frmManager
                 End If
                 lCount += 1
             Next
+            If atcDataManager.DataSources.Count = 0 Then
+                SelectedNodes.Clear()
+            End If
             treeFiles.ExpandAll()
             treeFiles.Refresh()
         End If

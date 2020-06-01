@@ -15,7 +15,6 @@ Imports DotSpatial.Controls
 Public Class atcDataPlugin
 
 #If GISProvider = "DotSpatial" Then
-    Inherits Extension
 #Else
     Implements MapWindow.Interfaces.IPlugin
 #End If
@@ -59,7 +58,10 @@ Public Class atcDataPlugin
     Public Overridable Function ComputeClicked(ByVal aItemName As String) As atcDataSource
         Dim ds As atcDataSource = Me
         Dim lItemName As String = aItemName '.Replace(" ", "")
+#If GISProvider = "DotSpatial" Then
+#Else
         lItemName = lItemName.Substring(atcDataManager.ComputeMenuName.Length + 1, lItemName.Length - atcDataManager.ComputeMenuName.Length - Name.Length - 2)
+#End If
         If lItemName.StartsWith(ds.Category & "_") Then
             Dim lNewSource As atcDataSource = Nothing
             lItemName = lItemName.Substring(ds.Category.Length + 1)
@@ -77,6 +79,9 @@ Public Class atcDataPlugin
                 lNewSource = ds.NewOne
             End If
             If lNewSource IsNot Nothing Then
+                If lNewSource.Name = "Timeseries::Math" Then
+                    CType(lNewSource, IDataMemory).ShareDates = CType(ds, IDataMemory).ShareDates
+                End If
                 If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                     If lNewSource.DataSets.Count > 0 Then
                         Return lNewSource

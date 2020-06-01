@@ -61,8 +61,8 @@ Public Class clsUSGSRoraPlugin
         aForm.Initialize(aTimeseriesGroup, lBasicAttributes, True)
     End Sub
 
-    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup, _
-                              ByVal aFileName As String, _
+    Public Overrides Sub Save(ByVal aTimeseriesGroup As atcData.atcDataGroup,
+                              ByVal aFileName As String,
                               ByVal ParamArray aOption() As String)
 
         If Not aTimeseriesGroup Is Nothing AndAlso aTimeseriesGroup.Count > 0 Then
@@ -74,20 +74,23 @@ Public Class clsUSGSRoraPlugin
             'lForm.Dispose()
         End If
     End Sub
-
+#If GISProvider = "DotSpatial" Then
+#Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
     End Sub
-
+#End If
     Private Sub LoadPlugin(ByVal aPluginName As String)
         Try
+#If GISProvider = "DotSpatial" Then
+#Else
             Dim lKey As String = pMapWin.Plugins.GetPluginKey(aPluginName)
             'If Not g_MapWin.Plugins.PluginIsLoaded(lKey) Then 
             pMapWin.Plugins.StartPlugin(lKey)
+#End If
         Catch e As Exception
             Logger.Dbg("Exception loading " & aPluginName & ": " & e.Message)
         End Try
     End Sub
-
 End Class
 

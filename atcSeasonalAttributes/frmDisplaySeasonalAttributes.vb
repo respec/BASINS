@@ -225,7 +225,11 @@ Friend Class frmDisplaySeasonalAttributes
     Private Sub PopulateGrid()
         Dim lWasSwapped As Boolean = Not pSwapperSource Is Nothing AndAlso pSwapperSource.SwapRowsColumns
         pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
-        If pSource.Columns < 3 Then
+        Dim lChooseSeasonTypeANew As Boolean = False
+#If Toolbox = "Hydro" Then
+        lChooseSeasonTypeANew = True
+#End If
+        If pSource.Columns < 3 OrElse lChooseSeasonTypeANew Then
             UserSpecifyAttributes()
             pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
         End If
@@ -235,6 +239,9 @@ Friend Class frmDisplaySeasonalAttributes
         agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
         SizeToGrid()
+#If Toolbox = "Hydro" Then
+        Me.Text = "Time-Series Attributes"
+#End If
     End Sub
 
     Private Sub SizeToGrid()
@@ -318,7 +325,7 @@ Friend Class frmDisplaySeasonalAttributes
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With

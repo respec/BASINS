@@ -337,7 +337,7 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With
@@ -352,7 +352,7 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, CreateReport)
                 OpenFile(.FileName)
             End If
@@ -470,7 +470,7 @@ Friend Class frmDisplayFrequencyGrid
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, pSource.CreateReport(True))
                 OpenFile(.FileName)
             End If

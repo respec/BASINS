@@ -203,7 +203,7 @@ Public Class frmSynoptic
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With
@@ -218,7 +218,7 @@ Public Class frmSynoptic
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Logger.Progress("Saving Synoptic Analysis", 0, cboGroupBy.Items.Count - 1)
                 SaveFileString(.FileName, "")
                 For lGroupBy As Integer = cboGroupBy.Items.Count - 1 To 0 Step -1
