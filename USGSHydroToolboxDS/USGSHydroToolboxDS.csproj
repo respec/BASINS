@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EA8971FF-2E6A-48DD-93B2-5E94444B47A5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>USGSHydroToolbox</RootNamespace>
+    <AssemblyName>USGSHydroToolbox</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Analysis">
+      <HintPath>..\bin\Debug\DotSpatial.Analysis.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Compatibility">
+      <HintPath>..\bin\Debug\DotSpatial.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Controls, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data, Version=2.0.0.465, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=53ab5a198378d4c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data.Rasters.GdalExtension, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a8023d70ef7a76f8, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.Rasters.GdalExtension.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions, Version=2.0.0.465, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.GeoAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Modeling.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=712bef29a31a9354, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Modeling.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.NetTopologySuite, Version=1.14.4.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.NTSExtension, Version=2.0.0.465, Culture=neutral, PublicKeyToken=928fbfe39f52ea75, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.NTSExtension.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Positioning">
+      <HintPath>..\bin\Debug\DotSpatial.Positioning.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Positioning.Design">
+      <HintPath>..\bin\Debug\DotSpatial.Positioning.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Positioning.Forms">
+      <HintPath>..\bin\Debug\DotSpatial.Positioning.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections, Version=2.0.0.465, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Projections.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Projections.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=52099474f11b7ff0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Projections.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Serialization, Version=2.0.0.465, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology, Version=2.0.0.465, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=0544cdeefb662382, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Images.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Images.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Images.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\enwiki-1.5x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcDataTree\atcDataTree-DSC.vbproj">
+      <Project>{f4ef0925-945b-418c-9a81-8490d89985db}</Project>
+      <Name>atcDataTree-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-DSC.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare-DSC.vbproj">
+      <Project>{92ea3681-9ea9-438a-a598-2531f483a0c6}</Project>
+      <Name>atcDurationCompare-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph-DSC.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcIntegratedDesignFlow\atcIDF-DSC.vbproj">
+      <Project>{edb3cf95-e4dd-4d02-97e8-cd3d12cc5f86}</Project>
+      <Name>atcIDF-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList-DSC.vbproj">
+      <Project>{a1a87cb8-8b9e-4c90-9549-c065357e499f}</Project>
+      <Name>atcList-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+      <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
+      <Name>atcMwGisUtility-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSeasonalAttributes\atcSeasonalAttributes-DSC.vbproj">
+      <Project>{50fef6be-f961-4949-8658-2948de7b777b}</Project>
+      <Name>atcSeasonalAttributes-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSeasons\atcSeasons-DSC.vbproj">
+      <Project>{12f7fdd0-a6ec-4abe-a01b-790ad8caef03}</Project>
+      <Name>atcSeasons-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis-DSC.vbproj">
+      <Project>{fabf7aa3-dde7-48a4-8226-ecd3ad423597}</Project>
+      <Name>atcSynopticAnalysis-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow-DSC.vbproj">
+      <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
+      <Name>atcTimeseriesBaseflow-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-DSC.vbproj">
+      <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
+      <Name>atcTimeseriesMath-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DSC.vbproj">
+      <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
+      <Name>atcTimeseriesRDB-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-DSC.vbproj">
+      <Project>{40de1f29-3531-4bc2-9d7e-324dc92689df}</Project>
+      <Name>atcTimeseriesScript-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DSC.vbproj">
+      <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
+      <Name>atcTimeseriesStatistics-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow-DSC.vbproj">
+      <Project>{9f09a31b-de05-4ff8-8e89-867affe0ace7}</Project>
+      <Name>atcUSGSBaseflow-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DSC.vbproj">
+      <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>
+      <Name>atcUSGSDF2P-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSRecess\atcUSGSRecess-DSC.vbproj">
+      <Project>{3d007252-dd48-4288-97bc-5e1657839fbb}</Project>
+      <Name>atcUSGSRecess-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSRora\atcUSGSRora-DSC.vbproj">
+      <Project>{28fc1ef2-44d7-44d1-9263-fd4fad14864a}</Project>
+      <Name>atcUSGSRora-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-DSC.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\BASINS\ToolboxMWPlugin-DSC.vbproj">
+      <Project>{9b3bb48b-2caf-4e49-a900-5e08217da078}</Project>
+      <Name>ToolboxMWPlugin-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\D4EMDownloadData\D4EMDownloadData-DSC.vbproj">
+      <Project>{add48409-fc1f-4a92-b07c-6b9a9a5bac72}</Project>
+      <Name>D4EMDownloadData-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
