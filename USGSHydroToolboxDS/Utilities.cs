@@ -108,6 +108,7 @@ namespace USGSHydroToolbox
         public const string g_CacheDir = @"C:\USGSHydroToolbox\Cache\";
         public const string g_PathChar = @"\";
         public const string g_AppNameShort = @"Hydro Toolbox";
+        public const string g_AppNameLong = @"USGS Hydrologic Toolbox";
 
         public static atcBasinsPlugIn BASINSPlugin;
 

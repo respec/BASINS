@@ -61,8 +61,8 @@ namespace USGSHydroToolbox
 
             if (Utilities.g_AppNameShort == "Hydro Toolbox")
             {
-                this.Icon = Images.USGS; 
-                this.Text = "Hydro Toolbox";
+                this.Icon = Images.USGS;
+                this.Text = Utilities.g_AppNameLong;
             }
             AddProjMenuItems(appManager.HeaderControl);
             AddDataMenuItems(appManager.HeaderControl);
@@ -95,10 +95,10 @@ namespace USGSHydroToolbox
             if (!String.IsNullOrEmpty(projname))
             {
                 var projid = System.IO.Path.GetFileNameWithoutExtension(projname);
-                this.Text = "Hydro Toolbox - " + projid;
+                this.Text = Utilities.g_AppNameLong + " - " + projid;
             }
             else
-                this.Text = "Hydro Toolbox";
+                this.Text = Utilities.g_AppNameLong;
 
             //bool handled = true;
             //Utilities.BASINSPlugin.ItemClicked("mnuNew", ref handled);
@@ -359,6 +359,7 @@ namespace USGSHydroToolbox
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.TSToolDescription(ETSTool.EVENTS), OnTSMenuClickEventHandler) { Enabled = true });
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.TSToolDescription(ETSTool.GRAPH), OnTSMenuClickEventHandler));
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.TSToolDescription(ETSTool.LIST), OnTSMenuClickEventHandler));
+            header.Add(new SimpleActionItem(SampleMenuKey, Utilities.TSToolDescription(ETSTool.SUBSETFILTER), OnTSMenuClickEventHandler));
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.TSToolDescription(ETSTool.TREND), OnTSMenuClickEventHandler));
 
             // Add sub menus
@@ -371,7 +372,11 @@ namespace USGSHydroToolbox
             var TsMathOperations = Utilities.TSMathOperationNames(ETSMathOperationType.ALL);
             foreach (var Key in TsMathOperations)
             {
-                if (Key.Contains("Subset") || Key.Contains("Merge"))
+                if (Key.Contains("Subset") && Key.Contains("Filter"))
+                {
+                    //skip
+                }
+                else if (Key.Contains("Subset") || Key.Contains("Merge"))
                 {
                     header.Add(new SimpleActionItem(SampleMenuKey, "tsgen_tst2", Key, OnTSMenuClickEventHandler));
                 }
@@ -388,7 +393,6 @@ namespace USGSHydroToolbox
             subfilter.SmallImage = Images.Basins.ToBitmap();
             header.Add(subfilter);
             */
-            header.Add(new SimpleActionItem(SampleMenuKey, "tsgen", Utilities.TSToolDescription(ETSTool.SUBSETFILTER), OnTSMenuClickEventHandler));
         }
 
         private void OnTSMenuClickEventHandler(object sender, EventArgs e)

@@ -52,7 +52,7 @@ Public Module modBasinsPlugin
 #ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-Hydro" 'For preferences in registry
     Friend Const g_AppNameShort As String = "Hydro Toolbox"
-    Friend Const g_AppNameLong As String = "USGS Hydro Toolbox 1.0.0"
+    Friend Const g_AppNameLong As String = "USGS Hydrologic Toolbox" & vbCrLf & "(1.0.0)"
     'Friend Const g_URL_Home As String = "https://water.usgs.gov/ogw/gwtoolbox/"
     Friend Const g_URL_Home As String = "https://www.usgs.gov/software/groundwater-toolbox-a-graphical-and-mapping-interface-analysis-hydrologic-data"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
