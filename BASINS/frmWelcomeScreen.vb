@@ -204,10 +204,11 @@ Public Class frmWelcomeScreen
         Dim lOpenFileDialog As New OpenFileDialog
 
         With lOpenFileDialog
-            .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
-            .CheckFileExists = True
 #If GISProvider = "DotSpatial" Then
             If lProject IsNot Nothing Then
+                '.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+                .Filter = "DotSpatial Project Files (*.dspx)|*.dspx|MapWindow Project Files (*.mwprj)|*.mwprj"
+                .CheckFileExists = True
                 .InitialDirectory = lProject.CurrentProjectDirectory
                 If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                     lProject.OpenProject(.FileName)
@@ -216,6 +217,8 @@ Public Class frmWelcomeScreen
                 End If
             End If
 #Else
+            .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+            .CheckFileExists = True
             .InitialDirectory = lAppInfo.DefaultDir
             If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 lProject.Load(.FileName)

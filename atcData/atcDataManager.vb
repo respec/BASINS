@@ -711,7 +711,7 @@ Public Class atcDataManager
                             lAttributeValues &= " " & lAttributeName & "='" & lAttributeValue & "'"
                         End If
                     Next
-                    lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'" & lAttributeValues & ">" & lSource.Name & "</DataSource>")
+                    lSaveXML.Append("<DataSource Specification='" & RelativeFilename(lSource.Specification, CurDir) & "'" & lAttributeValues & ">" & lSource.Name & "</DataSource>")
                 End If
             Next
             lSaveXML.Append("</DataManager>")

@@ -860,6 +860,7 @@ FoundDir:
 #Else
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
 #End If
+        ChDir(PathNameOnly(aProjectFile))
         aSettingsString = "<BASINS>" & atcDataManager.XML & "</BASINS>"
     End Sub
 
