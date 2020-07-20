@@ -227,6 +227,20 @@ Public Module modBasinsPlugin
     ''' </summary>
     Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
+#If GISProvider = "DotSpatial" Then
+            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilenameDS)
+            If Not FileExists(lFileName) Then
+                For Each lDir As String In g_BasinsDataDirs
+                    lFileName = lDir & "national" & g_PathChar & NationalProjectFilenameDS
+                    If FileExists(lFileName) Then 'found existing national project
+                        Exit For
+                    End If
+                Next
+            End If
+            If Not FileExists(lFileName) Then
+                lFileName = FindFile("Please locate BASINS national project", NationalProjectFilenameDS, , , True)
+            End If
+#Else
             Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
@@ -239,6 +253,7 @@ Public Module modBasinsPlugin
             If Not FileExists(lFileName) Then
                 lFileName = FindFile("Please locate BASINS national project", NationalProjectFilename, , , True)
             End If
+#End If
             If FileExists(lFileName) Then  'load national project
 #If GISProvider = "DotSpatial" Then
                 g_Project.OpenProject(lFileName)

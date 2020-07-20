@@ -633,9 +633,9 @@ Public Module modDownload
             lDirName = aDataPath & aDefDirName & "-" & lSuffix
         End While
         If lSuffix > 1 Then 'Also add suffix to project file name
-            Return IO.Path.Combine(lDirName, aDefDirName & "-" & lSuffix & ".mwprj")
+            Return IO.Path.Combine(lDirName, aDefDirName & "-" & lSuffix & ".dspx")
         Else
-            Return IO.Path.Combine(lDirName, aDefDirName & ".mwprj")
+            Return IO.Path.Combine(lDirName, aDefDirName & ".dspx")
         End If
     End Function
 
