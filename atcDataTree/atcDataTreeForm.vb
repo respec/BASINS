@@ -452,6 +452,8 @@ Friend Class atcDataTreeForm
     Private Sub ShowHelpForTree()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             ShowHelp("View\Tree.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Data Tree.html")
         Else
             ShowHelp("BASINS Details\Analysis\Time Series Functions\Data Tree.html")
         End If

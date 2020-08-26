@@ -1634,9 +1634,12 @@ Public Class frmSWSTATmod
 
     Private pSW As New Stopwatch()
 
-    Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp(pHelpLocation)
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("SW-Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
+        End If
     End Sub
 
     Private Sub PopulateForm()
@@ -1871,7 +1874,11 @@ Public Class frmSWSTATmod
 
     Private Sub frmSWSTAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp(pHelpLocation)
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("SW-Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
+            Else
+                ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
+            End If
         End If
     End Sub
 

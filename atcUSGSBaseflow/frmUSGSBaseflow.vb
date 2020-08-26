@@ -975,12 +975,20 @@ Public Class frmUSGSBaseflow
 
     Private Sub frmUSGSBaseflow_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("GW-Tools/Base-Flow Separation.html")
+            Else
+                ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+            End If
         End If
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("GW-Tools/Base-Flow Separation.html")
+        Else
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+        End If
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

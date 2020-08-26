@@ -2,6 +2,7 @@ Imports atcControls
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class frmSynoptic
     'The group of atcTimeseries displayed
@@ -282,7 +283,11 @@ Public Class frmSynoptic
     End Function
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Events.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
+        End If
     End Sub
 
     ''' <summary>

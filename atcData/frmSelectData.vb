@@ -1269,6 +1269,8 @@ NextName:
     Private Sub ShowHelpForSelect()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             ShowHelp("Tutorial.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Subset and Filter Time Series.html")
         Else
             ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
         End If

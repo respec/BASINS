@@ -3,6 +3,7 @@ Imports atcUtility
 Imports atcGraph
 Imports ZedGraph
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class frmResult
     Private WithEvents pDataGroup As atcTimeseriesGroup
@@ -39,16 +40,29 @@ Public Class frmResult
 
     Public ReadOnly Property HelpLocation() As String
         Get
-            Select Case pAnalysis.ToLower
-                Case "duration"
-                    Return pHelpLocationDuration
-                Case "compare"
-                    Return pHelpLocationCompare
-                Case "durationhydrograph"
-                    Return pHelpLocationDurationHydrograph
-                Case Else
-                    Return pHelpLocationDuration
-            End Select
+            If Application.ProductName = "USGSHydroToolbox" Then
+                Select Case pAnalysis.ToLower
+                    Case "duration"
+                        Return "SW-Tools\Duration Compare.html"
+                    Case "compare"
+                        Return "SW-Tools\Duration Compare.html"
+                    Case "durationhydrograph"
+                        Return "SW-Tools\Duration Hydrograph.html"
+                    Case Else
+                        Return "SW-Tools\Duration Compare.html"
+                End Select
+            Else
+                Select Case pAnalysis.ToLower
+                    Case "duration"
+                        Return pHelpLocationDuration
+                    Case "compare"
+                        Return pHelpLocationCompare
+                    Case "durationhydrograph"
+                        Return pHelpLocationDurationHydrograph
+                    Case Else
+                        Return pHelpLocationDuration
+                End Select
+            End If
         End Get
     End Property
 

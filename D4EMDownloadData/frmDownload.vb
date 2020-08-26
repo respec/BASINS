@@ -1080,7 +1080,11 @@ Public Class frmDownload
     End Sub
 
     Private Sub ShowHelp()
-        atcUtility.ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+        If pApplicationName = "Hydro Toolbox" Then
+            atcUtility.ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data.html")
+        Else
+            atcUtility.ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+        End If
     End Sub
 
     Private Function RegionValid(ByVal aRegionType As String, ByRef aReason As String) As Boolean

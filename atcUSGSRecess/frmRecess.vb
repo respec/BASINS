@@ -2370,12 +2370,20 @@ Public Class frmRecess
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Recess.html")
+        Else
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+        End If
     End Sub
 
     Private Sub frmRecess_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.F1 Then
-            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Recess.html")
+            Else
+                ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+            End If
         End If
     End Sub
 
