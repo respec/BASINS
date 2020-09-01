@@ -86,13 +86,13 @@ Public Class frmDownload
 
 #If GISProvider = "DotSpatial" Then
     Public Function AskUser(ByVal aMapWin As AppManager, ByVal aParentHandle As Integer) As String
+        pMapWin = aMapWin
         pApplicationName = "Hydro Toolbox"
 #Else
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
+        pMapWin = aMapWin
         pApplicationName = pMapWin.ApplicationInfo.ApplicationName
 #End If
-        pMapWin = aMapWin
-
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
@@ -199,6 +199,7 @@ Public Class frmDownload
             chkBASINS_LSTORET.Visible = False
             chkBASINS_Census.Visible = False
             chkBASINS_MetStations.Left = chkBASINS_Census.Left
+            chkBASINS_DEMG.Left = chkBASINS_NED.Left
             chkBASINS_303d.Visible = False
             'chkBASINS_MetData.Left = chkBASINS_303d.Left
         Else
