@@ -712,7 +712,7 @@ Friend Class frmManager
     Private Sub frmManager_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
+                ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
             Else
                 ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
             End If
@@ -721,7 +721,7 @@ Friend Class frmManager
 
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
+            ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
         Else
             ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
         End If
