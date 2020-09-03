@@ -1920,8 +1920,8 @@ StartOver:
             End If
         Next
         If lHUC8BoundaryOnly Then
-            If Logger.Msg("One (or more) of the core data sets is not available for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?" &
-                     vbCr & vbCr & "(Cancel will attempt to find the data in the program cache.)",
+            If Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?" &
+                     vbCr & vbCr & "(Cancel will attempt to build using data from the program cache.)",
                     MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
                 'save the HUC8s as a new shapefile
                 Dim lHUC8ShapefileName As String = GisUtilDS.LayerFileName("Cataloging Units")
