@@ -12,7 +12,7 @@ Public Class frmDurationHydrographControl
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics\Duration Hydrograph.html"
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("SW-Tools\Duration Hydrograph.html")
+            ShowHelp("SW Tools\Duration Hydrograph.html")
         Else
             ShowHelp(pHelpLocation)
         End If
@@ -21,7 +21,7 @@ Public Class frmDurationHydrographControl
     Private Sub frmDurationHydrographControl_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("SW-Tools\Duration Hydrograph.html")
+                ShowHelp("SW Tools\Duration Hydrograph.html")
             Else
                 ShowHelp(pHelpLocation)
             End If

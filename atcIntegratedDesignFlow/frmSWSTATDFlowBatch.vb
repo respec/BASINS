@@ -1614,7 +1614,7 @@ Public Class frmSWSTATDFlowBatch
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("SW-Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
+            ShowHelp("SW Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
         Else
             ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
         End If
@@ -1823,7 +1823,7 @@ Public Class frmSWSTATDFlowBatch
     Private Sub frmSWSTATDFlowBatch_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("SW-Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
+                ShowHelp("SW Tools/USGS Integrated Design Flow (IDF)/Interactive.html")
             Else
                 ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
             End If

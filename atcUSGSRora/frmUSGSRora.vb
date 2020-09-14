@@ -803,7 +803,7 @@ PlotOutput:
     Private Sub frmUSGSRora_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("GW-Tools/Recharge Estimation with RORA.html")
+                ShowHelp("GW Tools/Recharge Estimation with RORA.html")
             Else
                 ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
             End If
@@ -812,7 +812,7 @@ PlotOutput:
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("GW-Tools/Recharge Estimation with RORA.html")
+            ShowHelp("GW Tools/Recharge Estimation with RORA.html")
         Else
             ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
         End If

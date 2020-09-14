@@ -392,6 +392,10 @@ Friend Class frmSelectData
         pInitializing = True 'Gets set back to False in Populate below
         mnuSelectMap.Checked = False
 
+        If Application.ProductName = "USGSHydroToolbox" Then
+            chkFilter.Text = "Subset and Filter Time Series"
+        End If
+
         If aGroup IsNot Nothing AndAlso aGroup.Count > 10 Then
             Select Case Logger.Msg("Select all " & aGroup.Count & " datasets?", vbYesNoCancel, "Several datasets available")
                 Case vbNo : aGroup = Nothing

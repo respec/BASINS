@@ -170,7 +170,7 @@ namespace USGSHydroToolbox
             const string SampleMenuKey = "kGWTools";
 
             // Root menu
-            header.Add(new RootItem(SampleMenuKey, "GW-Tools"));
+            header.Add(new RootItem(SampleMenuKey, "GW Tools"));
 
             // Add some child menus
             //header.Add(new SimpleActionItem(SampleMenuKey, AnalysisDescription(EAnalysis.BASEFLOW), null) { Enabled = true });
@@ -214,7 +214,7 @@ namespace USGSHydroToolbox
             const string SampleMenuKey = "kSWTools";
 
             // Root menu
-            header.Add(new RootItem(SampleMenuKey, "SW-Tools"));
+            header.Add(new RootItem(SampleMenuKey, "SW Tools"));
 
             // Add some child menus
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.AnalysisDescriptionSW(EAnalysisSW.DC), OnSWMenuClickEventHandler) { Enabled = true });
