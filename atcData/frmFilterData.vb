@@ -411,6 +411,22 @@ Public Class frmFilterData
             End If
 
             If lWasModified Then
+                Dim lDisplayAttributes As Generic.List(Of String) = atcDataManager.SelectionAttributes()
+                lDisplayAttributes.Add("Data Source")
+                For Each lTSer As atcTimeseries In lModifiedGroup
+                    lTSer.Attributes.SetValueIfMissing("Data Source", "<In Memory>")
+                    If lTSer.Attributes.ContainsAttribute("History 1") Then
+                        lDisplayAttributes.Add("History 1")
+                    End If
+                    If lTSer.Attributes.ContainsAttribute("History 2") Then
+                        lDisplayAttributes.Add("History 2")
+                    End If
+                    If lTSer.Attributes.ContainsAttribute("History 3") Then
+                        lDisplayAttributes.Add("History 3")
+                    End If
+                Next
+                atcDataManager.SelectionAttributesSet(lDisplayAttributes)
+
                 pSelectedGroup.ChangeTo(lModifiedGroup)
                 pSelectedOK = True
                 pAsking = False
