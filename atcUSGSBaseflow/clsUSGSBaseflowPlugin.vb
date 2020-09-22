@@ -1,6 +1,11 @@
 ﻿Imports atcData
 Imports atcUtility
+Imports atcMwGisUtility.GisUtilDS
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Controls
+Imports DotSpatial.Data
+#End If
 
 Imports System.Drawing
 #If GISProvider = "DotSpatial" Then
@@ -12,6 +17,10 @@ Public Class clsUSGSBaseflowPlugin
 
     Private pRequiredHelperPlugin As String = "Timeseries::Meteorologic Generation" 'atcMetCmp
     Private pStatusMonitor As MonitorProgressStatus
+
+#If GISProvider = "DotSpatial" Then
+    Private pMapWin As IMap = Nothing
+#End If
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -47,6 +56,15 @@ Public Class clsUSGSBaseflowPlugin
             Dim lgisLayerFound As Boolean = False
             Dim lstnSelected As Integer = 0
 #If GISProvider = "DotSpatial" Then
+            Dim lMapLayer As IMapFeatureLayer = Nothing
+            For Each lMapLayer In GetFeatureLayers(Nothing)
+                If lMapLayer.LegendText.ToLower.Contains("nwis daily discharge stations") Then
+                    lgisLayerFound = True
+                    lstnSelected = NumSelectedFeatures(lMapLayer)
+                    'lHandled = True
+                    Exit For
+                End If
+            Next
 #Else
             Dim lMapLayer As MapWindow.Interfaces.Layer = Nothing
             For Each lMapLayer In pMapWin.Layers
@@ -63,9 +81,9 @@ Public Class clsUSGSBaseflowPlugin
             If lgisLayerFound Then
                 If lstnSelected = 0 Then
 #If GISProvider = "DotSpatial" Then
-                    'lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+                    lContAction = Logger.MsgCustomOwned("No stream gage is selected on map." & vbCrLf & "Map Layer: " & lMapLayer.LegendText & "    " & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
 #Else
-                    lContAction = Logger.MsgCustomOwned("No stream gage is selected." & vbCrLf & "Layer: " & lMapLayer.Name & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+                    lContAction = Logger.MsgCustomOwned("No stream gage is selected on map." & vbCrLf & "Map Layer: " & lMapLayer.Name & "     " & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
 #End If
                     If lContAction = "No" Then
                         Return Nothing
@@ -74,13 +92,14 @@ Public Class clsUSGSBaseflowPlugin
                     End If
                 ElseIf lstnSelected < 2 Then
 #If GISProvider = "DotSpatial" Then
-                    'Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
+                    Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.LegendText, lBatchTitle)
 #Else
                     Logger.Msg("Batch process can handle more than 1 stream gages." & vbCrLf & vbCrLf & "Layer: " & lMapLayer.Name, lBatchTitle)
 #End If
                 End If
             Else
-                lContAction = Logger.MsgCustomOwned("Could not find stream gage station layer: NWIS Daily Discharge Stations." & vbCrLf & "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
+                lContAction = Logger.MsgCustomOwned("Could not find stream gage station GIS layer: NWIS Daily Discharge Stations." & vbCrLf &
+                                                    "Continue?", lBatchTitle, Nothing, New String() {"Yes", "No"})
                 If lContAction = "No" Then
                     Return Nothing
                 Else
@@ -89,6 +108,26 @@ Public Class clsUSGSBaseflowPlugin
             End If
             Dim lSelectedStationIDs As New atcCollection()
 #If GISProvider = "DotSpatial" Then
+            Dim lFieldIndex As Integer = GetFieldIndexByName(lMapLayer, "site_no")
+            Dim lFieldIndex_nm As Integer = GetFieldIndexByName(lMapLayer, "station_nm")
+            If lFieldIndex < 0 Then
+                Logger.Msg("NWIS gage station map layer lacks station ID field." + vbCrLf +
+                           "Cannot generate batch spec file from selected gages from map", lBatchTitle)
+                Return Nothing
+            End If
+            Dim lRecordIndex As Integer = 0
+            Dim lStationId As String = ""
+            Dim lStationNm As String = ""
+
+            For Each lfeature As IFeature In GetSelectedMapFeatures(lMapLayer)
+                With lfeature
+                    lStationId = .DataRow().Item(lFieldIndex).ToString()
+                    lStationNm = .DataRow().Item(lFieldIndex_nm).ToString()
+                End With
+                If Not lSelectedStationIDs.Keys.Contains(lStationId) Then
+                    lSelectedStationIDs.Add(lStationId, lStationNm)
+                End If
+            Next
 #Else
             Dim lShp As New MapWinGIS.Shapefile()
             If lgisLayerFound AndAlso lShp.Open(lMapLayer.FileName, Nothing) Then
@@ -190,6 +229,9 @@ Public Class clsUSGSBaseflowPlugin
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub Initialize(ByVal aMapWin As IMap, ByVal aParentHandle As Integer)
+        pMapWin = aMapWin
+    End Sub
 #Else
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)

@@ -87,8 +87,18 @@
       <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DotSpatial.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DotSpatial.Extensions">
       <HintPath>..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -105,6 +115,7 @@
     <Reference Include="ZedGraph, Version=5.1.3.0, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\ZedGraph.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -216,66 +227,87 @@
     <ProjectReference Include="..\atcBasinsObsWQ\atcBasinsObsWQ-DSC.vbproj">
       <Project>{7dcb47a0-7b03-4b7c-bc42-b8d920d46604}</Project>
       <Name>atcBasinsObsWQ-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcBatchProcessing\atcBatchProcessing-DSC.vbproj">
       <Project>{7e95fcaa-7b7c-4585-8ee2-58db97ed9110}</Project>
       <Name>atcBatchProcessing-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls-DSC.vbproj">
       <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
       <Name>atcControls-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher-DSC.vbproj">
       <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
       <Name>atcD4EMLauncher-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData-DSC.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
       <Name>atcData-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcDurationCompare\atcDurationCompare-DSC.vbproj">
       <Project>{92ea3681-9ea9-438a-a598-2531f483a0c6}</Project>
       <Name>atcDurationCompare-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph-DSC.vbproj">
       <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
       <Name>atcGraph-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcList\atcList-DSC.vbproj">
       <Project>{a1a87cb8-8b9e-4c90-9549-c065357e499f}</Project>
       <Name>atcList-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+      <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
+      <Name>atcMwGisUtility-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow-DSC.vbproj">
       <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
       <Name>atcTimeseriesBaseflow-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-DSC.vbproj">
       <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
       <Name>atcTimeseriesMath-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DSC.vbproj">
       <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
       <Name>atcTimeseriesRDB-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DSC.vbproj">
       <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
       <Name>atcTimeseriesStatistics-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DSC.vbproj">
       <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>
       <Name>atcUSGSDF2P-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility-DSC.vbproj">
       <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
       <Name>atcUSGSUtility-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility-DSC.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSC.vbproj">
       <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
       <Name>MapWinUtility-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

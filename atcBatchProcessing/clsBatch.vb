@@ -33,6 +33,7 @@ Public Class clsBatch
     Implements IBatchProcessing
 
     Public Enum ANALYSIS
+        NONE
         ITA
         SWSTAT
         DFLOW

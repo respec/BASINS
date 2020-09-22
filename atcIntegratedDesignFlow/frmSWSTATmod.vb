@@ -1,6 +1,5 @@
 Imports atcData
 Imports atcUtility
-Imports DFLOWAnalysis
 Imports MapWinUtility
 Imports atcBatchProcessing
 Imports System.Windows.Forms
@@ -720,7 +719,7 @@ Public Class frmSWSTATmod
         '
         'chkLog
         '
-        Me.chkLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
@@ -3545,14 +3544,14 @@ Public Class frmSWSTATmod
         If pBatch AndAlso pAttributes IsNot Nothing Then
             Dim lParams() As Integer = Nothing
             If rbBio1.Checked Then
-                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString())
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration)
+                lParams = pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration.ToString())
+                pAttributes.SetValue(InputNamesDFLOW.BioSelectedMethod, InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration)
             ElseIf rbBio2.Checked Then
-                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString())
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration)
+                lParams = pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration.ToString())
+                pAttributes.SetValue(InputNamesDFLOW.BioSelectedMethod, InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration)
             ElseIf rbBio3.Checked Then
-                lParams = pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString())
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia)
+                lParams = pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Ammonia.ToString())
+                pAttributes.SetValue(InputNamesDFLOW.BioSelectedMethod, InputNamesDFLOW.EBioDFlowType.Ammonia)
             End If
             If lParams IsNot Nothing Then
                 tbBio1.Text = lParams(0).ToString()
@@ -3643,57 +3642,57 @@ Public Class frmSWSTATmod
 
         If pBatch AndAlso pAttributes IsNot Nothing Then
             If rbNonBio1.Checked Then
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
+                pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Hydrological)
                 'Dim lParams() As Integer = pAttributes.GetValue(InputNames.EDFlowType.Hydrological.ToString(), Nothing)
                 'If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
                 '    tbNonBio1.Text = lParams(0).ToString()
                 '    tbNonBio2.Text = lParams(1).ToString()
                 'End If
             ElseIf rbNonBio2.Checked Then
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
+                pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Explicit_Flow_Value)
                 'Dim lflowval As Double = pAttributes.GetValue(InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
                 'tbNonBio3.Text = lflowval.ToString()
             ElseIf rbNonBio3.Checked Then
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
+                pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Flow_Percentile)
                 'Dim lflowPct As Double = pAttributes.GetValue(InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
                 'tbNonBio4.Text = lflowPct.ToString()
             End If
         Else
             If rbNonBio1.Checked Then
-                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Hydrological)
                 Dim lAvgPeriod As Integer
                 Dim lReturnPeriod As Integer
-                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString()) Then
-                    Dim lParams() As Integer = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), Nothing)
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(InputNamesDFLOW.EDFlowType.Hydrological.ToString()) Then
+                    Dim lParams() As Integer = pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Hydrological.ToString(), Nothing)
                     If lParams IsNot Nothing AndAlso lParams.Length = 2 Then
                         lAvgPeriod = lParams(0)
                         lReturnPeriod = lParams(1)
                     Else
-                        lAvgPeriod = DFLOWAnalysis.DFLOWCalcs.fAveragingPeriod
-                        lReturnPeriod = DFLOWAnalysis.DFLOWCalcs.fReturnPeriod
+                        lAvgPeriod = DFLOWCalcs.fAveragingPeriod
+                        lReturnPeriod = DFLOWCalcs.fReturnPeriod
                     End If
                 Else
-                    lAvgPeriod = DFLOWAnalysis.DFLOWCalcs.fAveragingPeriod
-                    lReturnPeriod = DFLOWAnalysis.DFLOWCalcs.fReturnPeriod
+                    lAvgPeriod = DFLOWCalcs.fAveragingPeriod
+                    lReturnPeriod = DFLOWCalcs.fReturnPeriod
                 End If
                 tbNonBio1.Text = lAvgPeriod.ToString()
                 tbNonBio2.Text = lReturnPeriod.ToString()
             ElseIf rbNonBio2.Checked Then
-                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value)
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Explicit_Flow_Value)
                 Dim lflowval As Double
-                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString()) Then
-                    lflowval = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString())
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString()) Then
+                    lflowval = pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString())
                 Else
-                    lflowval = DFLOWAnalysis.DFLOWCalcs.fExplicitFlow
+                    lflowval = DFLOWCalcs.fExplicitFlow
                 End If
                 tbNonBio3.Text = lflowval.ToString()
             ElseIf rbNonBio3.Checked Then
-                If pAttributes IsNot Nothing Then pAttributes.SetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile)
+                If pAttributes IsNot Nothing Then pAttributes.SetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Flow_Percentile)
                 Dim lflowPct As Double
-                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString()) Then
-                    lflowPct = pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString())
+                If pAttributes IsNot Nothing AndAlso pAttributes.ContainsAttribute(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString()) Then
+                    lflowPct = pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString())
                 Else
-                    lflowPct = DFLOWAnalysis.DFLOWCalcs.fPercentile
+                    lflowPct = DFLOWCalcs.fPercentile
                 End If
                 tbNonBio4.Text = lflowPct.ToString()
             End If
@@ -3732,8 +3731,8 @@ Public Class frmSWSTATmod
             'fBioFPArray(3, 0) = tbBio1.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P0FlowAveragingPeriodDays) = Integer.Parse(tbBio1.Text)
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+                lParams(InputNamesDFLOW.EBioDFlowParamIndex.P0FlowAveragingPeriodDays) = Integer.Parse(tbBio1.Text)
+                pAttributes.SetValue(InputNamesDFLOW.BioUseDefault, False)
             End If
         End If
     End Sub
@@ -3742,8 +3741,8 @@ Public Class frmSWSTATmod
             'fBioFPArray(3, 1) = tbBio2.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P1AverageYearsBetweenExcursions) = Integer.Parse(tbBio2.Text)
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+                lParams(InputNamesDFLOW.EBioDFlowParamIndex.P1AverageYearsBetweenExcursions) = Integer.Parse(tbBio2.Text)
+                pAttributes.SetValue(InputNamesDFLOW.BioUseDefault, False)
             End If
         End If
     End Sub
@@ -3752,8 +3751,8 @@ Public Class frmSWSTATmod
             'fBioFPArray(3, 2) = tbBio3.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P2ExcursionClusterPeriodDays) = Integer.Parse(tbBio3.Text)
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+                lParams(InputNamesDFLOW.EBioDFlowParamIndex.P2ExcursionClusterPeriodDays) = Integer.Parse(tbBio3.Text)
+                pAttributes.SetValue(InputNamesDFLOW.BioUseDefault, False)
             End If
         End If
     End Sub
@@ -3762,8 +3761,8 @@ Public Class frmSWSTATmod
             'fBioFPArray(3, 3) = tbBio4.Text
             Dim lParams() As Integer = GetSavedParams()
             If lParams IsNot Nothing AndAlso lParams.Length = 4 Then
-                lParams(DFLOWAnalysis.InputNames.EBioDFlowParamIndex.P3AverageExcursionsPerCluster) = Integer.Parse(tbBio4.Text)
-                pAttributes.SetValue(DFLOWAnalysis.InputNames.BioUseDefault, False)
+                lParams(InputNamesDFLOW.EBioDFlowParamIndex.P3AverageExcursionsPerCluster) = Integer.Parse(tbBio4.Text)
+                pAttributes.SetValue(InputNamesDFLOW.BioUseDefault, False)
             End If
         End If
     End Sub
@@ -3772,25 +3771,25 @@ Public Class frmSWSTATmod
         If pAttributes IsNot Nothing Then
             If aBio Then
                 If rbBio1.Checked Then
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration.ToString(), Nothing)
                 ElseIf rbBio2.Checked Then
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration.ToString(), Nothing)
                 ElseIf rbBio3.Checked Then
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EBioDFlowType.Ammonia.ToString(), Nothing)
                 End If
             Else
                 If rbNonBio1.Checked Then
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Hydrological.ToString(), Nothing)
                 ElseIf rbNonBio2.Checked Then
                     If aValue > 0 Then
-                        pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), aValue)
+                        pAttributes.SetValue(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString(), aValue)
                     End If
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString(), Nothing)
                 ElseIf rbNonBio3.Checked Then
                     If aValue > 0 Then
-                        pAttributes.SetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), aValue)
+                        pAttributes.SetValue(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString(), aValue)
                     End If
-                    Return pAttributes.GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), Nothing)
+                    Return pAttributes.GetValue(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString(), Nothing)
                 End If
             End If
         Else
@@ -3817,28 +3816,28 @@ Public Class frmSWSTATmod
 
             aChoice = New atcDataAttributes()
             With aChoice
-                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration))
-                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration))
-                .SetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia))
-                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
-                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
-                .SetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+                .SetValue(InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration))
+                .SetValue(InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration))
+                .SetValue(InputNamesDFLOW.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(InputNamesDFLOW.EBioDFlowType.Ammonia))
+                .SetValue(InputNamesDFLOW.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                .SetValue(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                .SetValue(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString(), 0.1)
             End With
         Else
             With aChoice
-                DFLOWCalcs.fBioDefault = .GetValue(DFLOWAnalysis.InputNames.BioUseDefault, True)
-                DFLOWCalcs.fBioType = .GetValue(DFLOWAnalysis.InputNames.BioSelectedMethod, DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration)
+                DFLOWCalcs.fBioDefault = .GetValue(InputNamesDFLOW.BioUseDefault, True)
+                DFLOWCalcs.fBioType = .GetValue(InputNamesDFLOW.BioSelectedMethod, InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration)
                 Dim lBio4Params() As Integer '= DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType)
                 If DFLOWCalcs.fBioDefault Then
                     lBio4Params = DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType)
                 Else
                     Select Case DFLOWCalcs.fBioType
-                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration
-                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
-                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration
-                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
-                        Case DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia
-                            lBio4Params = .GetValue(DFLOWAnalysis.InputNames.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                        Case InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration
+                            lBio4Params = .GetValue(InputNamesDFLOW.EBioDFlowType.Acute_maximum_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                        Case InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration
+                            lBio4Params = .GetValue(InputNamesDFLOW.EBioDFlowType.Chronic_continuous_concentration.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
+                        Case InputNamesDFLOW.EBioDFlowType.Ammonia
+                            lBio4Params = .GetValue(InputNamesDFLOW.EBioDFlowType.Ammonia.ToString(), DFLOWCalcs.GetBioDefaultParams(DFLOWCalcs.fBioType))
                     End Select
                 End If
                 DFLOWCalcs.fBioPeriod = lBio4Params(0)
@@ -3846,13 +3845,13 @@ Public Class frmSWSTATmod
                 DFLOWCalcs.fBioCluster = lBio4Params(2)
                 DFLOWCalcs.fBioExcursions = lBio4Params(3)
 
-                DFLOWCalcs.fNonBioType = .GetValue(DFLOWAnalysis.InputNames.NBioSelectedMethod, DFLOWAnalysis.InputNames.EDFlowType.Hydrological)
-                Dim lHydro2Params() As Integer = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
+                DFLOWCalcs.fNonBioType = .GetValue(InputNamesDFLOW.NBioSelectedMethod, InputNamesDFLOW.EDFlowType.Hydrological)
+                Dim lHydro2Params() As Integer = .GetValue(InputNamesDFLOW.EDFlowType.Hydrological.ToString(), New Integer() {7, 10})
                 DFLOWCalcs.fAveragingPeriod = lHydro2Params(0)
                 DFLOWCalcs.fReturnPeriod = lHydro2Params(1)
 
-                DFLOWCalcs.fExplicitFlow = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
-                DFLOWCalcs.fPercentile = .GetValue(DFLOWAnalysis.InputNames.EDFlowType.Flow_Percentile.ToString(), 0.1)
+                DFLOWCalcs.fExplicitFlow = .GetValue(InputNamesDFLOW.EDFlowType.Explicit_Flow_Value.ToString(), 1.0)
+                DFLOWCalcs.fPercentile = .GetValue(InputNamesDFLOW.EDFlowType.Flow_Percentile.ToString(), 0.1)
             End With
         End If
     End Sub

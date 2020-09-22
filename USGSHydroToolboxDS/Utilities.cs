@@ -78,6 +78,8 @@ namespace USGSHydroToolbox
     {
         [Description("New HUC8 Project...")]
         NEW,
+        [Description("Close")]
+        CLOSE,
         [Description("Open HUC8 Project...")]
         OPEN,
         [Description("SAVE")]
@@ -90,9 +92,9 @@ namespace USGSHydroToolbox
 
     public enum EHelpAction
     {
-        [Description("Hydro Toolbox Web Page")]
+        [Description("Hydrologic Toolbox Web Page")]
         WEBPAGE,
-        [Description("Hydro Toolbox Documentation")]
+        [Description("Hydrologic Toolbox Documentation")]
         DOC,
         [Description("Report a bug")]
         BUGREPORT,
@@ -109,6 +111,7 @@ namespace USGSHydroToolbox
         public const string g_PathChar = @"\";
         public const string g_AppNameShort = @"Hydro Toolbox";
         public const string g_AppNameLong = @"USGS Hydrologic Toolbox";
+        public static string dirtyLabel = "";
 
         public static atcBasinsPlugIn BASINSPlugin;
 
@@ -193,6 +196,8 @@ namespace USGSHydroToolbox
                     return "Archive...";
                 case EProjectAction.NEW:
                     return "New HUC8 Project...";
+                case EProjectAction.CLOSE:
+                    return "Close";
                 case EProjectAction.OPEN:
                     return "Open HUC8 Project...";
                 case EProjectAction.SAVE:
@@ -209,13 +214,13 @@ namespace USGSHydroToolbox
             switch (ha)
             {
                 case EHelpAction.WEBPAGE:
-                    return "Hydro Toolbox Web Page";
+                    return "Hydrologic Toolbox Web Page";
                 case EHelpAction.ABOUT:
                     return "About";
                 case EHelpAction.BUGREPORT:
                     return "Report a bug";
                 case EHelpAction.DOC:
-                    return "Hydro Toolbox Documentation";
+                    return "Hydrologic Toolbox Documentation";
                 case EHelpAction.WELCOME:
                     return "Welcome Screen";
                 default:

@@ -1,6 +1,11 @@
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+#If GISProvider = "DotSpatial" Then
+Imports DotSpatial.Data
+Imports DotSpatial.Controls
+Imports atcMwGisUtility.GisUtilDS
+#End If
 
 Public Class clsIDFPlugin
     Inherits atcData.atcDataDisplay
@@ -175,6 +180,94 @@ Public Class clsIDFPlugin
         End Select
         Return True
     End Function
+
+    Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
+        Select Case aItemName
+            Case atcDataManager.AnalysisMenuName
+                    'Do nothing
+            Case "Interactive"
+                Show()
+                aHandled = True
+            Case atcDataManager.AnalysisMenuName & "_USGS Integrated Design Flow (IDF)_" & pTrendName
+                Dim lTimeseriesGroup As atcTimeseriesGroup =
+                  atcDataManager.UserSelectData("Select Data For Trend Analysis",
+                                                Nothing, Nothing, True, True, Me.Icon)
+                If lTimeseriesGroup.Count > 0 Then
+                    LoadPlugin("Timeseries::n-day high/low")
+                    Dim lForm As New frmTrend
+                    lForm.Initialize(lTimeseriesGroup, BasicAttributes, NDayAttributes, TrendAttributes)
+                End If
+                aHandled = True
+            Case "Run Existing Batch"
+                Dim lFrmBatch As New frmBatch()
+                lFrmBatch.Show()
+                aHandled = True
+
+            Case "Create SWSTAT Batch", "Create DFLOW Batch"
+                Dim lBatchTitle As String = "Batch Run "
+                Dim lStationsAreSelected As Boolean = False
+                Dim lMapLayer As IMapFeatureLayer = Nothing
+                For Each lMapLayer In GetFeatureLayers(Nothing)
+                    If lMapLayer.LegendText.ToLower.Contains("nwis daily discharge stations") Then
+                        Dim lstnSelected = NumSelectedFeatures(lMapLayer)
+                        'lHandled = True
+                        If lstnSelected < 2 Then
+                            Logger.Msg("Please select more than 1 stream gages for batch process." & vbCrLf & vbCrLf &
+                                       "Layer: " & lMapLayer.LegendText, lBatchTitle)
+                        End If
+                        lStationsAreSelected = True
+                        Exit For
+                    End If
+                Next
+
+                Dim lSelectedStationIDs As New atcCollection()
+                If lStationsAreSelected Then
+                    Dim lFieldIndex As Integer = GetFieldIndexByName(lMapLayer, "site_no")
+                    Dim lFieldIndex_nm As Integer = GetFieldIndexByName(lMapLayer, "station_nm")
+                    If lFieldIndex < 0 Then
+                        Logger.Msg("NWIS gage station map layer lacks station ID field." + vbCrLf +
+                           "Cannot generate batch spec file from selected gages from map", lBatchTitle)
+                        Exit Sub
+                    End If
+                    Dim lRecordIndex As Integer = 0
+                    Dim lStationId As String = ""
+                    Dim lStationNm As String = ""
+
+                    For Each lfeature As IFeature In GetSelectedMapFeatures(lMapLayer)
+                        With lfeature
+                            lStationId = .DataRow().Item(lFieldIndex).ToString()
+                            lStationNm = .DataRow().Item(lFieldIndex_nm).ToString()
+                        End With
+                        If Not lSelectedStationIDs.Keys.Contains(lStationId) Then
+                            lSelectedStationIDs.Add(lStationId, lStationNm)
+                        End If
+                    Next
+
+                    If lSelectedStationIDs.Count > 0 Then
+                        Logger.Msg("The batch is selecting the following stations for the batch run." & vbCrLf &
+                                   StationListing(lSelectedStationIDs),
+                                   lBatchTitle)
+                    End If
+                End If
+                Dim lfrmBatchMap As New frmBatchMap()
+                If aItemName = "Create SWSTAT Batch" Then
+                    lfrmBatchMap.BatchAnalysis = atcBatchProcessing.clsBatch.ANALYSIS.SWSTAT
+                ElseIf aItemName = "Create DFLOW Batch" Then
+                    lfrmBatchMap.BatchAnalysis = atcBatchProcessing.clsBatch.ANALYSIS.DFLOW
+                End If
+                lfrmBatchMap.Initiate(lSelectedStationIDs)
+                lfrmBatchMap.ShowDialog()
+                aHandled = True
+                'Return Nothing 'for now
+                Exit Sub
+                'Else
+                '    Logger.Msg("Could not find stream gage station map layer: NWIS Daily Discharge Stations.", lBatchTitle)
+                '    'Return Nothing
+                'End If
+            Case Else
+                Dim lItem As String = "Stop"
+        End Select
+    End Sub
 #Else
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)

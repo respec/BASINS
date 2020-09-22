@@ -3060,8 +3060,6 @@ Public Module modBaseflowUtil
 
     Public Sub DisplayTsGraph(ByVal aDataGroup As atcTimeseriesGroup, Optional ByVal aSpecs As atcDataAttributes = Nothing)
         'Make sure graph can't find provisional attribute
-#If GISProvider = "DotSpatial" Then
-        'need all values
         Dim lDataMin As Double = Double.MaxValue
         Dim lDataMax As Double = Double.MinValue
         For Each lTs As atcTimeseries In aDataGroup
@@ -3069,15 +3067,6 @@ Public Module modBaseflowUtil
             If lTs.Attributes.GetValue("Min") < lDataMin Then lDataMin = lTs.Attributes.GetValue("Min")
             If lTs.Attributes.GetValue("Max") > lDataMax Then lDataMax = lTs.Attributes.GetValue("Max")
         Next
-#Else
-        Dim lDataMin As Double = Double.MaxValue
-        Dim lDataMax As Double = Double.MinValue
-        For Each lTs As atcTimeseries In aDataGroup
-            lTs.Attributes.SetValue("ProvisionalValueAttribute", "X" & lTs.Attributes.GetValue("ProvisionalValueAttribute", ""))
-            If lTs.Attributes.GetValue("Min") < lDataMin Then lDataMin = lTs.Attributes.GetValue("Min")
-            If lTs.Attributes.GetValue("Max") > lDataMax Then lDataMax = lTs.Attributes.GetValue("Max")
-        Next
-#End If
         Dim lGraphForm As New atcGraph.atcGraphForm()
         'lGraphForm.Icon = Me.Icon
         Dim lZgc As ZedGraphControl = lGraphForm.ZedGraphCtrl
@@ -3099,7 +3088,7 @@ Public Module modBaseflowUtil
                 CType(.CurveList.Item(1), LineItem).Line.Width = 2
             End If
         End With
-        Dim lShowForm As Boolean = False
+        Dim lShowForm As Boolean = True
         Dim lSaveToFile As String = ""
         If aSpecs IsNot Nothing Then
             lShowForm = aSpecs.GetValue("ShowForm", False)
@@ -3115,17 +3104,10 @@ Public Module modBaseflowUtil
                 lGraphForm.FreeResources()
             End If
         End If
-#If GISProvider = "DotSpatial" Then
         'Restore provisional attribute after graphing
         For Each lTs As atcTimeseries In aDataGroup
             lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
         Next
-#Else
-        'Restore provisional attribute after graphing
-        For Each lTs As atcTimeseries In aDataGroup
-            lTs.Attributes.SetValue("ProvisionalValueAttribute", lTs.Attributes.GetValue("ProvisionalValueAttribute", "").ToString.Substring(1))
-        Next
-#End If
 
     End Sub
 

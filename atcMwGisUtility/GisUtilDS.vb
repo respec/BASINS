@@ -181,6 +181,10 @@ Public Class GisUtilDS
         End If
     End Function
 
+    Public Shared Function GetSelectedMapFeatures(ByVal aLayer As IMapFeatureLayer) As List(Of IFeature)
+        Return aLayer.Selection.ToFeatureList
+    End Function
+
     ''' <summary>Layer type from a layer name</summary>
     ''' <param name="aLayerName">
     '''     <para>Name of layer.</para>

@@ -19,7 +19,7 @@ Public Class frmBatchMap
     Private pBatchSpecFilefullname As String = ""
 
     Private WithEvents pfrmParams As frmSWSTAT
-    Public BatchAnalysis As clsBatch.ANALYSIS
+    Public BatchAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.NONE
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -509,6 +509,12 @@ Public Class frmBatchMap
         End If
     End Sub
 
+    Private Sub txtDataDir_GotFocus(sender As Object, e As EventArgs) Handles txtDataDir.GotFocus
+        Dim lVisibleTime As Integer = 5000  'In milliseconds
+        Dim ltt As ToolTip = New ToolTip()
+        ltt.Show("This is a directory that has data files in a 'NWIS' subdirectory", sender, 0, 15, lVisibleTime)
+    End Sub
+
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
@@ -717,12 +723,14 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnGroupGlobal_Click(sender As Object, e As EventArgs) Handles btnGroupGlobal.Click
-        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
-        Dim lnode As TreeNode = treeBFGroups.SelectedNode
-        Dim lNodeText As String = lnode.Text
+        If BatchAnalysis = clsBatch.ANALYSIS.NONE Then Exit Sub
+        'If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        'Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        'Dim lNodeText As String = lnode.Text
         pfrmParams = New atcIDF.frmSWSTAT()
         pfrmParams.BatchAnalysis = BatchAnalysis
-        If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+        'If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+        If BatchAnalysis = clsBatch.ANALYSIS.SWSTAT Then
             pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
             atcIDF.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
             Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDay, Nothing)

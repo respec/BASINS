@@ -94,11 +94,16 @@ namespace USGSHydroToolbox
             var projname = appManager.SerializationManager.CurrentProjectFile;
             if (!String.IsNullOrEmpty(projname))
             {
+                if (projname.EndsWith("mwprj"))
+                    MessageBox.Show("The Hydrologic Toolbox can open MapWindow 4.x projects,\n" + 
+                        "but CANNOT save into the .mwprj file format.\n" +
+                        "Please choose 'Save As' to save into a DotSpatial project (.dspx) instead.",
+                        "MapWindow 4.x Project End of Support Notice", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 var projid = System.IO.Path.GetFileNameWithoutExtension(projname);
-                this.Text = Utilities.g_AppNameLong + " - " + projid;
+                this.Text = Utilities.g_AppNameLong + " - " + projid + Utilities.dirtyLabel;
             }
             else
-                this.Text = Utilities.g_AppNameLong;
+                this.Text = Utilities.g_AppNameLong + Utilities.dirtyLabel;
 
             //bool handled = true;
             //Utilities.BASINSPlugin.ItemClicked("mnuNew", ref handled);
@@ -116,8 +121,8 @@ namespace USGSHydroToolbox
             header.Add(new SimpleActionItem(SampleMenuKey, "Download...", OnDataMenuClickEventHandler) { Enabled = true });
             header.Add(new SimpleActionItem(SampleMenuKey, "Open...", OnDataMenuClickEventHandler));
             header.Add(new SimpleActionItem(SampleMenuKey, "Manage...", OnDataMenuClickEventHandler));
-            header.Add(new SimpleActionItem(SampleMenuKey, "New...", OnDataMenuClickEventHandler));
-            header.Add(new SimpleActionItem(SampleMenuKey, "Save In...", OnDataMenuClickEventHandler));
+            //header.Add(new SimpleActionItem(SampleMenuKey, "New...", OnDataMenuClickEventHandler));
+            //header.Add(new SimpleActionItem(SampleMenuKey, "Save In...", OnDataMenuClickEventHandler));
             //header.Add(new SimpleActionItem(SampleMenuKey, "Open Large Grid", OnDataMenuClickEventHandler));
         }
 
@@ -230,6 +235,7 @@ namespace USGSHydroToolbox
 
         private void OnSWMenuClickEventHandler(object sender, EventArgs e)
         {
+            bool lhandled = true;
             var act = ((SimpleActionItem)sender).Caption;
             //MessageBox.Show("Clicked " + act);
             if (act == Utilities.AnalysisDescriptionSW(EAnalysisSW.DC))
@@ -245,19 +251,22 @@ namespace USGSHydroToolbox
             else if (act == Utilities.AnalysisDescriptionSW(EAnalysisSW.INTERACTIVE))
             {
                 var plugin = new clsIDFPlugin();
-                plugin.Show();
+                plugin.ItemClicked("Interactive", ref lhandled);
             }
             else if (act == Utilities.AnalysisDescriptionSW(EAnalysisSW.SWSTATBATCH))
             {
                 var plugin = new clsIDFPlugin();
+                plugin.ItemClicked("Create SWSTAT Batch", ref lhandled);
             }
             else if (act == Utilities.AnalysisDescriptionSW(EAnalysisSW.DFLOWBATCH))
             {
                 var plugin = new clsIDFPlugin();
+                plugin.ItemClicked("Create DFLOW Batch", ref lhandled);
             }
             else if (act == Utilities.AnalysisDescriptionSW(EAnalysisSW.RUNBATCH))
             {
                 var plugin = new clsIDFPlugin();
+                plugin.ItemClicked("Run Existing Batch", ref lhandled);
             }
         }
 
@@ -271,6 +280,7 @@ namespace USGSHydroToolbox
             // Add some child menus
             //header.Add(new SimpleActionItem(SampleMenuKey, AnalysisDescription(EAnalysis.BASEFLOW), null) { Enabled = true });
             header.Add(new SimpleActionItem(SampleMenuKey, Utilities.ProjectActionDescription(EProjectAction.NEW), OnProjMenuClickEventHandler) { Enabled = true });
+            header.Add(new SimpleActionItem(SampleMenuKey, Utilities.ProjectActionDescription(EProjectAction.CLOSE), OnProjMenuClickEventHandler) { Enabled = true });
             //header.Add(new SimpleActionItem(SampleMenuKey, Utilities.ProjectActionDescription(EProjectAction.OPEN), OnProjMenuClickEventHandler) { Enabled = true });
             //header.Add(new SimpleActionItem(SampleMenuKey, Utilities.ProjectActionDescription(EProjectAction.SAVE), OnProjMenuClickEventHandler));
             //header.Add(new SimpleActionItem(SampleMenuKey, Utilities.ProjectActionDescription(EProjectAction.SAVEAS), OnProjMenuClickEventHandler));
@@ -284,7 +294,15 @@ namespace USGSHydroToolbox
             bool handled = true;
             if (act == Utilities.ProjectActionDescription(EProjectAction.NEW))
             {
+                if (!String.IsNullOrEmpty(appManager.SerializationManager.CurrentProjectFile))
+                {
+                    appManager.SerializationManager.New();
+                }
                 Utilities.BASINSPlugin.ItemClicked("mnuNew", ref handled);
+            }
+            else if (act == Utilities.ProjectActionDescription(EProjectAction.CLOSE))
+            {
+                appManager.SerializationManager.New();
             }
             else if (act == Utilities.ProjectActionDescription(EProjectAction.OPEN))
             {

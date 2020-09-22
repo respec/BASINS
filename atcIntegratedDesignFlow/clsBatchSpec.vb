@@ -395,8 +395,8 @@ Public Class clsBatchSpec
         Dim lOutputDir As String = GlobalSettings.GetValue(InputNames.OutputDir, "")
         If Not IO.Directory.Exists(lOutputDir) Then
             Try
-                Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
-                Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
+                'Dim lDirInfo As New IO.DirectoryInfo(lOutputDir)
+                'Dim ldSecurity As System.Security.AccessControl.DirectorySecurity = lDirInfo.GetAccessControl()
                 MkDirPath(lOutputDir)
             Catch ex As Exception
                 'RaiseEvent StatusUpdate("0,0,Cannot create output directory: " & vbCrLf & lOutputDir)
