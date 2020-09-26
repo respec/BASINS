@@ -752,6 +752,17 @@ Public Class atcTimeseriesNdayHighLow
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
+
+    ''' <summary>
+    ''' Add operations to atcDataAttributes so they can be computed as needed
+    ''' </summary>
+    ''' <remarks>
+    ''' Same effect as the non-shared Initialize
+    ''' </remarks>
+    Public Shared Sub InitializeShared()
+        Dim lTemp As New atcTimeseriesNdayHighLow()
+        lTemp.Initialize()
+    End Sub
 #Else
     <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)

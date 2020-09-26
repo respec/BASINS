@@ -96,14 +96,14 @@ Public Class atcDataPlugin
 #If GISProvider = "DotSpatial" Then
     ''' <summary></summary>
     ''' <remarks></remarks>
-    Public Overridable ReadOnly Property Name() As String
+    Public Overridable Shadows ReadOnly Property Name() As String
         Get
             Return ""
         End Get
     End Property
 
     ''' <summary>A company name, individual, or organization name.</summary>
-    Public Overridable ReadOnly Property Author() As String
+    Public Overridable Shadows ReadOnly Property Author() As String
         Get
             Return "AQUA TERRA Consultants"
         End Get
@@ -111,7 +111,7 @@ Public Class atcDataPlugin
 
     ''' <summary>Longer version of <see cref="Name">Name</see> with room to expand acronyms</summary>
     ''' <remarks>Appears in the plug-ins dialog box when a user selects this plug-in.</remarks>
-    Public Overridable ReadOnly Property Description() As String
+    Public Overridable Shadows ReadOnly Property Description() As String
         Get
             Return ""
         End Get
@@ -122,7 +122,7 @@ Public Class atcDataPlugin
     ''' Either return a string of a hard-coded date such as "January 1, 2003" or
     ''' dynamically obtain the build date of the assembly.
     ''' </remarks>
-    Public Overridable ReadOnly Property BuildDate() As String
+    Public Overridable Shadows ReadOnly Property BuildDate() As String
         Get
             Return System.IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToString()
         End Get
@@ -133,7 +133,7 @@ Public Class atcDataPlugin
     ''' GetVersionInfo to dynamically return the version number from the assembly itself.
     ''' </remarks>
     ''' <summary>Version number of the plug-in</summary>
-    Public Overridable ReadOnly Property Version() As String
+    Public Overridable Shadows ReadOnly Property Version() As String
         Get
             Return System.Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
         End Get

@@ -229,6 +229,11 @@
       <Name>atcTimeseriesMath-DSC</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSC.vbproj">
+      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
+      <Name>atcTimeseriesNdayHighLow-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DSC.vbproj">
       <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
       <Name>atcTimeseriesRDB-DSC</Name>

@@ -273,6 +273,7 @@ namespace USGSHydroToolbox
                 var att = new atcDataAttributes();
                 atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared();
                 //var datasources = atcDataManager.GetPlugins(typeof(atcDataSource));
+                atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow.InitializeShared();
                 var script = new atcTimeseriesScript.atcTimeseriesScriptPlugin();
                 atcDataManager.DataPlugins.Add(script);
                 var lRDB = new atcTimeseriesRDB.atcTimeseriesRDB();

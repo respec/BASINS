@@ -578,7 +578,9 @@ Public Class clsBatchSpec
             lBFOpnCount += lBFOpn.Count
             UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " stations)", True)
         Next
-        
+        gProgressBar.Minimum = gProgressBar.Maximum
+        gProgressBar.PerformStep()
+
         Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lOutputDir, "ITFA_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
             Dim lBFOpn As atcCollection = ListBatchOpns.ItemByKey(lBFOpnId)
