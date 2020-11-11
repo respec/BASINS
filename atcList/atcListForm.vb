@@ -561,6 +561,8 @@ Public Class atcListForm
     Private Sub ShowHelpForList()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             ShowHelp("View\List.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools\List.html")
         Else
             ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
         End If

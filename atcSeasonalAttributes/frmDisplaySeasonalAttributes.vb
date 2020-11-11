@@ -376,7 +376,11 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Seasonal Attributes.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Attributes.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Seasonal Attributes.html")
+        End If
     End Sub
 
 End Class

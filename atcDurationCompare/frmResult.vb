@@ -43,13 +43,13 @@ Public Class frmResult
             If Application.ProductName = "USGSHydroToolbox" Then
                 Select Case pAnalysis.ToLower
                     Case "duration"
-                        Return "SW Tools\Duration Compare.html"
+                        Return "SW-Tools\Duration Compare.html"
                     Case "compare"
-                        Return "SW Tools\Duration Compare.html"
+                        Return "SW-Tools\Duration Compare.html"
                     Case "durationhydrograph"
-                        Return "SW Tools\Duration Hydrograph.html"
+                        Return "SW-Tools\Duration Hydrograph.html"
                     Case Else
-                        Return "SW Tools\Duration Compare.html"
+                        Return "SW-Tools\Duration Compare.html"
                 End Select
             Else
                 Select Case pAnalysis.ToLower

@@ -2264,7 +2264,7 @@ Public Class frmDF2P
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("GW Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
+            ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
         Else
             ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
         End If
@@ -2273,7 +2273,7 @@ Public Class frmDF2P
     Private Sub frmDF2P_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("GW Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
+                ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
             Else
                 ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
             End If

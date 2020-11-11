@@ -14,7 +14,7 @@ Public Class frmAnalysis
     Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics\Duration Compare.html"
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("SW Tools\Duration Compare.html")
+            ShowHelp("SW-Tools\Duration Compare.html")
         Else
             ShowHelp(pHelpLocation)
         End If
@@ -23,7 +23,7 @@ Public Class frmAnalysis
     Private Sub frmAnalysis_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             If Application.ProductName = "USGSHydroToolbox" Then
-                ShowHelp("SW Tools\Duration Compare.html")
+                ShowHelp("SW-Tools\Duration Compare.html")
             Else
                 ShowHelp(pHelpLocation)
             End If

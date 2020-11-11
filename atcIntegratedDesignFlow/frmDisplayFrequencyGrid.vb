@@ -439,7 +439,7 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         If Application.ProductName = "USGSHydroToolbox" Then
-            ShowHelp("SW Tools.html")
+            ShowHelp("SW-Tools.html")
         Else
             ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
         End If
