@@ -155,11 +155,11 @@ Public Class atcBasinsPlugIn
                     .Add("Build BASINS Project", "Build New Project")
                 End With
             Case "Hydro Toolbox"
-                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\GWToolbox.chm")
+                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\HydroToolbox.chm")
                 BasinsDataPath = "USGS-WATER\data\"
                 With atcUtility.HelpSubstitutions
-                    .Add("BASINS Details", "GW Toolbox Details")
-                    .Add("Welcome to BASINS 4.5 Window", "Welcome to GW Toolbox Window")
+                    .Add("BASINS Details", "Hydrologic Toolbox Details")
+                    .Add("Welcome to BASINS 4.5 Window", "Welcome to Hydrologic Toolbox Window")
                     .Add("Build BASINS Project", "Build New Project")
                 End With
 
