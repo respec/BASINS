@@ -1936,6 +1936,20 @@ Public Class frmSWSTATmod
         Next
         DFLOWCalcs_Initialize()
         If pDataGroup.Count > 0 Then
+            Dim lwhatdatalist As New List(Of String)
+            For I As Integer = 0 To pDataGroup.Count - 1
+                If Not lwhatdatalist.Contains(pDataGroup(I).Attributes.GetValue("Constituent")) Then
+                    lwhatdatalist.Add(pDataGroup(I).Attributes.GetValue("Constituent"))
+                End If
+            Next
+            If lwhatdatalist.Count > 1 Then
+                For I As Integer = 0 To pDataGroup.Count - 1
+                    pDataGroup(I).Attributes.SetValue("WhatData", pDataGroup(I).Attributes.GetValue("Constituent"))
+                Next
+                pBasicAttributes.Insert(1, "WhatData")
+                pTrendAttributes.Insert(1, "WhatData")
+                pNDayAttributes.Insert(1, "WhatData")
+            End If
             PopulateForm()
             PopulateDFLOW(pDataGroup)
             If aShowForm Then Me.Show()
