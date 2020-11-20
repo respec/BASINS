@@ -100,7 +100,6 @@ Public Class clsIDFPlugin
         Dim lTrendAttributes As New Generic.List(Of String)
         With lTrendAttributes
             .Add("STAID")
-            .Add("STANAM")
             .Add("KENTAU")
             .Add("KENPLV")
             .Add("KENSLP")

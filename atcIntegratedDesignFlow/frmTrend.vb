@@ -711,7 +711,25 @@ Friend Class frmTrend
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
+        'Ensure STAID is set in all timeseries
+        For Each lTs As atcTimeseries In pDataGroup
+            Logger.Dbg("IDF: station " & STAID(lTs))
+        Next
         If pDataGroup.Count > 0 Then
+            Dim lwhatdatalist As New List(Of String)
+            For I As Integer = 0 To pDataGroup.Count - 1
+                If Not lwhatdatalist.Contains(pDataGroup(I).Attributes.GetValue("Constituent")) Then
+                    lwhatdatalist.Add(pDataGroup(I).Attributes.GetValue("Constituent"))
+                End If
+            Next
+            If lwhatdatalist.Count > 1 Then
+                For I As Integer = 0 To pDataGroup.Count - 1
+                    pDataGroup(I).Attributes.SetValue("WhatData", pDataGroup(I).Attributes.GetValue("Constituent"))
+                Next
+                pBasicAttributes.Insert(1, "WhatData")
+                pTrendAttributes.Insert(1, "WhatData")
+                pNDayAttributes.Insert(1, "WhatData")
+            End If
             PopulateForm()
             If aShowForm Then Me.Show()
         Else 'user declined to specify timeseries

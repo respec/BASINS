@@ -97,6 +97,10 @@ Module HSPFOutputReports
         If StartUp.chkHeat.Checked Then
             pConstituents.Add("Heat")
         End If
+        If StartUp.chkTAM.Checked Then pConstituents.Add("TAM")
+        If StartUp.chkOrthoP.Checked Then pConstituents.Add("ORTHO-P")
+        If StartUp.chkKjeldahlN.Checked Then pConstituents.Add("TKN")
+        If StartUp.chkNitriteNitrate.Checked Then pConstituents.Add("NO2NO3")
         If StartUp.chkGQUAL1.Checked Then
             pConstituents.Add(StartUp.chkGQUAL1.Text & "-1")
         End If
@@ -598,8 +602,8 @@ Module HSPFOutputReports
                     lActiveSections.Add("NUTRX")
                     lActiveSections.Add("PLANK")
 
-                Case "TP"
-                    lConstituentName = "TP"
+                Case "TP", "ORTHO-P"
+                    lConstituentName = lConstituent ' "TP"
                     lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                     If lConstProperties Is Nothing Then
                         End
