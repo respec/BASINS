@@ -12,11 +12,13 @@ Imports System.Collections.Specialized
 Module WASP
     Sub WASPInputFile(ByVal aHSPFUCI As HspfUci, ByVal aBinaryData As atcDataSource,
                          ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal aReachId As Integer,
-                         ByVal aOutputfolder As String)
+                         ByVal aOutputfolder As String, Optional ByVal aNumSegments As Integer = 1,
+                         Optional ByVal aBenthicSegments As Boolean = False)
 
         Dim lWaspInpVersion As Integer = 3
 
         Dim lWaspProject As New atcWASPProject
+        lWaspProject.BenthicSegments = aBenthicSegments
         Dim lOutputFolder As String = System.IO.Path.Combine(aOutputfolder, "WASP")
         FileIO.FileSystem.CreateDirectory(lOutputFolder)
         Dim lFileName As String = System.IO.Path.Combine(lOutputFolder, "WASP_R" & aReachId.ToString & ".inp")
@@ -104,7 +106,7 @@ Module WASP
         'lWaspProject.WASPConstituents.Add(New clsWASPConstituent("Sands (mg/L)", "", ""))
 
         'need segments -- will make some assumptions here 
-        Dim lNSegs As Integer = 1
+        Dim lNSegs As Integer = aNumSegments
         Dim lLength_km As Double = 1.0
         Dim lSlope As Double = 0.01
         Dim lDepth_m As Double = 1.0
@@ -185,7 +187,7 @@ Module WASP
             End If
 
             Dim lMinFlowThruDays As Double = 0.1  '0.1?
-            If lFlowThru_days > lMinFlowThruDays Then
+            If aNumSegments = 1 And lFlowThru_days > lMinFlowThruDays Then
                 'break up to keep less than 0.1 days of flow-thru time
                 lNSegs = CInt((lFlowThru_days / lMinFlowThruDays) + 0.5)
                 'with this many segments, is the width much larger than the length?
@@ -194,29 +196,81 @@ Module WASP
                     lNSegs = ((lLength_km * 1000) / lWidth_m) + 1
                 End If
                 If lNSegs = 0 Then lNSegs = 1
-                lLength_km = lLength_km / lNSegs
-                lVolume_m3 = lVolume_m3 / lNSegs
             End If
+            lLength_km = lLength_km / lNSegs
+            lVolume_m3 = lVolume_m3 / lNSegs
         End If
 
-        For i As Integer = 1 To lNSegs
-            Dim lSeg As New atcWASPSegment(lWaspProject.WASPConstituents.Count)
-            lSeg.BaseID = Str(i)
-            lSeg.Depth = lDepth_m
-            If i = 1 Then
-                lSeg.DownID = ""
-            Else
-                lSeg.DownID = Str(i - 1)
-            End If
-            lSeg.ID = Str(i)
-            lSeg.Length = lLength_km
-            lSeg.Name = lSegName & Str(i)
-            lSeg.Slope = lSlope
-            lSeg.WaspID = i
-            lSeg.WaspName = Str(i)
-            lSeg.Width = lWidth_m
-            lWaspProject.Segments.Add(lSeg)
-        Next
+        If Not aBenthicSegments Then
+            'no benthic segments
+            For i As Integer = 1 To lNSegs
+                Dim lSeg As New atcWASPSegment(lWaspProject.WASPConstituents.Count)
+                lSeg.BaseID = Str(i)
+                lSeg.Depth = lDepth_m
+                If i = 1 Then
+                    lSeg.DownID = ""
+                Else
+                    lSeg.DownID = Str(i - 1)
+                End If
+                lSeg.ID = Str(i)
+                lSeg.Length = lLength_km
+                lSeg.Name = lSegName & Str(i)
+                lSeg.Slope = lSlope
+                lSeg.WaspID = i
+                lSeg.WaspName = Str(i)
+                lSeg.Width = lWidth_m
+                lWaspProject.Segments.Add(lSeg)
+            Next
+        Else
+            'benthic segments wanted
+            For i As Integer = 1 To lNSegs
+                'benthic segments wanted, number as 1, 4, 7, etc.
+                Dim lSeg As New atcWASPSegment(lWaspProject.WASPConstituents.Count)
+                lSeg.BaseID = Str((i * 3) - 2)
+                lSeg.Depth = lDepth_m
+                If i = 1 Then
+                    lSeg.DownID = ""
+                Else
+                    lSeg.DownID = Str((i * 3) - 5)
+                End If
+                lSeg.ID = Str((i * 3) - 2)
+                lSeg.Length = lLength_km
+                lSeg.Name = lSegName & Str(i)
+                lSeg.Slope = lSlope
+                lSeg.WaspID = (i * 3) - 2
+                lSeg.WaspName = Str(i)
+                lSeg.Width = lWidth_m
+                lWaspProject.Segments.Add(lSeg)
+                'now add benthic segment below this surface segment, as 2, 5, 8, etc.
+                Dim lSeg2 As New atcWASPSegment(lWaspProject.WASPConstituents.Count)
+                lSeg2.BaseID = Str((i * 3) - 1)
+                lSeg2.Depth = 0.03
+                lSeg2.DownID = "b"
+                lSeg2.ID = Str((i * 3) - 1)
+                lSeg2.Length = lLength_km
+                lSeg2.Name = lSegName & Str(i) & "_2"
+                lSeg2.Slope = 0.004
+                lSeg2.WaspID = (i * 3) - 1
+                lSeg2.WaspName = Str((i * 3) - 1)
+                lSeg2.Width = lWidth_m
+                lSeg2.Roughness = 0.004
+                lWaspProject.Segments.Add(lSeg2)
+                'now add second benthic segment below this surface segment, as 3, 6, 9, etc.
+                Dim lSeg3 As New atcWASPSegment(lWaspProject.WASPConstituents.Count)
+                lSeg3.BaseID = Str(i * 3)
+                lSeg3.Depth = 0.25
+                lSeg3.DownID = "b"
+                lSeg3.ID = Str(i * 3)
+                lSeg3.Length = lLength_km
+                lSeg3.Name = lSegName & Str(i) & "_3"
+                lSeg3.Slope = 0.004
+                lSeg3.WaspID = i * 3
+                lSeg3.WaspName = Str(i * 3)
+                lSeg3.Width = lWidth_m
+                lSeg3.Roughness = 0.004
+                lWaspProject.Segments.Add(lSeg3)
+            Next
+        End If
 
         'Dim lSeg As New atcWASPSegment(lWaspProject.WASPConstituents.Count)    'leaving these here for testing
         'lSeg.BaseID = "1"
@@ -380,7 +434,9 @@ Module WASP
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "PODOXM", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)          'Dissolved Oxygen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH4", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Ammonia Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH3+NH4", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Ammonia Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NH3", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Ammonia Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NO3", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'Nitrate Nitrogen
+        WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-NO2 NO3", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Nitrate Nitrogen
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-ORTHO P", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)  'Inorganic Phosphate
         WriteHSPFTimeseriesForWASP(aBinaryData, lReach, "L", "POQUAL-BOD", lConvFactP, aSDateJ, aEDateJ, lOutputFolder)      'BOD for Total Organic Nitrogen, Phosphorus, and BOD
 
@@ -416,8 +472,13 @@ Module WASP
             lFlowTimeseries = SubsetByDate(lFlowTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lFlowTimeseries IsNot Nothing Then
-            lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
-            lWaspProject.Segments(lNSegs - 1).FlowTimeSeries.ts = lFlowTimeseries
+            If Not aBenthicSegments Then
+                lWaspProject.Segments(lNSegs - 1).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                lWaspProject.Segments(lNSegs - 1).FlowTimeSeries.ts = lFlowTimeseries
+            Else
+                lWaspProject.Segments(lWaspProject.Segments.Count - 3).FlowTimeSeries = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                lWaspProject.Segments(lWaspProject.Segments.Count - 3).FlowTimeSeries.ts = lFlowTimeseries
+            End If
         End If
 
         'add concentrations at the upstream boundary (needs to be mg/l)
@@ -582,8 +643,13 @@ Module WASP
             lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
         End If
         If lTimeseries IsNot Nothing Then
-            aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
-            aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID).ts = lTimeseries
+            If Not aWaspProject.BenthicSegments Then
+                aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                aWaspProject.Segments(aWaspProject.Segments.Count - 1).LoadTimeSeries(aLoadID).ts = lTimeseries
+            Else
+                aWaspProject.Segments(aWaspProject.Segments.Count - 3).LoadTimeSeries(aLoadID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                aWaspProject.Segments(aWaspProject.Segments.Count - 3).LoadTimeSeries(aLoadID).ts = lTimeseries
+            End If
         End If
     End Sub
 
@@ -596,15 +662,28 @@ Module WASP
         If lTimeseries IsNot Nothing Then
             lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
             If aConstituent = "TW" Then
-                lTimeseries = (Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) - 32.0) * aConvFact
+                If lTimeseries.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
+                    lTimeseries = (lTimeseries - 32.0) * aConvFact
+                Else
+                    lTimeseries = (Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) - 32.0) * aConvFact
+                End If
             Else
-                'get conc by dividing the load in kg/day by cms and converting to mg/l
-                lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact * 1000 / (aFlowTimeseries * 60 * 60 * 24)
+                If aConstituent = "DOXIN" And (lTimeseries.Attributes.GetValue("TU") = atcTimeUnit.TUHour) And (aFlowTimeseries.Attributes.GetValue("TU") = atcTimeUnit.TUHour) Then
+                    lTimeseries = lTimeseries * aConvFact * 1000 / (aFlowTimeseries * 60 * 60)
+                Else
+                    'get conc by dividing the load in kg/day by cms and converting to mg/l
+                    lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv) * aConvFact * 1000 / (aFlowTimeseries * 60 * 60 * 24)
+                End If
             End If
         End If
         If lTimeseries IsNot Nothing Then
-            aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
-            aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID).ts = lTimeseries
+            If Not aWaspProject.BenthicSegments Then
+                aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                aWaspProject.Segments(aWaspProject.Segments.Count - 1).BoundTimeSeries(aBoundID).ts = lTimeseries
+            Else
+                aWaspProject.Segments(aWaspProject.Segments.Count - 3).BoundTimeSeries(aBoundID) = New clsTimeSeriesSelection(clsTimeSeriesSelection.enumSelectionType.Database)
+                aWaspProject.Segments(aWaspProject.Segments.Count - 3).BoundTimeSeries(aBoundID).ts = lTimeseries
+            End If
         End If
     End Sub
 
@@ -616,7 +695,11 @@ Module WASP
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", aConstituent)(0)
         If lTimeseries IsNot Nothing Then
             If aConstituent = "AIRTMP" Or aConstituent = "DEWTMP" Then
-                lTimeseries = (Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) - 32.0) * aConvFact
+                If lTimeseries.Attributes.GetValue("TU") = atcTimeUnit.TUHour Then
+                    lTimeseries = (lTimeseries - 32.0) * aConvFact
+                Else
+                    lTimeseries = (Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) - 32.0) * aConvFact
+                End If
             Else
                 lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame) * aConvFact
             End If
@@ -755,8 +838,12 @@ Module WASP
                         lConstituent = "SOQUAL-NH4"
                     ElseIf aConstituent = "POQUAL-NH3+NH4" Then
                         lConstituent = "SOQUAL-NH3+NH4"
+                    ElseIf aConstituent = "POQUAL-NH3" Then
+                        lConstituent = "SOQUAL-NH3"
                     ElseIf aConstituent = "POQUAL-NO3" Then
                         lConstituent = "SOQUAL-NO3"
+                    ElseIf aConstituent = "POQUAL-NO2 NO3" Then
+                        lConstituent = "SOQUAL-NO2 NO3"
                     ElseIf aConstituent = "POQUAL-ORTHO P" Then
                         lConstituent = "SOQUAL-ORTHO P"
                     ElseIf aConstituent = "POQUAL-BOD" Then

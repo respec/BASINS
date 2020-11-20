@@ -140,6 +140,9 @@
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="BATHTUB.vb" />
     <Compile Include="CookieCutterGraphs.vb" />
+    <Compile Include="frmWASPSegments.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="HelpForm.Designer.vb">
       <DependentUpon>HelpForm.vb</DependentUpon>
     </Compile>
@@ -185,6 +188,9 @@
     <Compile Include="WASP.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmWASPSegments.resx">
+      <DependentUpon>frmWASPSegments.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HelpForm.resx">
       <DependentUpon>HelpForm.vb</DependentUpon>
     </EmbeddedResource>
