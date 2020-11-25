@@ -3287,10 +3287,20 @@ Public Class frmSWSTATmod
             ClearAttributes()
             SeasonsYearsFromForm() 'setup all inputs from form
             ' It is important that the Return Periods that go into N-day calculation (i.e. PearsonType3/LGPSTX) via "lAttrs"
-            ' HAVE TO BE the full range of default return periods (28 entries), NOT the user selected return periods on the form.
+            ' HAVE TO BE the full range of default return periods (28 entries), NOT the user selected return periods on the form (i.e. aReturns).
             ' In fact, the atcTimeseriesNdayHighLow calculator should simply use its internally-defined default set of return periods
             ' instead of potentially confusing with users selected return periods on the form!
-            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
+
+            'Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", clsIDFPlugin.ListDefaultArray("Return Period"))
+
+            ' Slight tweak to using the default Return Periods
+            ' This code checks through full list of Returns in UI in case user has added/deleted any Return Periods
+            Dim lReturns(lstRecurrence.Items.Count - 1) As Double
+            For lIndex As Integer = 0 To lstRecurrence.Items.Count - 1
+                lReturns(lIndex) = CDbl(lstRecurrence.Items(lIndex))
+            Next
+            Dim lAttrs As atcDataAttributes = SetOperationConditions("n-day " & HighOrLowString() & " value", lReturns) ' clsIDFPlugin.ListDefaultArray("Return Period"))
+
             Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                          aHigh:=radioHigh.Checked,
                                                          aNday:=ListToArray(lstNday),

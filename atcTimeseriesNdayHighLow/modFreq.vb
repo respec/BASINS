@@ -444,6 +444,8 @@ Module modFreq
                                 .DefaultValue = GetNaN()
                             End With
                         End If
+                        'check for 'huge' value output from FORTRAN call to LGPSTX
+                        If lQnew(lIndex) > 1.0E+29 Then lQnew(lIndex) = 0.0
                         aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
                         lNonLogTS.Attributes.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
 
