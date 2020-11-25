@@ -317,6 +317,18 @@ Module HSPFOutputReports
                     If pOutputLocations.Count > 0 Then
                         Dim lWASPDataSource As New atcDataSource
                         For Each lLocation As String In pOutputLocations
+
+                            Dim lForm As New frmWASPSegments
+                            lForm.TopMost() = True
+                            lForm.Text = "WASP Segments for " & lLocation
+                            Dim lNumSegments As Integer = 1
+                            Dim lBenthicSegments As Boolean = False
+                            Logger.Status("HIDE")
+                            If Not lForm.AskUser(lNumSegments, lBenthicSegments) Then
+                                lNumSegments = 1
+                                lBenthicSegments = False
+                            End If
+
                             lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lLocation))
                             Dim lLocationID As Integer = lLocation.Substring(2)
                             Dim lRCHRESOperation As HspfOperation = aHspfUci.OpnBlks("RCHRES").OperFromID(lLocationID)
@@ -326,7 +338,8 @@ Module HSPFOutputReports
                                     lWASPDataSource.DataSets.Add(atcDataManager.DataSets.FindData("Location", lSourceOperation))
                                 End If
                             Next
-                            WASPInputFile(aHspfUci, lWASPDataSource, pSDateJ, pEDateJ, lLocationID, pTestPath)
+                            WASPInputFile(aHspfUci, lWASPDataSource, pSDateJ, pEDateJ, lLocationID, pTestPath, lNumSegments, lBenthicSegments)
+                            Logger.Status("SHOW")
                         Next
                     End If
                 End If

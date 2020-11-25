@@ -234,6 +234,10 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
+        If System.Windows.Forms.Application.ProductName = "USGSHydroToolbox" Then
+            chkGetNewest.CheckState = System.Windows.Forms.CheckState.Checked
+        End If
+
         SetCheckboxVisibilityFromMapOrRegion()
         TallyPreChecked(lGroups)
         SetColorsFromAvailability()

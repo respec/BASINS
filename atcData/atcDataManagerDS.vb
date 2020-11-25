@@ -377,10 +377,28 @@ Public Class atcDataManager
             If aNewSource.Name <> "Timeseries::Math" Then
                 RemoveDataSource(aSpecification)
             End If
-            If aNewSource.Open(aSpecification, aAttributes) Then
-                Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
-                pDataSources.Add(aNewSource)
-                RaiseEvent OpenedData(aNewSource)
+
+            Logger.Dbg("Specification:" & aSpecification)
+            If aNewSource.Open(aSpecification, aAttributes) Then  'file dialog happens here
+                If aNewSource.Specification.Contains(",") Then
+                    'multiple file selection
+                    Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
+                    Dim lFileNames() As String
+                    lFileNames = aNewSource.Specification.Split(",")
+                    For Each lFileName As String In lFileNames
+                        Logger.Dbg("FileName:" & lFileName)
+                        Dim lNewSourceMulti As atcTimeseriesSource = atcDataManager.DataSourceByName(aNewSource.Name)
+                        lNewSourceMulti.Specification = aNewSource.Specification
+                        lNewSourceMulti.Open(lFileName, aAttributes)
+                        Logger.Dbg("DataSetCount:" & lNewSourceMulti.DataSets.Count & ":Specification:" & lNewSourceMulti.Specification)
+                        pDataSources.Add(lNewSourceMulti)
+                        RaiseEvent OpenedData(lNewSourceMulti)
+                    Next
+                    Return True
+                Else
+                    Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
+                    pDataSources.Add(aNewSource)
+                    RaiseEvent OpenedData(aNewSource)
 
 #If GISProvider = "DotSpatial" Then
 #Else
@@ -392,12 +410,13 @@ Public Class atcDataManager
                     End If
                 End If
 #End If
-                Return True
+                    Return True
+                End If
             Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Dbg("When opening '" & aNewSource.Specification & "'" & vbCrLf & _
-                               aNewSource.Name & " gave the message:" & vbCrLf & _
-                               Logger.LastDbgText)
+                    Logger.Dbg("When opening '" & aNewSource.Specification & "'" & vbCrLf &
+                                   aNewSource.Name & " gave the message:" & vbCrLf &
+                                   Logger.LastDbgText)
                 End If
                 Return False
             End If

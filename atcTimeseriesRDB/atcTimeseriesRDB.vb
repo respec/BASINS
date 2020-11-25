@@ -398,7 +398,9 @@ Public Class atcTimeseriesRDB
             If Not IO.File.Exists(Specification) Then
                 Logger.Dbg("Opening new file " & Specification)
                 Return True
-
+            ElseIf Specification.Contains(",") Then
+                Logger.Dbg("Multiple files selected " & Specification)
+                Return True
             ElseIf IO.Path.GetFileName(Specification).ToLower.StartsWith("nwis_stations") Then
                 Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(Specification))
             Else

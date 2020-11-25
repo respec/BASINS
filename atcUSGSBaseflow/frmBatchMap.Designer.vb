@@ -263,6 +263,8 @@ Partial Class frmBatchMap
         'chkGetNewest
         '
         Me.chkGetNewest.AutoSize = True
+        Me.chkGetNewest.Checked = True
+        Me.chkGetNewest.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkGetNewest.Location = New System.Drawing.Point(537, 12)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(68, 17)
