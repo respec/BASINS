@@ -344,9 +344,9 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
-                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND", "ORTHO P_PERLND", "ORTHO P_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
-                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES", "ORTHO P_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case Else
                                                     Dim lPrefix As String = ""
