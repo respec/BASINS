@@ -98,7 +98,7 @@ Module HSPFOutputReports
             pConstituents.Add("Heat")
         End If
         If StartUp.chkTAM.Checked Then pConstituents.Add("TAM")
-        If StartUp.chkOrthoP.Checked Then pConstituents.Add("ORTHO-P")
+        If StartUp.chkOrthoP.Checked Then pConstituents.Add("ORTHO P")
         If StartUp.chkKjeldahlN.Checked Then pConstituents.Add("TKN")
         If StartUp.chkNitriteNitrate.Checked Then pConstituents.Add("NO2NO3")
         If StartUp.chkGQUAL1.Checked Then
@@ -602,7 +602,7 @@ Module HSPFOutputReports
                     lActiveSections.Add("NUTRX")
                     lActiveSections.Add("PLANK")
 
-                Case "TP", "ORTHO-P"
+                Case "TP", "ORTHO P"
                     lConstituentName = lConstituent ' "TP"
                     lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                     If lConstProperties Is Nothing Then
@@ -672,7 +672,7 @@ Module HSPFOutputReports
                     aQAQCReportFile.AppendLine(QAVerifyStorageTrend(aHspfUci, lScenarioResults, lConstituentName))
                 End If
 
-                If (lConstituent = "TN" Or lConstituent = "TP" Or
+                If (lConstituent = "TN" Or lConstituent = "TP" Or lConstituent = "ORTHO P" Or
                     lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
                     Dim lReport1ReachBudget As New atcReport.ReportText

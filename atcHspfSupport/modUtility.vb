@@ -685,7 +685,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
-                                .Add("P:Total3c", "  Total")
+                                .Add("P:Total5c", "  Total")
                             Case "Ref-OrgP"
                                 .Add("P:Header8", "RefOrgP (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
@@ -693,7 +693,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Groundwater Flow")
-                                .Add("P:Total3d", "  Total")
+                                .Add("P:Total5d", "  Total")
 
                             Case "lab-OrgP"
                                 .Add("P:Header9", "LabileOrgP (PQUAL)")
@@ -702,7 +702,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Groundwater Flow")
-                                .Add("P:Total3e", "  Total")
+                                .Add("P:Total5e", "  Total")
 
                         End Select
                     Next
@@ -757,6 +757,85 @@ Public Module Utility
                     .Add("R:P-TOT-OUT-EXIT3", "  Total P OutflowExit3")
                     .Add("R:P-TOT-OUT-EXIT4", "  Total P OutflowExit4")
                     .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
+
+                End With
+#End Region
+#Region "Case Ortho P"
+            Case "ORTHO P"
+
+                With lConstituentsToOutput
+                    .Add("P:Header1", "Phosphorus Loss (lb/ac")
+                    .Add("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "    Surface")
+                    .Add("P:PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "    Interflow")
+                    .Add("P:PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "    Baseflow")
+                    .Add("P:SDP4A", "    Sediment")
+                    .Add("P:Total4", "    Total")
+
+                    .Add("P:Total3", "    Total P Loss")
+
+                    .Add("P:Header3a", "P Storages (lb/ac)")
+                    .Add("P:Header3b", "  PO4-P Soln Storage")
+                    .Add("P:PO4-P SOL - SURFACE LAYER", "    Surface")
+                    .Add("P:PO4-P SOL - UPPER PRINCIPAL", "    Upper")
+                    .Add("P:PO4-P SOL - UPPER TRANSITORY", "    Interflow")
+                    .Add("P:PO4-P SOL - LOWER LAYER", "    Lower")
+                    .Add("P:PO4-P SOL - ACTIVE GROUNDWATER", "    GW")
+                    .Add("P:PO4-P SOL - TOTALS", "    Total")
+                    .Add("P:Header4", "  PO4-P Ads Storage")
+                    .Add("P:PO4-P ADS - SURFACE LAYER", "    Surface")
+                    .Add("P:PO4-P ADS - UPPER PRINCIPAL", "    Upper")
+                    .Add("P:PO4-P ADS - LOWER LAYER", "    Lower")
+                    .Add("P:PO4-P ADS - ACTIVE GROUNDWATER", "    GW")
+                    .Add("P:PO4-P ADS - TOTALS", "    Total")
+
+                    .Add("P:Header6", "P FLUXES")
+                    .Add("P:Header6a", "  Atmospheric Deposition (lb/a)")
+                    .Add("P:PO4-P - SURFACELAYER - TOTAL", "    PO4-P - Surface")
+                    .Add("P:PO4-P - UPPER LAYER - TOTAL", "    PO4-P - Upper")
+                    '.Add("P:add these up to get a total of each species ?", "")
+                    .Add("P:Header6b", "  Applications (lb/a)")
+                    .Add("P:IPO4", "    PO4-P")
+
+                    .Add("P:Header6e", "    PO4-P Immobilization")
+                    .Add("P:SP4IMB", "    Surface")
+                    .Add("P:UP4IMB", "    Upper")
+                    .Add("P:LP4IMB", "    Lower")
+                    .Add("P:AP4IMB", "    Groundwater")
+                    .Add("P:TP4IMB", "    Total")
+
+                    For Each ConstProperty As ConstituentProperties In aConstProperties
+                        Select Case ConstProperty.ConstNameForEXPPlus
+                            Case "PO4"
+                                .Add("P:Header7", "ORTHO P (PQUAL)")
+                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Scoured Sediment")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
+                                .Add("P:Total5c", "  Total")
+                        End Select
+                    Next
+                    For Each ConstProperty As ConstituentProperties In aConstProperties
+                        Select Case ConstProperty.ConstNameForEXPPlus
+                            Case "PO4"
+                                .Add("I:Header10", "ORTHO P (IQUAL)")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+                                .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
+                        End Select
+
+                    Next
+
+                    .Add("R:Header13", "Total PO4 as P")
+                    .Add("R:PO4-INTOT", "  Total PO4 Inflow")
+                    .Add("R:PO4-INDIS", "  Dissolved PO4 Inflow")
+                    .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
+                    .Add("R:PO4-PROCFLUX-TOT", "  PO4 Process Fluxes")
+                    .Add("R:PO4-ADSDES-TOT", "  PO4 Adsorption/Desorption")
+                    .Add("R:PO4-SCOURDEP-TOT", "  PO4 Scour/Deposition")
+                    .Add("R:PO4-OUTTOT", "  Total PO4 Outflow")
+                    .Add("R:PO4-ATMDEPTOT", " Atmospheric PO4 Deposition")
+                    .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")
+                    .Add("R:PO4-OUTPART-TOT", "  Particulate PO4 Outflow")
 
                 End With
 #End Region
@@ -1324,7 +1403,7 @@ Public Module Utility
                     'End If
 
 
-                Case "TP"
+                Case "TP", "ORTHO P"
                     'If aConstituent.Contains("SOQUAL") Then Stop
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
@@ -1940,6 +2019,29 @@ Public Module Utility
 
                     End If
 
+                Case "ORTHO P"
+
+                    If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
+                        QUALNames = New ConstituentProperties
+                        QUALID = lML.Source.MemSub1
+                        If QUALID <> 1 Then
+                            lTableName = "QUAL-PROPS" & ":" & QUALID
+                        Else
+                            lTableName = "QUAL-PROPS"
+                        End If
+                        QUALNames.ConstNameForEXPPlus = "PO4"
+                        QUALNames.ConstituentNameInUCI = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
+                        If aUCI.GlobalBlock.EmFg = 1 Then
+                            QUALNames.ConstituentUnit = Trim(lOper.Tables(lTableName).Parms("QTYID").Value) & "/ac"
+                        Else
+                            QUALNames.ConstituentUnit = Trim(lOper.Tables(lTableName).Parms("QTYID").Value) & "/ha"
+                        End If
+                        QUALNames.ReportType = aBalanceType
+                        ListContains = CheckQUALList(QUALNames, QUALs)
+                        If ListContains = False Then QUALs.Add(QUALNames)
+                    End If
+
             End Select
 
         Next lML
@@ -2028,7 +2130,7 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
-            Case "BOD-Labile"
+            Case "BOD-Labile", "ORTHO P"
                 Return QUALs
 
             Case Else

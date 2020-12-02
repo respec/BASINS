@@ -1676,7 +1676,7 @@ Public Module atcConstituentTables
 #End Region
 
 #Region "TotalP Case"
-            Case "TP"
+            Case "TP", "ORTHO P"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     pReach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus
