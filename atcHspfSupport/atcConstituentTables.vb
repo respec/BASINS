@@ -1522,7 +1522,7 @@ Public Module atcConstituentTables
                 SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "TotalN Case"
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     pReach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus

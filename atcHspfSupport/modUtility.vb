@@ -1262,7 +1262,7 @@ Public Module Utility
                         Exit For
                     End If
 
-                Case "TN"
+                Case "TN", "TAM", "TKN", "NO2NO3"
                     Select Case True
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1782,9 +1782,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TN" Then
+        If aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN" OrElse aBalanceType = "NO2NO3" Then
             aConversionFactorFromOxygen = CVON
-        ElseIf aBalanceType = "TP" Then
+        ElseIf aBalanceType = "TP" OrElse aBalanceType = "ORTHO P" Then
             aConversionFactorFromOxygen = CVOP
         End If
 
@@ -1870,9 +1870,10 @@ Public Module Utility
 
                     End If
 
-                Case "TN"
+                Case "TN", "TAM", "NO2NO3", "TKN"
 
-                    If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    If (aBalanceType = "TN" OrElse aBalanceType = "NO2NO3") AndAlso
+                       (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                         lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -1893,8 +1894,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1913,8 +1915,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1933,8 +1936,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1955,7 +1959,7 @@ Public Module Utility
 
                     End If
 
-                Case "TP"
+                Case "TP", "ORTHO P"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
@@ -1977,7 +1981,7 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    ElseIf aBalanceType = "TP" AndAlso (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 4 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -1997,7 +2001,7 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    ElseIf aBalanceType = "TP" AndAlso (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -2017,29 +2021,6 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    End If
-
-                Case "ORTHO P"
-
-                    If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
-                        QUALNames = New ConstituentProperties
-                        QUALID = lML.Source.MemSub1
-                        If QUALID <> 1 Then
-                            lTableName = "QUAL-PROPS" & ":" & QUALID
-                        Else
-                            lTableName = "QUAL-PROPS"
-                        End If
-                        QUALNames.ConstNameForEXPPlus = "PO4"
-                        QUALNames.ConstituentNameInUCI = Trim(lOper.Tables(lTableName).Parms("QUALID").Value)
-                        If aUCI.GlobalBlock.EmFg = 1 Then
-                            QUALNames.ConstituentUnit = Trim(lOper.Tables(lTableName).Parms("QTYID").Value) & "/ac"
-                        Else
-                            QUALNames.ConstituentUnit = Trim(lOper.Tables(lTableName).Parms("QTYID").Value) & "/ha"
-                        End If
-                        QUALNames.ReportType = aBalanceType
-                        ListContains = CheckQUALList(QUALNames, QUALs)
-                        If ListContains = False Then QUALs.Add(QUALNames)
                     End If
 
             End Select
@@ -2130,7 +2111,7 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
-            Case "BOD-Labile", "ORTHO P"
+            Case "BOD-Labile", "ORTHO P", "TAM", "TKN", "NO2NO3"
                 Return QUALs
 
             Case Else
@@ -2233,7 +2214,7 @@ Public Module Utility
                 lOutflowDataType.Add("AOHT", "AOHT")
                 lOutflowDataType.Add("TotalOutflow", "TotalOutflow")
 
-            Case "TotalN", "TotalP", "TN", "TP"
+            Case "TotalN", "TotalP", "TN", "TP", "TAM"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
                 If aOperName = "PERLND" Then
                     lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)

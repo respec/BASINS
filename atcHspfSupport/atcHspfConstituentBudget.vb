@@ -94,7 +94,7 @@ Public Module ConstituentBudget
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ISED-TOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
@@ -113,10 +113,28 @@ Public Module ConstituentBudget
                     Next
                 End If
 
-                lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
-                lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
-                lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
-                lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
+                If aBalanceType = "TN" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
+                ElseIf aBalanceType = "TAM" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-INTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-OUTTOT"))
+                ElseIf aBalanceType = "TKN" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-INTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOTORG-IN"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-OUTTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOTORG-OUT"))
+                ElseIf aBalanceType = "TAM" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-INTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-INTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-OUTTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-OUTTOT"))
+                End If
 
             Case "TP", "ORTHO P"
                 lUnits = "lbs"
@@ -559,7 +577,7 @@ Public Module ConstituentBudget
                     aReport1ReachBudget.Append(.ToString)
                 End With
 
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 aReport2NPSLoads.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
 
@@ -998,7 +1016,9 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "ORTHO P" Or aBalanceType = "Sediment" Then
+        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "ORTHO P" Or
+           aBalanceType = "TAM" Or aBalanceType = "TKN" Or aBalanceType = "NO2NO3" Or
+           aBalanceType = "Sediment" Then
             'do load allocation reports
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)

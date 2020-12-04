@@ -590,8 +590,8 @@ Module HSPFOutputReports
                     lActiveSections.Add("PWTGAS")
                     lActiveSections.Add("IWTGAS")
                     lActiveSections.Add("HTRCH")
-                Case "TN"
-                    lConstituentName = "TN"
+                Case "TN", "TAM", "TKN", "NO2NO3"
+                    lConstituentName = lConstituent ' "TN"
                     lConstProperties = Utility.LocateConstituentNames(aHspfUci, lConstituent)
                     If lConstProperties Is Nothing Then
                         End
@@ -673,6 +673,7 @@ Module HSPFOutputReports
                 End If
 
                 If (lConstituent = "TN" Or lConstituent = "TP" Or lConstituent = "ORTHO P" Or
+                    lConstituent = "TAM" Or lConstituent = "TKN" Or lConstituent = "NO2NO3" Or
                     lConstituent = "Sediment" Or lConstituent = "Water") And Not pModelQAQC Then
 
                     Dim lReport1ReachBudget As New atcReport.ReportText
