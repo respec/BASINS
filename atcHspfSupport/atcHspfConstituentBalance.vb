@@ -143,9 +143,10 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
-                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND", "ORTHO P_PERLND", "ORTHO P_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND",
+                                                     "ORTHO P_PERLND", "ORTHO P_IMPLND", "TKN_PERLND", "TKN_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
-                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES", "ORTHO P_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES", "ORTHO P_RCHRES", "TKN_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case Else
                                                     Dim lPrefix As String = ""

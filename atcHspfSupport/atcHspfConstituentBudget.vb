@@ -128,7 +128,7 @@ Public Module ConstituentBudget
                     lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
                     lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-OUTTOT"))
                     lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOTORG-OUT"))
-                ElseIf aBalanceType = "TAM" Then
+                ElseIf aBalanceType = "NO2NO3" Then
                     lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-INTOT"))
                     lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-INTOT"))
                     lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
