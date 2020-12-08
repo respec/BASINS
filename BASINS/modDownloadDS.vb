@@ -974,11 +974,9 @@ StartOver:
                     g_Project.SaveProject(lProjectFileName)
                 Else
                     'new check to see if the core data is available before attempting to download it
-                    Dim lHUC8BoundaryOnly As Boolean = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
-                    If Not lHUC8BoundaryOnly Then
-                        'download and project core data
-                        CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
-                    End If
+                    Dim lIssues As Boolean = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
+                    'download and project core data
+                    CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
                 End If
                 Return lProjectFileName
             End If
@@ -1902,7 +1900,8 @@ StartOver:
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
         Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
-        Dim lHUC8BoundaryOnly As Boolean = False
+        Dim lMissingHuc8s As String = ""
+        Dim lIssues As Boolean = False
         'get huc8s in this region
         Dim lXDoc As New Xml.XmlDocument
         lXDoc.LoadXml(aRegion)
@@ -1911,75 +1910,72 @@ StartOver:
         For Each lNode As Xml.XmlNode In lNodeList
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
-            If Not lHUC8BoundaryOnly Then
-                If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
-                    'problem, this file does not exist
-                    'just build project using selected HUC8s without any core data
-                    lHUC8BoundaryOnly = True
-                End If
+            'If Not FileExists(g_CacheDir & "/clsBASINS/" & lHUC8 & "_core31.exe") Then
+            If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                'problem, this file does not exist
+                lIssues = True
+                lMissingHuc8s &= " " & lHUC8
             End If
+            'End If
         Next
-        If lHUC8BoundaryOnly Then
-            If Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?" &
-                     vbCr & vbCr & "(Cancel will attempt to build using data from the program cache.)",
-                    MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
-                'save the HUC8s as a new shapefile
-                Dim lHUC8ShapefileName As String = GisUtilDS.LayerFileName("Cataloging Units")
-                Dim lNewShapefileName As String = aNewDataDir & FilenameNoPath(lHUC8ShapefileName)
-                'Dim lLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
-                Dim lHuc8Layer As IMapFeatureLayer = GisUtilDS.GetLayerByName("Cataloging Units")
-                Dim lNumSelectedFeatures As Integer = lHuc8Layer.Selection.Count
-                Dim lInputProjection As String = lHuc8Layer.DataSet.ProjectionString
-                If lNumSelectedFeatures = 0 Then
-                    'are any features selected in this cat shapefile?  it could be the another layer that was selected
-                    'select the lhuc8 features
-                    Dim lFieldIndex As Integer = GisUtilDS.GetFieldIndexByName(lHuc8Layer, "CU")
-                    Dim lExpression As String = ""
-                    For Each lHuc8 As String In lHUC8s
-                        lExpression &= "[CU] like '" & lHuc8 & "' Or "
-                    Next
-                    lHuc8Layer.ClearSelection()
-                    lExpression = lExpression.Substring(0, lExpression.Length - 4)
-                    lHuc8Layer.SelectByAttribute(lExpression)
-                End If
-                GisUtilDS.SaveSelectedFeatures(lHUC8ShapefileName, lNewShapefileName, False)
-                'change projection
-                Dim lOutputProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
-                Dim lNewProjectionInfo As New ProjectionInfo()
-                If lNewProjectionInfo.TryParseEsriString(lOutputProjection) Then
-                    Try
-                        lHuc8Layer.Reproject(lNewProjectionInfo)
-                        lHuc8Layer.DataSet.SaveAs(lNewShapefileName, True)
-                    Catch ex As Exception
-                        Logger.Msg("Problem projecting the HUC8 shapefile.", "Projection Problem")
-                    End Try
-                Else
-                    Logger.Msg("Problem reading output projection file.", "ReProject HUC8 Layer Problem")
-                End If
+        If lIssues Then
+            Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCr & "Attempting to build from cache." & vbCrLf & vbCrLf &
+                    "Core data unavailable for" & lMissingHuc8s,
+                    MsgBoxStyle.OkOnly, "New Project")
+            'save the HUC8s as a new shapefile
+            'Dim lHUC8ShapefileName As String = GisUtilDS.LayerFileName("Cataloging Units")
+            'Dim lNewShapefileName As String = aNewDataDir & FilenameNoPath(lHUC8ShapefileName)
+            ''Dim lLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
+            'Dim lHuc8Layer As IMapFeatureLayer = GisUtilDS.GetLayerByName("Cataloging Units")
+            'Dim lNumSelectedFeatures As Integer = lHuc8Layer.Selection.Count
+            'Dim lInputProjection As String = lHuc8Layer.DataSet.ProjectionString
+            'If lNumSelectedFeatures = 0 Then
+            '    'are any features selected in this cat shapefile?  it could be the another layer that was selected
+            '    'select the lhuc8 features
+            '    Dim lFieldIndex As Integer = GisUtilDS.GetFieldIndexByName(lHuc8Layer, "CU")
+            '    Dim lExpression As String = ""
+            '    For Each lHuc8 As String In lHUC8s
+            '        lExpression &= "[CU] Like '" & lHuc8 & "' Or "
+            '    Next
+            '    lHuc8Layer.ClearSelection()
+            '    lExpression = lExpression.Substring(0, lExpression.Length - 4)
+            '    lHuc8Layer.SelectByAttribute(lExpression)
+            'End If
+            'GisUtilDS.SaveSelectedFeatures(lHUC8ShapefileName, lNewShapefileName, False)
+            ''change projection
+            'Dim lOutputProjection As String = CleanUpUserProjString(IO.File.ReadAllText(aNewDataDir & "prj.proj"))
+            'Dim lNewProjectionInfo As New ProjectionInfo()
+            'If lNewProjectionInfo.TryParseEsriString(lOutputProjection) Then
+            '    Try
+            '        lHuc8Layer.Reproject(lNewProjectionInfo)
+            '        lHuc8Layer.DataSet.SaveAs(lNewShapefileName, True)
+            '    Catch ex As Exception
+            '        Logger.Msg("Problem projecting the HUC8 shapefile.", "Projection Problem")
+            '    End Try
+            'Else
+            '    Logger.Msg("Problem reading output projection file.", "ReProject HUC8 Layer Problem")
+            'End If
 
-                'put default files in project
-                Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
-                If Not IO.Directory.Exists(lNationalDir) Then
-                    lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
-                End If
-                If IO.Directory.Exists(lNationalDir) Then
-                    CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
-                    CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
-                    CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
-                    CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
-                End If
-                'g_Project.ProjectProjection = lOutputProjection
-                'save the new project with just this layer
-                ClearLayers()
-                AddAllShapesInDir(aNewDataDir, aNewDataDir)
-                'g_MapWin.PreviewMap.GetPictureFromMap()
-                Dim lProjectFileName As String = IO.Path.ChangeExtension(aProjectFileName, "dspx")
-                g_Project.SaveProject(lProjectFileName)
-            Else
-                lHUC8BoundaryOnly = False
-            End If
+            ''put default files in project
+            'Dim lNationalDir As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar)
+            'If Not IO.Directory.Exists(lNationalDir) Then
+            '    lNationalDir = IO.Path.Combine(aDataPath, "national" & g_PathChar)
+            'End If
+            'If IO.Directory.Exists(lNationalDir) Then
+            '    CopyFromIfNeeded("sic.dbf", lNationalDir, aNewDataDir)
+            '    CopyFromIfNeeded("storetag.dbf", lNationalDir, aNewDataDir)
+            '    CopyFromIfNeeded("wqcriter.dbf", lNationalDir, aNewDataDir)
+            '    CopyFromIfNeeded("wqobs_prm.dbf", lNationalDir, aNewDataDir)
+            'End If
+            ''g_Project.ProjectProjection = lOutputProjection
+            ''save the new project with just this layer
+            'ClearLayers()
+            'AddAllShapesInDir(aNewDataDir, aNewDataDir)
+            ''g_MapWin.PreviewMap.GetPictureFromMap()
+            'Dim lProjectFileName As String = IO.Path.ChangeExtension(aProjectFileName, "dspx")
+            'g_Project.SaveProject(lProjectFileName)
         End If
-        Return lHUC8BoundaryOnly
+        Return lIssues
     End Function
 
     'Given a file name and the XML describing how to render it, add a grid layer to MapWindow
@@ -2494,6 +2490,7 @@ StartOver:
             Logger.Dbg("CheckAddress " & URL)
             Dim request As WebRequest = WebRequest.Create(URL)
             Dim response As WebResponse = request.GetResponse()
+            response.Close()
         Catch ex As Exception
             Logger.Dbg("CheckAddress Failed " & ex.ToString)
             Return False
