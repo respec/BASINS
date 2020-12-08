@@ -740,7 +740,8 @@ Public Module atcConstituentTables
                                             lOperationIsConnected = True
 
                                             Dim aConversionFactor As Double = 0.0
-                                            If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                            If aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN" OrElse
+                                               aBalanceType = "NO2NO3" OrElse aBalanceType = "TP" OrElse aBalanceType = "ORTHO P" Then
                                                 aConversionFactor = ConversionFactorfromOxygen(aUCI, lConstituent.ReportType, lReach)
                                             End If
                                             Dim lMassLinkID As Integer = lConnection.MassLink
