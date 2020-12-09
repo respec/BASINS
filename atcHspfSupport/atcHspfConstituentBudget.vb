@@ -132,8 +132,8 @@ Public Module ConstituentBudget
                     lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-INTOT"))
                     lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-INTOT"))
                     lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
-                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-OUTTOT"))
-                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-OUTTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-OUTTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-OUTTOT"))
                 End If
 
             Case "TP", "ORTHO P"
