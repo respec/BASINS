@@ -305,7 +305,9 @@ Public Class frmWelcomeScreen
         Dim recentFiles As New ArrayList()
         For Each lfile As String In DotSpatial.Data.Properties.Settings.Default.RecentFiles
             If Not String.IsNullOrEmpty(lfile) Then
-                recentFiles.Add(lfile)
+                If lfile.EndsWith("dspx") Then
+                    recentFiles.Add(lfile)
+                End If
             End If
         Next
 

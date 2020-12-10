@@ -282,6 +282,11 @@ Friend Class frmManager
     End Sub
 
     Private Sub Populate(ByVal aNodeKey As Integer)
+
+        If Application.ProductName = "USGSHydroToolbox" Then
+            RemoveDataFromFileToolStripMenuItem.Visible = False
+        End If
+
         If Not pDelayPopulate Then
             treeFiles.Nodes.Clear()
             SaveInToolStripMenuItem.DropDownItems.Clear()
