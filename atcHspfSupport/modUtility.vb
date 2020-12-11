@@ -536,7 +536,7 @@ Public Module Utility
                         Select Case ConstProperty.ConstNameForEXPPlus
                             Case "NO3", "NO2NO3"
                                 .Add("I:Header8", "NO3+NO2 (IQUAL)")
-                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow")
+                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
 
                             Case "TAM", "TKN"
                                 .Add("I:Header9", "NH3+NH4 (IQUAL)")

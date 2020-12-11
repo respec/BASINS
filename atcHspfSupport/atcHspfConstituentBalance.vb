@@ -210,7 +210,7 @@ Public Module ConstituentBalance
 
                                                     End If
                                                     Dim lConversionFactor As Double = 0.0
-                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "TKN" Then
                                                         lConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, lReach)
                                                     End If
 
