@@ -64,6 +64,7 @@ Partial Class frmBatchMap
         '
         'txtDataDir
         '
+        Me.txtDataDir.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDataDir.Location = New System.Drawing.Point(77, 10)
         Me.txtDataDir.Name = "txtDataDir"
         Me.txtDataDir.Size = New System.Drawing.Size(288, 20)
@@ -71,6 +72,7 @@ Partial Class frmBatchMap
         '
         'btnBrowseDataDir
         '
+        Me.btnBrowseDataDir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnBrowseDataDir.Location = New System.Drawing.Point(371, 8)
         Me.btnBrowseDataDir.Name = "btnBrowseDataDir"
         Me.btnBrowseDataDir.Size = New System.Drawing.Size(89, 23)
@@ -98,6 +100,7 @@ Partial Class frmBatchMap
         '
         'btnCreateGroup
         '
+        Me.btnCreateGroup.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCreateGroup.Location = New System.Drawing.Point(444, 62)
         Me.btnCreateGroup.Name = "btnCreateGroup"
         Me.btnCreateGroup.Size = New System.Drawing.Size(75, 36)
@@ -107,6 +110,7 @@ Partial Class frmBatchMap
         '
         'btnPlotDuration
         '
+        Me.btnPlotDuration.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnPlotDuration.Location = New System.Drawing.Point(444, 104)
         Me.btnPlotDuration.Name = "btnPlotDuration"
         Me.btnPlotDuration.Size = New System.Drawing.Size(75, 38)
@@ -203,6 +207,7 @@ Partial Class frmBatchMap
         '
         'btnDownload
         '
+        Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDownload.Location = New System.Drawing.Point(466, 8)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(65, 23)
@@ -262,6 +267,7 @@ Partial Class frmBatchMap
         '
         'chkGetNewest
         '
+        Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
         Me.chkGetNewest.Checked = True
         Me.chkGetNewest.CheckState = System.Windows.Forms.CheckState.Checked
@@ -274,6 +280,7 @@ Partial Class frmBatchMap
         '
         'lstStations
         '
+        Me.lstStations.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstStations.DisplayMember = ""
         Me.lstStations.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstStations.LeftLabel = "Available:"

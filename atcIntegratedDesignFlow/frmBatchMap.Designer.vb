@@ -62,6 +62,7 @@ Partial Class frmBatchMap
         '
         'txtDataDir
         '
+        Me.txtDataDir.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtDataDir.Location = New System.Drawing.Point(77, 10)
         Me.txtDataDir.Name = "txtDataDir"
         Me.txtDataDir.Size = New System.Drawing.Size(288, 20)
@@ -69,6 +70,7 @@ Partial Class frmBatchMap
         '
         'btnBrowseDataDir
         '
+        Me.btnBrowseDataDir.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnBrowseDataDir.Location = New System.Drawing.Point(371, 8)
         Me.btnBrowseDataDir.Name = "btnBrowseDataDir"
         Me.btnBrowseDataDir.Size = New System.Drawing.Size(61, 23)
@@ -78,6 +80,7 @@ Partial Class frmBatchMap
         '
         'lstStations
         '
+        Me.lstStations.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstStations.DisplayMember = ""
         Me.lstStations.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstStations.LeftLabel = "Available:"
@@ -92,6 +95,8 @@ Partial Class frmBatchMap
         '
         'treeBFGroups
         '
+        Me.treeBFGroups.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.treeBFGroups.Location = New System.Drawing.Point(16, 211)
         Me.treeBFGroups.Name = "treeBFGroups"
         Me.treeBFGroups.Size = New System.Drawing.Size(261, 173)
@@ -108,7 +113,8 @@ Partial Class frmBatchMap
         '
         'btnCreateGroup
         '
-        Me.btnCreateGroup.Location = New System.Drawing.Point(435, 104)
+        Me.btnCreateGroup.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCreateGroup.Location = New System.Drawing.Point(444, 62)
         Me.btnCreateGroup.Name = "btnCreateGroup"
         Me.btnCreateGroup.Size = New System.Drawing.Size(75, 36)
         Me.btnCreateGroup.TabIndex = 6
@@ -117,11 +123,12 @@ Partial Class frmBatchMap
         '
         'btnPlotDuration
         '
-        Me.btnPlotDuration.Location = New System.Drawing.Point(435, 146)
+        Me.btnPlotDuration.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPlotDuration.Location = New System.Drawing.Point(444, 104)
         Me.btnPlotDuration.Name = "btnPlotDuration"
         Me.btnPlotDuration.Size = New System.Drawing.Size(75, 36)
         Me.btnPlotDuration.TabIndex = 7
-        Me.btnPlotDuration.Text = "Plot Data Timespans"
+        Me.btnPlotDuration.Text = "Plot Data Timespan"
         Me.btnPlotDuration.UseVisualStyleBackColor = True
         '
         'GroupBox1
@@ -213,6 +220,7 @@ Partial Class frmBatchMap
         '
         'btnDownload
         '
+        Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDownload.Location = New System.Drawing.Point(438, 8)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
@@ -222,6 +230,7 @@ Partial Class frmBatchMap
         '
         'btnGroupGlobal
         '
+        Me.btnGroupGlobal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGroupGlobal.Location = New System.Drawing.Point(12, 390)
         Me.btnGroupGlobal.Name = "btnGroupGlobal"
         Me.btnGroupGlobal.Size = New System.Drawing.Size(47, 23)
@@ -231,6 +240,7 @@ Partial Class frmBatchMap
         '
         'btnGroupGroup
         '
+        Me.btnGroupGroup.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGroupGroup.Location = New System.Drawing.Point(65, 390)
         Me.btnGroupGroup.Name = "btnGroupGroup"
         Me.btnGroupGroup.Size = New System.Drawing.Size(50, 23)
@@ -240,6 +250,7 @@ Partial Class frmBatchMap
         '
         'btnGroupRemove
         '
+        Me.btnGroupRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGroupRemove.Location = New System.Drawing.Point(121, 390)
         Me.btnGroupRemove.Name = "btnGroupRemove"
         Me.btnGroupRemove.Size = New System.Drawing.Size(56, 23)
@@ -249,6 +260,7 @@ Partial Class frmBatchMap
         '
         'btnGroupPlot
         '
+        Me.btnGroupPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGroupPlot.Location = New System.Drawing.Point(183, 390)
         Me.btnGroupPlot.Name = "btnGroupPlot"
         Me.btnGroupPlot.Size = New System.Drawing.Size(88, 23)
