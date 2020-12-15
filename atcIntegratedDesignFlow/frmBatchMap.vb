@@ -37,13 +37,13 @@ Public Class frmBatchMap
 
     Private Sub frmBatchMap_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If IO.Directory.Exists(txtDataDir.Text) Then
-            SaveSetting("atcUSGSBaseflow", "Default", "DataDir", txtDataDir.Text)
+            SaveSetting("atcIntegratedDesignFlow", "Default", "DataDir", txtDataDir.Text)
         End If
     End Sub
 
     Private Sub frmBatchMap_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        lstStations.LeftLabel = "Stations from map"
-        lstStations.RightLabel = "Selected for a group"
+        lstStations.LeftLabel = "Stations"
+        lstStations.RightLabel = "Selected Stations"
         Dim lindex As Integer = 0
         If pListStations IsNot Nothing AndAlso pListStations.Count > 0 Then
             Dim lStnIDinKey As Boolean = True
@@ -68,7 +68,7 @@ Public Class frmBatchMap
         pGroupsInputsDFLOW = New atcCollection()
         pGroupsInputsSWSTAT = New atcCollection()
 
-        Dim lDataDir As String = GetSetting("atcUSGSBaseflow", "Default", "DataDir", "")
+        Dim lDataDir As String = GetSetting("atcIntegratedDesignFlow", "Default", "DataDir", "")
         If IO.Directory.Exists(lDataDir) Then
             txtDataDir.Text = lDataDir
         End If
