@@ -86,6 +86,7 @@ Public Class frmBatchMap
                 lCount = pBatchGroupCountDFLOW
         End Select
         If lstStations.RightCount = 0 OrElse String.IsNullOrEmpty(lAnalysis) Then
+            If lstStations.RightCount = 0 Then Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
             Exit Sub
         End If
         Dim listStations As New List(Of String)
@@ -541,22 +542,26 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnPlotDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDuration.Click
-        Dim lTsGroup As New atcTimeseriesGroup()
-        Dim lArgs As New atcDataAttributes()
-        lArgs.Add("Constituent", "streamflow,flow")
-        For I As Integer = 0 To lstStations.RightCount - 1
-            Dim lstationId As String = lstStations.RightItem(I)
-            Dim lDataPath As String = GetDataFileFullPath(lstationId)
-            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
-            If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
-                If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
-                    lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
+        If lstStations.RightCount > 0 Then
+            Dim lTsGroup As New atcTimeseriesGroup()
+            Dim lArgs As New atcDataAttributes()
+            lArgs.Add("Constituent", "streamflow,flow")
+            For I As Integer = 0 To lstStations.RightCount - 1
+                Dim lstationId As String = lstStations.RightItem(I)
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                    If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
+                        lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
+                    End If
+                    lTsGroup.Add(lTsGroupTemp(0))
                 End If
-                lTsGroup.Add(lTsGroupTemp(0))
+            Next
+            If lTsGroup.Count > 0 Then
+                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
             End If
-        Next
-        If lTsGroup.Count > 0 Then
-            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
         End If
     End Sub
 

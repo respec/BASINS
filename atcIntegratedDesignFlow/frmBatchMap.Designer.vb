@@ -108,7 +108,7 @@ Partial Class frmBatchMap
         '
         'btnCreateGroup
         '
-        Me.btnCreateGroup.Location = New System.Drawing.Point(435, 124)
+        Me.btnCreateGroup.Location = New System.Drawing.Point(435, 104)
         Me.btnCreateGroup.Name = "btnCreateGroup"
         Me.btnCreateGroup.Size = New System.Drawing.Size(75, 36)
         Me.btnCreateGroup.TabIndex = 6
@@ -117,11 +117,11 @@ Partial Class frmBatchMap
         '
         'btnPlotDuration
         '
-        Me.btnPlotDuration.Location = New System.Drawing.Point(435, 166)
+        Me.btnPlotDuration.Location = New System.Drawing.Point(435, 146)
         Me.btnPlotDuration.Name = "btnPlotDuration"
-        Me.btnPlotDuration.Size = New System.Drawing.Size(75, 23)
+        Me.btnPlotDuration.Size = New System.Drawing.Size(75, 36)
         Me.btnPlotDuration.TabIndex = 7
-        Me.btnPlotDuration.Text = "Durations"
+        Me.btnPlotDuration.Text = "Plot Data Timespans"
         Me.btnPlotDuration.UseVisualStyleBackColor = True
         '
         'GroupBox1
@@ -251,9 +251,9 @@ Partial Class frmBatchMap
         '
         Me.btnGroupPlot.Location = New System.Drawing.Point(183, 390)
         Me.btnGroupPlot.Name = "btnGroupPlot"
-        Me.btnGroupPlot.Size = New System.Drawing.Size(48, 23)
+        Me.btnGroupPlot.Size = New System.Drawing.Size(88, 23)
         Me.btnGroupPlot.TabIndex = 15
-        Me.btnGroupPlot.Text = "Plot"
+        Me.btnGroupPlot.Text = "Plot Timespans"
         Me.btnGroupPlot.UseVisualStyleBackColor = True
         '
         'frmBatchMap
