@@ -277,10 +277,10 @@ Public Class frmSWSTAT
         Me.tabSelectDates.Controls.Add(Me.btnDisplayBasic)
         Me.tabSelectDates.Controls.Add(Me.grpDates)
         Me.tabSelectDates.Controls.Add(Me.grpYears)
-        Me.tabSelectDates.Location = New System.Drawing.Point(4, 22)
+        Me.tabSelectDates.Location = New System.Drawing.Point(4, 25)
         Me.tabSelectDates.Name = "tabSelectDates"
         Me.tabSelectDates.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSelectDates.Size = New System.Drawing.Size(435, 509)
+        Me.tabSelectDates.Size = New System.Drawing.Size(435, 506)
         Me.tabSelectDates.TabIndex = 0
         Me.tabSelectDates.Text = "Select Dates"
         Me.tabSelectDates.UseVisualStyleBackColor = True
@@ -293,9 +293,9 @@ Public Class frmSWSTAT
         Me.gbTextOutput.Controls.Add(Me.lblOutputDir)
         Me.gbTextOutput.Controls.Add(Me.txtOutputRootName)
         Me.gbTextOutput.Controls.Add(Me.lblBaseFilename)
-        Me.gbTextOutput.Location = New System.Drawing.Point(214, 6)
+        Me.gbTextOutput.Location = New System.Drawing.Point(257, 7)
         Me.gbTextOutput.Name = "gbTextOutput"
-        Me.gbTextOutput.Size = New System.Drawing.Size(212, 144)
+        Me.gbTextOutput.Size = New System.Drawing.Size(165, 166)
         Me.gbTextOutput.TabIndex = 73
         Me.gbTextOutput.TabStop = False
         Me.gbTextOutput.Text = "Output"
@@ -305,33 +305,33 @@ Public Class frmSWSTAT
         '
         Me.txtOutputDir.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOutputDir.Location = New System.Drawing.Point(6, 45)
+        Me.txtOutputDir.Location = New System.Drawing.Point(7, 52)
         Me.txtOutputDir.Name = "txtOutputDir"
-        Me.txtOutputDir.Size = New System.Drawing.Size(200, 20)
+        Me.txtOutputDir.Size = New System.Drawing.Size(151, 22)
         Me.txtOutputDir.TabIndex = 12
         '
         'lblOutputDir
         '
         Me.lblOutputDir.AutoSize = True
-        Me.lblOutputDir.Location = New System.Drawing.Point(6, 29)
+        Me.lblOutputDir.Location = New System.Drawing.Point(7, 33)
         Me.lblOutputDir.Name = "lblOutputDir"
-        Me.lblOutputDir.Size = New System.Drawing.Size(29, 13)
+        Me.lblOutputDir.Size = New System.Drawing.Size(37, 17)
         Me.lblOutputDir.TabIndex = 31
         Me.lblOutputDir.Text = "Path"
         '
         'txtOutputRootName
         '
-        Me.txtOutputRootName.Location = New System.Drawing.Point(6, 102)
+        Me.txtOutputRootName.Location = New System.Drawing.Point(7, 118)
         Me.txtOutputRootName.Name = "txtOutputRootName"
-        Me.txtOutputRootName.Size = New System.Drawing.Size(201, 20)
+        Me.txtOutputRootName.Size = New System.Drawing.Size(241, 22)
         Me.txtOutputRootName.TabIndex = 13
         '
         'lblBaseFilename
         '
         Me.lblBaseFilename.AutoSize = True
-        Me.lblBaseFilename.Location = New System.Drawing.Point(6, 86)
+        Me.lblBaseFilename.Location = New System.Drawing.Point(7, 99)
         Me.lblBaseFilename.Name = "lblBaseFilename"
-        Me.lblBaseFilename.Size = New System.Drawing.Size(52, 13)
+        Me.lblBaseFilename.Size = New System.Drawing.Size(69, 17)
         Me.lblBaseFilename.TabIndex = 30
         Me.lblBaseFilename.Text = "File Prefix"
         '
@@ -340,9 +340,9 @@ Public Class frmSWSTAT
         Me.grpHighLow.Controls.Add(Me.radioHigh)
         Me.grpHighLow.Controls.Add(Me.radioLow)
         Me.grpHighLow.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.grpHighLow.Location = New System.Drawing.Point(8, 6)
+        Me.grpHighLow.Location = New System.Drawing.Point(10, 7)
         Me.grpHighLow.Name = "grpHighLow"
-        Me.grpHighLow.Size = New System.Drawing.Size(200, 65)
+        Me.grpHighLow.Size = New System.Drawing.Size(240, 75)
         Me.grpHighLow.TabIndex = 72
         Me.grpHighLow.TabStop = False
         Me.grpHighLow.Text = "Flow Condition"
@@ -351,9 +351,9 @@ Public Class frmSWSTAT
         '
         Me.radioHigh.AutoSize = True
         Me.radioHigh.Checked = True
-        Me.radioHigh.Location = New System.Drawing.Point(6, 19)
+        Me.radioHigh.Location = New System.Drawing.Point(7, 22)
         Me.radioHigh.Name = "radioHigh"
-        Me.radioHigh.Size = New System.Drawing.Size(47, 17)
+        Me.radioHigh.Size = New System.Drawing.Size(58, 21)
         Me.radioHigh.TabIndex = 1
         Me.radioHigh.TabStop = True
         Me.radioHigh.Text = "High"
@@ -362,18 +362,18 @@ Public Class frmSWSTAT
         'radioLow
         '
         Me.radioLow.AutoSize = True
-        Me.radioLow.Location = New System.Drawing.Point(6, 42)
+        Me.radioLow.Location = New System.Drawing.Point(7, 48)
         Me.radioLow.Name = "radioLow"
-        Me.radioLow.Size = New System.Drawing.Size(45, 17)
+        Me.radioLow.Size = New System.Drawing.Size(54, 21)
         Me.radioLow.TabIndex = 2
         Me.radioLow.Text = "Low"
         Me.radioLow.UseVisualStyleBackColor = True
         '
         'btnDisplayBasic
         '
-        Me.btnDisplayBasic.Location = New System.Drawing.Point(8, 307)
+        Me.btnDisplayBasic.Location = New System.Drawing.Point(10, 354)
         Me.btnDisplayBasic.Name = "btnDisplayBasic"
-        Me.btnDisplayBasic.Size = New System.Drawing.Size(157, 23)
+        Me.btnDisplayBasic.Size = New System.Drawing.Size(188, 27)
         Me.btnDisplayBasic.TabIndex = 10
         Me.btnDisplayBasic.Text = "Display Basic Statistics"
         Me.btnDisplayBasic.UseVisualStyleBackColor = True
@@ -388,9 +388,9 @@ Public Class frmSWSTAT
         Me.grpDates.Controls.Add(Me.cboEndMonth)
         Me.grpDates.Controls.Add(Me.lblYearEnd)
         Me.grpDates.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.grpDates.Location = New System.Drawing.Point(8, 77)
+        Me.grpDates.Location = New System.Drawing.Point(10, 89)
         Me.grpDates.Name = "grpDates"
-        Me.grpDates.Size = New System.Drawing.Size(200, 73)
+        Me.grpDates.Size = New System.Drawing.Size(240, 84)
         Me.grpDates.TabIndex = 67
         Me.grpDates.TabStop = False
         Me.grpDates.Text = "Year / Season Boundaries"
@@ -398,36 +398,36 @@ Public Class frmSWSTAT
         'cboStartMonth
         '
         Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboStartMonth.Location = New System.Drawing.Point(41, 19)
+        Me.cboStartMonth.Location = New System.Drawing.Point(49, 22)
         Me.cboStartMonth.MaxDropDownItems = 12
         Me.cboStartMonth.Name = "cboStartMonth"
-        Me.cboStartMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboStartMonth.Size = New System.Drawing.Size(106, 24)
         Me.cboStartMonth.TabIndex = 3
         Me.cboStartMonth.Text = "January"
         '
         'lblYearStart
         '
         Me.lblYearStart.AutoSize = True
-        Me.lblYearStart.Location = New System.Drawing.Point(6, 22)
+        Me.lblYearStart.Location = New System.Drawing.Point(7, 25)
         Me.lblYearStart.Name = "lblYearStart"
-        Me.lblYearStart.Size = New System.Drawing.Size(29, 13)
+        Me.lblYearStart.Size = New System.Drawing.Size(38, 17)
         Me.lblYearStart.TabIndex = 23
         Me.lblYearStart.Text = "Start"
         '
         'txtEndDay
         '
-        Me.txtEndDay.Location = New System.Drawing.Point(135, 46)
+        Me.txtEndDay.Location = New System.Drawing.Point(162, 53)
         Me.txtEndDay.Name = "txtEndDay"
-        Me.txtEndDay.Size = New System.Drawing.Size(24, 20)
+        Me.txtEndDay.Size = New System.Drawing.Size(29, 22)
         Me.txtEndDay.TabIndex = 6
         Me.txtEndDay.Text = "31"
         Me.txtEndDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtStartDay
         '
-        Me.txtStartDay.Location = New System.Drawing.Point(135, 19)
+        Me.txtStartDay.Location = New System.Drawing.Point(162, 22)
         Me.txtStartDay.Name = "txtStartDay"
-        Me.txtStartDay.Size = New System.Drawing.Size(24, 20)
+        Me.txtStartDay.Size = New System.Drawing.Size(29, 22)
         Me.txtStartDay.TabIndex = 4
         Me.txtStartDay.Text = "1"
         Me.txtStartDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -435,19 +435,19 @@ Public Class frmSWSTAT
         'cboEndMonth
         '
         Me.cboEndMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboEndMonth.Location = New System.Drawing.Point(41, 46)
+        Me.cboEndMonth.Location = New System.Drawing.Point(49, 53)
         Me.cboEndMonth.MaxDropDownItems = 12
         Me.cboEndMonth.Name = "cboEndMonth"
-        Me.cboEndMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboEndMonth.Size = New System.Drawing.Size(106, 24)
         Me.cboEndMonth.TabIndex = 5
         Me.cboEndMonth.Text = "December"
         '
         'lblYearEnd
         '
         Me.lblYearEnd.AutoSize = True
-        Me.lblYearEnd.Location = New System.Drawing.Point(6, 49)
+        Me.lblYearEnd.Location = New System.Drawing.Point(7, 57)
         Me.lblYearEnd.Name = "lblYearEnd"
-        Me.lblYearEnd.Size = New System.Drawing.Size(26, 13)
+        Me.lblYearEnd.Size = New System.Drawing.Size(33, 17)
         Me.lblYearEnd.TabIndex = 61
         Me.lblYearEnd.Text = "End"
         '
@@ -464,9 +464,9 @@ Public Class frmSWSTAT
         Me.grpYears.Controls.Add(Me.txtOmitAfterYear)
         Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
         Me.grpYears.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.grpYears.Location = New System.Drawing.Point(8, 156)
+        Me.grpYears.Location = New System.Drawing.Point(10, 180)
         Me.grpYears.Name = "grpYears"
-        Me.grpYears.Size = New System.Drawing.Size(250, 145)
+        Me.grpYears.Size = New System.Drawing.Size(300, 167)
         Me.grpYears.TabIndex = 66
         Me.grpYears.TabStop = False
         Me.grpYears.Text = "Years to Include in Analysis"
@@ -474,9 +474,9 @@ Public Class frmSWSTAT
         'radioYearsCustom
         '
         Me.radioYearsCustom.AutoSize = True
-        Me.radioYearsCustom.Location = New System.Drawing.Point(6, 65)
+        Me.radioYearsCustom.Location = New System.Drawing.Point(7, 75)
         Me.radioYearsCustom.Name = "radioYearsCustom"
-        Me.radioYearsCustom.Size = New System.Drawing.Size(63, 17)
+        Me.radioYearsCustom.Size = New System.Drawing.Size(80, 21)
         Me.radioYearsCustom.TabIndex = 48
         Me.radioYearsCustom.TabStop = True
         Me.radioYearsCustom.Text = "Custom:"
@@ -485,9 +485,9 @@ Public Class frmSWSTAT
         'radioYearsCommon
         '
         Me.radioYearsCommon.AutoSize = True
-        Me.radioYearsCommon.Location = New System.Drawing.Point(6, 42)
+        Me.radioYearsCommon.Location = New System.Drawing.Point(7, 48)
         Me.radioYearsCommon.Name = "radioYearsCommon"
-        Me.radioYearsCommon.Size = New System.Drawing.Size(66, 17)
+        Me.radioYearsCommon.Size = New System.Drawing.Size(84, 21)
         Me.radioYearsCommon.TabIndex = 47
         Me.radioYearsCommon.TabStop = True
         Me.radioYearsCommon.Text = "Common"
@@ -496,9 +496,9 @@ Public Class frmSWSTAT
         'radioYearsAll
         '
         Me.radioYearsAll.AutoSize = True
-        Me.radioYearsAll.Location = New System.Drawing.Point(6, 19)
+        Me.radioYearsAll.Location = New System.Drawing.Point(7, 22)
         Me.radioYearsAll.Name = "radioYearsAll"
-        Me.radioYearsAll.Size = New System.Drawing.Size(36, 17)
+        Me.radioYearsAll.Size = New System.Drawing.Size(44, 21)
         Me.radioYearsAll.TabIndex = 46
         Me.radioYearsAll.TabStop = True
         Me.radioYearsAll.Text = "All"
@@ -508,9 +508,9 @@ Public Class frmSWSTAT
         '
         Me.lblDataStart.AutoSize = True
         Me.lblDataStart.Enabled = False
-        Me.lblDataStart.Location = New System.Drawing.Point(122, 91)
+        Me.lblDataStart.Location = New System.Drawing.Point(146, 105)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(119, 13)
+        Me.lblDataStart.Size = New System.Drawing.Size(152, 17)
         Me.lblDataStart.TabIndex = 45
         Me.lblDataStart.Tag = "Data Starts"
         Me.lblDataStart.Text = "Start Date: 11/22/1934"
@@ -519,9 +519,9 @@ Public Class frmSWSTAT
         '
         Me.lblDataEnd.AutoSize = True
         Me.lblDataEnd.Enabled = False
-        Me.lblDataEnd.Location = New System.Drawing.Point(122, 117)
+        Me.lblDataEnd.Location = New System.Drawing.Point(146, 135)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(116, 13)
+        Me.lblDataEnd.Size = New System.Drawing.Size(147, 17)
         Me.lblDataEnd.TabIndex = 1
         Me.lblDataEnd.Tag = "Data Ends"
         Me.lblDataEnd.Text = "End Date: 11/22/1934"
@@ -530,9 +530,9 @@ Public Class frmSWSTAT
         '
         Me.lblOmitBefore.AutoSize = True
         Me.lblOmitBefore.Enabled = False
-        Me.lblOmitBefore.Location = New System.Drawing.Point(5, 91)
+        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 105)
         Me.lblOmitBefore.Name = "lblOmitBefore"
-        Me.lblOmitBefore.Size = New System.Drawing.Size(54, 13)
+        Me.lblOmitBefore.Size = New System.Drawing.Size(72, 17)
         Me.lblOmitBefore.TabIndex = 40
         Me.lblOmitBefore.Text = "Start Year"
         '
@@ -540,27 +540,27 @@ Public Class frmSWSTAT
         '
         Me.lblOmitAfter.AutoSize = True
         Me.lblOmitAfter.Enabled = False
-        Me.lblOmitAfter.Location = New System.Drawing.Point(5, 117)
+        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 135)
         Me.lblOmitAfter.Name = "lblOmitAfter"
-        Me.lblOmitAfter.Size = New System.Drawing.Size(51, 13)
+        Me.lblOmitAfter.Size = New System.Drawing.Size(67, 17)
         Me.lblOmitAfter.TabIndex = 43
         Me.lblOmitAfter.Text = "End Year"
         '
         'txtOmitAfterYear
         '
         Me.txtOmitAfterYear.Enabled = False
-        Me.txtOmitAfterYear.Location = New System.Drawing.Point(65, 114)
+        Me.txtOmitAfterYear.Location = New System.Drawing.Point(78, 132)
         Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
-        Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitAfterYear.Size = New System.Drawing.Size(44, 22)
         Me.txtOmitAfterYear.TabIndex = 9
         Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtOmitBeforeYear
         '
         Me.txtOmitBeforeYear.Enabled = False
-        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(65, 88)
+        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(78, 102)
         Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
-        Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitBeforeYear.Size = New System.Drawing.Size(44, 22)
         Me.txtOmitBeforeYear.TabIndex = 8
         Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
@@ -574,10 +574,10 @@ Public Class frmSWSTAT
         Me.tabNDay.Controls.Add(Me.panelTop)
         Me.tabNDay.Controls.Add(Me.btnDisplayTrend)
         Me.tabNDay.Controls.Add(Me.btnNDay)
-        Me.tabNDay.Location = New System.Drawing.Point(4, 22)
+        Me.tabNDay.Location = New System.Drawing.Point(4, 25)
         Me.tabNDay.Name = "tabNDay"
         Me.tabNDay.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabNDay.Size = New System.Drawing.Size(435, 509)
+        Me.tabNDay.Size = New System.Drawing.Size(435, 506)
         Me.tabNDay.TabIndex = 2
         Me.tabNDay.Text = "N-Day, Trend, Frequency"
         Me.tabNDay.UseVisualStyleBackColor = True
@@ -589,9 +589,9 @@ Public Class frmSWSTAT
         Me.groupGraph.Controls.Add(Me.btnDoFrequencyGraph)
         Me.groupGraph.Controls.Add(Me.chkMultipleNDayPlots)
         Me.groupGraph.Controls.Add(Me.chkMultipleStationPlots)
-        Me.groupGraph.Location = New System.Drawing.Point(138, 375)
+        Me.groupGraph.Location = New System.Drawing.Point(166, 346)
         Me.groupGraph.Name = "groupGraph"
-        Me.groupGraph.Size = New System.Drawing.Size(200, 128)
+        Me.groupGraph.Size = New System.Drawing.Size(240, 148)
         Me.groupGraph.TabIndex = 43
         Me.groupGraph.TabStop = False
         Me.groupGraph.Text = "Graph"
@@ -599,9 +599,9 @@ Public Class frmSWSTAT
         'btnDoFrequencyGrid
         '
         Me.btnDoFrequencyGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(10, 17)
+        Me.btnDoFrequencyGrid.Location = New System.Drawing.Point(12, 20)
         Me.btnDoFrequencyGrid.Name = "btnDoFrequencyGrid"
-        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(138, 23)
+        Me.btnDoFrequencyGrid.Size = New System.Drawing.Size(166, 26)
         Me.btnDoFrequencyGrid.TabIndex = 37
         Me.btnDoFrequencyGrid.Text = "Frequency Grid"
         Me.btnDoFrequencyGrid.UseVisualStyleBackColor = True
@@ -609,9 +609,9 @@ Public Class frmSWSTAT
         'btnDoFrequencyGraph
         '
         Me.btnDoFrequencyGraph.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDoFrequencyGraph.Location = New System.Drawing.Point(10, 46)
+        Me.btnDoFrequencyGraph.Location = New System.Drawing.Point(12, 53)
         Me.btnDoFrequencyGraph.Name = "btnDoFrequencyGraph"
-        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(138, 23)
+        Me.btnDoFrequencyGraph.Size = New System.Drawing.Size(166, 27)
         Me.btnDoFrequencyGraph.TabIndex = 38
         Me.btnDoFrequencyGraph.Text = "Frequency Graph"
         Me.btnDoFrequencyGraph.UseVisualStyleBackColor = True
@@ -620,9 +620,9 @@ Public Class frmSWSTAT
         '
         Me.chkMultipleNDayPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleNDayPlots.AutoSize = True
-        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(14, 75)
+        Me.chkMultipleNDayPlots.Location = New System.Drawing.Point(5, 85)
         Me.chkMultipleNDayPlots.Name = "chkMultipleNDayPlots"
-        Me.chkMultipleNDayPlots.Size = New System.Drawing.Size(121, 17)
+        Me.chkMultipleNDayPlots.Size = New System.Drawing.Size(157, 21)
         Me.chkMultipleNDayPlots.TabIndex = 39
         Me.chkMultipleNDayPlots.Text = "Multiple N-Day Plots"
         Me.chkMultipleNDayPlots.UseVisualStyleBackColor = True
@@ -631,9 +631,9 @@ Public Class frmSWSTAT
         '
         Me.chkMultipleStationPlots.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkMultipleStationPlots.AutoSize = True
-        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(14, 98)
+        Me.chkMultipleStationPlots.Location = New System.Drawing.Point(5, 112)
         Me.chkMultipleStationPlots.Name = "chkMultipleStationPlots"
-        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(124, 17)
+        Me.chkMultipleStationPlots.Size = New System.Drawing.Size(161, 21)
         Me.chkMultipleStationPlots.TabIndex = 40
         Me.chkMultipleStationPlots.Text = "Multiple Station Plots"
         Me.chkMultipleStationPlots.UseVisualStyleBackColor = True
@@ -641,9 +641,9 @@ Public Class frmSWSTAT
         'btnFrequencyReport
         '
         Me.btnFrequencyReport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnFrequencyReport.Location = New System.Drawing.Point(8, 479)
+        Me.btnFrequencyReport.Location = New System.Drawing.Point(10, 466)
         Me.btnFrequencyReport.Name = "btnFrequencyReport"
-        Me.btnFrequencyReport.Size = New System.Drawing.Size(124, 23)
+        Me.btnFrequencyReport.Size = New System.Drawing.Size(148, 27)
         Me.btnFrequencyReport.TabIndex = 42
         Me.btnFrequencyReport.Text = "Frequency Report"
         Me.btnFrequencyReport.UseVisualStyleBackColor = True
@@ -651,9 +651,9 @@ Public Class frmSWSTAT
         'btnScreeningTests
         '
         Me.btnScreeningTests.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnScreeningTests.Location = New System.Drawing.Point(8, 450)
+        Me.btnScreeningTests.Location = New System.Drawing.Point(10, 433)
         Me.btnScreeningTests.Name = "btnScreeningTests"
-        Me.btnScreeningTests.Size = New System.Drawing.Size(124, 23)
+        Me.btnScreeningTests.Size = New System.Drawing.Size(148, 26)
         Me.btnScreeningTests.TabIndex = 41
         Me.btnScreeningTests.Text = "Screening Tests"
         Me.btnScreeningTests.UseVisualStyleBackColor = True
@@ -664,9 +664,9 @@ Public Class frmSWSTAT
         Me.chkLog.AutoSize = True
         Me.chkLog.Checked = True
         Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(8, 371)
+        Me.chkLog.Location = New System.Drawing.Point(10, 340)
         Me.chkLog.Name = "chkLog"
-        Me.chkLog.Size = New System.Drawing.Size(80, 17)
+        Me.chkLog.Size = New System.Drawing.Size(103, 21)
         Me.chkLog.TabIndex = 36
         Me.chkLog.Text = "Logarithmic"
         Me.chkLog.UseVisualStyleBackColor = True
@@ -681,7 +681,7 @@ Public Class frmSWSTAT
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(435, 368)
+        Me.panelTop.Size = New System.Drawing.Size(433, 338)
         Me.panelTop.TabIndex = 34
         '
         'grpRecurrence
@@ -696,9 +696,9 @@ Public Class frmSWSTAT
         Me.grpRecurrence.Controls.Add(Me.btnRecurrenceAll)
         Me.grpRecurrence.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpRecurrence.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.grpRecurrence.Location = New System.Drawing.Point(210, 0)
+        Me.grpRecurrence.Location = New System.Drawing.Point(252, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(225, 368)
+        Me.grpRecurrence.Size = New System.Drawing.Size(181, 338)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -706,18 +706,18 @@ Public Class frmSWSTAT
         'btnRecurrenceDefault
         '
         Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(163, 309)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(107, 270)
         Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
-        Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
+        Me.btnRecurrenceDefault.Size = New System.Drawing.Size(67, 23)
         Me.btnRecurrenceDefault.TabIndex = 31
         Me.btnRecurrenceDefault.Text = "Default"
         '
         'btnRecurrenceRemove
         '
         Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(129, 309)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(66, 270)
         Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
-        Me.btnRecurrenceRemove.Size = New System.Drawing.Size(28, 20)
+        Me.btnRecurrenceRemove.Size = New System.Drawing.Size(33, 23)
         Me.btnRecurrenceRemove.TabIndex = 30
         Me.btnRecurrenceRemove.Text = "-"
         '
@@ -727,19 +727,20 @@ Public Class frmSWSTAT
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstRecurrence.IntegralHeight = False
-        Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
+        Me.lstRecurrence.ItemHeight = 16
+        Me.lstRecurrence.Location = New System.Drawing.Point(7, 22)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(211, 284)
+        Me.lstRecurrence.Size = New System.Drawing.Size(164, 241)
         Me.lstRecurrence.TabIndex = 27
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(97, 309)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(27, 270)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
-        Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
+        Me.btnRecurrenceAdd.Size = New System.Drawing.Size(33, 23)
         Me.btnRecurrenceAdd.TabIndex = 29
         Me.btnRecurrenceAdd.Text = "+"
         '
@@ -747,35 +748,35 @@ Public Class frmSWSTAT
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 309)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(7, 270)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(85, 20)
+        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(13, 22)
         Me.txtRecurrenceAdd.TabIndex = 28
         '
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(154, 338)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(96, 304)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
-        Me.btnRecurrenceNone.Size = New System.Drawing.Size(65, 24)
+        Me.btnRecurrenceNone.Size = New System.Drawing.Size(78, 27)
         Me.btnRecurrenceNone.TabIndex = 33
         Me.btnRecurrenceNone.Text = "None"
         '
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 338)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(7, 304)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
-        Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
+        Me.btnRecurrenceAll.Size = New System.Drawing.Size(77, 27)
         Me.btnRecurrenceAll.TabIndex = 32
         Me.btnRecurrenceAll.Text = "All"
         '
         'Splitter1
         '
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
-        Me.Splitter1.Location = New System.Drawing.Point(200, 0)
+        Me.Splitter1.Location = New System.Drawing.Point(240, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(10, 368)
+        Me.Splitter1.Size = New System.Drawing.Size(12, 338)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
@@ -793,7 +794,7 @@ Public Class frmSWSTAT
         Me.grpNday.ForeColor = System.Drawing.SystemColors.ControlText
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 368)
+        Me.grpNday.Size = New System.Drawing.Size(240, 338)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -801,27 +802,27 @@ Public Class frmSWSTAT
         'btnNdayDefault
         '
         Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 309)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(166, 270)
         Me.btnNdayDefault.Name = "btnNdayDefault"
-        Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
+        Me.btnNdayDefault.Size = New System.Drawing.Size(67, 23)
         Me.btnNdayDefault.TabIndex = 24
         Me.btnNdayDefault.Text = "Default"
         '
         'btnNdayRemove
         '
         Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 309)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(126, 270)
         Me.btnNdayRemove.Name = "btnNdayRemove"
-        Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
+        Me.btnNdayRemove.Size = New System.Drawing.Size(32, 23)
         Me.btnNdayRemove.TabIndex = 23
         Me.btnNdayRemove.Text = "-"
         '
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 309)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(86, 270)
         Me.btnNdayAdd.Name = "btnNdayAdd"
-        Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
+        Me.btnNdayAdd.Size = New System.Drawing.Size(33, 23)
         Me.btnNdayAdd.TabIndex = 22
         Me.btnNdayAdd.Text = "+"
         '
@@ -829,26 +830,26 @@ Public Class frmSWSTAT
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 309)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(7, 270)
         Me.txtNdayAdd.Name = "txtNdayAdd"
-        Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
+        Me.txtNdayAdd.Size = New System.Drawing.Size(65, 22)
         Me.txtNdayAdd.TabIndex = 21
         '
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 338)
+        Me.btnNdayNone.Location = New System.Drawing.Point(156, 304)
         Me.btnNdayNone.Name = "btnNdayNone"
-        Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
+        Me.btnNdayNone.Size = New System.Drawing.Size(77, 26)
         Me.btnNdayNone.TabIndex = 26
         Me.btnNdayNone.Text = "None"
         '
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(6, 338)
+        Me.btnNdayAll.Location = New System.Drawing.Point(7, 304)
         Me.btnNdayAll.Name = "btnNdayAll"
-        Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
+        Me.btnNdayAll.Size = New System.Drawing.Size(77, 27)
         Me.btnNdayAll.TabIndex = 25
         Me.btnNdayAll.Text = "All"
         '
@@ -858,19 +859,20 @@ Public Class frmSWSTAT
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstNday.IntegralHeight = False
-        Me.lstNday.Location = New System.Drawing.Point(6, 19)
+        Me.lstNday.ItemHeight = 16
+        Me.lstNday.Location = New System.Drawing.Point(7, 22)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(188, 284)
+        Me.lstNday.Size = New System.Drawing.Size(226, 241)
         Me.lstNday.TabIndex = 20
         Me.lstNday.Tag = "NDay"
         '
         'btnDisplayTrend
         '
         Me.btnDisplayTrend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnDisplayTrend.Location = New System.Drawing.Point(8, 421)
+        Me.btnDisplayTrend.Location = New System.Drawing.Point(10, 399)
         Me.btnDisplayTrend.Name = "btnDisplayTrend"
-        Me.btnDisplayTrend.Size = New System.Drawing.Size(124, 23)
+        Me.btnDisplayTrend.Size = New System.Drawing.Size(148, 27)
         Me.btnDisplayTrend.TabIndex = 35
         Me.btnDisplayTrend.Text = "Trend List"
         Me.btnDisplayTrend.UseVisualStyleBackColor = True
@@ -878,9 +880,9 @@ Public Class frmSWSTAT
         'btnNDay
         '
         Me.btnNDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNDay.Location = New System.Drawing.Point(8, 392)
+        Me.btnNDay.Location = New System.Drawing.Point(10, 366)
         Me.btnNDay.Name = "btnNDay"
-        Me.btnNDay.Size = New System.Drawing.Size(124, 23)
+        Me.btnNDay.Size = New System.Drawing.Size(148, 26)
         Me.btnNDay.TabIndex = 34
         Me.btnNDay.Text = "N-Day Timeseries List"
         Me.btnNDay.UseVisualStyleBackColor = True
@@ -890,19 +892,19 @@ Public Class frmSWSTAT
         Me.tabDFLOW.Controls.Add(Me.btnCalculate)
         Me.tabDFLOW.Controls.Add(Me.GroupBox2)
         Me.tabDFLOW.Controls.Add(Me.gbBio)
-        Me.tabDFLOW.Location = New System.Drawing.Point(4, 22)
+        Me.tabDFLOW.Location = New System.Drawing.Point(4, 25)
         Me.tabDFLOW.Name = "tabDFLOW"
         Me.tabDFLOW.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabDFLOW.Size = New System.Drawing.Size(435, 509)
+        Me.tabDFLOW.Size = New System.Drawing.Size(524, 589)
         Me.tabDFLOW.TabIndex = 3
         Me.tabDFLOW.Text = "Design Flow"
         Me.tabDFLOW.UseVisualStyleBackColor = True
         '
         'btnCalculate
         '
-        Me.btnCalculate.Location = New System.Drawing.Point(6, 478)
+        Me.btnCalculate.Location = New System.Drawing.Point(7, 552)
         Me.btnCalculate.Name = "btnCalculate"
-        Me.btnCalculate.Size = New System.Drawing.Size(75, 23)
+        Me.btnCalculate.Size = New System.Drawing.Size(90, 26)
         Me.btnCalculate.TabIndex = 7
         Me.btnCalculate.Text = "Calculate"
         Me.btnCalculate.UseVisualStyleBackColor = True
@@ -921,9 +923,9 @@ Public Class frmSWSTAT
         Me.GroupBox2.Controls.Add(Me.rbNonBio3)
         Me.GroupBox2.Controls.Add(Me.rbNonBio2)
         Me.GroupBox2.Controls.Add(Me.rbNonBio1)
-        Me.GroupBox2.Location = New System.Drawing.Point(8, 242)
+        Me.GroupBox2.Location = New System.Drawing.Point(10, 279)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(419, 230)
+        Me.GroupBox2.Size = New System.Drawing.Size(502, 266)
         Me.GroupBox2.TabIndex = 6
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Non-Biological Design Flow Parameters"
@@ -933,9 +935,9 @@ Public Class frmSWSTAT
         Me.chkHarmonicMean.AutoSize = True
         Me.chkHarmonicMean.Checked = True
         Me.chkHarmonicMean.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkHarmonicMean.Location = New System.Drawing.Point(7, 137)
+        Me.chkHarmonicMean.Location = New System.Drawing.Point(8, 158)
         Me.chkHarmonicMean.Name = "chkHarmonicMean"
-        Me.chkHarmonicMean.Size = New System.Drawing.Size(101, 17)
+        Me.chkHarmonicMean.Size = New System.Drawing.Size(129, 21)
         Me.chkHarmonicMean.TabIndex = 12
         Me.chkHarmonicMean.Text = "Harmonic Mean"
         Me.chkHarmonicMean.UseVisualStyleBackColor = True
@@ -943,27 +945,27 @@ Public Class frmSWSTAT
         'tbNonBio3
         '
         Me.tbNonBio3.Enabled = False
-        Me.tbNonBio3.Location = New System.Drawing.Point(263, 84)
+        Me.tbNonBio3.Location = New System.Drawing.Point(316, 97)
         Me.tbNonBio3.Name = "tbNonBio3"
-        Me.tbNonBio3.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio3.Size = New System.Drawing.Size(55, 22)
         Me.tbNonBio3.TabIndex = 11
         Me.tbNonBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio4
         '
         Me.tbNonBio4.Enabled = False
-        Me.tbNonBio4.Location = New System.Drawing.Point(263, 110)
+        Me.tbNonBio4.Location = New System.Drawing.Point(316, 127)
         Me.tbNonBio4.Name = "tbNonBio4"
-        Me.tbNonBio4.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio4.Size = New System.Drawing.Size(55, 22)
         Me.tbNonBio4.TabIndex = 10
         Me.tbNonBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbNonBio2
         '
         Me.tbNonBio2.Enabled = False
-        Me.tbNonBio2.Location = New System.Drawing.Point(263, 58)
+        Me.tbNonBio2.Location = New System.Drawing.Point(316, 67)
         Me.tbNonBio2.Name = "tbNonBio2"
-        Me.tbNonBio2.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio2.Size = New System.Drawing.Size(55, 22)
         Me.tbNonBio2.TabIndex = 9
         Me.tbNonBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -971,9 +973,9 @@ Public Class frmSWSTAT
         '
         Me.Label5.AutoSize = True
         Me.Label5.Enabled = False
-        Me.Label5.Location = New System.Drawing.Point(315, 87)
+        Me.Label5.Location = New System.Drawing.Point(378, 100)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(21, 13)
+        Me.Label5.Size = New System.Drawing.Size(26, 17)
         Me.Label5.TabIndex = 8
         Me.Label5.Text = "cfs"
         '
@@ -981,9 +983,9 @@ Public Class frmSWSTAT
         '
         Me.Label6.AutoSize = True
         Me.Label6.Enabled = False
-        Me.Label6.Location = New System.Drawing.Point(315, 113)
+        Me.Label6.Location = New System.Drawing.Point(378, 130)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(15, 13)
+        Me.Label6.Size = New System.Drawing.Size(20, 17)
         Me.Label6.TabIndex = 7
         Me.Label6.Text = "%"
         '
@@ -991,18 +993,18 @@ Public Class frmSWSTAT
         '
         Me.Label7.AutoSize = True
         Me.Label7.Enabled = False
-        Me.Label7.Location = New System.Drawing.Point(19, 61)
+        Me.Label7.Location = New System.Drawing.Point(23, 70)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(226, 13)
+        Me.Label7.Size = New System.Drawing.Size(306, 17)
         Me.Label7.TabIndex = 6
         Me.Label7.Text = "Return period on years with excursions (years):"
         '
         'tbNonBio1
         '
         Me.tbNonBio1.Enabled = False
-        Me.tbNonBio1.Location = New System.Drawing.Point(263, 36)
+        Me.tbNonBio1.Location = New System.Drawing.Point(316, 42)
         Me.tbNonBio1.Name = "tbNonBio1"
-        Me.tbNonBio1.Size = New System.Drawing.Size(46, 20)
+        Me.tbNonBio1.Size = New System.Drawing.Size(55, 22)
         Me.tbNonBio1.TabIndex = 5
         Me.tbNonBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1010,18 +1012,18 @@ Public Class frmSWSTAT
         '
         Me.Label8.AutoSize = True
         Me.Label8.Enabled = False
-        Me.Label8.Location = New System.Drawing.Point(19, 39)
+        Me.Label8.Location = New System.Drawing.Point(23, 45)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(145, 13)
+        Me.Label8.Size = New System.Drawing.Size(195, 17)
         Me.Label8.TabIndex = 4
         Me.Label8.Text = "Flow averaging period (days):"
         '
         'rbNonBio3
         '
         Me.rbNonBio3.AutoSize = True
-        Me.rbNonBio3.Location = New System.Drawing.Point(6, 104)
+        Me.rbNonBio3.Location = New System.Drawing.Point(7, 120)
         Me.rbNonBio3.Name = "rbNonBio3"
-        Me.rbNonBio3.Size = New System.Drawing.Size(99, 17)
+        Me.rbNonBio3.Size = New System.Drawing.Size(127, 21)
         Me.rbNonBio3.TabIndex = 3
         Me.rbNonBio3.Text = "Flow percentile:"
         Me.rbNonBio3.UseVisualStyleBackColor = True
@@ -1029,9 +1031,9 @@ Public Class frmSWSTAT
         'rbNonBio2
         '
         Me.rbNonBio2.AutoSize = True
-        Me.rbNonBio2.Location = New System.Drawing.Point(6, 81)
+        Me.rbNonBio2.Location = New System.Drawing.Point(7, 93)
         Me.rbNonBio2.Name = "rbNonBio2"
-        Me.rbNonBio2.Size = New System.Drawing.Size(112, 17)
+        Me.rbNonBio2.Size = New System.Drawing.Size(142, 21)
         Me.rbNonBio2.TabIndex = 2
         Me.rbNonBio2.Text = "Explicit flow value:"
         Me.rbNonBio2.UseVisualStyleBackColor = True
@@ -1040,9 +1042,9 @@ Public Class frmSWSTAT
         '
         Me.rbNonBio1.AutoSize = True
         Me.rbNonBio1.Checked = True
-        Me.rbNonBio1.Location = New System.Drawing.Point(6, 19)
+        Me.rbNonBio1.Location = New System.Drawing.Point(7, 22)
         Me.rbNonBio1.Name = "rbNonBio1"
-        Me.rbNonBio1.Size = New System.Drawing.Size(83, 17)
+        Me.rbNonBio1.Size = New System.Drawing.Size(107, 21)
         Me.rbNonBio1.TabIndex = 1
         Me.rbNonBio1.TabStop = True
         Me.rbNonBio1.Text = "Hydrological"
@@ -1062,9 +1064,9 @@ Public Class frmSWSTAT
         Me.gbBio.Controls.Add(Me.rbBio2)
         Me.gbBio.Controls.Add(Me.rbBio1)
         Me.gbBio.Controls.Add(Me.ckbBio)
-        Me.gbBio.Location = New System.Drawing.Point(8, 6)
+        Me.gbBio.Location = New System.Drawing.Point(10, 7)
         Me.gbBio.Name = "gbBio"
-        Me.gbBio.Size = New System.Drawing.Size(419, 229)
+        Me.gbBio.Size = New System.Drawing.Size(502, 264)
         Me.gbBio.TabIndex = 5
         Me.gbBio.TabStop = False
         Me.gbBio.Text = "Biological Design Flow Parameters"
@@ -1072,27 +1074,27 @@ Public Class frmSWSTAT
         'tbBio3
         '
         Me.tbBio3.Enabled = False
-        Me.tbBio3.Location = New System.Drawing.Point(290, 163)
+        Me.tbBio3.Location = New System.Drawing.Point(348, 188)
         Me.tbBio3.Name = "tbBio3"
-        Me.tbBio3.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio3.Size = New System.Drawing.Size(55, 22)
         Me.tbBio3.TabIndex = 11
         Me.tbBio3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio4
         '
         Me.tbBio4.Enabled = False
-        Me.tbBio4.Location = New System.Drawing.Point(290, 188)
+        Me.tbBio4.Location = New System.Drawing.Point(348, 217)
         Me.tbBio4.Name = "tbBio4"
-        Me.tbBio4.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio4.Size = New System.Drawing.Size(55, 22)
         Me.tbBio4.TabIndex = 10
         Me.tbBio4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'tbBio2
         '
         Me.tbBio2.Enabled = False
-        Me.tbBio2.Location = New System.Drawing.Point(290, 138)
+        Me.tbBio2.Location = New System.Drawing.Point(348, 159)
         Me.tbBio2.Name = "tbBio2"
-        Me.tbBio2.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio2.Size = New System.Drawing.Size(55, 22)
         Me.tbBio2.TabIndex = 9
         Me.tbBio2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1100,9 +1102,9 @@ Public Class frmSWSTAT
         '
         Me.Label4.AutoSize = True
         Me.Label4.Enabled = False
-        Me.Label4.Location = New System.Drawing.Point(30, 191)
+        Me.Label4.Location = New System.Drawing.Point(36, 220)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(247, 13)
+        Me.Label4.Size = New System.Drawing.Size(330, 17)
         Me.Label4.TabIndex = 8
         Me.Label4.Text = "Average number of excursions counted per cluster:"
         '
@@ -1110,9 +1112,9 @@ Public Class frmSWSTAT
         '
         Me.Label3.AutoSize = True
         Me.Label3.Enabled = False
-        Me.Label3.Location = New System.Drawing.Point(30, 166)
+        Me.Label3.Location = New System.Drawing.Point(36, 192)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(214, 13)
+        Me.Label3.Size = New System.Drawing.Size(289, 17)
         Me.Label3.TabIndex = 7
         Me.Label3.Text = "Length of excursion clustering period (days):"
         '
@@ -1120,18 +1122,18 @@ Public Class frmSWSTAT
         '
         Me.Label2.AutoSize = True
         Me.Label2.Enabled = False
-        Me.Label2.Location = New System.Drawing.Point(30, 141)
+        Me.Label2.Location = New System.Drawing.Point(36, 163)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(225, 13)
+        Me.Label2.Size = New System.Drawing.Size(300, 17)
         Me.Label2.TabIndex = 6
         Me.Label2.Text = "Average number of years between excursions:"
         '
         'tbBio1
         '
         Me.tbBio1.Enabled = False
-        Me.tbBio1.Location = New System.Drawing.Point(290, 113)
+        Me.tbBio1.Location = New System.Drawing.Point(348, 130)
         Me.tbBio1.Name = "tbBio1"
-        Me.tbBio1.Size = New System.Drawing.Size(46, 20)
+        Me.tbBio1.Size = New System.Drawing.Size(55, 22)
         Me.tbBio1.TabIndex = 5
         Me.tbBio1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -1139,18 +1141,18 @@ Public Class frmSWSTAT
         '
         Me.Label1.AutoSize = True
         Me.Label1.Enabled = False
-        Me.Label1.Location = New System.Drawing.Point(30, 116)
+        Me.Label1.Location = New System.Drawing.Point(36, 134)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(145, 13)
+        Me.Label1.Size = New System.Drawing.Size(195, 17)
         Me.Label1.TabIndex = 4
         Me.Label1.Text = "Flow averaging period (days):"
         '
         'rbBio3
         '
         Me.rbBio3.AutoSize = True
-        Me.rbBio3.Location = New System.Drawing.Point(6, 66)
+        Me.rbBio3.Location = New System.Drawing.Point(7, 76)
         Me.rbBio3.Name = "rbBio3"
-        Me.rbBio3.Size = New System.Drawing.Size(102, 17)
+        Me.rbBio3.Size = New System.Drawing.Size(134, 21)
         Me.rbBio3.TabIndex = 3
         Me.rbBio3.Text = "Ammonia (30B3)"
         Me.rbBio3.UseVisualStyleBackColor = True
@@ -1158,9 +1160,9 @@ Public Class frmSWSTAT
         'rbBio2
         '
         Me.rbBio2.AutoSize = True
-        Me.rbBio2.Location = New System.Drawing.Point(6, 43)
+        Me.rbBio2.Location = New System.Drawing.Point(7, 50)
         Me.rbBio2.Name = "rbBio2"
-        Me.rbBio2.Size = New System.Drawing.Size(255, 17)
+        Me.rbBio2.Size = New System.Drawing.Size(338, 21)
         Me.rbBio2.TabIndex = 2
         Me.rbBio2.Text = "Criterion continuous concentration (chronic, 4B3)"
         Me.rbBio2.UseVisualStyleBackColor = True
@@ -1169,9 +1171,9 @@ Public Class frmSWSTAT
         '
         Me.rbBio1.AutoSize = True
         Me.rbBio1.Checked = True
-        Me.rbBio1.Location = New System.Drawing.Point(6, 20)
+        Me.rbBio1.Location = New System.Drawing.Point(7, 23)
         Me.rbBio1.Name = "rbBio1"
-        Me.rbBio1.Size = New System.Drawing.Size(238, 17)
+        Me.rbBio1.Size = New System.Drawing.Size(316, 21)
         Me.rbBio1.TabIndex = 1
         Me.rbBio1.TabStop = True
         Me.rbBio1.Text = "Criterion maximum concentration (acute, 1B3)"
@@ -1182,16 +1184,16 @@ Public Class frmSWSTAT
         Me.ckbBio.AutoSize = True
         Me.ckbBio.Checked = True
         Me.ckbBio.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.ckbBio.Location = New System.Drawing.Point(6, 89)
+        Me.ckbBio.Location = New System.Drawing.Point(7, 103)
         Me.ckbBio.Name = "ckbBio"
-        Me.ckbBio.Size = New System.Drawing.Size(61, 17)
+        Me.ckbBio.Size = New System.Drawing.Size(77, 21)
         Me.ckbBio.TabIndex = 0
         Me.ckbBio.Text = "Custom"
         Me.ckbBio.UseVisualStyleBackColor = True
         '
         'frmSWSTAT
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(443, 537)
         Me.Controls.Add(Me.tabMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -1663,12 +1665,17 @@ Public Class frmSWSTAT
             btnDisplayTrend.Visible = False
             btnDisplayBasic.Visible = False
             btnDoFrequencyGraph.Visible = False
+            btnDoFrequencyGrid.Visible = False
+            btnScreeningTests.Top = 392
+            groupGraph.Height = 86
             gbTextOutput.Visible = True
             If loperation.ToLower = "globalsetparm" Then
-                btnDoFrequencyGrid.Text = "Set Global Parameters"
+                btnFrequencyReport.Text = "Set Global Parameters"
             Else
-                btnDoFrequencyGrid.Text = "Set Group Parameters"
+                btnFrequencyReport.Text = "Set Group Parameters"
             End If
+            btnFrequencyReport.Top = groupGraph.Top + groupGraph.Height + 12
+            btnFrequencyReport.Width = btnScreeningTests.Width + groupGraph.Width + 8
             PopulateForm(attributes)
             grpHighLow.Visible = True
             grpHighLow.Enabled = True
@@ -2409,30 +2416,34 @@ Public Class frmSWSTAT
     End Sub
 
     Private Sub btnFrequencyReport_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnFrequencyReport.Click
-        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        If pBatch Then
+            CalculateBatch() 'setting params for batch run
+        Else
+            Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
 
-        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
-        With lSaveDialog
-            .Title = "Save Frequency Report As"
-            .DefaultExt = ".txt"
-            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
-            If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
-                .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
-            End If
-            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
-                Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
+            Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+            With lSaveDialog
+                .Title = "Save Frequency Report As"
+                .DefaultExt = ".txt"
+                .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
+                If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
+                    .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
+                End If
+                If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
+                    Calculate("n-day " & HighOrLowString() & " value", ListToArray(lstRecurrence))
 
-                Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
+                    Dim lFreqForm As New frmDisplayFrequencyGrid(aDataGroup:=pDataGroup,
                                                              aHigh:=radioHigh.Checked,
                                                              aNday:=ListToArray(lstNday),
                                                              aReturns:=ListToArray(lstRecurrence))
-                lFreqForm.Visible = False
+                    lFreqForm.Visible = False
 
-                SaveFileString(.FileName, lFreqForm.CreateReport)
-                OpenFile(.FileName)
-            End If
-        End With
-        Me.Cursor = System.Windows.Forms.Cursors.Default
+                    SaveFileString(.FileName, lFreqForm.CreateReport)
+                    OpenFile(.FileName)
+                End If
+            End With
+            Me.Cursor = System.Windows.Forms.Cursors.Default
+        End If
     End Sub
 
     Private Sub btnDoFrequencyGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoFrequencyGraph.Click

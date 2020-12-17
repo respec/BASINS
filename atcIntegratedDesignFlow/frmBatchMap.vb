@@ -680,11 +680,14 @@ Public Class frmBatchMap
             lGroupName = lGroupNode.Parent.Text
             lGroupNode = lGroupNode.Parent
         End If
+        Dim lArgs As atcDataAttributes = Nothing
         Dim lAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.DFLOW
         If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
             lAnalysis = clsBatch.ANALYSIS.SWSTAT
+            lArgs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
+        Else
+            lArgs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
         End If
-        Dim lArgs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
         If lArgs IsNot Nothing Then
             lArgs.SetValue("Constituent", "streamflow,flow")
             Dim lCon As String = ""
@@ -719,10 +722,9 @@ Public Class frmBatchMap
                 End If
             Next
             If lTsGroup.Count > 0 Then
-                Select Case lAnalysis
-                    Case clsBatch.ANALYSIS.DFLOW
-                    Case clsBatch.ANALYSIS.SWSTAT
-                End Select
+                pfrmParams = New atcIDF.frmSWSTAT()
+                pfrmParams.BatchAnalysis = BatchAnalysis
+                pfrmParams.Initialize(lTsGroup, lArgs)
             End If
         End If
     End Sub

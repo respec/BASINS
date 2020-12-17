@@ -263,9 +263,9 @@ Partial Class frmBatchMap
         Me.btnGroupPlot.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.btnGroupPlot.Location = New System.Drawing.Point(183, 390)
         Me.btnGroupPlot.Name = "btnGroupPlot"
-        Me.btnGroupPlot.Size = New System.Drawing.Size(88, 23)
+        Me.btnGroupPlot.Size = New System.Drawing.Size(111, 23)
         Me.btnGroupPlot.TabIndex = 15
-        Me.btnGroupPlot.Text = "Plot Timespans"
+        Me.btnGroupPlot.Text = "Plot Data Timespan"
         Me.btnGroupPlot.UseVisualStyleBackColor = True
         '
         'frmBatchMap
