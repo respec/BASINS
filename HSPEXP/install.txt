@@ -1,3 +1,13 @@
+Date: 12/22/2020
+
+HSPEXP+3.2
+
+New Features:
+1. Segmentation options for WASP model steup including benthic segments.
+2. Additional constituent balance reports for ortho phosphorus, tkn, nitrite-nitrate, and total ammonia.
+3. Complete documentation of additional constituent balance reports in Appendix A.
+
+
 Date: 6/1/2020
 
 HSPEXP+3.1
