@@ -8,7 +8,8 @@ Friend Class frmDisplayFrequencyGrid
     Private pInitializing As Boolean
     Public WithEvents SWSTATform As frmSWSTAT
     Public WithEvents SWSTATformmod As frmSWSTATmod
-    Public WithEvents SWSTATDFlowBatchfrm As frmSWSTATDFlowBatch
+    'Appears frmSWSTATDFlowBatch has been replaced by frmsWSTAT for batch development
+    'Public WithEvents SWSTATDFlowBatchfrm As frmSWSTATDFlowBatch
 
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcTimeseriesGroup

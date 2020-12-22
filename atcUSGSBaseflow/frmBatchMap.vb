@@ -73,29 +73,33 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
-        Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
-        Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lGroupName)
-        treeBFGroups.Nodes.Add(lnewTreeNode)
-        For I As Integer = 0 To lstStations.RightCount - 1
-            With lnewTreeNode
-                .Nodes.Add(lstStations.RightItem(I))
-            End With
-        Next
-
-        Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
-        If lBFInputs Is Nothing Then
-            lBFInputs = New atcDataAttributes()
-            lBFInputs.SetValue("Operation", "GroupSetParm")
-            lBFInputs.SetValue("Group", lGroupName)
-            pBFInputsGroups.Add(lGroupName, lBFInputs)
-            Dim lStationsInfo As New ArrayList()
+        If lstStations.RightCount > 0 Then
+            Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
+            Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lGroupName)
+            treeBFGroups.Nodes.Add(lnewTreeNode)
             For I As Integer = 0 To lstStations.RightCount - 1
-                lStationsInfo.Add("Station" & vbTab & lstStations.RightItem(I) & ",0.0,unknown")
+                With lnewTreeNode
+                    .Nodes.Add(lstStations.RightItem(I))
+                End With
             Next
-            lBFInputs.SetValue("StationInfo", lStationsInfo)
-        End If
 
-        pBatchGroupCount += 1
+            Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+            If lBFInputs Is Nothing Then
+                lBFInputs = New atcDataAttributes()
+                lBFInputs.SetValue("Operation", "GroupSetParm")
+                lBFInputs.SetValue("Group", lGroupName)
+                pBFInputsGroups.Add(lGroupName, lBFInputs)
+                Dim lStationsInfo As New ArrayList()
+                For I As Integer = 0 To lstStations.RightCount - 1
+                    lStationsInfo.Add("Station" & vbTab & lstStations.RightItem(I) & ",0.0,unknown")
+                Next
+                lBFInputs.SetValue("StationInfo", lStationsInfo)
+            End If
+
+            pBatchGroupCount += 1
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
+        End If
     End Sub
 
     Private Sub treeBFGroups_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles treeBFGroups.MouseUp
@@ -718,17 +722,21 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnPlotDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDuration.Click
-        Dim lTsGroup As New atcTimeseriesGroup()
-        For I As Integer = 0 To lstStations.RightCount - 1
-            Dim lstationId As String = lstStations.RightItem(I)
-            Dim lDataPath As String = GetDataFileFullPath(lstationId)
-            Dim lTs As atcTimeseries = GetFlowData(lDataPath)
-            If lTs IsNot Nothing Then
-                lTsGroup.Add(lTs)
+        If lstStations.RightCount > 0 Then
+            Dim lTsGroup As New atcTimeseriesGroup()
+            For I As Integer = 0 To lstStations.RightCount - 1
+                Dim lstationId As String = lstStations.RightItem(I)
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTs As atcTimeseries = GetFlowData(lDataPath)
+                If lTs IsNot Nothing Then
+                    lTsGroup.Add(lTs)
+                End If
+            Next
+            If lTsGroup.Count > 0 Then
+                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
             End If
-        Next
-        If lTsGroup.Count > 0 Then
-            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
         End If
     End Sub
 
