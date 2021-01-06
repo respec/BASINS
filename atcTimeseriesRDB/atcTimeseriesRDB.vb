@@ -483,7 +483,7 @@ Public Class atcTimeseriesRDB
                             Exit While
                         ElseIf lCurLine.Replace(" ", "").ToLower().Contains("tsparameterstatistic") Then
                             lDailyDischargeData = True
-                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase))
+                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase) - 4)
                             Exit While
                         ElseIf lCurLine.Replace(" ", "").ToLower().Contains("ts_idparameterstatistic") Then
                             lDailyDischargeData = True
