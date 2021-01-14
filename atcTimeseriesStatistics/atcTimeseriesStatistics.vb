@@ -277,9 +277,10 @@ Public Class atcTimeseriesStatistics
                 End If
             Next
 
+            Dim lMissingCount As Integer = CInt(lLastValueIndex - lCount)
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
-            aTimeseries.Attributes.SetValue("Count Missing", CInt(lLastValueIndex - lCount))
+            aTimeseries.Attributes.SetValue("Count Missing", lMissingCount)
             If (lLastValueIndex - lCount > lLastValueIndex * 0.75) Then
                 aTimeseries.Attributes.SetValueIfMissing("Point", True)
             End If
@@ -287,7 +288,7 @@ Public Class atcTimeseriesStatistics
             If lSumInverse > 0 Then
                 Dim lHM As Double = lCountPositive / lSumInverse
                 aTimeseries.Attributes.SetValue("Harmonic Mean", lHM)
-                If aTimeseries.numValues > 0 Then aTimeseries.Attributes.SetValue("Harmonic Mean Adj", lHM * (lCountPositive * 1.0) / (aTimeseries.numValues * 1.0))
+                If aTimeseries.numValues > 0 Then aTimeseries.Attributes.SetValue("Harmonic Mean Adj", lHM * (lCountPositive * 1.0) / ((lLastValueIndex - lMissingCount) * 1.0))
             End If
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Last", aTimeseries.Value(lLastValueIndex))
