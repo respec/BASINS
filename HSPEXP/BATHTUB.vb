@@ -504,8 +504,6 @@ Module BATHTUB
             BATHTUBInputFile.AppendLine()
         Next
 
-
-
         File.WriteAllText(aOutputfolder & "BATHTUB_" & aReachId & ".btb", BATHTUBInputFile.ToString)
 
     End Sub
@@ -528,7 +526,6 @@ Module BATHTUB
         lOutput(0) = lTS.Attributes.GetDefinedValue("Mean").Value
         lOutput(1) = lTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOutput(0)
         Return lOutput
-
 
     End Function
 

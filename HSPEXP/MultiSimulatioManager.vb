@@ -627,7 +627,6 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
     Private Function AddOutputTableColumns(ByRef aDataTable As Data.DataTable) As DataTable
 
-
         Dim column As DataColumn
         column = New DataColumn()
         column.DataType = Type.GetType("System.Int32")

@@ -121,13 +121,13 @@ Public Module CookieCutterGraphs
                         End If
                         lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
-                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                                If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                                End If
-                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 2, 1, lFoundTheTimeSeriesinWDMFile)
                         lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
@@ -138,11 +138,11 @@ Public Module CookieCutterGraphs
                         If lTimeSeries IsNot Nothing Then
                             TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
                             If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                                End If
-                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
 
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "NUTRX", "DNUST", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
@@ -152,73 +152,73 @@ Public Module CookieCutterGraphs
                         lFoundTheTimeSeriesinWDMFile = False
 
                         If lTimeSeries IsNot Nothing Then
-                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
 
-                                If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                                End If
-                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
 
-                            If lTimeseriesGroup.Count = 5 Then
-                                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                                Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
-                                Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
-                                Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
-                                Dim lCurve As ZedGraph.LineItem = Nothing
-                                lAuxPane.YAxis.Title.Text = "Ben. algae (" & ChrW(956) & "g/m^2"
-                                lAuxPane.YAxis.Scale.Min = 0
-                                lMainPane.YAxis.Title.Text = "Phytoplankton as chlorophyll a (" & ChrW(956) & "g/L)"
-                                lMainPane.YAxis.Scale.Min = 0
-                                lMainPane.Y2Axis.Title.Text = "Dissolved NH4-N, NO3-N, and PO4-P (mg/L)"
-                                lMainPane.Y2Axis.Scale.Min = 0
+                        If lTimeseriesGroup.Count = 5 Then
+                            Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                            Dim lGrapher As New clsGraphTime(lTimeseriesGroup, lZgc)
+                            Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(1)
+                            Dim lAuxPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                            Dim lCurve As ZedGraph.LineItem = Nothing
+                            lAuxPane.YAxis.Title.Text = "Ben. algae (" & ChrW(956) & "g/m^2"
+                            lAuxPane.YAxis.Scale.Min = 0
+                            lMainPane.YAxis.Title.Text = "Phytoplankton as chlorophyll a (" & ChrW(956) & "g/L)"
+                            lMainPane.YAxis.Scale.Min = 0
+                            lMainPane.Y2Axis.Title.Text = "Dissolved NH4-N, NO3-N, and PO4-P (mg/L)"
+                            lMainPane.Y2Axis.Scale.Min = 0
 
-                                lMainPane.XAxis.Title.Text = lRchresCaption
+                            lMainPane.XAxis.Title.Text = lRchresCaption
 
-                                lCurve = lAuxPane.CurveList.Item(0)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("Red")
-                                lCurve.Line.Width = 1
+                            lCurve = lAuxPane.CurveList.Item(0)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Red")
+                            lCurve.Line.Width = 1
 
-                                lCurve.Label.Text = "Benthic Algae"
+                            lCurve.Label.Text = "Benthic Algae"
 
-                                lCurve = lMainPane.CurveList.Item(0)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("Red")
-                                lCurve.Line.Width = 1
-                                lCurve.Label.Text = "Phytoplankton as chlorophyll a"
-                                lCurve = lMainPane.CurveList.Item(1)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("Green")
-                                lCurve.Line.Width = 1
-                                lCurve.Label.Text = "Dissolved PO4-P"
-                                lCurve = lMainPane.CurveList.Item(2)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("Purple")
-                                lCurve.Line.Width = 1
-                                lCurve.Label.Text = "Dissolved TAM-N"
-                                lCurve = lMainPane.CurveList.Item(3)
-                                lCurve.Line.IsVisible = True
-                                lCurve.Symbol.Type = SymbolType.None
-                                lCurve.Line.Color = Drawing.Color.FromName("Black")
-                                lCurve.Line.Width = 1
-                                lCurve.Label.Text = "Dissolved NO3-N"
+                            lCurve = lMainPane.CurveList.Item(0)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Red")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Phytoplankton as chlorophyll a"
+                            lCurve = lMainPane.CurveList.Item(1)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Green")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Dissolved PO4-P"
+                            lCurve = lMainPane.CurveList.Item(2)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Purple")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Dissolved TAM-N"
+                            lCurve = lMainPane.CurveList.Item(3)
+                            lCurve.Line.IsVisible = True
+                            lCurve.Symbol.Type = SymbolType.None
+                            lCurve.Line.Color = Drawing.Color.FromName("Black")
+                            lCurve.Line.Width = 1
+                            lCurve.Label.Text = "Dissolved NO3-N"
                             lZgc.SaveIn(lOutputFolder & "Nutrient_RCHRES_" & lRchId & ".png")
                             Logger.Dbg("Generated graph " & lOutputFolder & "Nutrient_RCHRES_" & lRchId & ".png")
                         Else
-                                '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
-                                'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
-                            End If
+                            '                            Logger.Msg("Cannot generate Regan Plot for RCHRES" & lRchId & ". : 
+                            'All timeseries are not available at the RCHRES" & lRchId & ". Therefore Regan plot will not be generated for this reach.")
+                        End If
 #End Region
-                            'Plotting the TSS Curve
+                        'Plotting the TSS Curve
 #Region "Plotting TSS Curve"
 
-                            lTimeseriesGroup = New atcTimeseriesGroup
+                        lTimeseriesGroup = New atcTimeseriesGroup
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "RO", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
@@ -243,13 +243,13 @@ Public Module CookieCutterGraphs
                         lFoundTheTimeSeriesinWDMFile = False
 
                         If lTimeSeries IsNot Nothing Then
-                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                                If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                                End If
-                                lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
                         lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "SEDTRN", "BEDDEP", 1, 1, lFoundTheTimeSeriesinWDMFile)
                         lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                         If lFoundTheTimeSeriesinWDMFile = False Then
@@ -257,13 +257,13 @@ Public Module CookieCutterGraphs
                         End If
                         lFoundTheTimeSeriesinWDMFile = False
                         If lTimeSeries IsNot Nothing Then
-                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                                If TSTimeUnit <= 4 Then
-                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                                End If
-                                lTimeSeries.Attributes.SetValue("YAxis", "Right")
-                                lTimeseriesGroup.Add(lTimeSeries)
+                            TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                            If TSTimeUnit <= 4 Then
+                                lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                             End If
+                            lTimeSeries.Attributes.SetValue("YAxis", "Right")
+                            lTimeseriesGroup.Add(lTimeSeries)
+                        End If
 
                         If lTimeseriesGroup.Count = 3 Then
                             Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
@@ -406,12 +406,12 @@ Public Module CookieCutterGraphs
 
                         Else
                             WQCriteriaInmgperliter = CommonRESStandard
-                            End If
+                        End If
 
-                            If WQCriteriaInmgperliter > 0.0 Then
+                        If WQCriteriaInmgperliter > 0.0 Then
 
 
-                                lTimeseriesGroup = New atcTimeseriesGroup
+                            lTimeseriesGroup = New atcTimeseriesGroup
                             lTimeSeries = LocateTheTimeSeries(aHSPFUCI, lRchId, "HYDR", "IVOL", 1, 1, lFoundTheTimeSeriesinWDMFile)
                             lTimeSeries = SubsetByDate(lTimeSeries, aSDateJ, aEDateJ, Nothing)
                             If lFoundTheTimeSeriesinWDMFile = False Then
@@ -435,54 +435,47 @@ Public Module CookieCutterGraphs
                             lFoundTheTimeSeriesinWDMFile = False
 
                             If lTimeSeries IsNot Nothing Then
-                                    TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
-                                    If TSTimeUnit <= 4 Then
-                                        lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                                        lTimeSeries.Attributes.SetValue("YAxis", "Left")
-                                        lTimeseriesGroup.Add(lTimeSeries)
-                                    End If
+                                TSTimeUnit = lTimeSeries.Attributes.GetDefinedValue("Time Unit").Value
+                                If TSTimeUnit <= 4 Then
+                                    lTimeSeries = Aggregate(lTimeSeries, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                                    lTimeSeries.Attributes.SetValue("YAxis", "Left")
+                                    lTimeseriesGroup.Add(lTimeSeries)
                                 End If
-                                If lTimeseriesGroup.Count = 2 Then
+                            End If
+                            If lTimeseriesGroup.Count = 2 Then
 
-                                    Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
-                                    Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
-                                    Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
+                                Dim lZgc As ZedGraphControl = CreateZgc(, 1024, 768)
+                                Dim lGrapher As New clsGraphProbability(lTimeseriesGroup, lZgc)
+                                Dim lMainPane As GraphPane = lZgc.MasterPane.PaneList(0)
 
-                                    Dim lCurve As ZedGraph.LineItem = Nothing
-                                    lCurve = lMainPane.CurveList.Item(0)
-                                    lCurve.Line.IsVisible = True
-                                    lCurve.Symbol.Type = SymbolType.None
-                                    lCurve.Line.Color = Drawing.Color.FromName("green")
-                                    lCurve.Line.Width = 2
-                                    lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
-                                    lCurve = lMainPane.CurveList.Item(1)
-                                    lCurve.Line.IsVisible = True
-                                    lCurve.Symbol.Type = SymbolType.None
-                                    lCurve.Line.Color = Drawing.Color.FromName("red")
-                                    lCurve.Line.Width = 2
-                                    lCurve.Label.Text = "Baseline"
+                                Dim lCurve As ZedGraph.LineItem = Nothing
+                                lCurve = lMainPane.CurveList.Item(0)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("green")
+                                lCurve.Line.Width = 2
+                                lCurve.Label.Text = "RES Standard (" & WQCriteriaInmgperliter & " mg/L)"
+                                lCurve = lMainPane.CurveList.Item(1)
+                                lCurve.Line.IsVisible = True
+                                lCurve.Symbol.Type = SymbolType.None
+                                lCurve.Line.Color = Drawing.Color.FromName("red")
+                                lCurve.Line.Width = 2
+                                lCurve.Label.Text = "Baseline"
 
-                                    lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
-                                    lMainPane.YAxis.Scale.Min = 0
-                                    lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
+                                lMainPane.YAxis.Title.Text = "Total Phosphorus (lbs/day)"
+                                lMainPane.YAxis.Scale.Min = 0
+                                lMainPane.XAxis.Title.Text = "Percent Exceedance at " & lRchresCaption
 
-                                    lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
+                                lZgc.SaveIn(lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
                                 Logger.Dbg("Generated graph " & lOutputFolder & "LoadDurationTP_RCHRES_" & lRchId & ".png")
                             End If
 
                         End If
 
-
-
-                        End If
+                    End If
 #End Region
 
-
-
-
-
                 Next RCHRES
-
 
             End If
 
