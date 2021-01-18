@@ -22,7 +22,7 @@
     <ManifestKeyFile>
     </ManifestKeyFile>
     <GenerateManifests>false</GenerateManifests>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
     <ApplicationIcon>Basins.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <SignAssembly>false</SignAssembly>
@@ -203,7 +203,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Basins.ico" />
-    <Content Include="Flow_RCH400.ico" />
     <Content Include="GraphColors.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -321,9 +320,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="My Project\app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
