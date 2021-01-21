@@ -212,19 +212,19 @@ Public Class StartUp
 
     Private Sub StartUp_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
-        Dim WinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
-        Logger.Dbg("Located WinHSPFLt at " & WinHspfLtDir)
+        Dim lWinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+        Logger.Dbg("Located WinHSPFLt at " & lWinHspfLtDir)
         Try
             'Set Environmental Variable
             Dim lEnvPath As String = Environment.GetEnvironmentVariable("PATH")
-            If Not lEnvPath.ToLowerInvariant.Contains(WinHspfLtDir.ToLowerInvariant) Then
-                System.Environment.SetEnvironmentVariable("PATH", WinHspfLtDir & ";" & lEnvPath)
+            If Not lEnvPath.ToLowerInvariant.Contains(lWinHspfLtDir.ToLowerInvariant) Then
+                System.Environment.SetEnvironmentVariable("PATH", lWinHspfLtDir & ";" & lEnvPath)
             End If
         Catch exSetEnv As Exception
             Logger.Dbg("Could not add WinHspfLtDir to PATH " & exSetEnv.Message)
         End Try
         Try
-            Dim lHassentPath As String = IO.Path.Combine(WinHspfLtDir, "hass_ent.dll")
+            Dim lHassentPath As String = IO.Path.Combine(lWinHspfLtDir, "hass_ent.dll")
             If LoadLibraryEx(lHassentPath, IntPtr.Zero, LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH) = 0 Then
                 Logger.Msg("Missing HSPF Library at install location:" & vbCrLf & lHassentPath)
                 End
@@ -232,8 +232,8 @@ Public Class StartUp
         Catch ex As Exception
         End Try
 
-        HSPFOutputReports.pHSPFExe = IO.Path.Combine(WinHspfLtDir, "WinHspfLt.exe")
-        atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(WinHspfLtDir, "hspfmsg.wdm")
+        HSPFOutputReports.pHSPFExe = IO.Path.Combine(lWinHspfLtDir, "WinHspfLt.exe")
+        atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(lWinHspfLtDir, "hspfmsg.wdm")
 
         Logger.Dbg(Now & " Attempting to open hspfmsg.wdm")
         pHspfMsg = New atcUCI.HspfMsg
@@ -347,9 +347,6 @@ Public Class StartUp
             chkWASP.Enabled = True
             chkBathtub.Enabled = True
         End If
-
-
-
     End Sub
 
     ' Reset all the controls to the user's default Control color.  
