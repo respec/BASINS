@@ -39,10 +39,10 @@ Public Class frmCustomMsgBox
         'lblMessage
         '
         Me.lblMessage.AutoSize = True
-        Me.lblMessage.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMessage.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblMessage.Location = New System.Drawing.Point(12, 21)
         Me.lblMessage.Name = "lblMessage"
-        Me.lblMessage.Size = New System.Drawing.Size(89, 20)
+        Me.lblMessage.Size = New System.Drawing.Size(71, 15)
         Me.lblMessage.TabIndex = 0
         Me.lblMessage.Text = "lblMessage"
         '
