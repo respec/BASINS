@@ -22,7 +22,7 @@
     <ManifestKeyFile>
     </ManifestKeyFile>
     <GenerateManifests>false</GenerateManifests>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
     <ApplicationIcon>Basins.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <SignAssembly>false</SignAssembly>
@@ -143,12 +143,6 @@
     <Compile Include="frmWASPSegments.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HelpForm.Designer.vb">
-      <DependentUpon>HelpForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="HelpForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="modListUCIParameters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -165,12 +159,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="rwzProgress.Designer.vb">
-      <DependentUpon>rwzProgress.vb</DependentUpon>
-    </Compile>
-    <Compile Include="rwzProgress.vb">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="MultiSimulatioManager.vb" />
     <Compile Include="SplashScreen1.Designer.vb">
@@ -191,17 +179,11 @@
     <EmbeddedResource Include="frmWASPSegments.resx">
       <DependentUpon>frmWASPSegments.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HelpForm.resx">
-      <DependentUpon>HelpForm.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="rwzProgress.resx">
-      <DependentUpon>rwzProgress.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SplashScreen1.resx">
       <DependentUpon>SplashScreen1.vb</DependentUpon>
@@ -212,7 +194,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Basins.ico" />
-    <Content Include="Flow_RCH400.ico" />
     <Content Include="GraphColors.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -231,7 +212,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Include="HSPEXP_TemporaryKey.pfx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -331,10 +311,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="My Project\app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="favicon.ico" />
-    <Content Include="HSPEXPIcon5.ico" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

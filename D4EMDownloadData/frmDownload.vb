@@ -192,15 +192,25 @@ Public Class frmDownload
         If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             lGroups.Add(grpNWISStations_GW)
             lGroups.Add(grpNWIS_GW)
-            lGroups.Add(grpBASINS)
-            lGroups.Add(grpNHDplus)
+            'lGroups.Add(grpBASINS)
+            lGroups.Add(grpNHDplus2)
             lGroups.Add(grpUSGS_Seamless)
 
-            chkBASINS_LSTORET.Visible = False
-            chkBASINS_Census.Visible = False
-            chkBASINS_MetStations.Left = chkBASINS_Census.Left
-            chkBASINS_DEMG.Left = chkBASINS_NED.Left
-            chkBASINS_303d.Visible = False
+            chkUSGS_Seamless_NLCD2001_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2001_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2004_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2006_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2006_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2008_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2011_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2011_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2013_LandCover.Visible = False
+
+            'chkBASINS_LSTORET.Visible = False
+            'chkBASINS_Census.Visible = False
+            'chkBASINS_MetStations.Left = chkBASINS_Census.Left
+            'chkBASINS_DEMG.Left = chkBASINS_NED.Left
+            'chkBASINS_303d.Visible = False
             'chkBASINS_MetData.Left = chkBASINS_303d.Left
         Else
             lGroups.Add(grpBASINS)

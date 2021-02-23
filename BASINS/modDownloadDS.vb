@@ -710,6 +710,7 @@ Public Module modDownload
             'prompt about creating a project with no data
             lProjectName = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
+
         If Not String.IsNullOrEmpty(lProjectName) Then
             Logger.Msg(lProjectName, "Created Project")
         End If
@@ -974,10 +975,12 @@ StartOver:
                     g_Project.SaveProject(lProjectFileName)
                 Else
                     'new check to see if the core data is available before attempting to download it
-                    Dim lHUC8BoundaryOnly As Boolean = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
-                    If Not lHUC8BoundaryOnly Then
+                    Dim lHUC8Status As Integer = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
+                    If lHUC8Status = 0 Then
                         'download and project core data
                         CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
+                    ElseIf lHUC8Status = 2 Then
+                        lProjectFileName = ""    'cancel
                     End If
                 End If
                 Return lProjectFileName
@@ -1899,13 +1902,14 @@ StartOver:
         Next
     End Sub
 
-    Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Boolean
+    Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Integer
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
         Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
         Dim lMissingHuc8s As String = ""
-        Dim lHUC8BoundaryOnly As Boolean = False
+        'Dim lHUC8BoundaryOnly As Boolean = False
+        Dim lHUC8Status As Integer = 0              '0 - ok (download or cache), 1 - use only huc8 boundary, 2- cancel
         'get huc8s in this region
         Dim lXDoc As New Xml.XmlDocument
         lXDoc.LoadXml(aRegion)
@@ -1914,21 +1918,36 @@ StartOver:
         For Each lNode As Xml.XmlNode In lNodeList
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
-            If Not lHUC8BoundaryOnly Then
+            If lHUC8Status = 0 Then
                 If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
                     'problem, this file does not exist
                     'just build project using selected HUC8s without any core data
-                    lHUC8BoundaryOnly = True
+                    lHUC8Status = 1
                     lMissingHuc8s &= " " & lHUC8
                 End If
             End If
         Next
-        If lHUC8BoundaryOnly Then
-            If Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCrLf & vbCrLf &
-                    lMissingHuc8s & vbCrLf & vbCrLf &
-                    "Do you want to build a project using only the HUC8 boundary?" &
-                     vbCr & vbCr & "(Cancel will attempt to build using data from the program cache.)",
-                    MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
+
+        If lHUC8Status = 1 Then
+            Dim lStr As String = Logger.MsgCustom("One (or more) of the core data sets is temporarily unavailable for download." & vbCrLf & vbCrLf &
+                                                    lMissingHuc8s & vbCrLf & vbCrLf &
+                                                    "Select 'Use HUC8' to build project using only the HUC8 boundary." & vbCrLf &
+                                                    "Select 'Use Cache' to build project using data from the program cache." & vbCrLf &
+                                                    "Select 'Cancel' to stop Build New Project and return to Main dialog box.",
+                                                    "New Project", "Use HUC8", "Use Cache", "Cancel")
+            If lStr = "Use HUC8" Then
+                lHUC8Status = 1
+            ElseIf lStr = "Use Cache" Then
+                lHUC8Status = 0
+            Else
+                lHUC8Status = 2  'cancel
+            End If
+            If lHUC8Status = 1 Then
+                'If Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCrLf & vbCrLf &
+                '        lMissingHuc8s & vbCrLf & vbCrLf &
+                '        "Do you want to build a project using only the HUC8 boundary?" &
+                '         vbCr & vbCr & "(Cancel will attempt to build using data from the program cache.)",
+                '        MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
                 'save the HUC8s as a new shapefile
                 Dim lHUC8ShapefileName As String = GisUtilDS.LayerFileName("Cataloging Units")
                 Dim lNewShapefileName As String = aNewDataDir & FilenameNoPath(lHUC8ShapefileName)
@@ -1981,11 +2000,9 @@ StartOver:
                 'g_MapWin.PreviewMap.GetPictureFromMap()
                 Dim lProjectFileName As String = IO.Path.ChangeExtension(aProjectFileName, "dspx")
                 g_Project.SaveProject(lProjectFileName)
-            Else
-                lHUC8BoundaryOnly = False
             End If
         End If
-        Return lHUC8BoundaryOnly
+        Return lHUC8Status
     End Function
 
     'Given a file name and the XML describing how to render it, add a grid layer to MapWindow

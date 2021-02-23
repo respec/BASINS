@@ -15,14 +15,14 @@ Module BATHTUB
     Sub BATHTUBInputFile(ByVal aHSPFUCI As HspfUci, ByVal aBinaryData As atcDataSource,
                          ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal aReachId As Integer,
                          ByVal aOutputfolder As String)
-        Dim BATHTUBInputFile As New Text.StringBuilder
-        BATHTUBInputFile.AppendLine("Vers 6.14f (04/28/2015)") 'First line of BATHTUB Output
-        BATHTUBInputFile.AppendLine("HSPF Reach " & aReachId & " BATHTUB Model Developed Using HSPEXP+")
+        Dim lBATHTUBInputFile As New Text.StringBuilder
+        lBATHTUBInputFile.AppendLine("Vers 6.14f (04/28/2015)") 'First line of BATHTUB Output
+        lBATHTUBInputFile.AppendLine("HSPF Reach " & aReachId & " BATHTUB Model Developed Using HSPEXP+")
 
         'GLobal Parameters in four lines
-        BATHTUBInputFile.AppendLine("4,""Global Parmameters""")
+        lBATHTUBInputFile.AppendLine("4,""Global Parmameters""")
         Dim lYears As Integer = YearCount(aSDateJ, aEDateJ)
-        BATHTUBInputFile.AppendLine("1,""AVERAGING PERIOD (YRS)"",1,0")
+        lBATHTUBInputFile.AppendLine("1,""AVERAGING PERIOD (YRS)"",1,0")
         Dim lTimeseries_precip As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "PRSUPY")(0)
         Dim lTimeseries_sarea As atcTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "SAREA")(0)
         Dim lTimeseries As atcTimeseries = lTimeseries_precip / lTimeseries_sarea
@@ -31,7 +31,7 @@ Module BATHTUB
         Dim lAverage As Double = lTimeseries.Attributes.GetDefinedValue("Mean").Value
         Dim lStdEv As Double = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
         Dim lCVmean As Double = lStdEv / (lTimeseries.numValues) ^ (0.5) / lAverage
-        BATHTUBInputFile.AppendLine("2,""PRECIPITATION (METERS)""," & Format(lAverage / 3.28084, "0.00") & "," & Format(lCVmean, "0.00"))
+        lBATHTUBInputFile.AppendLine("2,""PRECIPITATION (METERS)""," & Format(lAverage / 3.28084, "0.00") & "," & Format(lCVmean, "0.00"))
         Dim lTimeseries_volev = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "VOLEV")(0)
         lTimeseries = lTimeseries_volev / lTimeseries_sarea
         lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
@@ -39,10 +39,10 @@ Module BATHTUB
         lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value
         lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
         lCVmean = lStdEv / (lTimeseries.numValues) ^ (0.5) / lAverage
-        BATHTUBInputFile.AppendLine("3,""EVAPORATION (METERS)""," & Format(lAverage / 3.28084, "0.00") & "," & Format(lCVmean, "0.00"))
+        lBATHTUBInputFile.AppendLine("3,""EVAPORATION (METERS)""," & Format(lAverage / 3.28084, "0.00") & "," & Format(lCVmean, "0.00"))
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "AVDEP")(0)
         Dim lChangeInDepth_m As Double = (lTimeseries.Value(1) - lTimeseries.Value(lTimeseries.numValues)) * 0.0254 / lYears
-        BATHTUBInputFile.AppendLine("4,""INCREASE IN STORAGE (METERS)""," & Format(lChangeInDepth_m, "0.00") & ",0")
+        lBATHTUBInputFile.AppendLine("4,""INCREASE IN STORAGE (METERS)""," & Format(lChangeInDepth_m, "0.00") & ",0")
 
         'Model options in 12 lines; mostly copied from the default btb file
         Dim lString As String = "12,""Model Options""" & vbCrLf &
@@ -58,7 +58,7 @@ Module BATHTUB
         "10,""AVAILABILITY FACTORS"",0" & vbCrLf &
         "11,""MASS-BALANCE TABLES"",1" & vbCrLf &
         "12,""OUTPUT DESTINATION"",2"
-        BATHTUBInputFile.AppendLine(lString)
+        lBATHTUBInputFile.AppendLine(lString)
 
         'Model coefficients in 17 lines. Copied from an example file.
         lString = "17,""Model Coefficients""" & vbCrLf &
@@ -79,14 +79,14 @@ Module BATHTUB
         "15,""Avail Factor - Ortho P"",1.93,0" & vbCrLf &
         "16,""Avail Factor - TN"",.59,0" & vbCrLf &
         "17,""Avail Factor - Inorganic N"",.79,0"
-        BATHTUBInputFile.AppendLine(lString)
+        lBATHTUBInputFile.AppendLine(lString)
 
         'Atmospheric deposition in 2 lines. Not sure if other atmospheric deposition information is required.
-        BATHTUBInputFile.AppendLine("5,""Atmospheric Loads""")
+        lBATHTUBInputFile.AppendLine("5,""Atmospheric Loads""")
         Dim lSurfaceArea_km2 As Double = 0
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "SAREA")(0)
         lSurfaceArea_km2 = lTimeseries.Attributes.GetDefinedValue("Mean").Value * 0.00404686
-        BATHTUBInputFile.AppendLine("1,""CONSERVATIVE SUBST."",0,0")
+        lBATHTUBInputFile.AppendLine("1,""CONSERVATIVE SUBST."",0,0")
         lTimeseries = aBinaryData.DataSets.FindData("Location", "R:" & aReachId).FindData("Constituent", "PO4-ATMDEPTOT")(0)
         Dim lTPAverage As Double = 0
         Dim lTPCVmean As Double = 0
@@ -99,9 +99,9 @@ Module BATHTUB
             If lTPAverage <> 0 Then
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lTPCVmean = lStdEv / (lTimeseries.numValues) ^ (0.5) / lTPAverage
-                BATHTUBInputFile.AppendLine("2,""TOTAL P""," & Format(lTPAverage, "0.00") & "," & Format(lTPCVmean, "0.00"))
+                lBATHTUBInputFile.AppendLine("2,""TOTAL P""," & Format(lTPAverage, "0.00") & "," & Format(lTPCVmean, "0.00"))
             Else
-                BATHTUBInputFile.AppendLine("2,""TOTAL P"",0,0")
+                lBATHTUBInputFile.AppendLine("2,""TOTAL P"",0,0")
             End If
         End If
 
@@ -130,13 +130,13 @@ Module BATHTUB
         If lAverage <> 0 Then
             lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
             lCVmean = lStdEv / (lTimeseries.numValues) ^ (0.5) / lAverage
-            BATHTUBInputFile.AppendLine("3,""TOTAL N""," & Format(lAverage, "0.00") & "," & Format(lCVmean, "0.00"))
+            lBATHTUBInputFile.AppendLine("3,""TOTAL N""," & Format(lAverage, "0.00") & "," & Format(lCVmean, "0.00"))
         Else
-            BATHTUBInputFile.AppendLine("3,""TOTAL N"",0,0")
+            lBATHTUBInputFile.AppendLine("3,""TOTAL N"",0,0")
         End If
 
-        BATHTUBInputFile.AppendLine("4,""ORTHO P""," & Format(lTPAverage / 2, "0.00") & "," & Format(lTPCVmean, "0.00"))
-        BATHTUBInputFile.AppendLine("5,""INORGANIC N""," & Format(lAverage / 2, "0.00") & "," & Format(lCVmean, "0.00"))
+        lBATHTUBInputFile.AppendLine("4,""ORTHO P""," & Format(lTPAverage / 2, "0.00") & "," & Format(lTPCVmean, "0.00"))
+        lBATHTUBInputFile.AppendLine("5,""INORGANIC N""," & Format(lAverage / 2, "0.00") & "," & Format(lCVmean, "0.00"))
 
         'Lake segments; assumes only one segment
         Dim lMeanDepth_m As Double = 0
@@ -145,15 +145,15 @@ Module BATHTUB
         lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUYear, 1, atcTran.TranAverSame)
         lTimeseries /= 3.28084
         lMeanDepth_m = lTimeseries.Attributes.GetDefinedValue("Mean").Value
-        Dim CVMeanSampleSizeBasedOnHourly As Double = 0
-        CVMeanSampleSizeBasedOnHourly = ((aEDateJ - aSDateJ) / 365)
+        Dim lCVMeanSampleSizeBasedOnHourly As Double = 0
+        lCVMeanSampleSizeBasedOnHourly = ((aEDateJ - aSDateJ) / 365)
         'Dim lDepth_CVmean As Double = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value / (lTimeseries.numValues) ^ (0.5) / lMeanDepth_m
-        Dim lDepth_CVmean As Double = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value / (CVMeanSampleSizeBasedOnHourly) ^ (0.5) / lMeanDepth_m
+        Dim lDepth_CVmean As Double = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value / (lCVMeanSampleSizeBasedOnHourly) ^ (0.5) / lMeanDepth_m
 
         Dim lLength_km As Double = aHSPFUCI.OpnBlks("RCHRES").OperFromID(aReachId).Tables("HYDR-PARM2").Parms("LEN").Value * 1.60934 'COnverting stream length in miles to km
-        BATHTUBInputFile.AppendLine("1,""Segments""")
+        lBATHTUBInputFile.AppendLine("1,""Segments""")
         'Properties of the first segment
-        BATHTUBInputFile.AppendLine("1,""Main Pool"",0,1," & Format(lSurfaceArea_km2, "0.00") & "," &
+        lBATHTUBInputFile.AppendLine("1,""Main Pool"",0,1," & Format(lSurfaceArea_km2, "0.00") & "," &
                                     Format(lMeanDepth_m, "0.00") & "," & Format(lLength_km, "0.00") & "," & Format(lMeanDepth_m, "0.00") & "," &
                                     Format(lDepth_CVmean, "0.00") & ",0,0,0.08,0.05,0,0")
         'Lines for pollutants in the first segment; all written as zero and user must input in Bathtub; placeholder values are included for non-algal turbidity mean and CVmean to allow model to run
@@ -171,7 +171,7 @@ Module BATHTUB
         "1,""MOD-V  MG/M3-DAY"",0,0,1,0" & vbCrLf
 
 
-        BATHTUBInputFile.Append(lString)
+        lBATHTUBInputFile.Append(lString)
 
         'Information about the tributaries
 
@@ -184,14 +184,14 @@ Module BATHTUB
         Next
 
         'An extra tributary is created for lakeshed loading
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""Tributaries""")
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""Tributaries""")
         lCountNumberOfTributaries = 0
         Dim lOperationTypes As New atcCollection
         lOperationTypes.Add("P:", "PERLND")
         lOperationTypes.Add("I:", "IMPLND")
         lOperationTypes.Add("R:", "RCHRES")
 
-        CVMeanSampleSizeBasedOnHourly = 0
+        lCVMeanSampleSizeBasedOnHourly = 0
         Dim lCVmeanROVOL As Double = 0
         Dim lCVmeanTP As Double = 0
         Dim lCVmeanOP As Double = 0
@@ -206,7 +206,7 @@ Module BATHTUB
                 Dim lLocationID As String = lSource.Source.VolName.Substring(0, 1) & ":" & lSource.Source.VolId
                 Dim lTribID As Integer = lSource.Source.VolId
                 Dim lAreaTable As DataTable = AreaReportInTableFormat(aHSPFUCI, lOperationTypes, lLocationID)
-                Dim lselectExpression As String = "Landuse='Total'"
+                Dim lSelectExpression As String = "Landuse='Total'"
                 Dim lTotalRows() As DataRow = lAreaTable.Select("Landuse='Total'")
                 Dim lDrainageAreaKM2 As Double = lTotalRows(0)("TotalArea") * 0.00404686 'Converting areas from ac to km2
 
@@ -227,9 +227,9 @@ Module BATHTUB
                 lAverage = lTimeseries.Attributes.GetDefinedValue("Mean").Value
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
                 lCVmeanROVOL = lStdEv / (lTimeseries.numValues) ^ (0.5) / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""HSPF Reach " & lTribID & """,1,1," & Format(lDrainageAreaKM2, "0.00") & "," & Format(lAverage, "0.00") & "," & Format(lCVmeanROVOL, "0.00") & ",0")
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""HSPF Reach " & lTribID & """,1,1," & Format(lDrainageAreaKM2, "0.00") & "," & Format(lAverage, "0.00") & "," & Format(lCVmeanROVOL, "0.00") & ",0")
 
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""CONSERVATIVE SUBST."",0,0")
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""CONSERVATIVE SUBST."",0,0")
 
                 'Get the total P concentration data
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, lTribID, "PLANK", "TPKCF1", 5, 1, lTimeSeriesIsInWDM)
@@ -246,9 +246,9 @@ Module BATHTUB
                 lConcTimeseries /= 1233480
                 lAverage = FlowWeightedConc(lConcTimeseries, lROVOLTimeseries)
                 lStdEv = lConcTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
-                CVMeanSampleSizeBasedOnHourly = ((aEDateJ - aSDateJ) / 365)
-                lCVmeanTP = lStdEv / (CVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL P""," & Format(lAverage, "0.00") & "," & Format(lCVmeanTP, "0.00"))
+                lCVMeanSampleSizeBasedOnHourly = ((aEDateJ - aSDateJ) / 365)
+                lCVmeanTP = lStdEv / (lCVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL P""," & Format(lAverage, "0.00") & "," & Format(lCVmeanTP, "0.00"))
 
                 'Get the total N concentration
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, lTribID, "PLANK", "TPKCF1", 4, 1, lTimeSeriesIsInWDM)
@@ -265,8 +265,8 @@ Module BATHTUB
                 lConcTimeseries /= 1233480
                 lAverage = FlowWeightedConc(lConcTimeseries, lROVOLTimeseries)
                 lStdEv = lConcTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
-                lCVmeanTN = lStdEv / (CVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL N""," & Format(lAverage, "0.00") & "," & Format(lCVmeanTN, "0.00"))
+                lCVmeanTN = lStdEv / (lCVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""TOTAL N""," & Format(lAverage, "0.00") & "," & Format(lCVmeanTN, "0.00"))
 
                 'Get the ortho P concentration
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, lTribID, "NUTRX", "DNUST", 4, 1, lTimeSeriesIsInWDM)
@@ -279,8 +279,8 @@ Module BATHTUB
                 lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
                 lAverage = FlowWeightedConc(lTimeseries, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lTimeseries.Attributes.GetDefinedValue("Standard Deviation").Value
-                lCVmeanOP = lStdEv / (CVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""ORTHO P""," & Format(lAverage, "0.00") & "," & Format(lCVmeanOP, "0.00"))
+                lCVmeanOP = lStdEv / (lCVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""ORTHO P""," & Format(lAverage, "0.00") & "," & Format(lCVmeanOP, "0.00"))
 
                 'Get the inorganic N concentration (sum of NO3, NO2, and TAM)
                 lTimeseries = LocateTheTimeSeries(aHSPFUCI, lTribID, "NUTRX", "DNUST", 1, 1, lTimeSeriesIsInWDM)
@@ -313,9 +313,9 @@ Module BATHTUB
                 lInorgN = SubsetByDate(lInorgN, aSDateJ, aEDateJ, Nothing)
                 lAverage = FlowWeightedConc(lInorgN, lROVOLTimeseries) * 1000 'Original concentration is in mg/l or ppm. Multiplying it by 1000, makes it ppb
                 lStdEv = lInorgN.Attributes.GetDefinedValue("Standard Deviation").Value
-                lCVmeanIN = lStdEv / (CVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""INORGANIC N""," & Format(lAverage, "0.00") & "," & Format(lCVmeanIN, "0.00"))
-                BATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""LandUses"",0,0,0,0,0,0,0,0")
+                lCVmeanIN = lStdEv / (lCVMeanSampleSizeBasedOnHourly) ^ (0.5) / lAverage
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""INORGANIC N""," & Format(lAverage, "0.00") & "," & Format(lCVmeanIN, "0.00"))
+                lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries & ",""LandUses"",0,0,0,0,0,0,0,0")
             End If
         Next
 
@@ -393,58 +393,58 @@ Module BATHTUB
                 lRow("Area_km2") = lSource.MFact * 0.00404686 'Converting area from ac to km2
                 Dim WaterVolumeInMAndCov As Double() = CalculateVolumeInMeters(lSource.Source.Opn, aBinaryData, aSDateJ, aEDateJ, lLocationID)
                 lRow("Water_Vol_m") = WaterVolumeInMAndCov(0)
-                lRow("Water_Vol_COV") = WaterVolumeInMAndCov(1) * ((lTimeseries.numValues) ^ (0.5)) / ((CVMeanSampleSizeBasedOnHourly) ^ (0.5))
+                lRow("Water_Vol_COV") = WaterVolumeInMAndCov(1) * ((lTimeseries.numValues) ^ (0.5)) / ((lCVMeanSampleSizeBasedOnHourly) ^ (0.5))
                 'The loading rate from the function is in lbs/ac. Multiplying it by 112.085 converts to mg/m2. Dividing it by water depth, converts to mg/m3
                 Dim NutrientLoadAndCOV As Double() = CalculatePhosphorus(lSource.Source.Opn, aBinaryData, lRCHRESOperation, lMassLinkID, aSDateJ, aEDateJ, aHSPFUCI)
                 lRow("PO4_mg_m3") = NutrientLoadAndCOV(0) / WaterVolumeInMAndCov(0)
-                lRow("PO4_COV") = NutrientLoadAndCOV(1) * ((lTimeseries.numValues) ^ (0.5)) / ((CVMeanSampleSizeBasedOnHourly) ^ (0.5))
+                lRow("PO4_COV") = NutrientLoadAndCOV(1) * ((lTimeseries.numValues) ^ (0.5)) / ((lCVMeanSampleSizeBasedOnHourly) ^ (0.5))
                 lRow("TP_mg_m3") = NutrientLoadAndCOV(2) / WaterVolumeInMAndCov(0)
-                lRow("TP_COV") = NutrientLoadAndCOV(3) * ((lTimeseries.numValues) ^ (0.5)) / ((CVMeanSampleSizeBasedOnHourly) ^ (0.5))
+                lRow("TP_COV") = NutrientLoadAndCOV(3) * ((lTimeseries.numValues) ^ (0.5)) / ((lCVMeanSampleSizeBasedOnHourly) ^ (0.5))
                 NutrientLoadAndCOV = CalculateNitrogen(lSource.Source.Opn, aBinaryData, lRCHRESOperation, lMassLinkID, aSDateJ, aEDateJ, aHSPFUCI)
                 lRow("InorgN_mg_m3") = NutrientLoadAndCOV(0) / WaterVolumeInMAndCov(0)
-                lRow("InorgN_COV") = NutrientLoadAndCOV(1) * ((lTimeseries.numValues) ^ (0.5)) / ((CVMeanSampleSizeBasedOnHourly) ^ (0.5))
+                lRow("InorgN_COV") = NutrientLoadAndCOV(1) * ((lTimeseries.numValues) ^ (0.5)) / ((lCVMeanSampleSizeBasedOnHourly) ^ (0.5))
                 lRow("TN_mg_m3") = NutrientLoadAndCOV(2) / WaterVolumeInMAndCov(0)
-                lRow("TN_COV") = NutrientLoadAndCOV(3) * ((lTimeseries.numValues) ^ (0.5)) / ((CVMeanSampleSizeBasedOnHourly) ^ (0.5))
+                lRow("TN_COV") = NutrientLoadAndCOV(3) * ((lTimeseries.numValues) ^ (0.5)) / ((lCVMeanSampleSizeBasedOnHourly) ^ (0.5))
                 lNPSTable.Rows.Add(lRow)
             End If
         Next
-        Dim lakeshedAreaKm2 As Double = lNPSTable.Compute("SUM(Area_km2)", "")
+        Dim lLakeshedAreaKm2 As Double = lNPSTable.Compute("SUM(Area_km2)", "")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""LakeShed"",1,2," & Format(lakeshedAreaKm2, "0.00") & ",0,0,0") ' & Format(lAverage, "0.00") & "," & Format(lCov, "0.00") & ",0")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""CONSERVATIVE SUBST."",0,0")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL P"",0,0")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL N"",0,0")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""ORTHO P"",0,0")
         'BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""INORGANIC N"",0,0")
-        Dim landuseAreakm2 As String = lCountNumberOfTributaries + 1 & ",""LandUses"","
+        Dim lLanduseAreakm2 As String = lCountNumberOfTributaries + 1 & ",""LandUses"","
         Dim lNumberOfLandUses As Integer = lNPSTable.Rows.Count
         For Each lNPSTableRow As DataRow In lNPSTable.Rows
-            landuseAreakm2 &= Format(lNPSTableRow("Area_km2"), "0.00") & ","
+            lLanduseAreakm2 &= Format(lNPSTableRow("Area_km2"), "0.00") & ","
         Next
         If lNumberOfLandUses < 8 Then
             For i As Integer = 1 To 8 - lNumberOfLandUses
-                landuseAreakm2 &= "0,"
+                lLanduseAreakm2 &= "0,"
             Next
         End If
-        landuseAreakm2 = landuseAreakm2.Substring(0, landuseAreakm2.Length - 1)
+        lLanduseAreakm2 = lLanduseAreakm2.Substring(0, lLanduseAreakm2.Length - 1)
 
         'BATHTUBInputFile.AppendLine(landuseAreakm2)
         'BATHTUBInputFile.AppendLine("0,""Channels""")
         'BATHTUBInputFile.AppendLine("8,""Land Use Export Categories""")
-        Dim CumArea As Double = 0
-        Dim CumRunoff As Double = 0
-        Dim CumTPLoad As Double = 0
-        Dim CumTNLoad As Double = 0
-        Dim CumOPLoad As Double = 0
-        Dim CumINLoad As Double = 0
-        Dim LandUseNumber As Integer = 0
+        Dim lCumArea As Double = 0
+        Dim lCumRunoff As Double = 0
+        Dim lCumTPLoad As Double = 0
+        Dim lCumTNLoad As Double = 0
+        Dim lCumOPLoad As Double = 0
+        Dim lCumINLoad As Double = 0
+        Dim lLandUseNumber As Integer = 0
         For Each lNPSTableRow As DataRow In lNPSTable.Rows
-            LandUseNumber += 1
-            CumArea += lNPSTableRow("Area_km2")
-            CumRunoff += lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
-            CumTPLoad += lNPSTableRow("TP_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
-            CumTNLoad += lNPSTableRow("TN_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
-            CumOPLoad += lNPSTableRow("PO4_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
-            CumINLoad += lNPSTableRow("InorgN_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
+            lLandUseNumber += 1
+            lCumArea += lNPSTableRow("Area_km2")
+            lCumRunoff += lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
+            lCumTPLoad += lNPSTableRow("TP_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
+            lCumTNLoad += lNPSTableRow("TN_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
+            lCumOPLoad += lNPSTableRow("PO4_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
+            lCumINLoad += lNPSTableRow("InorgN_mg_m3") * lNPSTableRow("Water_Vol_m") * lNPSTableRow("Area_km2")
             'BATHTUBInputFile.AppendLine(LandUseNumber & "," & """" & lNPSTableRow("LandUseName") & """")
             'BATHTUBInputFile.AppendLine(LandUseNumber & ",""Runoff""," & Format(lNPSTableRow("Water_Vol_m"), "0.00") & "," & Format(lNPSTableRow("Water_Vol_COV"), "0.00"))
             'BATHTUBInputFile.AppendLine(LandUseNumber & ",""CONSERVATIVE SUBST."",0,0")
@@ -454,59 +454,57 @@ Module BATHTUB
             'BATHTUBInputFile.AppendLine(LandUseNumber & ",""INORGANIC N""," & Format(lNPSTableRow("InorgN_mg_m3"), "0.00") & "," & Format(lNPSTableRow("InorgN_COV"), "0.00"))
         Next
 
-        Dim CumTPConc As Double = 0
-        Dim CumTNConc As Double = 0
-        Dim CumOPConc As Double = 0
-        Dim CumINConc As Double = 0
+        Dim lCumTPConc As Double = 0
+        Dim lCumTNConc As Double = 0
+        Dim lCumOPConc As Double = 0
+        Dim lCumINConc As Double = 0
 
-        If CumRunoff > 0 Then
-            CumTPConc = CumTPLoad / CumRunoff
-            CumTNConc = CumTNLoad / CumRunoff
-            CumOPConc = CumOPLoad / CumRunoff
-            CumINConc = CumINLoad / CumRunoff
+        If lCumRunoff > 0 Then
+            lCumTPConc = lCumTPLoad / lCumRunoff
+            lCumTNConc = lCumTNLoad / lCumRunoff
+            lCumOPConc = lCumOPLoad / lCumRunoff
+            lCumINConc = lCumINLoad / lCumRunoff
         End If
 
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""Lakeshed: HSPF Reach " & aReachId & """,1,1," & Format(CumArea, "0.00") & "," & Format(CumRunoff, "0.00") & "," & Format(lCVmeanROVOL, "0.00") & ",0")
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""CONSERVATIVE SUBST."",0,0")
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL P""," & Format(CumTPConc, "0.00") & "," & Format(lCVmeanTP, "0.00"))
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL N""," & Format(CumTNConc, "0.00") & "," & Format(lCVmeanTN, "0.00"))
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""ORTHO P""," & Format(CumOPConc, "0.00") & "," & Format(lCVmeanOP, "0.00"))
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""INORGANIC N""," & Format(CumINConc, "0.00") & "," & Format(lCVmeanIN, "0.00"))
-        BATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""LandUses"",0,0,0,0,0,0,0,0")
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""Lakeshed: HSPF Reach " & aReachId & """,1,1," & Format(lCumArea, "0.00") & "," & Format(lCumRunoff, "0.00") & "," & Format(lCVmeanROVOL, "0.00") & ",0")
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""CONSERVATIVE SUBST."",0,0")
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL P""," & Format(lCumTPConc, "0.00") & "," & Format(lCVmeanTP, "0.00"))
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""TOTAL N""," & Format(lCumTNConc, "0.00") & "," & Format(lCVmeanTN, "0.00"))
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""ORTHO P""," & Format(lCumOPConc, "0.00") & "," & Format(lCVmeanOP, "0.00"))
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""INORGANIC N""," & Format(lCumINConc, "0.00") & "," & Format(lCVmeanIN, "0.00"))
+        lBATHTUBInputFile.AppendLine(lCountNumberOfTributaries + 1 & ",""LandUses"",0,0,0,0,0,0,0,0")
 
         'BATHTUBInputFile.AppendLine(landuseAreakm2)
-        BATHTUBInputFile.AppendLine("0,""Channels""")
-        BATHTUBInputFile.AppendLine("8,""Land Use Export Categories""")
+        lBATHTUBInputFile.AppendLine("0,""Channels""")
+        lBATHTUBInputFile.AppendLine("8,""Land Use Export Categories""")
 
         'If lNumberOfLandUses < 8 Then
         For i As Integer = 1 To 8 '- lNumberOfLandUses
-            BATHTUBInputFile.AppendLine(i & "," & """landuse" & i & """")
+            lBATHTUBInputFile.AppendLine(i & "," & """landuse" & i & """")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & "," & """""")
-            BATHTUBInputFile.AppendLine(i & ",""Runoff"",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""Runoff"",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""Runoff"",0,0")
-            BATHTUBInputFile.AppendLine(i & ",""CONSERVATIVE SUBST."",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""CONSERVATIVE SUBST."",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""CONSERVATIVE SUBST."",0,0")
-            BATHTUBInputFile.AppendLine(i & ",""TOTAL P"",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""TOTAL P"",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""TOTAL P"",0,0")
-            BATHTUBInputFile.AppendLine(i & ",""TOTAL N"",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""TOTAL N"",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""TOTAL N"",0,0")
-            BATHTUBInputFile.AppendLine(i & ",""ORTHO P"",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""ORTHO P"",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""ORTHO P"",0,0")
-            BATHTUBInputFile.AppendLine(i & ",""INORGANIC N"",0,0")
+            lBATHTUBInputFile.AppendLine(i & ",""INORGANIC N"",0,0")
             'BATHTUBInputFile.AppendLine(i + lNumberOfLandUses & ",""INORGANIC N"",0,0")
         Next
         'End If
 
 
-        BATHTUBInputFile.AppendLine("""Notes""")
+        lBATHTUBInputFile.AppendLine("""Notes""")
         'BATHTUBInputFile.AppendLine("Write Whatever you Want!!!")
         For i As Integer = 0 To 9
-            BATHTUBInputFile.AppendLine()
+            lBATHTUBInputFile.AppendLine()
         Next
 
-
-
-        File.WriteAllText(aOutputfolder & "BATHTUB_" & aReachId & ".btb", BATHTUBInputFile.ToString)
+        File.WriteAllText(aOutputfolder & "BATHTUB_" & aReachId & ".btb", lBATHTUBInputFile.ToString)
 
     End Sub
     Private Function CalculateVolumeInMeters(ByVal aHSPFOpn As HspfOperation, ByVal aBinaryData As atcDataSource, ByVal aSDateJ As Double, ByVal aEDateJ As Double,
@@ -528,7 +526,6 @@ Module BATHTUB
         lOutput(0) = lTS.Attributes.GetDefinedValue("Mean").Value
         lOutput(1) = lTS.Attributes.GetDefinedValue("Standard Deviation").Value / lOutput(0)
         Return lOutput
-
 
     End Function
 
