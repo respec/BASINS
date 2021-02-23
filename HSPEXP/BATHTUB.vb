@@ -166,7 +166,7 @@ Module BATHTUB
         "1,""CHL-A      MG/M3"",0,0,1,0" & vbCrLf &
         "1,""SECCHI         M"",0,0,1,0" & vbCrLf &
         "1,""ORGANIC N  MG/M3"",0,0,1,0" & vbCrLf &
-        "1,""TP-ORTHO-P MG/M3"",0,0,1,0" & vbCrLf &
+        "1,""TP-ORTHO P MG/M3"",0,0,1,0" & vbCrLf &
         "1,""HOD-V  MG/M3-DAY"",0,0,1,0" & vbCrLf &
         "1,""MOD-V  MG/M3-DAY"",0,0,1,0" & vbCrLf
 
