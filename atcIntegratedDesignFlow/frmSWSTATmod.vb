@@ -2103,16 +2103,26 @@ Public Class frmSWSTATmod
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
         If IsNumeric(txtStartDay.Text) Then
-            pYearStartDay = Math.Min(CInt(txtStartDay.Text), DayMon(1901, pYearStartMonth))
+            If CInt(txtStartDay.Text) > 0 Then
+                pYearStartDay = Math.Min(CInt(txtStartDay.Text), DayMon(1901, pYearStartMonth))
+            Else
+                pYearStartDay = 1
+            End If
             txtStartDay.Text = pYearStartDay
         Else
             pYearStartDay = 0
+            txtStartDay.Text = ""
         End If
         If IsNumeric(txtEndDay.Text) Then
-            pYearEndDay = Math.Min(CInt(txtEndDay.Text), DayMon(1901, pYearEndMonth))
+            If CInt(txtEndDay.Text) > 0 Then
+                pYearEndDay = Math.Min(CInt(txtEndDay.Text), DayMon(1901, pYearEndMonth))
+            Else
+                pYearEndDay = DayMon(1901, pYearEndMonth)
+            End If
             txtEndDay.Text = pYearEndDay
         Else
             pYearEndDay = 0
+            txtEndDay.Text = ""
         End If
         If IsNumeric(txtOmitBeforeYear.Text) Then
             pFirstYear = CInt(txtOmitBeforeYear.Text)
@@ -2124,7 +2134,7 @@ Public Class frmSWSTATmod
         Else
             pLastYear = 0
         End If
-        SaveSettings()
+        'SaveSettings()
     End Sub
 
     Private Sub ShowCustomYears(ByVal aShowCustom As Boolean)
@@ -2631,10 +2641,12 @@ Public Class frmSWSTATmod
         End If
 
         Dim lName As String = HighOrLowString()
-        pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
-        pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
-        pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
-        pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+        'Here it is getting default boundary dates for low/high condition,
+        ' so it shouldn't try to get the dates from archived values
+        'pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+        'pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+        'pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+        'pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
         SeasonsYearsToForm()
     End Sub
 
@@ -3089,10 +3101,12 @@ Public Class frmSWSTATmod
                                                                  aEndMonth:=pYearEndMonth,
                                                                  aEndDay:=pYearEndDay)
                 If lRankedAnnual.Count > 0 Then
+                    Dim lFromDateFormat As atcDateFormat = New atcDateFormat(pDateFormat.ToString())
+                    lFromDateFormat.Midnight24 = False
                     For Each lTS As atcTimeseries In lRankedAnnual
                         With lTS.Attributes
                             .SetValue("Original ID", lTS.OriginalParentID)
-                            .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
+                            .SetValue("From", lFromDateFormat.JDateToString(lTS.Dates.Value(0)))
                             .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                             .SetValue("Not Used", .GetValue("Count Missing"))
                             '.SetValueIfMissing("SpearmanTest", RunSpearmanTest(lTS))
