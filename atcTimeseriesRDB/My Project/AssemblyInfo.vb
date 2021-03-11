@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("ClassLibrary1")> 
+<Assembly: AssemblyTitle("atcTimeseriesRDB")>
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("ClassLibrary1")> 
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("atcTimeseriesRDB")>
 <Assembly: AssemblyCopyright("Copyright ©  2007")> 
 <Assembly: AssemblyTrademark("")> 
 

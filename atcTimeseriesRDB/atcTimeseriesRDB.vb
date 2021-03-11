@@ -934,6 +934,15 @@ Public Class atcTimeseriesRDB
                 End Select
             Next
 
+            Dim lUSGSToolboxProgram As Boolean = False
+            Try
+                Dim lProgramName As String = System.Reflection.Assembly.GetEntryAssembly.Location
+                If lProgramName.Contains("USGSToolbox") OrElse lProgramName.Contains("USGSHydroToolbox") Then
+                    lUSGSToolboxProgram = True
+                End If
+            Catch ex As Exception
+                lUSGSToolboxProgram = False
+            End Try
             Dim lParsedDate As Date
             While lTable.CurrentRecord < lTable.NumRecords
                 lTable.MoveNext()
@@ -970,26 +979,17 @@ Public Class atcTimeseriesRDB
                                 Dim lUnits As String = Nothing
                                 Select Case lConstituent
                                     Case "00045"
-                                        Try
-                                            If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                                lConstituent = "Precipitation" : lUnits = "inches"
-                                            Else
-                                                lConstituent = "PREC" : lUnits = "in"
-                                            End If
-                                        Catch
+                                        If lUSGSToolboxProgram Then
+                                            lConstituent = "Precipitation" : lUnits = "inches"
+                                        Else
                                             lConstituent = "PREC" : lUnits = "in"
-                                        End Try
+                                        End If
                                     Case "00060"
-                                        Try
-                                            If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                                lConstituent = "Streamflow" : lUnits = "cubic feet per second"
-                                            Else
-                                                lConstituent = "FLOW" : lUnits = "cfs"
-                                            End If
-                                        Catch
+                                        If lUSGSToolboxProgram Then
+                                            lConstituent = "Streamflow" : lUnits = "cubic feet per second"
+                                        Else
                                             lConstituent = "FLOW" : lUnits = "cfs"
-                                        End Try
-
+                                        End If
                                     Case "61055" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Water level, depth below measuring point, feet 
                                     Case "62611" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level above NAVD 1988, feet 
                                     Case "72019" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Depth to water level, feet below land surface 
@@ -1011,24 +1011,17 @@ Public Class atcTimeseriesRDB
                                 End If
 
                                 If lUnits IsNot Nothing Then
-                                    Try
-                                        If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                            Select Case lUnits
-                                                Case "ft" : lUnits = "feet"
-                                                Case "cfs" : lUnits = "cubic feet per second"
-                                            End Select
-                                        Else
-                                            Select Case lUnits
-                                                Case "feet" : lUnits = "ft"
-                                                Case "cubic feet per second" : lUnits = "cfs"
-                                            End Select
-                                        End If
-                                    Catch ex As Exception
+                                    If lUSGSToolboxProgram Then
+                                        Select Case lUnits
+                                            Case "ft" : lUnits = "feet"
+                                            Case "cfs" : lUnits = "cubic feet per second"
+                                        End Select
+                                    Else
                                         Select Case lUnits
                                             Case "feet" : lUnits = "ft"
                                             Case "cubic feet per second" : lUnits = "cfs"
                                         End Select
-                                    End Try
+                                    End If
                                     lData.Attributes.SetValue("Units", lUnits)
                                 End If
 
