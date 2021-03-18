@@ -74,7 +74,6 @@ Partial Class frmDownload
         Me.chkNWISStations_gw_daily_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWISStations_gw_periodic_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWISStations_discharge_GW = New System.Windows.Forms.CheckBox()
-        Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWISStations_gw_periodic = New System.Windows.Forms.CheckBox()
         Me.txtMinCount_GW = New System.Windows.Forms.TextBox()
         Me.chkNWISStations_precipitation_GW = New System.Windows.Forms.CheckBox()
@@ -100,6 +99,7 @@ Partial Class frmDownload
         Me.grpNWIS_GW = New System.Windows.Forms.GroupBox()
         Me.chkNWIS_GetNWISPrecipitation_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISDailyDischarge_GW = New System.Windows.Forms.CheckBox()
+        Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISIdaDischarge_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISDailyGW_GW = New System.Windows.Forms.CheckBox()
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel()
@@ -150,7 +150,7 @@ Partial Class frmDownload
         Me.chkBASINS_MetData.AutoSize = True
         Me.chkBASINS_MetData.Location = New System.Drawing.Point(6, 42)
         Me.chkBASINS_MetData.Name = "chkBASINS_MetData"
-        Me.chkBASINS_MetData.Size = New System.Drawing.Size(76, 19)
+        Me.chkBASINS_MetData.Size = New System.Drawing.Size(70, 17)
         Me.chkBASINS_MetData.TabIndex = 3
         Me.chkBASINS_MetData.Text = "Met Data"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_MetData, "Weather station data in WDM format")
@@ -161,7 +161,7 @@ Partial Class frmDownload
         Me.chkBASINS_303d.AutoSize = True
         Me.chkBASINS_303d.Location = New System.Drawing.Point(390, 42)
         Me.chkBASINS_303d.Name = "chkBASINS_303d"
-        Me.chkBASINS_303d.Size = New System.Drawing.Size(62, 19)
+        Me.chkBASINS_303d.Size = New System.Drawing.Size(56, 17)
         Me.chkBASINS_303d.TabIndex = 11
         Me.chkBASINS_303d.Text = "303(d)"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_303d, "EPA Listed Impaired Waters")
@@ -173,7 +173,7 @@ Partial Class frmDownload
         Me.chkBASINS_MetStations.AutoSize = True
         Me.chkBASINS_MetStations.Location = New System.Drawing.Point(6, 19)
         Me.chkBASINS_MetStations.Name = "chkBASINS_MetStations"
-        Me.chkBASINS_MetStations.Size = New System.Drawing.Size(94, 19)
+        Me.chkBASINS_MetStations.Size = New System.Drawing.Size(85, 17)
         Me.chkBASINS_MetStations.TabIndex = 2
         Me.chkBASINS_MetStations.Text = "Met Stations"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_MetStations, "Weather station locations")
@@ -184,7 +184,7 @@ Partial Class frmDownload
         Me.chkBASINS_NHD.AutoSize = True
         Me.chkBASINS_NHD.Location = New System.Drawing.Point(235, 19)
         Me.chkBASINS_NHD.Name = "chkBASINS_NHD"
-        Me.chkBASINS_NHD.Size = New System.Drawing.Size(53, 19)
+        Me.chkBASINS_NHD.Size = New System.Drawing.Size(50, 17)
         Me.chkBASINS_NHD.TabIndex = 7
         Me.chkBASINS_NHD.Text = "NHD"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_NHD, "National Hydrography Dataset")
@@ -195,7 +195,7 @@ Partial Class frmDownload
         Me.chkBASINS_NED.AutoSize = True
         Me.chkBASINS_NED.Location = New System.Drawing.Point(390, 19)
         Me.chkBASINS_NED.Name = "chkBASINS_NED"
-        Me.chkBASINS_NED.Size = New System.Drawing.Size(52, 19)
+        Me.chkBASINS_NED.Size = New System.Drawing.Size(49, 17)
         Me.chkBASINS_NED.TabIndex = 6
         Me.chkBASINS_NED.Text = "NED"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_NED, "National Elevation Dataset")
@@ -207,7 +207,7 @@ Partial Class frmDownload
         Me.chkBASINS_LSTORET.AutoSize = True
         Me.chkBASINS_LSTORET.Location = New System.Drawing.Point(112, 42)
         Me.chkBASINS_LSTORET.Name = "chkBASINS_LSTORET"
-        Me.chkBASINS_LSTORET.Size = New System.Drawing.Size(116, 19)
+        Me.chkBASINS_LSTORET.Size = New System.Drawing.Size(108, 17)
         Me.chkBASINS_LSTORET.TabIndex = 5
         Me.chkBASINS_LSTORET.Text = "Legacy STORET"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_LSTORET, "STORET data from before 1999")
@@ -218,7 +218,7 @@ Partial Class frmDownload
         Me.chkBASINS_GIRAS.AutoSize = True
         Me.chkBASINS_GIRAS.Location = New System.Drawing.Point(112, 19)
         Me.chkBASINS_GIRAS.Name = "chkBASINS_GIRAS"
-        Me.chkBASINS_GIRAS.Size = New System.Drawing.Size(118, 19)
+        Me.chkBASINS_GIRAS.Size = New System.Drawing.Size(108, 17)
         Me.chkBASINS_GIRAS.TabIndex = 4
         Me.chkBASINS_GIRAS.Text = "GIRAS Land Use"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_GIRAS, "Geographic Information Retrieval and Analysis System Land Use as Shape File")
@@ -229,7 +229,7 @@ Partial Class frmDownload
         Me.chkBASINS_DEMG.AutoSize = True
         Me.chkBASINS_DEMG.Location = New System.Drawing.Point(300, 19)
         Me.chkBASINS_DEMG.Name = "chkBASINS_DEMG"
-        Me.chkBASINS_DEMG.Size = New System.Drawing.Size(80, 19)
+        Me.chkBASINS_DEMG.Size = New System.Drawing.Size(72, 17)
         Me.chkBASINS_DEMG.TabIndex = 8
         Me.chkBASINS_DEMG.Text = "DEM Grid"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_DEMG, "Digital Elevation Model as raster coverage")
@@ -240,7 +240,7 @@ Partial Class frmDownload
         Me.chkBASINS_DEM.AutoSize = True
         Me.chkBASINS_DEM.Location = New System.Drawing.Point(300, 42)
         Me.chkBASINS_DEM.Name = "chkBASINS_DEM"
-        Me.chkBASINS_DEM.Size = New System.Drawing.Size(93, 19)
+        Me.chkBASINS_DEM.Size = New System.Drawing.Size(84, 17)
         Me.chkBASINS_DEM.TabIndex = 9
         Me.chkBASINS_DEM.Text = "DEM Shape"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_DEM, "Digital Elevation Model as shape file")
@@ -251,7 +251,7 @@ Partial Class frmDownload
         Me.chkBASINS_Census.AutoSize = True
         Me.chkBASINS_Census.Location = New System.Drawing.Point(235, 42)
         Me.chkBASINS_Census.Name = "chkBASINS_Census"
-        Me.chkBASINS_Census.Size = New System.Drawing.Size(67, 19)
+        Me.chkBASINS_Census.Size = New System.Drawing.Size(61, 17)
         Me.chkBASINS_Census.TabIndex = 10
         Me.chkBASINS_Census.Text = "Census"
         Me.ToolTip1.SetToolTip(Me.chkBASINS_Census, "Selected map layers from US Census")
@@ -279,7 +279,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISWQ.Enabled = False
         Me.chkNWIS_GetNWISWQ.Location = New System.Drawing.Point(112, 19)
         Me.chkNWIS_GetNWISWQ.Name = "chkNWIS_GetNWISWQ"
-        Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(98, 19)
+        Me.chkNWIS_GetNWISWQ.Size = New System.Drawing.Size(90, 17)
         Me.chkNWIS_GetNWISWQ.TabIndex = 28
         Me.chkNWIS_GetNWISWQ.Text = "Water Quality"
         Me.chkNWIS_GetNWISWQ.UseVisualStyleBackColor = True
@@ -290,7 +290,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyDischarge.Enabled = False
         Me.chkNWIS_GetNWISDailyDischarge.Location = New System.Drawing.Point(6, 19)
         Me.chkNWIS_GetNWISDailyDischarge.Name = "chkNWIS_GetNWISDailyDischarge"
-        Me.chkNWIS_GetNWISDailyDischarge.Size = New System.Drawing.Size(112, 19)
+        Me.chkNWIS_GetNWISDailyDischarge.Size = New System.Drawing.Size(100, 17)
         Me.chkNWIS_GetNWISDailyDischarge.TabIndex = 27
         Me.chkNWIS_GetNWISDailyDischarge.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDailyDischarge.UseVisualStyleBackColor = True
@@ -301,7 +301,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISIdaDischarge.Enabled = False
         Me.chkNWIS_GetNWISIdaDischarge.Location = New System.Drawing.Point(6, 42)
         Me.chkNWIS_GetNWISIdaDischarge.Name = "chkNWIS_GetNWISIdaDischarge"
-        Me.chkNWIS_GetNWISIdaDischarge.Size = New System.Drawing.Size(162, 19)
+        Me.chkNWIS_GetNWISIdaDischarge.Size = New System.Drawing.Size(144, 17)
         Me.chkNWIS_GetNWISIdaDischarge.TabIndex = 31
         Me.chkNWIS_GetNWISIdaDischarge.Text = "Instantaneous Discharge"
         Me.chkNWIS_GetNWISIdaDischarge.UseVisualStyleBackColor = True
@@ -325,7 +325,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISPeriodicGW.AutoSize = True
         Me.chkNWIS_GetNWISPeriodicGW.Location = New System.Drawing.Point(398, 2)
         Me.chkNWIS_GetNWISPeriodicGW.Name = "chkNWIS_GetNWISPeriodicGW"
-        Me.chkNWIS_GetNWISPeriodicGW.Size = New System.Drawing.Size(71, 19)
+        Me.chkNWIS_GetNWISPeriodicGW.Size = New System.Drawing.Size(64, 17)
         Me.chkNWIS_GetNWISPeriodicGW.TabIndex = 32
         Me.chkNWIS_GetNWISPeriodicGW.Text = "Periodic"
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW, "Periodic Groundwater Station Point Layer")
@@ -337,7 +337,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISMeasurements.Enabled = False
         Me.chkNWIS_GetNWISMeasurements.Location = New System.Drawing.Point(205, 0)
         Me.chkNWIS_GetNWISMeasurements.Name = "chkNWIS_GetNWISMeasurements"
-        Me.chkNWIS_GetNWISMeasurements.Size = New System.Drawing.Size(109, 19)
+        Me.chkNWIS_GetNWISMeasurements.Size = New System.Drawing.Size(95, 17)
         Me.chkNWIS_GetNWISMeasurements.TabIndex = 29
         Me.chkNWIS_GetNWISMeasurements.Text = "Measurements"
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISMeasurements, "Periodic Manual Streamflow Measurements")
@@ -348,7 +348,7 @@ Partial Class frmDownload
         Me.lblNWISnoStations.AutoSize = True
         Me.lblNWISnoStations.Location = New System.Drawing.Point(4, 6)
         Me.lblNWISnoStations.Name = "lblNWISnoStations"
-        Me.lblNWISnoStations.Size = New System.Drawing.Size(416, 15)
+        Me.lblNWISnoStations.Size = New System.Drawing.Size(363, 13)
         Me.lblNWISnoStations.TabIndex = 0
         Me.lblNWISnoStations.Text = "Station Locations must be selected on the map before data value download"
         '
@@ -358,7 +358,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyGW.Enabled = False
         Me.chkNWIS_GetNWISDailyGW.Location = New System.Drawing.Point(320, 0)
         Me.chkNWIS_GetNWISDailyGW.Name = "chkNWIS_GetNWISDailyGW"
-        Me.chkNWIS_GetNWISDailyGW.Size = New System.Drawing.Size(76, 19)
+        Me.chkNWIS_GetNWISDailyGW.Size = New System.Drawing.Size(71, 17)
         Me.chkNWIS_GetNWISDailyGW.TabIndex = 30
         Me.chkNWIS_GetNWISDailyGW.Text = "Daily GW"
         Me.chkNWIS_GetNWISDailyGW.UseVisualStyleBackColor = True
@@ -402,7 +402,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2004_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2004_LandCover.Location = New System.Drawing.Point(251, 65)
         Me.chkUSGS_Seamless_NLCD2004_LandCover.Name = "chkUSGS_Seamless_NLCD2004_LandCover"
-        Me.chkUSGS_Seamless_NLCD2004_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2004_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2004_LandCover.TabIndex = 43
         Me.chkUSGS_Seamless_NLCD2004_LandCover.Text = "2004 Land Cover"
         Me.chkUSGS_Seamless_NLCD2004_LandCover.UseVisualStyleBackColor = True
@@ -412,7 +412,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2008_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2008_LandCover.Location = New System.Drawing.Point(131, 65)
         Me.chkUSGS_Seamless_NLCD2008_LandCover.Name = "chkUSGS_Seamless_NLCD2008_LandCover"
-        Me.chkUSGS_Seamless_NLCD2008_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2008_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2008_LandCover.TabIndex = 41
         Me.chkUSGS_Seamless_NLCD2008_LandCover.Text = "2008 Land Cover"
         Me.chkUSGS_Seamless_NLCD2008_LandCover.UseVisualStyleBackColor = True
@@ -422,7 +422,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2013_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Location = New System.Drawing.Point(6, 65)
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Name = "chkUSGS_Seamless_NLCD2013_LandCover"
-        Me.chkUSGS_Seamless_NLCD2013_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2013_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2013_LandCover.TabIndex = 39
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Text = "2013 Land Cover"
         Me.chkUSGS_Seamless_NLCD2013_LandCover.UseVisualStyleBackColor = True
@@ -432,7 +432,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2016_Impervious.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2016_Impervious.Location = New System.Drawing.Point(6, 42)
         Me.chkUSGS_Seamless_NLCD2016_Impervious.Name = "chkUSGS_Seamless_NLCD2016_Impervious"
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(117, 19)
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2016_Impervious.TabIndex = 35
         Me.chkUSGS_Seamless_NLCD2016_Impervious.Text = "2016 Impervious"
         Me.chkUSGS_Seamless_NLCD2016_Impervious.UseVisualStyleBackColor = True
@@ -442,7 +442,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2016_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2016_LandCover.Location = New System.Drawing.Point(6, 19)
         Me.chkUSGS_Seamless_NLCD2016_LandCover.Name = "chkUSGS_Seamless_NLCD2016_LandCover"
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2016_LandCover.TabIndex = 31
         Me.chkUSGS_Seamless_NLCD2016_LandCover.Text = "2016 Land Cover"
         Me.chkUSGS_Seamless_NLCD2016_LandCover.UseVisualStyleBackColor = True
@@ -452,7 +452,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2011_Impervious.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2011_Impervious.Location = New System.Drawing.Point(131, 42)
         Me.chkUSGS_Seamless_NLCD2011_Impervious.Name = "chkUSGS_Seamless_NLCD2011_Impervious"
-        Me.chkUSGS_Seamless_NLCD2011_Impervious.Size = New System.Drawing.Size(117, 19)
+        Me.chkUSGS_Seamless_NLCD2011_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2011_Impervious.TabIndex = 36
         Me.chkUSGS_Seamless_NLCD2011_Impervious.Text = "2011 Impervious"
         Me.chkUSGS_Seamless_NLCD2011_Impervious.UseVisualStyleBackColor = True
@@ -462,7 +462,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2011_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2011_LandCover.Location = New System.Drawing.Point(131, 19)
         Me.chkUSGS_Seamless_NLCD2011_LandCover.Name = "chkUSGS_Seamless_NLCD2011_LandCover"
-        Me.chkUSGS_Seamless_NLCD2011_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2011_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2011_LandCover.TabIndex = 32
         Me.chkUSGS_Seamless_NLCD2011_LandCover.Text = "2011 Land Cover"
         Me.chkUSGS_Seamless_NLCD2011_LandCover.UseVisualStyleBackColor = True
@@ -472,7 +472,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2001_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2001_LandCover.Location = New System.Drawing.Point(365, 19)
         Me.chkUSGS_Seamless_NLCD2001_LandCover.Name = "chkUSGS_Seamless_NLCD2001_LandCover"
-        Me.chkUSGS_Seamless_NLCD2001_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2001_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2001_LandCover.TabIndex = 34
         Me.chkUSGS_Seamless_NLCD2001_LandCover.Text = "2001 Land Cover"
         Me.chkUSGS_Seamless_NLCD2001_LandCover.UseVisualStyleBackColor = True
@@ -482,7 +482,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2001_Impervious.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2001_Impervious.Location = New System.Drawing.Point(365, 42)
         Me.chkUSGS_Seamless_NLCD2001_Impervious.Name = "chkUSGS_Seamless_NLCD2001_Impervious"
-        Me.chkUSGS_Seamless_NLCD2001_Impervious.Size = New System.Drawing.Size(117, 19)
+        Me.chkUSGS_Seamless_NLCD2001_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2001_Impervious.TabIndex = 38
         Me.chkUSGS_Seamless_NLCD2001_Impervious.Text = "2001 Impervious"
         Me.chkUSGS_Seamless_NLCD2001_Impervious.UseVisualStyleBackColor = True
@@ -492,7 +492,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2006_Impervious.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2006_Impervious.Location = New System.Drawing.Point(251, 42)
         Me.chkUSGS_Seamless_NLCD2006_Impervious.Name = "chkUSGS_Seamless_NLCD2006_Impervious"
-        Me.chkUSGS_Seamless_NLCD2006_Impervious.Size = New System.Drawing.Size(117, 19)
+        Me.chkUSGS_Seamless_NLCD2006_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2006_Impervious.TabIndex = 37
         Me.chkUSGS_Seamless_NLCD2006_Impervious.Text = "2006 Impervious"
         Me.chkUSGS_Seamless_NLCD2006_Impervious.UseVisualStyleBackColor = True
@@ -502,7 +502,7 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2006_LandCover.AutoSize = True
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Location = New System.Drawing.Point(251, 19)
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Name = "chkUSGS_Seamless_NLCD2006_LandCover"
-        Me.chkUSGS_Seamless_NLCD2006_LandCover.Size = New System.Drawing.Size(119, 19)
+        Me.chkUSGS_Seamless_NLCD2006_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2006_LandCover.TabIndex = 33
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Text = "2006 Land Cover"
         Me.chkUSGS_Seamless_NLCD2006_LandCover.UseVisualStyleBackColor = True
@@ -528,7 +528,7 @@ Partial Class frmDownload
         Me.chkNHDplus_hydrography.AutoSize = True
         Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(326, 19)
         Me.chkNHDplus_hydrography.Name = "chkNHDplus_hydrography"
-        Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(95, 19)
+        Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(86, 17)
         Me.chkNHDplus_hydrography.TabIndex = 18
         Me.chkNHDplus_hydrography.Text = "Hydrography"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
@@ -539,7 +539,7 @@ Partial Class frmDownload
         Me.chkNHDplus_elev_cm.AutoSize = True
         Me.chkNHDplus_elev_cm.Location = New System.Drawing.Point(73, 19)
         Me.chkNHDplus_elev_cm.Name = "chkNHDplus_elev_cm"
-        Me.chkNHDplus_elev_cm.Size = New System.Drawing.Size(102, 19)
+        Me.chkNHDplus_elev_cm.Size = New System.Drawing.Size(92, 17)
         Me.chkNHDplus_elev_cm.TabIndex = 14
         Me.chkNHDplus_elev_cm.Text = "Elevation Grid"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus_elev_cm, "elev_cm grid")
@@ -550,7 +550,7 @@ Partial Class frmDownload
         Me.chkNHDplus_All.AutoSize = True
         Me.chkNHDplus_All.Location = New System.Drawing.Point(6, 19)
         Me.chkNHDplus_All.Name = "chkNHDplus_All"
-        Me.chkNHDplus_All.Size = New System.Drawing.Size(39, 19)
+        Me.chkNHDplus_All.Size = New System.Drawing.Size(37, 17)
         Me.chkNHDplus_All.TabIndex = 13
         Me.chkNHDplus_All.Text = "All"
         Me.chkNHDplus_All.UseVisualStyleBackColor = True
@@ -560,7 +560,7 @@ Partial Class frmDownload
         Me.chkNHDplus_Catchment.AutoSize = True
         Me.chkNHDplus_Catchment.Location = New System.Drawing.Point(205, 19)
         Me.chkNHDplus_Catchment.Name = "chkNHDplus_Catchment"
-        Me.chkNHDplus_Catchment.Size = New System.Drawing.Size(91, 19)
+        Me.chkNHDplus_Catchment.Size = New System.Drawing.Size(82, 17)
         Me.chkNHDplus_Catchment.TabIndex = 17
         Me.chkNHDplus_Catchment.Text = "Catchments"
         Me.chkNHDplus_Catchment.UseVisualStyleBackColor = True
@@ -570,7 +570,7 @@ Partial Class frmDownload
         Me.chkNWISStations_qw.AutoSize = True
         Me.chkNWISStations_qw.Location = New System.Drawing.Point(112, 19)
         Me.chkNWISStations_qw.Name = "chkNWISStations_qw"
-        Me.chkNWISStations_qw.Size = New System.Drawing.Size(98, 19)
+        Me.chkNWISStations_qw.Size = New System.Drawing.Size(90, 17)
         Me.chkNWISStations_qw.TabIndex = 23
         Me.chkNWISStations_qw.Text = "Water Quality"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_qw, "Water Quality Station Point Layer")
@@ -581,7 +581,7 @@ Partial Class frmDownload
         Me.chkNWISStations_measurement.AutoSize = True
         Me.chkNWISStations_measurement.Location = New System.Drawing.Point(211, 19)
         Me.chkNWISStations_measurement.Name = "chkNWISStations_measurement"
-        Me.chkNWISStations_measurement.Size = New System.Drawing.Size(109, 19)
+        Me.chkNWISStations_measurement.Size = New System.Drawing.Size(95, 17)
         Me.chkNWISStations_measurement.TabIndex = 24
         Me.chkNWISStations_measurement.Text = "Measurements"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_measurement, "Manual Streamflow Measurement Station Point Layer")
@@ -592,7 +592,7 @@ Partial Class frmDownload
         Me.chkNWISStations_discharge.AutoSize = True
         Me.chkNWISStations_discharge.Location = New System.Drawing.Point(6, 19)
         Me.chkNWISStations_discharge.Name = "chkNWISStations_discharge"
-        Me.chkNWISStations_discharge.Size = New System.Drawing.Size(82, 19)
+        Me.chkNWISStations_discharge.Size = New System.Drawing.Size(74, 17)
         Me.chkNWISStations_discharge.TabIndex = 22
         Me.chkNWISStations_discharge.Text = "Discharge"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_discharge, "Discharge Station Point Layer")
@@ -603,7 +603,7 @@ Partial Class frmDownload
         Me.chkNWISStations_gw_daily.AutoSize = True
         Me.chkNWISStations_gw_daily.Location = New System.Drawing.Point(326, 19)
         Me.chkNWISStations_gw_daily.Name = "chkNWISStations_gw_daily"
-        Me.chkNWISStations_gw_daily.Size = New System.Drawing.Size(76, 19)
+        Me.chkNWISStations_gw_daily.Size = New System.Drawing.Size(71, 17)
         Me.chkNWISStations_gw_daily.TabIndex = 25
         Me.chkNWISStations_gw_daily.Text = "Daily GW"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw_daily, "Daily Groundwater Station Point Layer")
@@ -613,9 +613,9 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(17, 725)
+        Me.chkClip.Location = New System.Drawing.Point(17, 727)
         Me.chkClip.Name = "chkClip"
-        Me.chkClip.Size = New System.Drawing.Size(103, 19)
+        Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 44
         Me.chkClip.Text = "Clip to Region"
         Me.ToolTip1.SetToolTip(Me.chkClip, "Discard additional data if a larger area was retrieved than was requested")
@@ -625,9 +625,9 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(222, 711)
+        Me.chkMerge.Location = New System.Drawing.Point(222, 713)
         Me.chkMerge.Name = "chkMerge"
-        Me.chkMerge.Size = New System.Drawing.Size(62, 19)
+        Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 43
         Me.chkMerge.Text = "Merge"
         Me.ToolTip1.SetToolTip(Me.chkMerge, "Merge parts of the same dataset from different areas to form one layer")
@@ -640,7 +640,7 @@ Partial Class frmDownload
         Me.chkNLDAS_GetNLDASParameter.Enabled = False
         Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(112, 19)
         Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
-        Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(337, 19)
+        Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(293, 17)
         Me.chkNLDAS_GetNLDASParameter.TabIndex = 42
         Me.chkNLDAS_GetNLDASParameter.Text = "Hourly Data (available when grid cell(s) selected on map)"
         Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASParameter, "Hourly Data for selected NLDAS grids")
@@ -651,7 +651,7 @@ Partial Class frmDownload
         Me.chkNLDAS_GetNLDASGrid.AutoSize = True
         Me.chkNLDAS_GetNLDASGrid.Location = New System.Drawing.Point(6, 19)
         Me.chkNLDAS_GetNLDASGrid.Name = "chkNLDAS_GetNLDASGrid"
-        Me.chkNLDAS_GetNLDASGrid.Size = New System.Drawing.Size(49, 19)
+        Me.chkNLDAS_GetNLDASGrid.Size = New System.Drawing.Size(45, 17)
         Me.chkNLDAS_GetNLDASGrid.TabIndex = 41
         Me.chkNLDAS_GetNLDASGrid.Text = "Grid"
         Me.ToolTip1.SetToolTip(Me.chkNLDAS_GetNLDASGrid, "NLDAS Grid Layer")
@@ -662,7 +662,7 @@ Partial Class frmDownload
         Me.chkNWISStations_gw_daily_GW.AutoSize = True
         Me.chkNWISStations_gw_daily_GW.Location = New System.Drawing.Point(6, 19)
         Me.chkNWISStations_gw_daily_GW.Name = "chkNWISStations_gw_daily_GW"
-        Me.chkNWISStations_gw_daily_GW.Size = New System.Drawing.Size(127, 19)
+        Me.chkNWISStations_gw_daily_GW.Size = New System.Drawing.Size(113, 17)
         Me.chkNWISStations_gw_daily_GW.TabIndex = 25
         Me.chkNWISStations_gw_daily_GW.Text = "Daily Groundwater"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw_daily_GW, "Daily Groundwater Station Point Layer")
@@ -673,7 +673,7 @@ Partial Class frmDownload
         Me.chkNWISStations_gw_periodic_GW.AutoSize = True
         Me.chkNWISStations_gw_periodic_GW.Location = New System.Drawing.Point(134, 19)
         Me.chkNWISStations_gw_periodic_GW.Name = "chkNWISStations_gw_periodic_GW"
-        Me.chkNWISStations_gw_periodic_GW.Size = New System.Drawing.Size(145, 19)
+        Me.chkNWISStations_gw_periodic_GW.Size = New System.Drawing.Size(128, 17)
         Me.chkNWISStations_gw_periodic_GW.TabIndex = 24
         Me.chkNWISStations_gw_periodic_GW.Text = "Periodic Groundwater"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw_periodic_GW, "Non-Daily Groundwater Station Point Layer")
@@ -684,30 +684,18 @@ Partial Class frmDownload
         Me.chkNWISStations_discharge_GW.AutoSize = True
         Me.chkNWISStations_discharge_GW.Location = New System.Drawing.Point(289, 19)
         Me.chkNWISStations_discharge_GW.Name = "chkNWISStations_discharge_GW"
-        Me.chkNWISStations_discharge_GW.Size = New System.Drawing.Size(82, 19)
+        Me.chkNWISStations_discharge_GW.Size = New System.Drawing.Size(74, 17)
         Me.chkNWISStations_discharge_GW.TabIndex = 22
         Me.chkNWISStations_discharge_GW.Text = "Discharge"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_discharge_GW, "Discharge Station Point Layer")
         Me.chkNWISStations_discharge_GW.UseVisualStyleBackColor = True
-        '
-        'chkNWIS_GetNWISPeriodicGW_GW
-        '
-        Me.chkNWIS_GetNWISPeriodicGW_GW.AutoSize = True
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Enabled = False
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Location = New System.Drawing.Point(133, 3)
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Name = "chkNWIS_GetNWISPeriodicGW_GW"
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Size = New System.Drawing.Size(145, 19)
-        Me.chkNWIS_GetNWISPeriodicGW_GW.TabIndex = 29
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Text = "Periodic Groundwater"
-        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW_GW, "Periodic Groundwater")
-        Me.chkNWIS_GetNWISPeriodicGW_GW.UseVisualStyleBackColor = True
         '
         'chkNWISStations_gw_periodic
         '
         Me.chkNWISStations_gw_periodic.AutoSize = True
         Me.chkNWISStations_gw_periodic.Location = New System.Drawing.Point(404, 19)
         Me.chkNWISStations_gw_periodic.Name = "chkNWISStations_gw_periodic"
-        Me.chkNWISStations_gw_periodic.Size = New System.Drawing.Size(71, 19)
+        Me.chkNWISStations_gw_periodic.Size = New System.Drawing.Size(64, 17)
         Me.chkNWISStations_gw_periodic.TabIndex = 26
         Me.chkNWISStations_gw_periodic.Text = "Periodic"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_gw_periodic, "Periodic Groundwater Station Point Layer")
@@ -729,7 +717,7 @@ Partial Class frmDownload
         Me.chkNWISStations_precipitation_GW.AutoSize = True
         Me.chkNWISStations_precipitation_GW.Location = New System.Drawing.Point(6, 42)
         Me.chkNWISStations_precipitation_GW.Name = "chkNWISStations_precipitation_GW"
-        Me.chkNWISStations_precipitation_GW.Size = New System.Drawing.Size(94, 19)
+        Me.chkNWISStations_precipitation_GW.Size = New System.Drawing.Size(84, 17)
         Me.chkNWISStations_precipitation_GW.TabIndex = 28
         Me.chkNWISStations_precipitation_GW.Text = "Precipitation"
         Me.ToolTip1.SetToolTip(Me.chkNWISStations_precipitation_GW, "Precipitation Station Point Layer")
@@ -739,9 +727,9 @@ Partial Class frmDownload
         '
         Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(123, 725)
+        Me.chkGetNewest.Location = New System.Drawing.Point(123, 727)
         Me.chkGetNewest.Name = "chkGetNewest"
-        Me.chkGetNewest.Size = New System.Drawing.Size(89, 19)
+        Me.chkGetNewest.Size = New System.Drawing.Size(82, 17)
         Me.chkGetNewest.TabIndex = 49
         Me.chkGetNewest.Text = "Get Newest"
         Me.ToolTip1.SetToolTip(Me.chkGetNewest, "Discard previously cached data for this result")
@@ -752,7 +740,7 @@ Partial Class frmDownload
         Me.chkNCDC_MetData.AutoSize = True
         Me.chkNCDC_MetData.Location = New System.Drawing.Point(111, 19)
         Me.chkNCDC_MetData.Name = "chkNCDC_MetData"
-        Me.chkNCDC_MetData.Size = New System.Drawing.Size(338, 19)
+        Me.chkNCDC_MetData.Size = New System.Drawing.Size(298, 17)
         Me.chkNCDC_MetData.TabIndex = 3
         Me.chkNCDC_MetData.Text = "ISH Data (Available when ISH station(s) selected on map)"
         Me.ToolTip1.SetToolTip(Me.chkNCDC_MetData, "Integrated Surface Hourly weather station data")
@@ -763,7 +751,7 @@ Partial Class frmDownload
         Me.chkNCDC_MetStations.AutoSize = True
         Me.chkNCDC_MetStations.Location = New System.Drawing.Point(6, 19)
         Me.chkNCDC_MetStations.Name = "chkNCDC_MetStations"
-        Me.chkNCDC_MetStations.Size = New System.Drawing.Size(93, 19)
+        Me.chkNCDC_MetStations.Size = New System.Drawing.Size(85, 17)
         Me.chkNCDC_MetStations.TabIndex = 4
         Me.chkNCDC_MetStations.Text = "ISH Stations"
         Me.ToolTip1.SetToolTip(Me.chkNCDC_MetStations, "Integrated Surface Hourly weather station locations")
@@ -774,7 +762,7 @@ Partial Class frmDownload
         Me.chkNHDplus2_hydrography.AutoSize = True
         Me.chkNHDplus2_hydrography.Location = New System.Drawing.Point(326, 19)
         Me.chkNHDplus2_hydrography.Name = "chkNHDplus2_hydrography"
-        Me.chkNHDplus2_hydrography.Size = New System.Drawing.Size(95, 19)
+        Me.chkNHDplus2_hydrography.Size = New System.Drawing.Size(86, 17)
         Me.chkNHDplus2_hydrography.TabIndex = 18
         Me.chkNHDplus2_hydrography.Text = "Hydrography"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus2_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
@@ -785,7 +773,7 @@ Partial Class frmDownload
         Me.chkNHDplus2_elev_cm.AutoSize = True
         Me.chkNHDplus2_elev_cm.Location = New System.Drawing.Point(73, 19)
         Me.chkNHDplus2_elev_cm.Name = "chkNHDplus2_elev_cm"
-        Me.chkNHDplus2_elev_cm.Size = New System.Drawing.Size(102, 19)
+        Me.chkNHDplus2_elev_cm.Size = New System.Drawing.Size(92, 17)
         Me.chkNHDplus2_elev_cm.TabIndex = 14
         Me.chkNHDplus2_elev_cm.Text = "Elevation Grid"
         Me.ToolTip1.SetToolTip(Me.chkNHDplus2_elev_cm, "elev_cm grid")
@@ -817,7 +805,7 @@ Partial Class frmDownload
         Me.lblRegion.AutoSize = True
         Me.lblRegion.Location = New System.Drawing.Point(12, 15)
         Me.lblRegion.Name = "lblRegion"
-        Me.lblRegion.Size = New System.Drawing.Size(119, 15)
+        Me.lblRegion.Size = New System.Drawing.Size(104, 13)
         Me.lblRegion.TabIndex = 0
         Me.lblRegion.Text = "Region to Download"
         '
@@ -852,7 +840,7 @@ Partial Class frmDownload
         Me.chkSTORET_Results.Enabled = False
         Me.chkSTORET_Results.Location = New System.Drawing.Point(112, 19)
         Me.chkSTORET_Results.Name = "chkSTORET_Results"
-        Me.chkSTORET_Results.Size = New System.Drawing.Size(307, 19)
+        Me.chkSTORET_Results.Size = New System.Drawing.Size(267, 17)
         Me.chkSTORET_Results.TabIndex = 40
         Me.chkSTORET_Results.Text = "Results (available when station(s) selected on map)"
         Me.chkSTORET_Results.UseVisualStyleBackColor = True
@@ -862,7 +850,7 @@ Partial Class frmDownload
         Me.chkSTORET_Stations.AutoSize = True
         Me.chkSTORET_Stations.Location = New System.Drawing.Point(6, 19)
         Me.chkSTORET_Stations.Name = "chkSTORET_Stations"
-        Me.chkSTORET_Stations.Size = New System.Drawing.Size(70, 19)
+        Me.chkSTORET_Stations.Size = New System.Drawing.Size(64, 17)
         Me.chkSTORET_Stations.TabIndex = 39
         Me.chkSTORET_Stations.Text = "Stations"
         Me.chkSTORET_Stations.UseVisualStyleBackColor = True
@@ -888,9 +876,9 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 725)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 727)
         Me.chkCacheOnly.Name = "chkCacheOnly"
-        Me.chkCacheOnly.Size = New System.Drawing.Size(88, 19)
+        Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 45
         Me.chkCacheOnly.Text = "Cache Only"
         Me.chkCacheOnly.UseVisualStyleBackColor = True
@@ -918,7 +906,7 @@ Partial Class frmDownload
         Me.lblTimeZone.Enabled = False
         Me.lblTimeZone.Location = New System.Drawing.Point(131, 37)
         Me.lblTimeZone.Name = "lblTimeZone"
-        Me.lblTimeZone.Size = New System.Drawing.Size(178, 15)
+        Me.lblTimeZone.Size = New System.Drawing.Size(155, 13)
         Me.lblTimeZone.TabIndex = 44
         Me.lblTimeZone.Text = "Project Time Zone - UTC minus"
         '
@@ -954,7 +942,7 @@ Partial Class frmDownload
         Me.lblMinCount.AutoSize = True
         Me.lblMinCount.Location = New System.Drawing.Point(363, 21)
         Me.lblMinCount.Name = "lblMinCount"
-        Me.lblMinCount.Size = New System.Drawing.Size(63, 15)
+        Me.lblMinCount.Size = New System.Drawing.Size(55, 13)
         Me.lblMinCount.TabIndex = 27
         Me.lblMinCount.Text = "Min Count"
         '
@@ -964,6 +952,7 @@ Partial Class frmDownload
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISPrecipitation_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISDailyDischarge_GW)
+        Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISPeriodicGW_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge_GW)
         Me.grpNWIS_GW.Controls.Add(Me.chkNWIS_GetNWISDailyGW_GW)
         Me.grpNWIS_GW.Controls.Add(Me.panelNWISnoStations_GW)
@@ -980,7 +969,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISPrecipitation_GW.AutoSize = True
         Me.chkNWIS_GetNWISPrecipitation_GW.Location = New System.Drawing.Point(6, 39)
         Me.chkNWIS_GetNWISPrecipitation_GW.Name = "chkNWIS_GetNWISPrecipitation_GW"
-        Me.chkNWIS_GetNWISPrecipitation_GW.Size = New System.Drawing.Size(94, 19)
+        Me.chkNWIS_GetNWISPrecipitation_GW.Size = New System.Drawing.Size(84, 17)
         Me.chkNWIS_GetNWISPrecipitation_GW.TabIndex = 1
         Me.chkNWIS_GetNWISPrecipitation_GW.Text = "Precipitation"
         Me.chkNWIS_GetNWISPrecipitation_GW.UseVisualStyleBackColor = True
@@ -991,10 +980,22 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyDischarge_GW.Enabled = False
         Me.chkNWIS_GetNWISDailyDischarge_GW.Location = New System.Drawing.Point(290, 19)
         Me.chkNWIS_GetNWISDailyDischarge_GW.Name = "chkNWIS_GetNWISDailyDischarge_GW"
-        Me.chkNWIS_GetNWISDailyDischarge_GW.Size = New System.Drawing.Size(112, 19)
+        Me.chkNWIS_GetNWISDailyDischarge_GW.Size = New System.Drawing.Size(100, 17)
         Me.chkNWIS_GetNWISDailyDischarge_GW.TabIndex = 27
         Me.chkNWIS_GetNWISDailyDischarge_GW.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDailyDischarge_GW.UseVisualStyleBackColor = True
+        '
+        'chkNWIS_GetNWISPeriodicGW_GW
+        '
+        Me.chkNWIS_GetNWISPeriodicGW_GW.AutoSize = True
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Enabled = False
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Location = New System.Drawing.Point(134, 19)
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Name = "chkNWIS_GetNWISPeriodicGW_GW"
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Size = New System.Drawing.Size(128, 17)
+        Me.chkNWIS_GetNWISPeriodicGW_GW.TabIndex = 29
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Text = "Periodic Groundwater"
+        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW_GW, "Periodic Groundwater")
+        Me.chkNWIS_GetNWISPeriodicGW_GW.UseVisualStyleBackColor = True
         '
         'chkNWIS_GetNWISIdaDischarge_GW
         '
@@ -1002,7 +1003,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISIdaDischarge_GW.Enabled = False
         Me.chkNWIS_GetNWISIdaDischarge_GW.Location = New System.Drawing.Point(290, 39)
         Me.chkNWIS_GetNWISIdaDischarge_GW.Name = "chkNWIS_GetNWISIdaDischarge_GW"
-        Me.chkNWIS_GetNWISIdaDischarge_GW.Size = New System.Drawing.Size(162, 19)
+        Me.chkNWIS_GetNWISIdaDischarge_GW.Size = New System.Drawing.Size(144, 17)
         Me.chkNWIS_GetNWISIdaDischarge_GW.TabIndex = 31
         Me.chkNWIS_GetNWISIdaDischarge_GW.Text = "Instantaneous Discharge"
         Me.chkNWIS_GetNWISIdaDischarge_GW.UseVisualStyleBackColor = True
@@ -1013,7 +1014,7 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyGW_GW.Enabled = False
         Me.chkNWIS_GetNWISDailyGW_GW.Location = New System.Drawing.Point(6, 19)
         Me.chkNWIS_GetNWISDailyGW_GW.Name = "chkNWIS_GetNWISDailyGW_GW"
-        Me.chkNWIS_GetNWISDailyGW_GW.Size = New System.Drawing.Size(127, 19)
+        Me.chkNWIS_GetNWISDailyGW_GW.Size = New System.Drawing.Size(113, 17)
         Me.chkNWIS_GetNWISDailyGW_GW.TabIndex = 30
         Me.chkNWIS_GetNWISDailyGW_GW.Text = "Daily Groundwater"
         Me.chkNWIS_GetNWISDailyGW_GW.UseVisualStyleBackColor = True
@@ -1023,7 +1024,6 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.panelNWISnoStations_GW.Controls.Add(Me.lblNWISnoStations_GW)
-        Me.panelNWISnoStations_GW.Controls.Add(Me.chkNWIS_GetNWISPeriodicGW_GW)
         Me.panelNWISnoStations_GW.Location = New System.Drawing.Point(6, 16)
         Me.panelNWISnoStations_GW.Name = "panelNWISnoStations_GW"
         Me.panelNWISnoStations_GW.Size = New System.Drawing.Size(475, 43)
@@ -1035,7 +1035,7 @@ Partial Class frmDownload
         Me.lblNWISnoStations_GW.AutoSize = True
         Me.lblNWISnoStations_GW.Location = New System.Drawing.Point(3, 4)
         Me.lblNWISnoStations_GW.Name = "lblNWISnoStations_GW"
-        Me.lblNWISnoStations_GW.Size = New System.Drawing.Size(416, 15)
+        Me.lblNWISnoStations_GW.Size = New System.Drawing.Size(363, 13)
         Me.lblNWISnoStations_GW.TabIndex = 0
         Me.lblNWISnoStations_GW.Text = "Station Locations must be selected on the map before data value download"
         '
@@ -1074,7 +1074,7 @@ Partial Class frmDownload
         Me.chkNHDplus2_All.AutoSize = True
         Me.chkNHDplus2_All.Location = New System.Drawing.Point(6, 19)
         Me.chkNHDplus2_All.Name = "chkNHDplus2_All"
-        Me.chkNHDplus2_All.Size = New System.Drawing.Size(39, 19)
+        Me.chkNHDplus2_All.Size = New System.Drawing.Size(37, 17)
         Me.chkNHDplus2_All.TabIndex = 13
         Me.chkNHDplus2_All.Text = "All"
         Me.chkNHDplus2_All.UseVisualStyleBackColor = True
@@ -1084,7 +1084,7 @@ Partial Class frmDownload
         Me.chkNHDplus2_Catchment.AutoSize = True
         Me.chkNHDplus2_Catchment.Location = New System.Drawing.Point(205, 19)
         Me.chkNHDplus2_Catchment.Name = "chkNHDplus2_Catchment"
-        Me.chkNHDplus2_Catchment.Size = New System.Drawing.Size(91, 19)
+        Me.chkNHDplus2_Catchment.Size = New System.Drawing.Size(82, 17)
         Me.chkNHDplus2_Catchment.TabIndex = 17
         Me.chkNHDplus2_Catchment.Text = "Catchments"
         Me.chkNHDplus2_Catchment.UseVisualStyleBackColor = True
@@ -1206,9 +1206,9 @@ Partial Class frmDownload
     Friend WithEvents chkNWISStations_gw_periodic_GW As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWISStations_discharge_GW As System.Windows.Forms.CheckBox
     Friend WithEvents grpNWIS_GW As System.Windows.Forms.GroupBox
-    Friend WithEvents chkNWIS_GetNWISPeriodicGW_GW As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISDailyDischarge_GW As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISDailyGW_GW As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISPeriodicGW_GW As System.Windows.Forms.CheckBox
     Friend WithEvents panelNWISnoStations_GW As System.Windows.Forms.Panel
     Friend WithEvents lblNWISnoStations_GW As System.Windows.Forms.Label
     Friend WithEvents chkNWIS_GetNWISIdaDischarge_GW As System.Windows.Forms.CheckBox
