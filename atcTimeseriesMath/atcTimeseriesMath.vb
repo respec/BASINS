@@ -113,7 +113,7 @@ Public Class atcTimeseriesMath
                 Dim defBoundaryMonth As New atcAttributeDefinition
                 With defBoundaryMonth
                     .Name = "Boundary Month"
-                    .Description = "Integer"
+                    .Description = "Boundary Month"
                     .DefaultValue = 10
                     .Editable = True
                     .TypeString = "Integer"
@@ -124,7 +124,7 @@ Public Class atcTimeseriesMath
                 Dim defBoundaryDay As New atcAttributeDefinition
                 With defBoundaryDay
                     .Name = "Boundary Day"
-                    .Description = "Integer"
+                    .Description = "Boundary Day"
                     .DefaultValue = 1
                     .Editable = True
                     .TypeString = "Integer"
