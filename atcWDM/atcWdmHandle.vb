@@ -119,7 +119,7 @@ TestFileName:
         End If
         Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
         Logger.Dbg(lMsg)
-        F90_MSG(lMsg, Len(lMsg))
+        'F90_MSG(lMsg, Len(lMsg))
         _fpreset()
     End Sub
 
