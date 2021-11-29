@@ -115,7 +115,11 @@ Module modWinHSPFLt
             'Logger.Dbg("F90_SCNDBG") : Call F90_SCNDBG(10) 'lots of debugging
             Logger.Dbg("F90_SPIPH") : Call F90_SPIPH(pPipeReadFromStatus, pPipeWriteToStatus)
 
-            Dim lMsgName As String = FindFile("HSPF Message File", "hspfmsg.wdm")
+            Dim lProgramDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar
+            Dim lMsgName As String = lProgramDir & "hspfmsg.wdm"   'use the local one if possible
+            If Not FileExists(lMsgName) Then
+                lMsgName = FindFile("HSPF Message File", "hspfmsg.wdm")
+            End If
             Logger.Dbg("MsgName = " & lMsgName)
 
             Dim lOpt As Integer = 1

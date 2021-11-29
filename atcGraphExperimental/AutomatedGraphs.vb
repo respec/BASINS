@@ -552,6 +552,7 @@ Public Module AutomatedGraphs
                         Trim(lGraphDataset(0)).ToLower = "multiply" Or
                         Trim(lGraphDataset(0)).ToLower = "subtract" Or
                         Trim(lGraphDataset(0)).ToLower = "divide") Then
+                aRecordIndex += 1
                 Continue For
 
             End If
