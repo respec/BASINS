@@ -242,24 +242,27 @@ Public Class frmResult
             'Next
 
             .Legend.IsVisible = False
-        End With
-        Dim lPEDecimals As String = "Percentiles" & vbCrLf
-        For lGroupIndex As Integer = 0 To aDataGroup.Count - 1
-            lPEDecimals &= aDataGroup(lGroupIndex).Attributes.GetValue("PEDecimal")
-            If lGroupIndex + 1 Mod 5 = 0 Then
-                lPEDecimals &= Environment.NewLine
-            End If
-        Next
-        Dim lText As New TextObj(lPEDecimals, 0.45F, 0.05F)
-        With lText
-            .Location.CoordinateFrame = CoordType.ChartFraction
-            .Location.AlignH = AlignH.Left
-            .FontSpec.Family = "Courier"
-            .FontSpec.Border.IsVisible = False
-            .FontSpec.StringAlignment = Drawing.StringAlignment.Near
+            Dim lPEDecimals As String = "Percentiles" & vbCrLf
+            Dim lPEDecimal As String
+            For lGroupIndex As Integer = 0 To aDataGroup.Count - 1
+                lPEDecimal = aDataGroup(lGroupIndex).Attributes.GetValue("PEDecimal")
+                lPEDecimals &= lPEDecimal
+                If lGroupIndex + 1 Mod 5 = 0 Then
+                    lPEDecimals &= Environment.NewLine
+                End If
+                .CurveList.Item(lGroupIndex).Label.Text = lPEDecimal & .CurveList.Item(lGroupIndex).Label.Text
+            Next
+            Dim lText As New TextObj(lPEDecimals, 0.45F, 0.05F)
+            With lText
+                .Location.CoordinateFrame = CoordType.ChartFraction
+                .Location.AlignH = AlignH.Left
+                .FontSpec.Family = "Courier"
+                .FontSpec.Border.IsVisible = False
+                .FontSpec.StringAlignment = Drawing.StringAlignment.Near
+            End With
+            .GraphObjList.Add(lText)
         End With
 
-        lGraphDurHyd.ZedGraphCtrl.GraphPane.GraphObjList.Add(lText)
         lGraphForm.Width = 720
         lGraphForm.Height = 560
 
