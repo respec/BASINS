@@ -31,7 +31,9 @@ Public Module modDownload
         Next
         If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
             Logger.Msg(lMessage, "Data Download")
-            g_Project.SaveProject(g_Project.CurrentProjectFile)
+            If Not String.IsNullOrEmpty(g_Project.CurrentProjectFile) AndAlso IO.File.Exists(g_Project.CurrentProjectFile) Then
+                g_Project.SaveProject(g_Project.CurrentProjectFile)
+            End If
             If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "GW Toolbox" Then
                 atcDataManager.UserManage()
             End If

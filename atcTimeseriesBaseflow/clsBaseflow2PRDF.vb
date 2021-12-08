@@ -108,7 +108,15 @@ Public Class clsBaseflow2PRDF
         Logger.Dbg(
                   "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf &
                   "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform TwoPRDF")
-        TwoPRDF(lTsDaily)
+        Try
+            TwoPRDF(lTsDaily)
+        Catch ex As Exception
+            gError = "2PRDF method failed. Exception: " & ex.InnerException.Message
+            If gBatchRun Then
+                Throw New ApplicationException(gError)
+            End If
+            Return Nothing
+        End Try
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
         With pTsBaseflow1.Attributes

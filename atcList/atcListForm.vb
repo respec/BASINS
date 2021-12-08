@@ -16,7 +16,7 @@ Public Class atcListForm
         pFormat = GetSetting("BASINS", "List", "Format", pFormat)
         pExpFormat = GetSetting("BASINS", "List", "ExpFormat", pExpFormat)
         pCantFit = GetSetting("BASINS", "List", "CantFit", pCantFit)
-        Me.Text = GetSetting("BASINS", "List", "Title", Me.Text)
+        'Me.Text = GetSetting("BASINS", "List", "Title", Me.Text)
         Integer.TryParse(GetSetting("BASINS", "List", "SignificantDigits", pSignificantDigits), pSignificantDigits)
 
     End Sub

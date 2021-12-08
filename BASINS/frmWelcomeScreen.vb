@@ -254,6 +254,7 @@ Public Class frmWelcomeScreen
 #End If
         If lProjectOpenOK Then
             Logger.Dbg("Loaded Project '" & fileName & "'")
+            Logger.Status("HIDE")
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Close()
         Else

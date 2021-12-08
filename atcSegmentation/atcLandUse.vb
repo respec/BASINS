@@ -3,8 +3,9 @@ Imports System.IO
 Imports MapWinUtility
 Imports MapWinUtility.Strings
 Imports atcUtility
+Imports atcSegmentation
 
-<CLSCompliant(True)> _
+<CLSCompliant(True)>
 Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
     Private pWatershed As Watershed
@@ -126,8 +127,26 @@ Public Class LandUses
             Logger.Msg("Problem reading file " & lName & vbCrLf & e.Message, "Create Problem")
             lReturnCode = 1
         End Try
+
+        'sort landuses based on description
+        Me.Sort()
+
         Return lReturnCode
     End Function
+
+    Public Sub Sort()
+        Dim lLandusesList As New List(Of LandUse)
+        For Each lLanduse As LandUse In Me
+            lLandusesList.Add(lLanduse)
+        Next
+
+        lLandusesList.Sort(Function(x, y) x.Description.CompareTo(y.Description))
+        Me.Clear()
+
+        For Each lLanduse As LandUse In lLandusesList
+            Me.Add(lLanduse)
+        Next
+    End Sub
 End Class
 
 <CLSCompliant(True)> _

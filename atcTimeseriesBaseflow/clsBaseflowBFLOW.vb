@@ -108,7 +108,10 @@ Public Class clsBaseflowBFLOW
         Logger.Dbg(
                   "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf &
                   "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform BFLOW")
-        BFLOW(lTsDaily)
+        lTsBaseflow = BFLOW(lTsDaily)
+        If lTsBaseflow Is Nothing Then
+            Return Nothing
+        End If
 
         Dim lTsBaseflowgroup As New atcTimeseriesGroup
         With pTsBaseflow1.Attributes
@@ -338,13 +341,14 @@ Public Class clsBaseflowBFLOW
         'Integer, dimension(200) : icount
         'Integer, dimension(nregmx) : npreg, idone
         'Dim florec(NREGMX, 200) As Double
-        Dim florec(200, NREGMX) As Single
+        Dim nprmax As Integer = 200
+        Dim florec(nprmax, NREGMX) As Single
         Dim aveflo(NREGMX) As Single
         Dim bfdd(NREGMX) As Single
         Dim qaveln(NREGMX) As Single
         Dim npreg(NREGMX) As Integer
         Dim idone(NREGMX) As Integer
-        Dim icount(200) As Integer
+        Dim icount(nprmax) As Integer
 
         Dim nd As Integer = 0
         '10 !NDMIN: minimum Number of days for alpha calculation
@@ -387,6 +391,15 @@ Public Class clsBaseflowBFLOW
                 J2Date(aTS.Dates.Value(ldatesind(I)), lDates)
                 If lDates(1) <= 2 OrElse lDates(1) >= 11 Then
                     npr += 1
+                    If npr > nprmax Then
+                        gError &= "BFLOW: Exceeded maximum recession count (200) in winter months (1, 2, 11, 12). " &
+                            "Check data for long periods of repeated values. " &
+                            "(Alternatively, the user might want to remove BFLOW as one of the hydrograph-separation methods selected for analysis.)"
+                        If gBatchRun Then
+                            Throw New ApplicationException(gError)
+                        End If
+                        Return Nothing
+                    End If
                     q10(npr) = lstrflow(I - 1)
                     q0(npr) = lstrflow(I - ndreg(I))
                     If q0(npr) - q10(npr) > 0.001 Then
@@ -428,153 +441,163 @@ Public Class clsBaseflowBFLOW
         Dim Now As Integer
         Dim igap As Integer
 
-        If npr > 1 Then
-            np = 0
-            sumx = 0
-            sumy = 0
-            sumxy = 0
-            sumx2 = 0
-            For I As Integer = 1 To npr
-                np += 1
-                x = qaveln(I)
-                sumx += x
-                sumy += bfdd(I)
-                sumxy += x * bfdd(I)
-                sumx2 += x * x
-            Next
-
-            ssxx = 0
-            ssxx = 0
-            slope = 0
-            yint = 0
-
-            ssxy = sumxy - (sumx * sumy) / np
-            ssxx = sumx2 - (sumx * sumx) / np
-            slope = ssxy / ssxx
-            yint = sumy / np - slope * sumx / np
-
-            'find the recession curve with the lowest point on it
-            For j = 1 To npr
-                amn = 1.0E+20
+        Try
+            If npr > 1 Then
+                np = 0
+                sumx = 0
+                sumy = 0
+                sumxy = 0
+                sumx2 = 0
                 For I As Integer = 1 To npr
-                    If idone(I) = 0 Then
-                        'If florec(1, I) < amn Then
-                        '    amn = florec(1, I)
-                        '    Now = I
-                        'End If
-                        If florec(I, 1) < amn Then
-                            amn = florec(I, 1)
-                            Now = I
+                    np += 1
+                    x = qaveln(I)
+                    sumx += x
+                    sumy += bfdd(I)
+                    sumxy += x * bfdd(I)
+                    sumx2 += x * x
+                Next
+
+                ssxx = 0
+                ssxx = 0
+                slope = 0
+                yint = 0
+
+                ssxy = sumxy - (sumx * sumy) / np
+                ssxx = sumx2 - (sumx * sumx) / np
+                slope = ssxy / ssxx
+                yint = sumy / np - slope * sumx / np
+
+                'find the recession curve with the lowest point on it
+                For j = 1 To npr
+                    amn = 1.0E+20
+                    For I As Integer = 1 To npr
+                        If idone(I) = 0 Then
+                            'If florec(1, I) < amn Then
+                            '    amn = florec(1, I)
+                            '    Now = I
+                            'End If
+                            If florec(I, 1) < amn Then
+                                amn = florec(I, 1)
+                                Now = I
+                            End If
+                        End If
+                    Next
+                    idone(Now) = 1
+
+                    'now Is the number In array florec Of the current smallest flow
+                    'icount keeps track Of where the now recession curve falls On the
+                    'x axis(Day line)
+                    igap = 0
+                    If j = 1 Then
+                        icount(Now) = 1
+                        igap = 1
+                    Else
+                        For I As Integer = 1 To NREGMX
+                            If florec(Now, 1) <= aveflo(I) Then 'florec(1, Now) <= aveflo(I)
+                                icount(Now) = I
+                                igap = 1
+                                Exit For
+                            End If
+                        Next
+                    End If
+
+                    'if there is a gap, run linear regression on the average flow
+                    If igap = 0 Then
+                        np = 0
+                        sumx = 0
+                        sumy = 0
+                        sumxy = 0
+                        sumx2 = 0
+                        For I As Integer = 1 To NREGMX
+                            If aveflo(I) > 0 Then
+                                np += 1
+                                x = 1.0 * I
+                                sumx += x
+                                sumy += aveflo(I)
+                                sumxy += x * aveflo(I)
+                                sumx2 += x * x
+                            End If
+                        Next
+                        ssxy = 0
+                        ssxx = 0
+                        slope = 0
+                        yint = 0
+                        If sumx > 1 Then
+                            ssxy = sumxy - (sumx * sumy) / np
+                            ssxx = sumx2 - (sumx * sumx) / np
+                            slope = ssxy / ssxx
+                            yint = sumy / np - slope * sumx / np
+                            'icount(Now) = (florec(1, Now) - yint) / slope
+                            icount(Now) = Math.Floor((florec(Now, 1) - yint) / slope)
+                        Else
+                            slope = 0
+                            yint = 0
+                            icount(Now) = 0
                         End If
                     End If
-                Next
-                idone(Now) = 1
 
-                'now Is the number In array florec Of the current smallest flow
-                'icount keeps track Of where the now recession curve falls On the
-                'x axis(Day line)
-                igap = 0
-                If j = 1 Then
-                    icount(Now) = 1
-                    igap = 1
-                Else
-                    For I As Integer = 1 To NREGMX
-                        If florec(Now, 1) <= aveflo(I) Then 'florec(1, Now) <= aveflo(I)
-                            icount(Now) = I
-                            igap = 1
+                    'update average flow array
+                    For I As Integer = 1 To NDMAX
+                        If florec(Now, I) > 0.0001 Then 'florec(I, Now) > 0.0001
+                            k = icount(Now) + I - 1
+                            'aveflo(k) = (aveflo(k) * npreg(k) + florec(I, Now)) / (npreg(k) + 1)
+                            aveflo(k) = (aveflo(k) * npreg(k) + florec(Now, I)) / (npreg(k) + 1)
+                            If aveflo(k) <= 0 Then aveflo(k) = slope * I + yint
+                            npreg(k) += 1
+                        Else
                             Exit For
                         End If
                     Next
-                End If
+                Next
 
-                'if there is a gap, run linear regression on the average flow
-                If igap = 0 Then
-                    np = 0
-                    sumx = 0
-                    sumy = 0
-                    sumxy = 0
-                    sumx2 = 0
-                    For I As Integer = 1 To NREGMX
-                        If aveflo(I) > 0 Then
+                'run alpha regression on all adjusted points
+                'calcuate alpha factor for groundwater
+                np = 0
+                sumx = 0.0
+                sumy = 0.0
+                sumxy = 0.0
+                sumx2 = 0.0
+                For j = 1 To npr
+                    For I As Integer = 1 To NDMAX
+                        If (florec(j, I) > 0.0) Then 'florec(I, j) > 0.0
                             np += 1
-                            x = 1.0 * I
+                            x = (icount(j) + I) * 1.0
                             sumx += x
-                            sumy += aveflo(I)
-                            sumxy += x * aveflo(I)
+                            sumy += florec(j, I) 'florec(I, j)
+                            sumxy += x * florec(j, I) 'florec(I, j)
                             sumx2 += x * x
+                        Else
+                            Exit For
                         End If
                     Next
-                    ssxy = 0
-                    ssxx = 0
-                    slope = 0
-                    yint = 0
-                    If sumx > 1 Then
-                        ssxy = sumxy - (sumx * sumy) / np
-                        ssxx = sumx2 - (sumx * sumx) / np
-                        slope = ssxy / ssxx
-                        yint = sumy / np - slope * sumx / np
-                        'icount(Now) = (florec(1, Now) - yint) / slope
-                        icount(Now) = Math.Floor((florec(Now, 1) - yint) / slope)
-                    Else
-                        slope = 0
-                        yint = 0
-                        icount(Now) = 0
-                    End If
+                Next
+                ssxy = sumxy - (sumx * sumy) / np
+                ssxx = sumx2 - (sumx * sumx) / np
+                alf = ssxy / ssxx
+                bfd = 2.3 / alf
+
+                If IPRINT = 1 Then
+                    'WriteOutputDat("", pTsBaseflow1.Attributes)
                 End If
-
-                'update average flow array
-                For I As Integer = 1 To NDMAX
-                    If florec(Now, I) > 0.0001 Then 'florec(I, Now) > 0.0001
-                        k = icount(Now) + I - 1
-                        'aveflo(k) = (aveflo(k) * npreg(k) + florec(I, Now)) / (npreg(k) + 1)
-                        aveflo(k) = (aveflo(k) * npreg(k) + florec(Now, I)) / (npreg(k) + 1)
-                        If aveflo(k) <= 0 Then aveflo(k) = slope * I + yint
-                        npreg(k) += 1
-                    Else
-                        Exit For
-                    End If
-                Next
-            Next
-
-            'run alpha regression on all adjusted points
-            'calcuate alpha factor for groundwater
-            np = 0
-            sumx = 0.0
-            sumy = 0.0
-            sumxy = 0.0
-            sumx2 = 0.0
-            For j = 1 To npr
-                For I As Integer = 1 To NDMAX
-                    If (florec(j, I) > 0.0) Then 'florec(I, j) > 0.0
-                        np += 1
-                        x = (icount(j) + I) * 1.0
-                        sumx += x
-                        sumy += florec(j, I) 'florec(I, j)
-                        sumxy += x * florec(j, I) 'florec(I, j)
-                        sumx2 += x * x
-                    Else
-                        Exit For
-                    End If
-                Next
-            Next
-            ssxy = sumxy - (sumx * sumy) / np
-            ssxx = sumx2 - (sumx * sumx) / np
-            alf = ssxy / ssxx
-            bfd = 2.3 / alf
-
-            If IPRINT = 1 Then
-                'WriteOutputDat("", pTsBaseflow1.Attributes)
+                'Write(3, 5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3, npr, alf, bfd
+            Else
+                If IPRINT = 1 Then
+                    Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
+                    lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
+                    Dim bflowDatFile As String = Path.Combine(lOutputDir, "BFLOW_" & aTS.Attributes.GetValue("Location") & ".dat")
+                    WriteOutputDat(bflowDatFile, pTsBaseflow1.Attributes)
+                    'write(3,5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3
+                End If
             End If
-            'Write(3, 5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3, npr, alf, bfd
-        Else
-            If IPRINT = 1 Then
-                Dim lOutputDir As String = Path.GetDirectoryName(aTS.Attributes.GetValue("History 1"))
-                lOutputDir = lOutputDir.ToLower.Substring("read from ".Length)
-                Dim bflowDatFile As String = Path.Combine(lOutputDir, "BFLOW_" & aTS.Attributes.GetValue("Location") & ".dat")
-                WriteOutputDat(bflowDatFile, pTsBaseflow1.Attributes)
-                'write(3,5002) flwfile, bflw_fr1, bflw_fr2, bflw_fr3
+        Catch ex As Exception
+            gError &= "BFLOW estimate recession constant failed (Exception: " & ex.InnerException.Message & "). " &
+                      "Check data for long periods of repeated values. " &
+                      "(Alternatively, the user might want to remove BFLOW as one of the hydrograph-separation methods selected for analysis.)"
+            If gBatchRun Then
+                Throw New ApplicationException(gError)
             End If
-        End If
+            Return Nothing
+        End Try
 
         'save base-flow values from the 3 passes into time series
         For I = 1 To lndays

@@ -333,6 +333,8 @@ Public Class ManDelinPlugIn
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "COMID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASIN") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "HydroSeq") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "HydroSeq")
         End If
 
         'temporarily flag segments that have been clipped -- we'll want to know this later
@@ -588,6 +590,8 @@ Public Class ManDelinPlugIn
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "RCHID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "COMID") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "COMID")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "HydroSeq") Then
+            lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "HydroSeq")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASIN") Then
             lReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASIN")
         End If
@@ -600,6 +604,8 @@ Public Class ManDelinPlugIn
             lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "TOCOMID")
         ElseIf GisUtil.IsField(lStreamsLayerIndex, "SUBBASINR") Then
             lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "SUBBASINR")
+        ElseIf GisUtil.IsField(lStreamsLayerIndex, "DnHydroSeq") Then
+            lDownReachField = GisUtil.FieldIndex(lStreamsLayerIndex, "DnHydroSeq")
         End If
 
         Dim lDownstreamFieldIndex As Integer = GisUtil.FieldIndexAddIfMissing(lStreamsLayerIndex, "SUBBASINR", 1, 10)

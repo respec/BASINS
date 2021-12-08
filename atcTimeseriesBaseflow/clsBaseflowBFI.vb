@@ -148,7 +148,16 @@ Public Class clsBaseflowBFI
             lTsDAYMIN.Value(I) = -999 'important as later on will use this -999 as guide for detecting valud TP day
         Next
         GetMins0(lTsDaily, lTsQMINS, lTsDAYMIN)
-        Dim lTsBF As atcTimeseries = DoBFI(lTsDaily, lTsQMINS, lTsDAYMIN)
+        Dim lTsBF As atcTimeseries = Nothing
+        Try
+            lTsBF = DoBFI(lTsDaily, lTsQMINS, lTsDAYMIN)
+        Catch ex As Exception
+            gError = "BFI method failed. Exception: " & ex.InnerException.Message
+            If gBatchRun Then
+                Throw New ApplicationException(gError)
+            End If
+            Return Nothing
+        End Try
 
         'Adjust for pre- and post- duration dates
         lTsBF = SubsetByDate(lTsBF, StartDate, EndDate, Nothing)

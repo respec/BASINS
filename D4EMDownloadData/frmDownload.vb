@@ -493,7 +493,7 @@ Public Class frmDownload
         Dim lStations As New Generic.List(Of String)
         Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Point)
         For Each lyr As IMapFeatureLayer In layers
-            If lyr.Checked Then
+            If lyr.IsSelected Then
                 If lyr.Selection().Count > 0 Then
                     Dim lKeyFld As DataColumn = Nothing
                     Dim lKeyFldIndex As Integer = -1
