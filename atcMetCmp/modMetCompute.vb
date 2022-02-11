@@ -2375,4 +2375,121 @@ OuttaHere:
         Return lDewpointTS
 
     End Function
+
+    ''' <summary>uses Hargreaves method to compute daily evaporation rate from 
+    ''' daily average temperatures And Julian day.</summary>
+    ''' <param name="aMonth">Month</param>
+    ''' <param name="aDay">Day</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
+    ''' <param name="aTAve">Average daily temperature (C)</param>
+    ''' <param name="aTRng">Average daily temperature (C)</param>
+    ''' <param name="aDegF">Temperature in Fahrenheit (True) or Celsius (False)</param>
+    ''' <param name="aMissingValue">Value to return if problem occurs</param>
+    ''' <remarks>returns evaporation rate in in/day</remarks>
+    'Public Function ETValueComputedbyHargraeves(ByVal aMonth As Integer,
+    '                                            ByVal aDay As Integer,
+    Public Function ETValueComputedbyHargraeves(ByVal JulDay As Integer,
+                                                ByVal aLatDeg As Double,
+                                                ByVal aTAve As Double,
+                                                ByVal aTRng As Double,
+                                                ByVal aDegF As Boolean,
+                                                ByVal aMissingValue As Double) As Double
+        'check latitude
+        If aLatDeg < MetComputeLatitudeMin OrElse aLatDeg > MetComputeLatitudeMax Then 'invalid latitude 
+            Return aMissingValue
+        Else 'latitude ok,convert to radians
+
+            Dim LatRdn As Double = aLatDeg * DegreesToRadians
+            'convert temperature to Centigrade if necessary
+            'If aDegF Then
+            '    aTAve = (aTAve - 32.0#) * (5.0# / 9.0#)
+            '    aTRng = aTRng * (5.0# / 9.0#)
+            'End If
+
+            Dim a As Double = 2.0 * Math.PI / 365.0
+            Dim ta As Double = (aTAve - 32.0) * 5.0 / 9.0 'average temperature (deg C)
+            Dim tr As Double = aTRng * 5.0 / 9.0 'temperature range (deg C)
+            Dim lamda As Double = 2.5 - 0.002361 * ta 'latent heat of vaporization
+            Dim dr As Double = 1.0 + 0.033 * Math.Cos(a * JulDay) 'relative earth-sun distance
+            'Dim phi As Double = LatRdn * 2.0 * Math.PI / 360.0 'latitude angle (rad)
+            Dim phi As Double = aLatDeg * 2.0 * Math.PI / 360.0 'latitude angle (rad)
+            Dim del As Double = 0.4093 * Math.Sin(a * (284 + JulDay)) 'solar declination angle (rad)
+            Dim lphiXdel = -Math.Tan(phi) * Math.Tan(del)
+            'If lphiXdel < -1.0 Then
+            '    lphiXdel = -1.0
+            'ElseIf lphiXdel > 1.0 Then
+            '    lphiXdel = 1.0
+            'End If
+            Dim omega As Double = Math.Acos(lphiXdel) 'sunset hour angle (rad)
+            Dim ra As Double = 37.6 * dr * (omega * Math.Sin(phi) * Math.Sin(del) + Math.Cos(phi) * Math.Cos(del) * Math.Sin(omega)) 'extraterrestrial radiation
+            Dim e As Double = 0.0023 * ra / lamda * Math.Sqrt(tr) * (ta + 17.8) 'evap. rate (mm/day)
+            If (e < 0.0) Then e = 0.0
+            If aDegF Then e /= 25.4 'evap rate (In/day)
+            Return e
+        End If
+    End Function
+
+    ''' <summary>compute Hargraeves ET</summary>
+    ''' <param name="aTMinTS">Min Air Temperature - daily</param>
+    ''' <param name="aTMaxTS">Max Air Temperature - daily</param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aDegF">Temperature in Degrees F (True) or C (False)</param>
+    ''' <param name="aLatDeg">Latitude, in degrees</param>
+    ''' <returns>Daily Pan Evaporation</returns>
+    ''' <remarks></remarks>
+    Public Function ETTimeseriesComputedByHargraeves(ByVal aTMinTS As atcTimeseries,
+                                                     ByVal aTMaxTS As atcTimeseries,
+                                                     ByVal aSource As atcTimeseriesSource,
+                                                     ByVal aDegF As Boolean,
+                                                     ByVal aLatDeg As Double) As atcTimeseries
+        Dim lAirTmp(aTMinTS.numValues) As Double
+        Dim lATmpRng(aTMinTS.numValues) As Double
+        Dim lETValues(aTMinTS.numValues) As Double
+        Dim lETTimeseries As New atcTimeseries(aSource)
+
+        CopyBaseAttributes(aTMinTS, lETTimeseries)
+        lETTimeseries.Attributes.SetValue("Constituent", "PET")
+        lETTimeseries.Attributes.SetValue("TSTYPE", "EVAP")
+        lETTimeseries.Attributes.SetValue("Scenario", "COMPUTED")
+        lETTimeseries.Attributes.SetValue("Description", "Daily ET (in) computed using Hargraeves algorithm")
+        lETTimeseries.Attributes.AddHistory("Computed Daily ET using Hargraeves - inputs: Ave Temp, Temp Range, Degrees F, Latitude")
+        lETTimeseries.Attributes.Add("TMIN", aTMinTS.ToString)
+        lETTimeseries.Attributes.Add("TMAX", aTMaxTS.ToString)
+        'lETTimeseries.Attributes.Add("TRNG", aTMinTS.ToString)
+        lETTimeseries.Attributes.Add("Degrees F", aDegF)
+        lETTimeseries.Attributes.Add("LATDEG", aLatDeg)
+        lETTimeseries.Dates = aTMinTS.Dates
+        lETTimeseries.numValues = aTMinTS.numValues
+
+        'get fill value for input dsns
+        Dim lMissingValue(2) As Double
+        lMissingValue(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
+        lMissingValue(2) = aTMinTS.Attributes.GetValue("TSFILL", -999)
+
+        Dim lJulDay As Double
+        Dim lDate(5) As Integer
+        Dim lPoint As Boolean = aTMinTS.Attributes.GetValue("point", False)
+        For lValueIndex As Integer = 1 To lETTimeseries.numValues
+            If Math.Abs(aTMinTS.Value(lValueIndex) - lMissingValue(1)) < 0.000001 OrElse
+               Math.Abs(aTMinTS.Value(lValueIndex) - lMissingValue(2)) < 0.000001 Then
+                'missing source data
+                lETValues(lValueIndex) = lMissingValue(1)
+            Else 'compute pet
+                lAirTmp(lValueIndex) = (aTMinTS.Value(lValueIndex) + aTMaxTS.Value(lValueIndex)) / 2
+                lATmpRng(lValueIndex) = aTMaxTS.Value(lValueIndex) - aTMinTS.Value(lValueIndex)
+                If lPoint Then
+                    J2Date(lETTimeseries.Dates.Value(lValueIndex), lDate)
+                Else
+                    J2Date(lETTimeseries.Dates.Value(lValueIndex - 1), lDate)
+                End If
+                'TODO: make this consistant with our conventions
+                lJulDay = 30.5 * (lDate(1) - 1) + lDate(2)
+                lETValues(lValueIndex) = ETValueComputedbyHargraeves(lJulDay, aLatDeg, lAirTmp(lValueIndex), lATmpRng(lValueIndex), aDegF, lMissingValue(1))
+            End If
+        Next lValueIndex
+        Array.Copy(lETValues, 1, lETTimeseries.Values, 1, lETTimeseries.numValues)
+
+        Return lETTimeseries
+    End Function
+
 End Module
