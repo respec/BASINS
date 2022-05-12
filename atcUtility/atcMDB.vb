@@ -122,17 +122,26 @@ Public Class atcMDB
         For lIndex As Integer = 2 To aFieldValues.Count
             lStr = lStr & "," & aFieldValues(lIndex)
         Next
-        lCommand.CommandText = "INSERT INTO " & aTableName & " VALUES (" & lStr & ")"
+        lCommand.CommandText = "INSERT INTO ? VALUES (?)"
+        lCommand.Parameters.Add("@tablename", OdbcType.VarChar).Value = aTableName
+        lCommand.Parameters.Add("@values", OdbcType.VarChar).Value = lStr
         lCommand.ExecuteNonQuery()
         pConnection.Close()
         Return True
     End Function
 
     Public Function DeleteRowFromTable(ByVal aTableName As String, ByVal aFieldName As String, ByVal aID As String) As Boolean
+        Dim lId As Integer
+        If Not Integer.TryParse(aID, lId) Then
+            Return False
+        End If
         pConnection.Open()
         Dim lCommand As New OdbcCommand
         lCommand.Connection = pConnection
-        lCommand.CommandText = "DELETE FROM " & aTableName & " WHERE " & aFieldName & " = " & aID
+        lCommand.CommandText = "DELETE FROM ? WHERE ? = ?"
+        lCommand.Parameters.Add("@tablename", OdbcType.VarChar).Value = aTableName
+        lCommand.Parameters.Add("@fieldname", OdbcType.VarChar).Value = aFieldName
+        lCommand.Parameters.Add("@id", OdbcType.Int).Value = lId
         lCommand.ExecuteNonQuery()
         pConnection.Close()
         Return True
