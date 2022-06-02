@@ -49,19 +49,14 @@ Partial Class frmDownload
         Me.chkUSGS_Seamless_NLCD2004_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2008_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2013_LandCover = New System.Windows.Forms.CheckBox()
-        Me.chkUSGS_Seamless_NLCD2016_Impervious = New System.Windows.Forms.CheckBox()
-        Me.chkUSGS_Seamless_NLCD2016_LandCover = New System.Windows.Forms.CheckBox()
+        Me.chkUSGS_Seamless_NLCD2019_Impervious = New System.Windows.Forms.CheckBox()
+        Me.chkUSGS_Seamless_NLCD2019_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2011_Impervious = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2011_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2001_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2001_Impervious = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2006_Impervious = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2006_LandCover = New System.Windows.Forms.CheckBox()
-        Me.grpNHDplus = New System.Windows.Forms.GroupBox()
-        Me.chkNHDplus_hydrography = New System.Windows.Forms.CheckBox()
-        Me.chkNHDplus_elev_cm = New System.Windows.Forms.CheckBox()
-        Me.chkNHDplus_All = New System.Windows.Forms.CheckBox()
-        Me.chkNHDplus_Catchment = New System.Windows.Forms.CheckBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.chkNWISStations_qw = New System.Windows.Forms.CheckBox()
         Me.chkNWISStations_measurement = New System.Windows.Forms.CheckBox()
@@ -82,6 +77,7 @@ Partial Class frmDownload
         Me.chkNCDC_MetStations = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_hydrography = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_elev_cm = New System.Windows.Forms.CheckBox()
+        Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox()
         Me.btnDownload = New System.Windows.Forms.Button()
         Me.cboRegion = New System.Windows.Forms.ComboBox()
         Me.lblRegion = New System.Windows.Forms.Label()
@@ -99,7 +95,6 @@ Partial Class frmDownload
         Me.grpNWIS_GW = New System.Windows.Forms.GroupBox()
         Me.chkNWIS_GetNWISPrecipitation_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISDailyDischarge_GW = New System.Windows.Forms.CheckBox()
-        Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISIdaDischarge_GW = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISDailyGW_GW = New System.Windows.Forms.CheckBox()
         Me.panelNWISnoStations_GW = New System.Windows.Forms.Panel()
@@ -108,11 +103,12 @@ Partial Class frmDownload
         Me.grpNHDplus2 = New System.Windows.Forms.GroupBox()
         Me.chkNHDplus2_All = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_Catchment = New System.Windows.Forms.CheckBox()
+        Me.chkUSGS_Seamless_NLCD2016_Impervious = New System.Windows.Forms.CheckBox()
+        Me.chkUSGS_Seamless_NLCD2016_LandCover = New System.Windows.Forms.CheckBox()
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
         Me.grpUSGS_Seamless.SuspendLayout()
-        Me.grpNHDplus.SuspendLayout()
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
         Me.grpNLDAS.SuspendLayout()
@@ -265,7 +261,7 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDailyDischarge)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISIdaDischarge)
         Me.grpNWIS.Controls.Add(Me.panelNWISnoStations)
-        Me.grpNWIS.Location = New System.Drawing.Point(11, 406)
+        Me.grpNWIS.Location = New System.Drawing.Point(11, 355)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(487, 65)
         Me.grpNWIS.TabIndex = 26
@@ -378,20 +374,22 @@ Partial Class frmDownload
         '
         Me.grpUSGS_Seamless.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2016_Impervious)
+        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2016_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2004_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2008_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2013_LandCover)
-        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2016_Impervious)
-        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2016_LandCover)
+        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2019_Impervious)
+        Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2019_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2011_Impervious)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2011_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2001_LandCover)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2001_Impervious)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2006_Impervious)
         Me.grpUSGS_Seamless.Controls.Add(Me.chkUSGS_Seamless_NLCD2006_LandCover)
-        Me.grpUSGS_Seamless.Location = New System.Drawing.Point(12, 477)
+        Me.grpUSGS_Seamless.Location = New System.Drawing.Point(12, 426)
         Me.grpUSGS_Seamless.Name = "grpUSGS_Seamless"
-        Me.grpUSGS_Seamless.Size = New System.Drawing.Size(487, 86)
+        Me.grpUSGS_Seamless.Size = New System.Drawing.Size(486, 118)
         Me.grpUSGS_Seamless.TabIndex = 30
         Me.grpUSGS_Seamless.TabStop = False
         Me.grpUSGS_Seamless.Text = "National Land Cover Data from National Map"
@@ -400,7 +398,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2004_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2004_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2004_LandCover.Location = New System.Drawing.Point(251, 65)
+        Me.chkUSGS_Seamless_NLCD2004_LandCover.Location = New System.Drawing.Point(365, 19)
         Me.chkUSGS_Seamless_NLCD2004_LandCover.Name = "chkUSGS_Seamless_NLCD2004_LandCover"
         Me.chkUSGS_Seamless_NLCD2004_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2004_LandCover.TabIndex = 43
@@ -410,7 +408,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2008_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2008_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2008_LandCover.Location = New System.Drawing.Point(131, 65)
+        Me.chkUSGS_Seamless_NLCD2008_LandCover.Location = New System.Drawing.Point(247, 19)
         Me.chkUSGS_Seamless_NLCD2008_LandCover.Name = "chkUSGS_Seamless_NLCD2008_LandCover"
         Me.chkUSGS_Seamless_NLCD2008_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2008_LandCover.TabIndex = 41
@@ -420,37 +418,37 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2013_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2013_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2013_LandCover.Location = New System.Drawing.Point(6, 65)
+        Me.chkUSGS_Seamless_NLCD2013_LandCover.Location = New System.Drawing.Point(133, 19)
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Name = "chkUSGS_Seamless_NLCD2013_LandCover"
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2013_LandCover.TabIndex = 39
         Me.chkUSGS_Seamless_NLCD2013_LandCover.Text = "2013 Land Cover"
         Me.chkUSGS_Seamless_NLCD2013_LandCover.UseVisualStyleBackColor = True
         '
-        'chkUSGS_Seamless_NLCD2016_Impervious
+        'chkUSGS_Seamless_NLCD2019_Impervious
         '
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Location = New System.Drawing.Point(6, 42)
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Name = "chkUSGS_Seamless_NLCD2016_Impervious"
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(104, 17)
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.TabIndex = 35
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Text = "2016 Impervious"
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.UseVisualStyleBackColor = True
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.Location = New System.Drawing.Point(6, 42)
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.Name = "chkUSGS_Seamless_NLCD2019_Impervious"
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.Size = New System.Drawing.Size(104, 17)
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.TabIndex = 35
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.Text = "2019 Impervious"
+        Me.chkUSGS_Seamless_NLCD2019_Impervious.UseVisualStyleBackColor = True
         '
-        'chkUSGS_Seamless_NLCD2016_LandCover
+        'chkUSGS_Seamless_NLCD2019_LandCover
         '
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Location = New System.Drawing.Point(6, 19)
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Name = "chkUSGS_Seamless_NLCD2016_LandCover"
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(108, 17)
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.TabIndex = 31
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Text = "2016 Land Cover"
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.UseVisualStyleBackColor = True
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.Location = New System.Drawing.Point(6, 19)
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.Name = "chkUSGS_Seamless_NLCD2019_LandCover"
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.Size = New System.Drawing.Size(108, 17)
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.TabIndex = 31
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.Text = "2019 Land Cover"
+        Me.chkUSGS_Seamless_NLCD2019_LandCover.UseVisualStyleBackColor = True
         '
         'chkUSGS_Seamless_NLCD2011_Impervious
         '
         Me.chkUSGS_Seamless_NLCD2011_Impervious.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2011_Impervious.Location = New System.Drawing.Point(131, 42)
+        Me.chkUSGS_Seamless_NLCD2011_Impervious.Location = New System.Drawing.Point(133, 65)
         Me.chkUSGS_Seamless_NLCD2011_Impervious.Name = "chkUSGS_Seamless_NLCD2011_Impervious"
         Me.chkUSGS_Seamless_NLCD2011_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2011_Impervious.TabIndex = 36
@@ -460,7 +458,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2011_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2011_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2011_LandCover.Location = New System.Drawing.Point(131, 19)
+        Me.chkUSGS_Seamless_NLCD2011_LandCover.Location = New System.Drawing.Point(133, 42)
         Me.chkUSGS_Seamless_NLCD2011_LandCover.Name = "chkUSGS_Seamless_NLCD2011_LandCover"
         Me.chkUSGS_Seamless_NLCD2011_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2011_LandCover.TabIndex = 32
@@ -470,7 +468,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2001_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2001_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2001_LandCover.Location = New System.Drawing.Point(365, 19)
+        Me.chkUSGS_Seamless_NLCD2001_LandCover.Location = New System.Drawing.Point(365, 42)
         Me.chkUSGS_Seamless_NLCD2001_LandCover.Name = "chkUSGS_Seamless_NLCD2001_LandCover"
         Me.chkUSGS_Seamless_NLCD2001_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2001_LandCover.TabIndex = 34
@@ -480,7 +478,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2001_Impervious
         '
         Me.chkUSGS_Seamless_NLCD2001_Impervious.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2001_Impervious.Location = New System.Drawing.Point(365, 42)
+        Me.chkUSGS_Seamless_NLCD2001_Impervious.Location = New System.Drawing.Point(365, 65)
         Me.chkUSGS_Seamless_NLCD2001_Impervious.Name = "chkUSGS_Seamless_NLCD2001_Impervious"
         Me.chkUSGS_Seamless_NLCD2001_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2001_Impervious.TabIndex = 38
@@ -490,7 +488,7 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2006_Impervious
         '
         Me.chkUSGS_Seamless_NLCD2006_Impervious.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2006_Impervious.Location = New System.Drawing.Point(251, 42)
+        Me.chkUSGS_Seamless_NLCD2006_Impervious.Location = New System.Drawing.Point(247, 65)
         Me.chkUSGS_Seamless_NLCD2006_Impervious.Name = "chkUSGS_Seamless_NLCD2006_Impervious"
         Me.chkUSGS_Seamless_NLCD2006_Impervious.Size = New System.Drawing.Size(104, 17)
         Me.chkUSGS_Seamless_NLCD2006_Impervious.TabIndex = 37
@@ -500,70 +498,12 @@ Partial Class frmDownload
         'chkUSGS_Seamless_NLCD2006_LandCover
         '
         Me.chkUSGS_Seamless_NLCD2006_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2006_LandCover.Location = New System.Drawing.Point(251, 19)
+        Me.chkUSGS_Seamless_NLCD2006_LandCover.Location = New System.Drawing.Point(247, 42)
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Name = "chkUSGS_Seamless_NLCD2006_LandCover"
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Size = New System.Drawing.Size(108, 17)
         Me.chkUSGS_Seamless_NLCD2006_LandCover.TabIndex = 33
         Me.chkUSGS_Seamless_NLCD2006_LandCover.Text = "2006 Land Cover"
         Me.chkUSGS_Seamless_NLCD2006_LandCover.UseVisualStyleBackColor = True
-        '
-        'grpNHDplus
-        '
-        Me.grpNHDplus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_hydrography)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_elev_cm)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
-        Me.grpNHDplus.Controls.Add(Me.chkNHDplus_Catchment)
-        Me.grpNHDplus.Location = New System.Drawing.Point(11, 256)
-        Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(487, 45)
-        Me.grpNHDplus.TabIndex = 12
-        Me.grpNHDplus.TabStop = False
-        Me.grpNHDplus.Text = "National Hydrography Dataset Plus v1.0"
-        Me.grpNHDplus.Visible = False
-        '
-        'chkNHDplus_hydrography
-        '
-        Me.chkNHDplus_hydrography.AutoSize = True
-        Me.chkNHDplus_hydrography.Location = New System.Drawing.Point(326, 19)
-        Me.chkNHDplus_hydrography.Name = "chkNHDplus_hydrography"
-        Me.chkNHDplus_hydrography.Size = New System.Drawing.Size(86, 17)
-        Me.chkNHDplus_hydrography.TabIndex = 18
-        Me.chkNHDplus_hydrography.Text = "Hydrography"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus_hydrography, "NHDArea, NHDFlowline, NHDLine, NHDPoint, NHDWaterbody")
-        Me.chkNHDplus_hydrography.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_elev_cm
-        '
-        Me.chkNHDplus_elev_cm.AutoSize = True
-        Me.chkNHDplus_elev_cm.Location = New System.Drawing.Point(73, 19)
-        Me.chkNHDplus_elev_cm.Name = "chkNHDplus_elev_cm"
-        Me.chkNHDplus_elev_cm.Size = New System.Drawing.Size(92, 17)
-        Me.chkNHDplus_elev_cm.TabIndex = 14
-        Me.chkNHDplus_elev_cm.Text = "Elevation Grid"
-        Me.ToolTip1.SetToolTip(Me.chkNHDplus_elev_cm, "elev_cm grid")
-        Me.chkNHDplus_elev_cm.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_All
-        '
-        Me.chkNHDplus_All.AutoSize = True
-        Me.chkNHDplus_All.Location = New System.Drawing.Point(6, 19)
-        Me.chkNHDplus_All.Name = "chkNHDplus_All"
-        Me.chkNHDplus_All.Size = New System.Drawing.Size(37, 17)
-        Me.chkNHDplus_All.TabIndex = 13
-        Me.chkNHDplus_All.Text = "All"
-        Me.chkNHDplus_All.UseVisualStyleBackColor = True
-        '
-        'chkNHDplus_Catchment
-        '
-        Me.chkNHDplus_Catchment.AutoSize = True
-        Me.chkNHDplus_Catchment.Location = New System.Drawing.Point(205, 19)
-        Me.chkNHDplus_Catchment.Name = "chkNHDplus_Catchment"
-        Me.chkNHDplus_Catchment.Size = New System.Drawing.Size(82, 17)
-        Me.chkNHDplus_Catchment.TabIndex = 17
-        Me.chkNHDplus_Catchment.Text = "Catchments"
-        Me.chkNHDplus_Catchment.UseVisualStyleBackColor = True
         '
         'chkNWISStations_qw
         '
@@ -779,6 +719,18 @@ Partial Class frmDownload
         Me.ToolTip1.SetToolTip(Me.chkNHDplus2_elev_cm, "elev_cm grid")
         Me.chkNHDplus2_elev_cm.UseVisualStyleBackColor = True
         '
+        'chkNWIS_GetNWISPeriodicGW_GW
+        '
+        Me.chkNWIS_GetNWISPeriodicGW_GW.AutoSize = True
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Enabled = False
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Location = New System.Drawing.Point(134, 19)
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Name = "chkNWIS_GetNWISPeriodicGW_GW"
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Size = New System.Drawing.Size(128, 17)
+        Me.chkNWIS_GetNWISPeriodicGW_GW.TabIndex = 29
+        Me.chkNWIS_GetNWISPeriodicGW_GW.Text = "Periodic Groundwater"
+        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW_GW, "Periodic Groundwater")
+        Me.chkNWIS_GetNWISPeriodicGW_GW.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -864,7 +816,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_qw)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_measurement)
         Me.grpNWISStations.Controls.Add(Me.chkNWISStations_discharge)
-        Me.grpNWISStations.Location = New System.Drawing.Point(11, 358)
+        Me.grpNWISStations.Location = New System.Drawing.Point(11, 307)
         Me.grpNWISStations.Name = "grpNWISStations"
         Me.grpNWISStations.Size = New System.Drawing.Size(487, 42)
         Me.grpNWISStations.TabIndex = 21
@@ -985,18 +937,6 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyDischarge_GW.Text = "Daily Discharge"
         Me.chkNWIS_GetNWISDailyDischarge_GW.UseVisualStyleBackColor = True
         '
-        'chkNWIS_GetNWISPeriodicGW_GW
-        '
-        Me.chkNWIS_GetNWISPeriodicGW_GW.AutoSize = True
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Enabled = False
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Location = New System.Drawing.Point(134, 19)
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Name = "chkNWIS_GetNWISPeriodicGW_GW"
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Size = New System.Drawing.Size(128, 17)
-        Me.chkNWIS_GetNWISPeriodicGW_GW.TabIndex = 29
-        Me.chkNWIS_GetNWISPeriodicGW_GW.Text = "Periodic Groundwater"
-        Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW_GW, "Periodic Groundwater")
-        Me.chkNWIS_GetNWISPeriodicGW_GW.UseVisualStyleBackColor = True
-        '
         'chkNWIS_GetNWISIdaDischarge_GW
         '
         Me.chkNWIS_GetNWISIdaDischarge_GW.AutoSize = True
@@ -1061,7 +1001,7 @@ Partial Class frmDownload
         Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_elev_cm)
         Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_All)
         Me.grpNHDplus2.Controls.Add(Me.chkNHDplus2_Catchment)
-        Me.grpNHDplus2.Location = New System.Drawing.Point(11, 307)
+        Me.grpNHDplus2.Location = New System.Drawing.Point(11, 256)
         Me.grpNHDplus2.Name = "grpNHDplus2"
         Me.grpNHDplus2.Size = New System.Drawing.Size(487, 45)
         Me.grpNHDplus2.TabIndex = 51
@@ -1089,6 +1029,26 @@ Partial Class frmDownload
         Me.chkNHDplus2_Catchment.Text = "Catchments"
         Me.chkNHDplus2_Catchment.UseVisualStyleBackColor = True
         '
+        'chkUSGS_Seamless_NLCD2016_Impervious
+        '
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Location = New System.Drawing.Point(5, 88)
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Name = "chkUSGS_Seamless_NLCD2016_Impervious"
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(104, 17)
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.TabIndex = 45
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Text = "2016 Impervious"
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.UseVisualStyleBackColor = True
+        '
+        'chkUSGS_Seamless_NLCD2016_LandCover
+        '
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Location = New System.Drawing.Point(5, 65)
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Name = "chkUSGS_Seamless_NLCD2016_LandCover"
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(108, 17)
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.TabIndex = 44
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Text = "2016 Land Cover"
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.UseVisualStyleBackColor = True
+        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
@@ -1109,7 +1069,6 @@ Partial Class frmDownload
         Me.Controls.Add(Me.lblRegion)
         Me.Controls.Add(Me.cboRegion)
         Me.Controls.Add(Me.btnDownload)
-        Me.Controls.Add(Me.grpNHDplus)
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
         Me.Controls.Add(Me.btnCancel)
@@ -1130,8 +1089,6 @@ Partial Class frmDownload
         Me.panelNWISnoStations.PerformLayout()
         Me.grpUSGS_Seamless.ResumeLayout(False)
         Me.grpUSGS_Seamless.PerformLayout()
-        Me.grpNHDplus.ResumeLayout(False)
-        Me.grpNHDplus.PerformLayout()
         Me.grpSTORET.ResumeLayout(False)
         Me.grpSTORET.PerformLayout()
         Me.grpNWISStations.ResumeLayout(False)
@@ -1168,8 +1125,6 @@ Partial Class frmDownload
     Friend WithEvents chkNWIS_GetNWISDailyGW As System.Windows.Forms.CheckBox
     Friend WithEvents grpUSGS_Seamless As System.Windows.Forms.GroupBox
     Friend WithEvents chkUSGS_Seamless_NLCD2006_LandCover As System.Windows.Forms.CheckBox
-    Friend WithEvents grpNHDplus As System.Windows.Forms.GroupBox
-    Friend WithEvents chkNHDplus_All As System.Windows.Forms.CheckBox
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnDownload As System.Windows.Forms.Button
     Friend WithEvents cboRegion As System.Windows.Forms.ComboBox
@@ -1179,9 +1134,6 @@ Partial Class frmDownload
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents grpSTORET As System.Windows.Forms.GroupBox
     Friend WithEvents chkSTORET_Stations As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_elev_cm As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_Catchment As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNHDplus_hydrography As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2006_Impervious As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2001_Impervious As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISWQ As System.Windows.Forms.CheckBox
@@ -1218,8 +1170,8 @@ Partial Class frmDownload
     Friend WithEvents txtMinCount_GW As System.Windows.Forms.TextBox
     Friend WithEvents chkNWISStations_precipitation_GW As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_GetNWISPrecipitation_GW As System.Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As System.Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2019_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2019_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2011_Impervious As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2011_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkGetNewest As System.Windows.Forms.CheckBox
@@ -1236,4 +1188,6 @@ Partial Class frmDownload
     Friend WithEvents chkUSGS_Seamless_NLCD2013_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2004_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2008_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As Windows.Forms.CheckBox
 End Class

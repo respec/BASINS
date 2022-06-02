@@ -215,7 +215,7 @@ Public Class frmDownload
         Else
             lGroups.Add(grpBASINS)
             'lGroups.Add(grpNCDC)
-            lGroups.Add(grpNHDplus)
+            'lGroups.Add(grpNHDplus)
             lGroups.Add(grpNHDplus2)
             lGroups.Add(grpNWISStations)
             lGroups.Add(grpNWIS)
@@ -266,19 +266,19 @@ Public Class frmDownload
 
                     'check to see if nhdplus desired and available
                     Dim lProblem As Boolean = False
-                    If chkNHDplus_All.Checked Or chkNHDplus_Catchment.Checked Or chkNHDplus_elev_cm.Checked Or chkNHDplus_hydrography.Checked Then
-                        For Each lHuc8 As String In HUC8s()
-                            If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV1/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
-                                lProblem = True
-                            End If
-                        Next
-                        If lProblem Then
-                            If MapWinUtility.Logger.Msg("NHDPlus v1.0 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
-                                                         MsgBoxStyle.YesNo, "Desired Data Not Available") = MsgBoxResult.No Then
-                                Return CancelString
-                            End If
-                        End If
-                    End If
+                    'If chkNHDplus_All.Checked Or chkNHDplus_Catchment.Checked Or chkNHDplus_elev_cm.Checked Or chkNHDplus_hydrography.Checked Then
+                    '    For Each lHuc8 As String In HUC8s()
+                    '        If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV1/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
+                    '            lProblem = True
+                    '        End If
+                    '    Next
+                    '    If lProblem Then
+                    '        If MapWinUtility.Logger.Msg("NHDPlus v1.0 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
+                    '                                     MsgBoxStyle.YesNo, "Desired Data Not Available") = MsgBoxResult.No Then
+                    '            Return CancelString
+                    '        End If
+                    '    End If
+                    'End If
                     If chkNHDplus2_All.Checked Or chkNHDplus2_Catchment.Checked Or chkNHDplus2_elev_cm.Checked Or chkNHDplus2_hydrography.Checked Then
                         For Each lHuc8 As String In HUC8s()
                             'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
@@ -555,7 +555,7 @@ Public Class frmDownload
 
         If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             chkNWIS_GetNWISDailyDischarge_GW.Visible = True
-            chkNWIS_GetNWISIdaDischarge_GW.Visible = True
+            chkNWIS_GetNWISIdaDischarge_GW.Visible = False
             chkNWIS_GetNWISDailyGW_GW.Visible = True
             chkNWIS_GetNWISPeriodicGW_GW.Visible = True
             chkNWIS_GetNWISPrecipitation_GW.Visible = True
