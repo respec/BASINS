@@ -717,7 +717,11 @@ Public Class clsBatchSpecDFLOW
                     End If
                 End Try
                 lConfigFile = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Config.txt"), False)
+                Dim lhasError As Boolean = False
                 For Each lStation As clsBatchUnitStation In lBFOpn
+                    If Not String.IsNullOrEmpty(lStation.Message) AndAlso lStation.Message.StartsWith("Error", True, Nothing) Then
+                        lhasError = True
+                    End If
                     Dim lDataFilename As String = ListBatchUnitsData.ItemByKey(lStation.StationID)
                     If String.IsNullOrEmpty(lDataFilename) Then
                         lDataFilename = lStation.StationDataFilename
@@ -744,6 +748,18 @@ Public Class clsBatchSpecDFLOW
                 lConfigFile.Flush()
                 lConfigFile.Close()
                 lConfigFile = Nothing
+
+                If lhasError Then
+                    Dim lErrorFile As IO.StreamWriter = New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "Error.txt"), False)
+                    For Each lStation As clsBatchUnitStation In lBFOpn
+                        If Not String.IsNullOrEmpty(lStation.Message) AndAlso lStation.Message.StartsWith("Error", True, Nothing) Then
+                            lErrorFile.WriteLine("Station " + lStation.StationID + ": " + lStation.Message)
+                        End If
+                    Next
+                    lErrorFile.Flush()
+                    lErrorFile.Close()
+                    lErrorFile = Nothing
+                End If
 
                 If DFLOWCalcs.DFLOWMessage IsNot Nothing AndAlso DFLOWCalcs.DFLOWMessage.Length > 0 Then
                     Dim log As New IO.StreamWriter(IO.Path.Combine(lBFOpnDir, "DFLOW_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)

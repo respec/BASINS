@@ -885,21 +885,8 @@ Public Class DFLOWCalcs
             End If
 
             ' ===== Harmonic mean of flows
-            Dim lHFlow As Double = 0
-            Dim lNH As Integer = 0
-            Dim lHFlowAdj As Double = 0
-            For lI = 1 To UBound(lTS) '0 To UBound(lTS) - 1
-                If (Not Double.IsNaN(lTS(lI))) AndAlso (lTS(lI) > 0) Then 'And (lTS(lI) <> 0)
-                    lNH = lNH + 1
-                    lHFlow = lHFlow + 1 / lTS(lI)
-                End If
-            Next
-            If lHFlow <> 0 Then
-                lHFlow = lNH / lHFlow
-                If UBound(lTS) > 0 Then lHFlowAdj = lHFlow * ((1.0 * lNH) / (1.0 * UBound(lTS)))
-            End If
-            'Dim lHM As Double = lTimeSeries.Attributes.GetValue("Harmonic Mean")
-            'Dim lHMAdj As Double = lTimeSeries.Attributes.GetValue("Harmonic Mean Adj")
+            Dim lHFlow As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean")
+            Dim lHFlowAdj As Double = lHydrologicTS2.Attributes.GetValue("Harmonic Mean Adj")
 
             ' ===== Calculate percentiles
             Dim lNMiss As Integer = 0
