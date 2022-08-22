@@ -1405,6 +1405,11 @@ StartOver:
             g_MapWin.View.UnlockLegend()
         Else
             ProcessDownloadResult &= lInstructionsNode.Name & ": " & lInstructionsNode.InnerXml
+            If lInstructionsNode.Name.ToLower = "error" Then
+                'if there's an error also add instruction text
+                ProcessDownloadResult &= vbCrLf & "in ProcessDownloadResult"
+                ProcessDownloadResult &= vbCrLf & aInstructions
+            End If
         End If
         Logger.Status("")
     End Function

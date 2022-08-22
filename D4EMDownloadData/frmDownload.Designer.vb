@@ -46,6 +46,8 @@ Partial Class frmDownload
         Me.chkNWIS_GetNWISDailyGW = New System.Windows.Forms.CheckBox()
         Me.btnHelp = New System.Windows.Forms.Button()
         Me.grpUSGS_Seamless = New System.Windows.Forms.GroupBox()
+        Me.chkUSGS_Seamless_NLCD2016_Impervious = New System.Windows.Forms.CheckBox()
+        Me.chkUSGS_Seamless_NLCD2016_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2004_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2008_LandCover = New System.Windows.Forms.CheckBox()
         Me.chkUSGS_Seamless_NLCD2013_LandCover = New System.Windows.Forms.CheckBox()
@@ -103,8 +105,8 @@ Partial Class frmDownload
         Me.grpNHDplus2 = New System.Windows.Forms.GroupBox()
         Me.chkNHDplus2_All = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_Catchment = New System.Windows.Forms.CheckBox()
-        Me.chkUSGS_Seamless_NLCD2016_Impervious = New System.Windows.Forms.CheckBox()
-        Me.chkUSGS_Seamless_NLCD2016_LandCover = New System.Windows.Forms.CheckBox()
+        Me.grpSoils = New System.Windows.Forms.GroupBox()
+        Me.chkSSURGO = New System.Windows.Forms.CheckBox()
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -117,6 +119,7 @@ Partial Class frmDownload
         Me.panelNWISnoStations_GW.SuspendLayout()
         Me.grpNCDC.SuspendLayout()
         Me.grpNHDplus2.SuspendLayout()
+        Me.grpSoils.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
@@ -362,7 +365,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(293, 723)
+        Me.btnHelp.Location = New System.Drawing.Point(293, 775)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 46
@@ -394,6 +397,26 @@ Partial Class frmDownload
         Me.grpUSGS_Seamless.TabStop = False
         Me.grpUSGS_Seamless.Text = "National Land Cover Data from National Map"
         Me.grpUSGS_Seamless.Visible = False
+        '
+        'chkUSGS_Seamless_NLCD2016_Impervious
+        '
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Location = New System.Drawing.Point(5, 88)
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Name = "chkUSGS_Seamless_NLCD2016_Impervious"
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(104, 17)
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.TabIndex = 45
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.Text = "2016 Impervious"
+        Me.chkUSGS_Seamless_NLCD2016_Impervious.UseVisualStyleBackColor = True
+        '
+        'chkUSGS_Seamless_NLCD2016_LandCover
+        '
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.AutoSize = True
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Location = New System.Drawing.Point(5, 65)
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Name = "chkUSGS_Seamless_NLCD2016_LandCover"
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(108, 17)
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.TabIndex = 44
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.Text = "2016 Land Cover"
+        Me.chkUSGS_Seamless_NLCD2016_LandCover.UseVisualStyleBackColor = True
         '
         'chkUSGS_Seamless_NLCD2004_LandCover
         '
@@ -553,7 +576,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(17, 727)
+        Me.chkClip.Location = New System.Drawing.Point(17, 779)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 44
@@ -565,7 +588,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(222, 713)
+        Me.chkMerge.Location = New System.Drawing.Point(222, 765)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 43
@@ -667,7 +690,7 @@ Partial Class frmDownload
         '
         Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(123, 727)
+        Me.chkGetNewest.Location = New System.Drawing.Point(123, 779)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(82, 17)
         Me.chkGetNewest.TabIndex = 49
@@ -734,7 +757,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(423, 723)
+        Me.btnDownload.Location = New System.Drawing.Point(423, 775)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 48
@@ -765,7 +788,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(358, 723)
+        Me.btnCancel.Location = New System.Drawing.Point(358, 775)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 47
@@ -828,7 +851,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 727)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 779)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 45
@@ -1029,25 +1052,29 @@ Partial Class frmDownload
         Me.chkNHDplus2_Catchment.Text = "Catchments"
         Me.chkNHDplus2_Catchment.UseVisualStyleBackColor = True
         '
-        'chkUSGS_Seamless_NLCD2016_Impervious
+        'grpSoils
         '
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Location = New System.Drawing.Point(5, 88)
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Name = "chkUSGS_Seamless_NLCD2016_Impervious"
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Size = New System.Drawing.Size(104, 17)
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.TabIndex = 45
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.Text = "2016 Impervious"
-        Me.chkUSGS_Seamless_NLCD2016_Impervious.UseVisualStyleBackColor = True
+        Me.grpSoils.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpSoils.Controls.Add(Me.chkSSURGO)
+        Me.grpSoils.Location = New System.Drawing.Point(12, 714)
+        Me.grpSoils.Name = "grpSoils"
+        Me.grpSoils.Size = New System.Drawing.Size(487, 44)
+        Me.grpSoils.TabIndex = 52
+        Me.grpSoils.TabStop = False
+        Me.grpSoils.Text = "USDA NRCS Soils"
+        Me.grpSoils.Visible = False
         '
-        'chkUSGS_Seamless_NLCD2016_LandCover
+        'chkSSURGO
         '
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.AutoSize = True
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Location = New System.Drawing.Point(5, 65)
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Name = "chkUSGS_Seamless_NLCD2016_LandCover"
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Size = New System.Drawing.Size(108, 17)
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.TabIndex = 44
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.Text = "2016 Land Cover"
-        Me.chkUSGS_Seamless_NLCD2016_LandCover.UseVisualStyleBackColor = True
+        Me.chkSSURGO.AutoSize = True
+        Me.chkSSURGO.Location = New System.Drawing.Point(6, 19)
+        Me.chkSSURGO.Name = "chkSSURGO"
+        Me.chkSSURGO.Size = New System.Drawing.Size(72, 17)
+        Me.chkSSURGO.TabIndex = 4
+        Me.chkSSURGO.Text = "SSURGO"
+        Me.ToolTip1.SetToolTip(Me.chkSSURGO, "SSURGO Data from USDA Soil Data Mart")
+        Me.chkSSURGO.UseVisualStyleBackColor = True
         '
         'frmDownload
         '
@@ -1055,7 +1082,8 @@ Partial Class frmDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(511, 758)
+        Me.ClientSize = New System.Drawing.Size(511, 810)
+        Me.Controls.Add(Me.grpSoils)
         Me.Controls.Add(Me.grpNHDplus2)
         Me.Controls.Add(Me.grpNCDC)
         Me.Controls.Add(Me.chkGetNewest)
@@ -1105,6 +1133,8 @@ Partial Class frmDownload
         Me.grpNCDC.PerformLayout()
         Me.grpNHDplus2.ResumeLayout(False)
         Me.grpNHDplus2.PerformLayout()
+        Me.grpSoils.ResumeLayout(False)
+        Me.grpSoils.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1190,4 +1220,6 @@ Partial Class frmDownload
     Friend WithEvents chkUSGS_Seamless_NLCD2008_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As Windows.Forms.CheckBox
+    Friend WithEvents grpSoils As Windows.Forms.GroupBox
+    Friend WithEvents chkSSURGO As Windows.Forms.CheckBox
 End Class

@@ -222,6 +222,7 @@ Public Class frmDownload
             lGroups.Add(grpUSGS_Seamless)
             'lGroups.Add(grpSTORET)
             lGroups.Add(grpNLDAS)
+            lGroups.Add(grpSoils)
         End If
 
         For Each lGroup As System.Windows.Forms.GroupBox In lGroups
