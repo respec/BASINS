@@ -80,6 +80,7 @@ Partial Class frmDownload
         Me.chkNHDplus2_hydrography = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_elev_cm = New System.Windows.Forms.CheckBox()
         Me.chkNWIS_GetNWISPeriodicGW_GW = New System.Windows.Forms.CheckBox()
+        Me.chkSSURGO = New System.Windows.Forms.CheckBox()
         Me.btnDownload = New System.Windows.Forms.Button()
         Me.cboRegion = New System.Windows.Forms.ComboBox()
         Me.lblRegion = New System.Windows.Forms.Label()
@@ -90,6 +91,12 @@ Partial Class frmDownload
         Me.grpNWISStations = New System.Windows.Forms.GroupBox()
         Me.chkCacheOnly = New System.Windows.Forms.CheckBox()
         Me.grpNLDAS = New System.Windows.Forms.GroupBox()
+        Me.lblConstituents = New System.Windows.Forms.Label()
+        Me.lblEnd = New System.Windows.Forms.Label()
+        Me.lblStart = New System.Windows.Forms.Label()
+        Me.numStart = New System.Windows.Forms.NumericUpDown()
+        Me.numEnd = New System.Windows.Forms.NumericUpDown()
+        Me.lstParameters = New System.Windows.Forms.ListBox()
         Me.lblTimeZone = New System.Windows.Forms.Label()
         Me.txtTimeZone = New System.Windows.Forms.TextBox()
         Me.grpNWISStations_GW = New System.Windows.Forms.GroupBox()
@@ -106,7 +113,6 @@ Partial Class frmDownload
         Me.chkNHDplus2_All = New System.Windows.Forms.CheckBox()
         Me.chkNHDplus2_Catchment = New System.Windows.Forms.CheckBox()
         Me.grpSoils = New System.Windows.Forms.GroupBox()
-        Me.chkSSURGO = New System.Windows.Forms.CheckBox()
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.panelNWISnoStations.SuspendLayout()
@@ -114,6 +120,8 @@ Partial Class frmDownload
         Me.grpSTORET.SuspendLayout()
         Me.grpNWISStations.SuspendLayout()
         Me.grpNLDAS.SuspendLayout()
+        CType(Me.numStart, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.numEnd, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpNWISStations_GW.SuspendLayout()
         Me.grpNWIS_GW.SuspendLayout()
         Me.panelNWISnoStations_GW.SuspendLayout()
@@ -365,7 +373,7 @@ Partial Class frmDownload
         'btnHelp
         '
         Me.btnHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnHelp.Location = New System.Drawing.Point(293, 775)
+        Me.btnHelp.Location = New System.Drawing.Point(293, 802)
         Me.btnHelp.Name = "btnHelp"
         Me.btnHelp.Size = New System.Drawing.Size(59, 23)
         Me.btnHelp.TabIndex = 46
@@ -576,7 +584,7 @@ Partial Class frmDownload
         '
         Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(17, 779)
+        Me.chkClip.Location = New System.Drawing.Point(17, 806)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(92, 17)
         Me.chkClip.TabIndex = 44
@@ -588,7 +596,7 @@ Partial Class frmDownload
         '
         Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(222, 765)
+        Me.chkMerge.Location = New System.Drawing.Point(222, 792)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(56, 17)
         Me.chkMerge.TabIndex = 43
@@ -601,7 +609,7 @@ Partial Class frmDownload
         '
         Me.chkNLDAS_GetNLDASParameter.AutoSize = True
         Me.chkNLDAS_GetNLDASParameter.Enabled = False
-        Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(112, 19)
+        Me.chkNLDAS_GetNLDASParameter.Location = New System.Drawing.Point(59, 19)
         Me.chkNLDAS_GetNLDASParameter.Name = "chkNLDAS_GetNLDASParameter"
         Me.chkNLDAS_GetNLDASParameter.Size = New System.Drawing.Size(293, 17)
         Me.chkNLDAS_GetNLDASParameter.TabIndex = 42
@@ -690,7 +698,7 @@ Partial Class frmDownload
         '
         Me.chkGetNewest.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGetNewest.AutoSize = True
-        Me.chkGetNewest.Location = New System.Drawing.Point(123, 779)
+        Me.chkGetNewest.Location = New System.Drawing.Point(123, 806)
         Me.chkGetNewest.Name = "chkGetNewest"
         Me.chkGetNewest.Size = New System.Drawing.Size(82, 17)
         Me.chkGetNewest.TabIndex = 49
@@ -754,10 +762,21 @@ Partial Class frmDownload
         Me.ToolTip1.SetToolTip(Me.chkNWIS_GetNWISPeriodicGW_GW, "Periodic Groundwater")
         Me.chkNWIS_GetNWISPeriodicGW_GW.UseVisualStyleBackColor = True
         '
+        'chkSSURGO
+        '
+        Me.chkSSURGO.AutoSize = True
+        Me.chkSSURGO.Location = New System.Drawing.Point(6, 19)
+        Me.chkSSURGO.Name = "chkSSURGO"
+        Me.chkSSURGO.Size = New System.Drawing.Size(72, 17)
+        Me.chkSSURGO.TabIndex = 4
+        Me.chkSSURGO.Text = "SSURGO"
+        Me.ToolTip1.SetToolTip(Me.chkSSURGO, "SSURGO Data from USDA Soil Data Mart")
+        Me.chkSSURGO.UseVisualStyleBackColor = True
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(423, 775)
+        Me.btnDownload.Location = New System.Drawing.Point(423, 802)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 48
@@ -788,7 +807,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(358, 775)
+        Me.btnCancel.Location = New System.Drawing.Point(358, 802)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(59, 23)
         Me.btnCancel.TabIndex = 47
@@ -851,7 +870,7 @@ Partial Class frmDownload
         '
         Me.chkCacheOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkCacheOnly.AutoSize = True
-        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 779)
+        Me.chkCacheOnly.Location = New System.Drawing.Point(222, 806)
         Me.chkCacheOnly.Name = "chkCacheOnly"
         Me.chkCacheOnly.Size = New System.Drawing.Size(81, 17)
         Me.chkCacheOnly.TabIndex = 45
@@ -863,23 +882,91 @@ Partial Class frmDownload
         '
         Me.grpNLDAS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpNLDAS.Controls.Add(Me.lblConstituents)
+        Me.grpNLDAS.Controls.Add(Me.lblEnd)
+        Me.grpNLDAS.Controls.Add(Me.lblStart)
+        Me.grpNLDAS.Controls.Add(Me.numStart)
+        Me.grpNLDAS.Controls.Add(Me.numEnd)
+        Me.grpNLDAS.Controls.Add(Me.lstParameters)
         Me.grpNLDAS.Controls.Add(Me.lblTimeZone)
         Me.grpNLDAS.Controls.Add(Me.txtTimeZone)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASParameter)
         Me.grpNLDAS.Controls.Add(Me.chkNLDAS_GetNLDASGrid)
         Me.grpNLDAS.Location = New System.Drawing.Point(11, 598)
         Me.grpNLDAS.Name = "grpNLDAS"
-        Me.grpNLDAS.Size = New System.Drawing.Size(487, 60)
+        Me.grpNLDAS.Size = New System.Drawing.Size(487, 88)
         Me.grpNLDAS.TabIndex = 39
         Me.grpNLDAS.TabStop = False
         Me.grpNLDAS.Text = "North American Land Data Assimilation System"
         Me.grpNLDAS.Visible = False
         '
+        'lblConstituents
+        '
+        Me.lblConstituents.AutoSize = True
+        Me.lblConstituents.Enabled = False
+        Me.lblConstituents.Location = New System.Drawing.Point(333, 41)
+        Me.lblConstituents.Name = "lblConstituents"
+        Me.lblConstituents.Size = New System.Drawing.Size(68, 13)
+        Me.lblConstituents.TabIndex = 50
+        Me.lblConstituents.Text = "Constituents:"
+        '
+        'lblEnd
+        '
+        Me.lblEnd.AutoSize = True
+        Me.lblEnd.Enabled = False
+        Me.lblEnd.Location = New System.Drawing.Point(212, 63)
+        Me.lblEnd.Name = "lblEnd"
+        Me.lblEnd.Size = New System.Drawing.Size(54, 13)
+        Me.lblEnd.TabIndex = 49
+        Me.lblEnd.Text = "End Year:"
+        '
+        'lblStart
+        '
+        Me.lblStart.AutoSize = True
+        Me.lblStart.Enabled = False
+        Me.lblStart.Location = New System.Drawing.Point(88, 63)
+        Me.lblStart.Name = "lblStart"
+        Me.lblStart.Size = New System.Drawing.Size(57, 13)
+        Me.lblStart.TabIndex = 48
+        Me.lblStart.Text = "Start Year:"
+        '
+        'numStart
+        '
+        Me.numStart.Enabled = False
+        Me.numStart.Location = New System.Drawing.Point(145, 61)
+        Me.numStart.Maximum = New Decimal(New Integer() {2022, 0, 0, 0})
+        Me.numStart.Minimum = New Decimal(New Integer() {1979, 0, 0, 0})
+        Me.numStart.Name = "numStart"
+        Me.numStart.Size = New System.Drawing.Size(62, 20)
+        Me.numStart.TabIndex = 47
+        Me.numStart.Value = New Decimal(New Integer() {1979, 0, 0, 0})
+        '
+        'numEnd
+        '
+        Me.numEnd.Enabled = False
+        Me.numEnd.Location = New System.Drawing.Point(269, 61)
+        Me.numEnd.Maximum = New Decimal(New Integer() {2022, 0, 0, 0})
+        Me.numEnd.Minimum = New Decimal(New Integer() {1979, 0, 0, 0})
+        Me.numEnd.Name = "numEnd"
+        Me.numEnd.Size = New System.Drawing.Size(62, 20)
+        Me.numEnd.TabIndex = 46
+        Me.numEnd.Value = New Decimal(New Integer() {2022, 0, 0, 0})
+        '
+        'lstParameters
+        '
+        Me.lstParameters.Enabled = False
+        Me.lstParameters.FormattingEnabled = True
+        Me.lstParameters.Location = New System.Drawing.Point(403, 38)
+        Me.lstParameters.Name = "lstParameters"
+        Me.lstParameters.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstParameters.Size = New System.Drawing.Size(78, 43)
+        Me.lstParameters.TabIndex = 45
+        '
         'lblTimeZone
         '
         Me.lblTimeZone.AutoSize = True
         Me.lblTimeZone.Enabled = False
-        Me.lblTimeZone.Location = New System.Drawing.Point(131, 37)
+        Me.lblTimeZone.Location = New System.Drawing.Point(88, 40)
         Me.lblTimeZone.Name = "lblTimeZone"
         Me.lblTimeZone.Size = New System.Drawing.Size(155, 13)
         Me.lblTimeZone.TabIndex = 44
@@ -888,7 +975,7 @@ Partial Class frmDownload
         'txtTimeZone
         '
         Me.txtTimeZone.Enabled = False
-        Me.txtTimeZone.Location = New System.Drawing.Point(315, 37)
+        Me.txtTimeZone.Location = New System.Drawing.Point(249, 37)
         Me.txtTimeZone.Name = "txtTimeZone"
         Me.txtTimeZone.Size = New System.Drawing.Size(39, 20)
         Me.txtTimeZone.TabIndex = 43
@@ -1008,7 +1095,7 @@ Partial Class frmDownload
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetStations)
         Me.grpNCDC.Controls.Add(Me.chkNCDC_MetData)
-        Me.grpNCDC.Location = New System.Drawing.Point(12, 664)
+        Me.grpNCDC.Location = New System.Drawing.Point(12, 692)
         Me.grpNCDC.Name = "grpNCDC"
         Me.grpNCDC.Size = New System.Drawing.Size(487, 44)
         Me.grpNCDC.TabIndex = 50
@@ -1057,7 +1144,7 @@ Partial Class frmDownload
         Me.grpSoils.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpSoils.Controls.Add(Me.chkSSURGO)
-        Me.grpSoils.Location = New System.Drawing.Point(12, 714)
+        Me.grpSoils.Location = New System.Drawing.Point(11, 742)
         Me.grpSoils.Name = "grpSoils"
         Me.grpSoils.Size = New System.Drawing.Size(487, 44)
         Me.grpSoils.TabIndex = 52
@@ -1065,24 +1152,13 @@ Partial Class frmDownload
         Me.grpSoils.Text = "USDA NRCS Soils"
         Me.grpSoils.Visible = False
         '
-        'chkSSURGO
-        '
-        Me.chkSSURGO.AutoSize = True
-        Me.chkSSURGO.Location = New System.Drawing.Point(6, 19)
-        Me.chkSSURGO.Name = "chkSSURGO"
-        Me.chkSSURGO.Size = New System.Drawing.Size(72, 17)
-        Me.chkSSURGO.TabIndex = 4
-        Me.chkSSURGO.Text = "SSURGO"
-        Me.ToolTip1.SetToolTip(Me.chkSSURGO, "SSURGO Data from USDA Soil Data Mart")
-        Me.chkSSURGO.UseVisualStyleBackColor = True
-        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(511, 810)
+        Me.ClientSize = New System.Drawing.Size(511, 837)
         Me.Controls.Add(Me.grpSoils)
         Me.Controls.Add(Me.grpNHDplus2)
         Me.Controls.Add(Me.grpNCDC)
@@ -1123,6 +1199,8 @@ Partial Class frmDownload
         Me.grpNWISStations.PerformLayout()
         Me.grpNLDAS.ResumeLayout(False)
         Me.grpNLDAS.PerformLayout()
+        CType(Me.numStart, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.numEnd, System.ComponentModel.ISupportInitialize).EndInit()
         Me.grpNWISStations_GW.ResumeLayout(False)
         Me.grpNWISStations_GW.PerformLayout()
         Me.grpNWIS_GW.ResumeLayout(False)
@@ -1222,4 +1300,10 @@ Partial Class frmDownload
     Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As Windows.Forms.CheckBox
     Friend WithEvents grpSoils As Windows.Forms.GroupBox
     Friend WithEvents chkSSURGO As Windows.Forms.CheckBox
+    Friend WithEvents lstParameters As Windows.Forms.ListBox
+    Friend WithEvents numEnd As Windows.Forms.NumericUpDown
+    Friend WithEvents lblConstituents As Windows.Forms.Label
+    Friend WithEvents lblEnd As Windows.Forms.Label
+    Friend WithEvents lblStart As Windows.Forms.Label
+    Friend WithEvents numStart As Windows.Forms.NumericUpDown
 End Class

@@ -252,6 +252,23 @@ Public Class frmDownload
         SetCheckboxVisibilityFromMapOrRegion()
         TallyPreChecked(lGroups)
         SetColorsFromAvailability()
+        lstParameters.Items.Add("Precip")   '"APCPsfc"
+        lstParameters.Items.Add("PET")      '"PEVAPsfc"
+        lstParameters.Items.Add("Air Temp") '"TMP2m"
+        lstParameters.Items.Add("Wind")     '"UGRD10m" '"VGRD10m"
+        lstParameters.Items.Add("Sol Rad")  '"DSWRFsfc"
+        lstParameters.Items.Add("Cloud")    '"DSWRFsfc"
+        lstParameters.Items.Add("Dewp")     '"SPFH2m"
+        If lstParameters.Enabled Then
+            For i As Integer = 0 To lstParameters.Items.Count - 1
+                lstParameters.SetSelected(i, True)
+            Next
+            'show from top
+            Dim ltemp As Integer = lstParameters.TopIndex
+            lstParameters.TopIndex = 0   'not working???
+        End If
+        numEnd.Value = DateTime.Now.Year
+        numEnd.Maximum = DateTime.Now.Year
 
         Do
             Me.ShowDialog(System.Windows.Forms.Control.FromHandle(New IntPtr(aParentHandle)))
@@ -662,6 +679,12 @@ Public Class frmDownload
                             chkNLDAS_GetNLDASParameter.Enabled = True
                             txtTimeZone.Enabled = True
                             lblTimeZone.Enabled = True
+                            lstParameters.Enabled = True
+                            numStart.Enabled = True
+                            numEnd.Enabled = True
+                            lblConstituents.Enabled = True
+                            lblStart.Enabled = True
+                            lblEnd.Enabled = True
                             chkNLDAS_GetNLDASParameter.Text = "Hourly Data"
                             chkNLDAS_GetNLDASParameter.Checked = True
                     End Select
@@ -1213,4 +1236,12 @@ Public Class frmDownload
         End Try
         Return True
     End Function
+
+    Private Sub numEnd_ValueChanged(sender As Object, e As EventArgs) Handles numEnd.ValueChanged
+        numStart.Maximum = numEnd.Value
+    End Sub
+
+    Private Sub numStart_ValueChanged(sender As Object, e As EventArgs) Handles numStart.ValueChanged
+        numEnd.Minimum = numStart.Value
+    End Sub
 End Class
