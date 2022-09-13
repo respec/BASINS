@@ -890,6 +890,36 @@ Public Class frmDownload
                                         Dim lWDMfrm As New frmWDM
                                         lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDAS", IO.Path.Combine(lSaveFolderOnly, "nldas"), "NLDAS Processing Options")
                                         lWDMxml &= "<TimeZoneShift>" & txtTimeZone.Text & "</TimeZoneShift>" & vbCrLf
+                                        If lstParameters.SelectedItems.Count <> 7 And lstParameters.SelectedItems.Count <> 0 Then
+                                            'user doens't want all the parameters
+                                            If lstParameters.SelectedItems.Contains("Precip") Then
+                                                lWDMxml &= "<datatype>APCPsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("PET") Then
+                                                lWDMxml &= "<datatype>PEVAPsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Air Temp") Then
+                                                lWDMxml &= "<datatype>TMP2m</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Wind") Then
+                                                lWDMxml &= "<datatype>UGRD10m</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>VGRD10m</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Sol Rad") Then
+                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Cloud") Then
+                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Dewp") Then
+                                                lWDMxml &= "<datatype>SPFH2m</datatype>" & vbCrLf
+                                            End If
+                                        End If
+                                        If numStart.Value > 1979 Or numEnd.Value < DateTime.Now.Year Then
+                                            'user doens't want the whole available span, add one day for start of day 
+                                            lWDMxml &= "<startdate>1/2/" & numStart.Value & "</startdate>" & vbCrLf
+                                            lWDMxml &= "<enddate>1/1/" & numEnd.Value + 1 & "</enddate>" & vbCrLf
+                                        End If
                                     End If
                                     'If lChild Is chkNWIS_GetNWISPrecipitation Then
                                     '    Dim lWDMfrm As New frmWDM
