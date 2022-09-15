@@ -916,8 +916,8 @@ Public Class frmDownload
                                             End If
                                         End If
                                         If numStart.Value > 1979 Or numEnd.Value < DateTime.Now.Year Then
-                                            'user doens't want the whole available span, add one day for start of day 
-                                            lWDMxml &= "<startdate>1/2/" & numStart.Value & "</startdate>" & vbCrLf
+                                            'user doesn't want the whole available span, add one hour for start of day 
+                                            lWDMxml &= "<startdate>1/1/" & numStart.Value & " 1:00:00</startdate>" & vbCrLf
                                             lWDMxml &= "<enddate>1/1/" & numEnd.Value + 1 & "</enddate>" & vbCrLf
                                         End If
                                     End If
