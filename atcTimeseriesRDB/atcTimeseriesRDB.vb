@@ -1071,6 +1071,19 @@ Public Class atcTimeseriesRDB
             DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, GetNaN, lMissingVal, , Me))
         Next
         lRawDataSets.Clear()
+
+        For A As Integer = 0 To lData.Attributes.Count - 1
+            With lData.Attributes(A)
+                If .Arguments IsNot Nothing Then .Arguments.Clear()
+                If .Value.GetType().Name = "atcTimeseries" Then
+                    .Value.Clear()
+                End If
+            End With
+        Next
+        lData.Clear()
+        lData = Nothing
+        lTable.Clear()
+        lTable = Nothing
     End Sub
 
     ''' <summary>

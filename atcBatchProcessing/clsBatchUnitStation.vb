@@ -168,6 +168,12 @@ Public Class clsBatchUnitStation
     End Function
 
     Public Sub Clear()
+        For Each lTs As atcTimeseries In DataSource.DataSets
+            If lTs IsNot Nothing Then
+                lTs.Clear()
+                lTs = Nothing
+            End If
+        Next
         DataSource.Clear()
         DataSource = Nothing
         BFInputs.Clear()

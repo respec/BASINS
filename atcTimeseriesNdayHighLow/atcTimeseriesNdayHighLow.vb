@@ -320,6 +320,17 @@ Public Class atcTimeseriesNdayHighLow
                                 newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
                             End Try
                             lSJday = lNextSJday
+
+                            For A As Integer = 0 To lCurrentYear.Attributes.Count - 1
+                                With lCurrentYear.Attributes(A)
+                                    If .Arguments IsNot Nothing Then .Arguments.Clear()
+                                    If .Value.GetType().Name = "atcTimeseries" Then
+                                        .Value.Clear()
+                                    End If
+                                End With
+                            Next
+                            lCurrentYear.Clear()
+                            lCurrentYear = Nothing
                         Next
 
                         Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual

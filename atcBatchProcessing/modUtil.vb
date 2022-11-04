@@ -68,4 +68,31 @@ Public Module modUtil
             Return lTrendAttributes
         End Function
     End Class
+
+    Public Class Util
+        Public Shared Function IsDirectoryWritable(aDir As String) As Boolean
+            Dim lDirWritable As Boolean = True
+            Try
+                Dim lSW As IO.StreamWriter = Nothing
+                Try
+                    lSW = New IO.StreamWriter(IO.Path.Combine(aDir, "z.txt"), False)
+                    lSW.WriteLine("1")
+                    lSW.Flush()
+                    lSW.Close()
+                    lSW = Nothing
+                    IO.File.Delete(IO.Path.Combine(aDir, "z.txt"))
+                Catch ex As Exception
+                    If lSW IsNot Nothing Then
+                        lSW.Close()
+                        lSW = Nothing
+                    End If
+                    lDirWritable = False
+                End Try
+            Catch ex As Exception
+                lDirWritable = False
+            End Try
+            Return lDirWritable
+        End Function
+
+    End Class
 End Module
