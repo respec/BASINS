@@ -8,14 +8,14 @@ Public Class DFLOWCalcs
     Friend Structure stExcursion
         Public Start As Integer
         Public Finish As Integer
-        Public SumLength As Integer
+        Public SumLength As Double
         Public Count As Integer
         Public SumMag As Double
     End Structure
     Friend Structure stCluster
         Public Start As Integer
         Public Finish As Integer
-        Public Excursions As Integer
+        Public Excursions As Double
         Public Events As Integer
     End Structure
 
@@ -213,18 +213,18 @@ Public Class DFLOWCalcs
         Return lResult
     End Function
 
-    Public Shared Function xBy(ByVal aDesignFlow As Double, _
-                         ByVal aDays As Integer, _
-                         ByVal aYears As Integer, _
-                         ByVal aMaxDays As Integer, _
-                         ByVal aMaxExcursions As Double, _
-                         ByVal aFlowRecord As Double(), _
-                         ByRef aExcursionCount As Integer, _
-                         ByRef aExcursions As ArrayList, _
-                         ByRef aClusters As ArrayList, _
+    Public Shared Function xBy(ByVal aDesignFlow As Double,
+                         ByVal aDays As Integer,
+                         ByVal aYears As Integer,
+                         ByVal aMaxDays As Integer,
+                         ByVal aMaxExcursions As Double,
+                         ByVal aFlowRecord As Double(),
+                         ByRef aExcursionCount As Double,
+                         ByRef aExcursions As ArrayList,
+                         ByRef aClusters As ArrayList,
                          ByRef afrmProgress As frmDFLOWProgress)
 
-        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365 / aYears
+        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365.25 / aYears
         ''MessageBox.Show("Entered xBy", UBound(aFlowRecord, 1) & " " & aFlowRecord(1))
         'Using sw As StreamWriter = New StreamWriter("c:\TestFile.txt")
         '    ' Add some text to the file.
@@ -308,13 +308,13 @@ Public Class DFLOWCalcs
     ''' <param name="aFlowRecord"></param>
     ''' <param name="aExcursions"></param>
     ''' <remarks></remarks>
-    Public Shared Function CountExcursions(ByVal aDesignFlow As Double, _
-                               ByVal aDays As Integer, _
-                               ByVal aMaxDays As Integer, _
-                               ByVal aMaxExc As Integer, _
-                               ByVal aFlowRecord As Array, _
-                               ByRef aExcursions As ArrayList, _
-                               ByRef aClusters As ArrayList) As Integer
+    Public Shared Function CountExcursions(ByVal aDesignFlow As Double,
+                               ByVal aDays As Integer,
+                               ByVal aMaxDays As Integer,
+                               ByVal aMaxExc As Integer,
+                               ByVal aFlowRecord As Array,
+                               ByRef aExcursions As ArrayList,
+                               ByRef aClusters As ArrayList) As Double
 
 
 
@@ -338,7 +338,7 @@ Public Class DFLOWCalcs
 
                 ' ----- N-day averaged flow is below design flow - append to excursions !! CHECK USE of lExcursion below
 
-                If lDay > lExcursion.Finish + 1 Or (lExcursion.Finish - lExcursion.Start) >= aMaxDays Then
+                If lDay > lExcursion.Finish + 1 Or (lExcursion.Finish - lExcursion.Start + 1) >= aMaxDays Then
 
                     ' ----- It's a new excursion if it's not connected to last excursion, 
                     '       or if the last excursion is too long.
@@ -424,7 +424,7 @@ Public Class DFLOWCalcs
 
         aClusters.Add(lCluster)
 
-        Dim lExcursionCount As Integer = 0
+        Dim lExcursionCount As Double = 0.0
         For Each lCluster In aClusters
             lExcursionCount = lExcursionCount + lCluster.Excursions
         Next
@@ -765,7 +765,7 @@ Public Class DFLOWCalcs
             Dim lxBy As Double = xQy(lBioPeriod, lBioYears, lHydrologicTS2, aInputs)
 
             ' ----- 3. Do xBy calculation
-            Dim lExcursionCount As Integer
+            Dim lExcursionCount As Double
             lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
             Dim lAttrName As String = lBioPeriod & "B" & lBioYears
             lHydrologicTS.Attributes.SetValue(lAttrName, lxBy)
