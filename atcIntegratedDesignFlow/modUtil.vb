@@ -463,7 +463,7 @@ Public Module modUtil
                             .IncludeMonths = False
                         End With
                         .Text = "N-Day " & lHighLowText & " Annual Time Series and Ranking"
-                        .Initialize(lRankedAnnual.Clone, NDayAttributes(), True, , False) 'show value, but not show form
+                        .Initialize(lRankedAnnual, NDayAttributes(), True, , False) 'show value, but not show form
                         .DisplayValueAttributes = True
                         lTserListing = .ToString()
                         '.Icon = Me.Icon

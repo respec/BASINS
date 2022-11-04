@@ -14,6 +14,9 @@ Public Class clsBatchSpec
     Public Sub New()
     End Sub
 
+    Public Property RunModeConsole As Boolean = False
+    Public Property SilentConsole As Boolean = True
+
     Public Overrides Sub PopulateScenarios()
         If IO.File.Exists(SpecFilename) Then
             If ListBatchOpns Is Nothing Then
@@ -386,8 +389,13 @@ Public Class clsBatchSpec
 
     Public Overrides Sub DoBatch()
         If Not String.IsNullOrEmpty(Message) AndAlso Message.ToLower.StartsWith("error") Then
-            Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message, _
+            If RunModeConsole Then
+                Console.WriteLine("Please address following issues before running batch:" & vbCrLf & Message,
                        "Batch Run SWSTAT")
+            Else
+                Logger.Msg("Please address following issues before running batch:" & vbCrLf & Message,
+                       "Batch Run SWSTAT")
+            End If
             Exit Sub
         Else
             Message = ""
@@ -396,7 +404,11 @@ Public Class clsBatchSpec
         Dim lGlobalOutputDirReady As Boolean = True
         MkDirPath(lGlobalOutputDir)
         If Not IO.Directory.Exists(lGlobalOutputDir) Then
-            UpdateStatus("Can not create global output directory: " & vbCrLf & lGlobalOutputDir, , True)
+            If RunModeConsole Then
+                Console.WriteLine("Can not create global output directory: " & vbCrLf & lGlobalOutputDir)
+            Else
+                UpdateStatus("Can not create global output directory: " & vbCrLf & lGlobalOutputDir, , True)
+            End If
             'Exit Sub
             lGlobalOutputDirReady = False
         End If
@@ -404,7 +416,11 @@ Public Class clsBatchSpec
         If Not lOutputDirWritable Then
             'RaiseEvent StatusUpdate("0,0,Can not write to output directory: " & vbCrLf & lOutputDir)
             'Windows.Forms.Application.DoEvents()
-            UpdateStatus("Can not write to global output directory: " & vbCrLf & lGlobalOutputDir, , True)
+            If RunModeConsole Then
+                If Not SilentConsole Then Console.WriteLine("Can not write to global output directory: " & vbCrLf & lGlobalOutputDir)
+            Else
+                UpdateStatus("Can not write to global output directory: " & vbCrLf & lGlobalOutputDir, , True)
+            End If
             'Exit Sub
             lGlobalOutputDirReady = False
         End If
@@ -415,9 +431,11 @@ Public Class clsBatchSpec
                 lTotalBFOpn += 1
             Next
         Next
-        gProgressBar.Minimum = 0
-        gProgressBar.Maximum = lTotalBFOpn
-        gProgressBar.Step = 1
+        If Not RunModeConsole Then
+            gProgressBar.Minimum = 0
+            gProgressBar.Maximum = lTotalBFOpn
+            gProgressBar.Step = 1
+        End If
         Dim lBFOpnCount As Integer = 0
         Dim lConfigFile As IO.StreamWriter = Nothing
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
@@ -456,7 +474,7 @@ Public Class clsBatchSpec
                 Dim lNDays(0) As Double
                 Dim lReturnPeriods(0) As Double
                 InputNames.GetNdayReturnPeriodAttributes(lInputArgs, lNDays, lReturnPeriods)
-                If (lNDays IsNot Nothing AndAlso lNDays.Length > 0) AndAlso _
+                If (lNDays IsNot Nothing AndAlso lNDays.Length > 0) AndAlso
                    (lReturnPeriods IsNot Nothing AndAlso lReturnPeriods.Length > 0) Then
                     OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
                     'MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
@@ -468,14 +486,18 @@ Public Class clsBatchSpec
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
+                        End If
                         Dim lNDayLowTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, False)
                         lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayLowFlowTimeseries.txt"), False)
                         lSW.WriteLine(lNDayLowTserListing)
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
+                        End If
 
                         'Do Frequency second
                         Dim lFreqGridHigh As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
@@ -484,14 +506,18 @@ Public Class clsBatchSpec
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
+                        End If
                         Dim lFreqGridLow As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
                         lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridLowFlow.txt"), False)
                         lSW.WriteLine(lFreqGridLow)
                         lSW.Flush()
                         lSW.Close()
                         lSW = Nothing
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
+                        End If
                         'Dim lNDayValuesLowDone As Boolean = InputNames.CalculateNDayValues(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
                         'Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
                         'Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
@@ -510,7 +536,9 @@ Public Class clsBatchSpec
                         lSW.Close()
                         lSW = Nothing
                         lTrendHighGridText = ""
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
+                        End If
                         Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
                         lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
                         lSW.WriteLine(lTrendLowGridText)
@@ -518,12 +546,18 @@ Public Class clsBatchSpec
                         lSW.Close()
                         lSW = Nothing
                         lTrendLowGridText = ""
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
+                        End If
                         'Do freq graphs
                         InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
+                        End If
                         InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
+                        If Not RunModeConsole Then
+                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
+                        End If
                         'ASCIICommon(lTsFlow)
                         'lStation.Message &= lStation.CalcBF.BF_Message.Trim()
                     Catch ex As Exception
@@ -559,15 +593,39 @@ Public Class clsBatchSpec
                     lConfigFile.Close()
                     lConfigFile = Nothing
                 End If
-                
+
             End If
-            
+
             'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
             lBFOpnCount += lBFOpn.Count
-            UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " stations)", True)
+            If RunModeConsole Then
+                If Not SilentConsole Then Console.WriteLine("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " groups)")
+            Else
+                UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " groups)", True)
+            End If
+
+            'Free up memory
+            For Z As Integer = 0 To lDataGroup.Count - 1
+                For A As Integer = 0 To lDataGroup(Z).Attributes.Count - 1
+                    With lDataGroup(Z).Attributes(A)
+                        If .Arguments IsNot Nothing Then .Arguments.Clear()
+                        If .Value.GetType().Name = "atcTimeseries" Then
+                            .Value.Clear()
+                        End If
+                    End With
+                Next
+                lDataGroup(Z).Clear()
+            Next
+
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                lStation.Clear()
+            Next
         Next
-        gProgressBar.Minimum = gProgressBar.Maximum
-        gProgressBar.PerformStep()
+
+        If Not RunModeConsole Then
+            gProgressBar.Minimum = gProgressBar.Maximum
+            gProgressBar.PerformStep()
+        End If
 
         Dim lSummary As New IO.StreamWriter(IO.Path.Combine(lGlobalOutputDir, "ITFA_Log_" & SafeFilename(DateTime.Now()) & ".txt"), False)
         For Each lBFOpnId As Integer In ListBatchOpns.Keys
@@ -591,6 +649,10 @@ Public Class clsBatchSpec
         lSummary.Flush()
         lSummary.Close()
         lSummary = Nothing
-        UpdateStatus("Batch Run Complete for " & lTotalBFOpn & " analyses in " & ListBatchOpns.Count & " groups.", True)
+        If RunModeConsole Then
+            If Not SilentConsole Then Console.WriteLine("Batch Run Complete for " & lTotalBFOpn & " analyses in " & ListBatchOpns.Count & " groups.", True)
+        Else
+            UpdateStatus("Batch Run Complete for " & lTotalBFOpn & " analyses in " & ListBatchOpns.Count & " groups.", True)
+        End If
     End Sub
 End Class

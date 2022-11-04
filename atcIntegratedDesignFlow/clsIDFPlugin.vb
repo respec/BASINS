@@ -203,6 +203,7 @@ Public Class clsIDFPlugin
                 aHandled = True
 
             Case "Create SWSTAT Batch", "Create DFLOW Batch"
+#If Platform = "Win" Then
                 Dim lBatchTitle As String = "Batch Run "
                 Dim lStationsAreSelected As Boolean = False
                 Dim lMapLayer As IMapFeatureLayer = Nothing
@@ -256,6 +257,7 @@ Public Class clsIDFPlugin
                 End If
                 lfrmBatchMap.Initiate(lSelectedStationIDs)
                 lfrmBatchMap.ShowDialog()
+#End If
                 aHandled = True
                 'Return Nothing 'for now
                 Exit Sub

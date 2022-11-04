@@ -168,13 +168,23 @@ Public Class clsBatch
                 lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
             End If
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
+                Dim lTsFlow As atcTimeseries = Nothing
+                For Each lTs As atcTimeseries In lGroup
+                    If lTs.Attributes.GetValue("TSFORM") = 1 Then
+                        lTsFlow = lTs
+                    Else
+                        'Just throw away other types of data such as min (4), max (5), or sum (2)
+                        'only keeps mean (1)
+                        lTs.Clear()
+                        lTs = Nothing
+                    End If
+                Next
                 If aPreserve Then
-                    Return lGroup(0)
+                    Return lTsFlow
                 Else
-                    Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
                     'aStation.DataSource.Clear()
                     'aStation.DataSource = Nothing
-                    Return lTsFlow
+                    Return lTsFlow.Clone()
                 End If
             End If
         End If
