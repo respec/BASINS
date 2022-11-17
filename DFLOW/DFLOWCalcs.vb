@@ -224,7 +224,7 @@ Public Class DFLOWCalcs
                          ByRef aClusters As ArrayList,
                          ByRef afrmProgress As frmDFLOWProgress)
 
-        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365.25 / aYears
+        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365.0 / aYears
         ''MessageBox.Show("Entered xBy", UBound(aFlowRecord, 1) & " " & aFlowRecord(1))
         'Using sw As StreamWriter = New StreamWriter("c:\TestFile.txt")
         '    ' Add some text to the file.
@@ -253,7 +253,7 @@ Public Class DFLOWCalcs
 
             lFU = aDesignFlow
             lExcU = CountExcursions(lFU, aDays, aMaxDays, aMaxExcursions, aFlowRecord, lExcursions, lClusters)
-            Do While (lExcU <= lMaxExcursionsAllowed)
+            Do While (lExcU < lMaxExcursionsAllowed)
                 lFU = lFU * 2 + 1
                 lExcU = CountExcursions(lFU, aDays, aMaxDays, aMaxExcursions, aFlowRecord, lExcursions, lClusters)
             Loop
@@ -338,10 +338,14 @@ Public Class DFLOWCalcs
 
                 ' ----- N-day averaged flow is below design flow - append to excursions !! CHECK USE of lExcursion below
 
-                If lDay > lExcursion.Finish + 1 Or (lExcursion.Finish - lExcursion.Start + 1) >= aMaxDays Then
+                If lDay > lExcursion.Finish + 1 Or (lExcursion.Finish - lExcursion.Start) >= aMaxDays Then
 
                     ' ----- It's a new excursion if it's not connected to last excursion, 
                     '       or if the last excursion is too long.
+
+                    If (lExcursion.Finish - lExcursion.Start + 1) >= aMaxDays Then
+                        lExcursion.SumLength = aMaxDays / aDays
+                    End If
 
                     aExcursions.Add(lExcursion)
 
@@ -385,7 +389,6 @@ Public Class DFLOWCalcs
             aExcursions.Add(lExcursion)
         End If
 
-
         ' ----- Process clusters
 
 
@@ -402,6 +405,8 @@ Public Class DFLOWCalcs
         For lEx = 2 To aExcursions.Count
             ' Loop through excursions
             lExcursion = aExcursions.Item(lEx - 1)
+            lExcursion.Start = lExcursion.Start - (aDays / 2)
+            lExcursion.Finish = lExcursion.Finish - (aDays / 2)
             If lExcursion.Finish - lCluster.Start > aMaxDays Then
                 aClusters.Add(lCluster)
                 With lCluster
