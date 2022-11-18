@@ -309,7 +309,7 @@ Public Class frmDFLOWResults
 
                     Dim lExcursions As New ArrayList
                     Dim lClusters As New ArrayList
-                    Dim lExcQ As Double = DFLOWCalcs.CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
+                    Dim lExcQ As Double = DFLOWCalcs.CountExcursions(lxQy, DFLOWCalcs.fAveragingPeriod, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursions, lClusters)
                     lExcursions.Clear()
                     lClusters.Clear()
 
@@ -382,7 +382,7 @@ Public Class frmDFLOWResults
                         lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy"
                         Application.DoEvents()
 
-                        lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, pTimeseriesGroup(lDSIndex))
+                        lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, lHydrologicDS)
                         If lEquivalentxQy > lxBy Then
 
                             lReturnPeriod = lYears
@@ -399,7 +399,7 @@ Public Class frmDFLOWResults
                             While lEquivalentxQy >= lxBy And lReturnPeriod < lYears
 
                                 lReturnPeriod = lReturnPeriod + 1
-                                lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, pTimeseriesGroup(lDSIndex))
+                                lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, lHydrologicDS)
 
                                 lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriod & " of up to " & lYears & ")"
                                 Application.DoEvents()
@@ -641,7 +641,7 @@ Public Class frmDFLOWResults
 
                             lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
                             lagsExcursions.CellValue(lRow, 3) = .Finish - .Start + 1 & " "
-                            lagsExcursions.CellValue(lRow, 4) = Format((.SumMag / (.SumLength) - 1) / 100.0, "Percent") & " "
+                            lagsExcursions.CellValue(lRow, 4) = Format((.SumMag / (.Count) - 1), "Percent") & " "
 
                             lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
                             lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
