@@ -8,14 +8,14 @@ Public Class DFLOWCalcs
     Friend Structure stExcursion
         Public Start As Integer
         Public Finish As Integer
-        Public SumLength As Integer
+        Public SumLength As Double
         Public Count As Integer
         Public SumMag As Double
     End Structure
     Friend Structure stCluster
         Public Start As Integer
         Public Finish As Integer
-        Public Excursions As Integer
+        Public Excursions As Double
         Public Events As Integer
     End Structure
 
@@ -226,12 +226,12 @@ Public Class DFLOWCalcs
                          ByVal aMaxDays As Integer,
                          ByVal aMaxExcursions As Double,
                          ByVal aFlowRecord As Double(),
-                         ByRef aExcursionCount As Integer,
+                         ByRef aExcursionCount As Double,
                          ByRef aExcursions As ArrayList,
                          ByRef aClusters As ArrayList,
                          ByRef afrmProgress As frmDFLOWProgress)
 
-        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365 / aYears
+        Dim lMaxExcursionsAllowed As Double = UBound(aFlowRecord, 1) / 365.0 / aYears
         ''MessageBox.Show("Entered xBy", UBound(aFlowRecord, 1) & " " & aFlowRecord(1))
         'Using sw As StreamWriter = New StreamWriter("c:\TestFile.txt")
         '    ' Add some text to the file.
@@ -260,7 +260,7 @@ Public Class DFLOWCalcs
 
             lFU = aDesignFlow
             lExcU = CountExcursions(lFU, aDays, aMaxDays, aMaxExcursions, aFlowRecord, lExcursions, lClusters)
-            Do While (lExcU <= lMaxExcursionsAllowed)
+            Do While (lExcU < lMaxExcursionsAllowed)
                 If Double.IsInfinity(lFU) OrElse Double.IsNaN(lFU) Then
                     Exit Do
                 End If
@@ -331,7 +331,7 @@ Public Class DFLOWCalcs
                                ByVal aMaxExc As Integer,
                                ByVal aFlowRecord As Array,
                                ByRef aExcursions As ArrayList,
-                               ByRef aClusters As ArrayList) As Integer
+                               ByRef aClusters As ArrayList) As Double
 
 
 
@@ -359,6 +359,10 @@ Public Class DFLOWCalcs
 
                     ' ----- It's a new excursion if it's not connected to last excursion, 
                     '       or if the last excursion is too long.
+
+                    If (lExcursion.Finish - lExcursion.Start + 1) >= aMaxDays Then
+                        lExcursion.SumLength = aMaxDays / aDays
+                    End If
 
                     aExcursions.Add(lExcursion)
 
@@ -419,6 +423,8 @@ Public Class DFLOWCalcs
         For lEx = 2 To aExcursions.Count
             ' Loop through excursions
             lExcursion = aExcursions.Item(lEx - 1)
+            lExcursion.Start = lExcursion.Start - (aDays / 2)
+            lExcursion.Finish = lExcursion.Finish - (aDays / 2)
             If lExcursion.Finish - lCluster.Start > aMaxDays Then
                 aClusters.Add(lCluster)
                 With lCluster
@@ -441,7 +447,7 @@ Public Class DFLOWCalcs
 
         aClusters.Add(lCluster)
 
-        Dim lExcursionCount As Integer = 0
+        Dim lExcursionCount As Double = 0.0
         For Each lCluster In aClusters
             lExcursionCount = lExcursionCount + lCluster.Excursions
         Next
@@ -800,7 +806,7 @@ Public Class DFLOWCalcs
             Dim lExcursions As New ArrayList
             Dim lClusters As New ArrayList
             'Dim lExcQ As Integer = CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
-            Dim lExcQ As Integer = CountExcursions(lxQy, lBioPeriod, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
+            Dim lExcQ As Double = CountExcursions(lxQy, 1, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
             lExcursions.Clear()
             lClusters.Clear()
 
@@ -814,21 +820,26 @@ Public Class DFLOWCalcs
             ' ----- 1. Create n-day running average from current time series
             lSum = 0
             lN = 0
+
+            Dim lTSrhm As Double()           'the xBy uses a running harmonic mean
+            ReDim lTSrhm(UBound(lTS))
+
             For lI = 0 To UBound(lTS) - 1
                 If Double.IsNaN(lTS(lI)) Then
                     lSum = 0
                     lN = 0
                 Else
-                    lSum = lSum + lTS(lI)
+                    lSum = lSum + (1.0 / lTS(lI))
                     lN = lN + 1
                     If lN > lBioPeriod Then
-                        lSum = lSum - lTS(lI - lBioPeriod)
+                        lSum = lSum - (1.0 / lTS(lI - lBioPeriod))
                     End If
                 End If
+
                 If lN >= lBioPeriod Then
-                    lTSN(lI) = lSum / lBioPeriod
+                    lTSrhm(lI) = lBioPeriod / lSum
                 Else
-                    lTSN(lI) = lNaN
+                    lTSrhm(lI) = lNaN
                 End If
             Next
 
@@ -837,8 +848,8 @@ Public Class DFLOWCalcs
             Dim lxBy As Double = xQy(lBioPeriod, lBioYears, lHydrologicTS2, aInputs)
 
             ' ----- 3. Do xBy calculation
-            Dim lExcursionCount As Integer
-            lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
+            Dim lExcursionCount As Double
+            lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSrhm, lExcursionCount, lExcursions, lClusters, lfrmProgress)
             Dim lAttrName As String = lBioPeriod & "B" & lBioYears
             lHydrologicTS.Attributes.SetValue(lAttrName, lxBy)
             Dim loc As String = aDataGroup(lDSIndex).Attributes.GetValue("Location", "")
