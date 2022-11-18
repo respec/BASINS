@@ -309,7 +309,7 @@ Public Class frmDFLOWResults
 
                     Dim lExcursions As New ArrayList
                     Dim lClusters As New ArrayList
-                    Dim lExcQ As Double = DFLOWCalcs.CountExcursions(lxQy, DFLOWCalcs.fAveragingPeriod, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursions, lClusters)
+                    Dim lExcQ As Double = DFLOWCalcs.CountExcursions(lxQy, 1, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursions, lClusters)
                     lExcursions.Clear()
                     lClusters.Clear()
 

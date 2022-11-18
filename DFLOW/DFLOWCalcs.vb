@@ -733,7 +733,7 @@ Public Class DFLOWCalcs
             Dim lExcursions As New ArrayList
             Dim lClusters As New ArrayList
             'Dim lExcQ As Integer = CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
-            Dim lExcQ As Double = CountExcursions(lxQy, lBioPeriod, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
+            Dim lExcQ As Double = CountExcursions(lxQy, 1, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
             lExcursions.Clear()
             lClusters.Clear()
 
