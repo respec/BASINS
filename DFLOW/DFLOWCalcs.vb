@@ -733,7 +733,7 @@ Public Class DFLOWCalcs
             Dim lExcursions As New ArrayList
             Dim lClusters As New ArrayList
             'Dim lExcQ As Integer = CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
-            Dim lExcQ As Integer = CountExcursions(lxQy, lBioPeriod, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
+            Dim lExcQ As Double = CountExcursions(lxQy, lBioPeriod, lBioCluster, lBioExcursions, lTSN, lExcursions, lClusters)
             lExcursions.Clear()
             lClusters.Clear()
 
@@ -747,21 +747,26 @@ Public Class DFLOWCalcs
             ' ----- 1. Create n-day running average from current time series
             lSum = 0
             lN = 0
+
+            Dim lTSrhm As Double()           'the xBy uses a running harmonic mean
+            ReDim lTSrhm(UBound(lTS))
+
             For lI = 0 To UBound(lTS) - 1
                 If Double.IsNaN(lTS(lI)) Then
                     lSum = 0
                     lN = 0
                 Else
-                    lSum = lSum + lTS(lI)
+                    lSum = lSum + (1.0 / lTS(lI))
                     lN = lN + 1
-                    If lN > lBioPeriod Then
-                        lSum = lSum - lTS(lI - lBioPeriod)
+                    If lN > DFLOWCalcs.fBioPeriod Then
+                        lSum = lSum - (1.0 / lTS(lI - DFLOWCalcs.fBioPeriod))
                     End If
                 End If
-                If lN >= lBioPeriod Then
-                    lTSN(lI) = lSum / lBioPeriod
+
+                If lN >= DFLOWCalcs.fBioPeriod Then
+                    lTSrhm(lI) = DFLOWCalcs.fBioPeriod / lSum
                 Else
-                    lTSN(lI) = lNaN
+                    lTSrhm(lI) = lNaN
                 End If
             Next
 
@@ -771,7 +776,7 @@ Public Class DFLOWCalcs
 
             ' ----- 3. Do xBy calculation
             Dim lExcursionCount As Double
-            lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
+            lxBy = xBy(lxBy, lBioPeriod, lBioYears, lBioCluster, lBioExcursions, lTSrhm, lExcursionCount, lExcursions, lClusters, lfrmProgress)
             Dim lAttrName As String = lBioPeriod & "B" & lBioYears
             lHydrologicTS.Attributes.SetValue(lAttrName, lxBy)
             lExcursionCountArray.Add(lExcursionCount)
