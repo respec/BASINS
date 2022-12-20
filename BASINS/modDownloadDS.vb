@@ -1907,7 +1907,8 @@ StartOver:
     Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Integer
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
-        Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
+        'Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
+        Dim lBaseURL As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
         Dim lMissingHuc8s As String = ""
         'Dim lHUC8BoundaryOnly As Boolean = False

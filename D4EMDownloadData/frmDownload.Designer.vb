@@ -1296,14 +1296,14 @@ Partial Class frmDownload
     Friend WithEvents chkUSGS_Seamless_NLCD2013_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2004_LandCover As System.Windows.Forms.CheckBox
     Friend WithEvents chkUSGS_Seamless_NLCD2008_LandCover As System.Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As Windows.Forms.CheckBox
-    Friend WithEvents grpSoils As Windows.Forms.GroupBox
-    Friend WithEvents chkSSURGO As Windows.Forms.CheckBox
-    Friend WithEvents lstParameters As Windows.Forms.ListBox
-    Friend WithEvents numEnd As Windows.Forms.NumericUpDown
-    Friend WithEvents lblConstituents As Windows.Forms.Label
-    Friend WithEvents lblEnd As Windows.Forms.Label
-    Friend WithEvents lblStart As Windows.Forms.Label
-    Friend WithEvents numStart As Windows.Forms.NumericUpDown
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2016_LandCover As System.Windows.Forms.CheckBox
+    Friend WithEvents grpSoils As System.Windows.Forms.GroupBox
+    Friend WithEvents chkSSURGO As System.Windows.Forms.CheckBox
+    Friend WithEvents lstParameters As System.Windows.Forms.ListBox
+    Friend WithEvents numEnd As System.Windows.Forms.NumericUpDown
+    Friend WithEvents lblConstituents As System.Windows.Forms.Label
+    Friend WithEvents lblEnd As System.Windows.Forms.Label
+    Friend WithEvents lblStart As System.Windows.Forms.Label
+    Friend WithEvents numStart As System.Windows.Forms.NumericUpDown
 End Class
