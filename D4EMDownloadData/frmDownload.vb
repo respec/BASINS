@@ -267,8 +267,8 @@ Public Class frmDownload
             Dim ltemp As Integer = lstParameters.TopIndex
             lstParameters.TopIndex = 0   'not working???
         End If
-        numEnd.Value = DateTime.Now.Year
         numEnd.Maximum = DateTime.Now.Year
+        numEnd.Value = DateTime.Now.Year
 
         Do
             Me.ShowDialog(System.Windows.Forms.Control.FromHandle(New IntPtr(aParentHandle)))
