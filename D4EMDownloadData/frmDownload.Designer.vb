@@ -945,7 +945,7 @@ Partial Class frmDownload
         '
         Me.numEnd.Enabled = False
         Me.numEnd.Location = New System.Drawing.Point(269, 61)
-        Me.numEnd.Maximum = New Decimal(New Integer() {2022, 0, 0, 0})
+        Me.numEnd.Maximum = New Decimal(New Integer() {2030, 0, 0, 0})
         Me.numEnd.Minimum = New Decimal(New Integer() {1979, 0, 0, 0})
         Me.numEnd.Name = "numEnd"
         Me.numEnd.Size = New System.Drawing.Size(62, 20)
