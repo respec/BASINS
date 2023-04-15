@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "atcFtableBuilderCS-D4EM10", "..\atcFtableBuilderCS\atcFtableBuilderCS-D4EM10.csproj", "{854A5E80-0C36-4C6E-BF00-143B2A4C585A}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MapWinUtility-D4EM10", "..\..\MapWindow4Plugins\MapWinUtility\MapWinUtility-D4EM10.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MapWinUtility-D4EM10", "..\MapWinUtility\MapWinUtility-D4EM10.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility-D4EM10", "..\atcUtility\atcUtility-D4EM10.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
 EndProject

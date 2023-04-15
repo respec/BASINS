@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EDB3CF95-E4DD-4D02-97E8-CD3D12CC5F86}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>atcIDF</RootNamespace>
+    <AssemblyName>atcIDF</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.5.2</OldToolsVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DocumentationFile>atcIDF.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\Bin\Debug\DotSpatial.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="ZedGraph, Version=5.1.3.0, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\ZedGraph.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="atcFrequencyGridSource.vb" />
+    <Compile Include="clsBatchSpec.vb" />
+    <Compile Include="clsBatchSpecDFLOW.vb" />
+    <Compile Include="clsIDFPlugin.vb" />
+    <Compile Include="DFLOWCalcs.vb" />
+    <Compile Include="frmAboutDFLOW.Designer.vb">
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAboutDFLOW.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBatch.Designer.vb">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBatchMap.Designer.vb">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatchMap.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWExcursions.Designer.vb">
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWExcursions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.Designer.vb">
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWProgress.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDFLOWResults.Designer.vb">
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDFLOWResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDisplayFrequencyGrid.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSWSTAT.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSWSTATmod.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTrend.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modUtil.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmAboutDFLOW.resx">
+      <DependentUpon>frmAboutDFLOW.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatch.resx">
+      <DependentUpon>frmBatch.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatchMap.resx">
+      <DependentUpon>frmBatchMap.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWExcursions.resx">
+      <DependentUpon>frmDFLOWExcursions.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWProgress.resx">
+      <DependentUpon>frmDFLOWProgress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDFLOWResults.resx">
+      <DependentUpon>frmDFLOWResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
+      <DependentUpon>frmDisplayFrequencyGrid.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSWSTAT.resx">
+      <DependentUpon>frmSWSTAT.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSWSTATmod.resx">
+      <DependentUpon>frmSWSTATmod.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTrend.resx">
+      <DependentUpon>frmTrend.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSNet48.vbproj">
+      <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
+      <Name>atcMwGisUtility-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSNet48.vbproj">
+      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
+      <Name>atcTimeseriesNdayHighLow-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSNet48.vbproj">
+      <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
+      <Name>MapWinUtility-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcBatchProcessing\atcBatchProcessing-DSNet48.vbproj">
+      <Project>{7e95fcaa-7b7c-4585-8ee2-58db97ed9110}</Project>
+      <Name>atcBatchProcessing-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcControls\atcControls-DSNet48.vbproj">
+      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
+      <Name>atcControls-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-DSNet48.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph-DSNet48.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcList\atcList-DSNet48.vbproj">
+      <Project>{a1a87cb8-8b9e-4c90-9549-c065357e499f}</Project>
+      <Name>atcList-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSeasons\atcSeasons-DSNet48.vbproj">
+      <Project>{12f7fdd0-a6ec-4abe-a01b-790ad8caef03}</Project>
+      <Name>atcSeasons-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility-DSNet48.vbproj">
+      <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
+      <Name>atcUSGSUtility-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-DSNet48.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+</Project>

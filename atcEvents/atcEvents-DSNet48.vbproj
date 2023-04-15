@@ -1,19 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</ProjectGuid>
+    <ProjectGuid>{9F469FD8-4A92-4C1F-901C-93D84D457D8F}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <AssemblyKeyContainerName>
-    </AssemblyKeyContainerName>
-    <AssemblyName>MapWinUtility</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyName>atcEvents</AssemblyName>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
@@ -23,15 +17,14 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>MapWinUtility</RootNamespace>
-    <StartupObject>
-    </StartupObject>
+    <RootNamespace>atcEvents</RootNamespace>
+    <MyType>Windows</MyType>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <MyType>Windows</MyType>
+    <OldToolsVersion>4.5.2</OldToolsVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -47,19 +40,15 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\Debug</OutputPath>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
@@ -67,18 +56,13 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\bin\Debug</OutputPath>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <OutputPath>..\bin\Release</OutputPath>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>
-    </DefineConstants>
     <DefineDebug>false</DefineDebug>
-    <DefineTrace>false</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
@@ -87,80 +71,76 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>none</DebugType>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugSymbols>true</DebugSymbols>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>false</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <PlatformTarget>x64</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug</OutputPath>
-    <DefineConstants>GISProvider="DotSpatial"</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug</OutputPath>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>MapWinUtility.xml</DocumentationFile>
+    <DocumentationFile>atcEvents.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Controls, Version=2.0.0.465, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions, Version=2.0.0.465, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-      <Private>False</Private>
-    </Reference>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -169,85 +149,44 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\clsMetadata.vb" />
-    <Compile Include="Classes\clsProgressStatus.vb" />
-    <Compile Include="Classes\clsColors.vb">
+    <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\clsDataManagement.vb">
+    <Compile Include="atcEventBase.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\clsImageUtils.vb">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\clsLog.vb">
+    <Compile Include="atcEventPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\clsLogger.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\clsMiscUtils.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\clsNet.vb" />
-    <Compile Include="Classes\clsScripting.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\clsStrings.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Forms\frmCustomMsgBox.vb">
+    <Compile Include="frmSpecifyEventAttributes.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Modules\modFile.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Classes\clsPluginManagementTools.vb" />
-    <Compile Include="Modules\modLaunch.vb" />
-    <Compile Include="My Project\AssemblyInfo.vb" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="fgdc-std-001-1998.dtd" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DefaultMetadata.xml" />
-    <EmbeddedResource Include="Forms\frmCustomMsgBox.resx">
-      <DependentUpon>frmCustomMsgBox.vb</DependentUpon>
+    <EmbeddedResource Include="frmSpecifyEventAttributes.resx">
+      <DependentUpon>frmSpecifyEventAttributes.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSNet48.vbproj">
+      <Project>{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}</Project>
+      <Name>MapWinUtility-DSNet48</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcData\atcData-DSNet48.vbproj">
+      <Name>atcData-DSNet48</Name>
+      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility-DSNet48.vbproj">
+      <Name>atcUtility-DSNet48</Name>
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>

@@ -40,22 +40,22 @@ Public Class ImageUtils
             img = CType(Picture, Icon).ToBitmap
         ElseIf TypeOf Picture Is Image Then
             img = CType(Picture, Image)
-        ElseIf TypeOf Picture Is stdole.IPictureDisp Then
-            Dim ipdisp As stdole.IPictureDisp = CType(Picture, stdole.IPictureDisp)
+            'ElseIf TypeOf Picture Is stdole.IPictureDisp Then
+            '    Dim ipdisp As stdole.IPictureDisp = CType(Picture, stdole.IPictureDisp)
 
-            Const PIC_BITMAP As Integer = 1
-            Const PIC_ICON As Integer = 3
+            '    Const PIC_BITMAP As Integer = 1
+            '    Const PIC_ICON As Integer = 3
 
-            If ipdisp.Type = PIC_BITMAP Then
-                'This is a shared function; create an instance
-                'of myself so I can convert this.
-                Dim cvter As New ImageUtils
-                img = cvter.IPictureDispToImage(Picture)
-            ElseIf ipdisp.Type = PIC_ICON Then
-                Throw New System.Exception("VB6 Icons not currently supported")
-            Else
-                Throw New System.Exception("Unsupported image format")
-            End If
+            '    If ipdisp.Type = PIC_BITMAP Then
+            '        'This is a shared function; create an instance
+            '        'of myself so I can convert this.
+            '        Dim cvter As New ImageUtils
+            '        img = cvter.IPictureDispToImage(Picture)
+            '    ElseIf ipdisp.Type = PIC_ICON Then
+            '        Throw New System.Exception("VB6 Icons not currently supported")
+            '    Else
+            '        Throw New System.Exception("Unsupported image format")
+            '    End If
         End If
 
         Dim retval As Image

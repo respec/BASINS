@@ -370,7 +370,8 @@ Public Class frmAbout
             'lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                'lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = " Release Date: January 31, 2023"
             Catch
             End Try
             Try

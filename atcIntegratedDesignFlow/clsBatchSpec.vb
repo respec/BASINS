@@ -451,11 +451,18 @@ Public Class clsBatchSpec
             For Each lStation As clsBatchUnitStation In lBFOpn
                 'Dim lOutputPrefix As String = lStation.BFInputs.GetValue(InputNames.OutputPrefix, "")
                 'If String.IsNullOrEmpty(lOutputPrefix) Then lOutputPrefix = "ITFA_" & lStation.StationID
-                Dim lTsFlow As atcTimeseries = GetStationStreamFlowData(lStation, ListBatchUnitsData)
+
+                Dim linclude_provisional As String = lStation.BFInputs.GetValue(InputNames.IncludeProvisionalData, "")
+                Dim lTsFlow As atcTimeseries = Nothing
+                If String.Compare(linclude_provisional, "YES", True) = 0 Then
+                    lTsFlow = GetStationStreamFlowData(lStation, ListBatchUnitsData, , True)
+                Else
+                    lTsFlow = GetStationStreamFlowData(lStation, ListBatchUnitsData)
+                End If
                 If lTsFlow IsNot Nothing Then
                     lDataGroup.Add(lTsFlow)
                 Else
-                    lStation.Message &= "Error: flow data is missing." & vbCrLf
+                    lStation.Message &= "Note: no flow data, hence no outputs." & vbCrLf
                 End If
             Next
             If lDataGroup.Count > 0 Then
@@ -477,47 +484,60 @@ Public Class clsBatchSpec
                 If (lNDays IsNot Nothing AndAlso lNDays.Length > 0) AndAlso
                    (lReturnPeriods IsNot Nothing AndAlso lReturnPeriods.Length > 0) Then
                     OutputFilenameRoot = lStation0.BFInputs.GetValue(InputNames.OutputPrefix, "ITFA")
+                    Dim lHighFlowFlagLabel As String = lStation0.BFInputs.GetValue(InputNames.HighLowText, "LOW")
+                    Dim lHighFlowFlag As Boolean = True
+                    If lHighFlowFlagLabel = "LOW" OrElse lHighFlowFlagLabel = "low" Then
+                        lHighFlowFlag = False
+                    End If
                     'MethodsLastDone = lStation0.BFInputs.GetValue(InputNames.ITAMethod.FREQUECYGRID)
                     Try
+                        Dim lSW As IO.StreamWriter = Nothing
                         'Do NDay first
-                        Dim lNDayHighTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, True)
-                        Dim lSW As New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayHighFlowTimeseries.txt"), False)
-                        lSW.WriteLine(lNDayHighTserListing)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
-                        End If
-                        Dim lNDayLowTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayLowFlowTimeseries.txt"), False)
-                        lSW.WriteLine(lNDayLowTserListing)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
+                        If lHighFlowFlag Then
+                            Dim lNDayHighTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, True)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayHighFlowTimeseries.txt"), False)
+                            lSW.WriteLine(lNDayHighTserListing)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay High flow Calculation.", True)
+                            End If
+                        Else
+                            Dim lNDayLowTserListing As String = InputNames.CalculateNDayTser(lDataGroup, lInputArgs, lNDays, False)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "NDayLowFlowTimeseries.txt"), False)
+                            lSW.WriteLine(lNDayLowTserListing)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done NDay Low flow Calculation.", True)
+                            End If
                         End If
 
                         'Do Frequency second
-                        Dim lFreqGridHigh As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridHighFlow.txt"), False)
-                        lSW.WriteLine(lFreqGridHigh)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
+                        If lHighFlowFlag Then
+                            Dim lFreqGridHigh As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridHighFlow.txt"), False)
+                            lSW.WriteLine(lFreqGridHigh)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency High Flow Calculation.", True)
+                            End If
+                        Else
+                            Dim lFreqGridLow As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridLowFlow.txt"), False)
+                            lSW.WriteLine(lFreqGridLow)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
+                            End If
                         End If
-                        Dim lFreqGridLow As String = InputNames.DoFrequencyGrid(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "FrequencyGridLowFlow.txt"), False)
-                        lSW.WriteLine(lFreqGridLow)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done Frequency Low Flow Calculation.", True)
-                        End If
+
                         'Dim lNDayValuesLowDone As Boolean = InputNames.CalculateNDayValues(lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
                         'Dim lFreqSource As atcFrequencyGridSource = New atcFrequencyGridSource(lDataGroup, lNDays, lReturnPeriods)
                         'Dim lCheckFreqSrcMsg As String = InputNames.CheckFreqGrid(lFreqSource)
@@ -529,34 +549,41 @@ Public Class clsBatchSpec
                         'UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency grid.", True)
 
                         'Do Trend analysis once for radioHigh.Checked once for not
-                        Dim lTrendHighGridText As String = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
-                        lSW.WriteLine(lTrendHighGridText)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        lTrendHighGridText = ""
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
+                        If lHighFlowFlag Then
+                            Dim lTrendHighGridText As String = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, True)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisHighFlowReport.txt"), False)
+                            lSW.WriteLine(lTrendHighGridText)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            lTrendHighGridText = ""
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend high flow analysis.", True)
+                            End If
+                        Else
+                            Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
+                            lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
+                            lSW.WriteLine(lTrendLowGridText)
+                            lSW.Flush()
+                            lSW.Close()
+                            lSW = Nothing
+                            lTrendLowGridText = ""
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
+                            End If
                         End If
-                        Dim lTrendLowGridText = InputNames.TrendAnalysis(lDataGroup, lInputArgs, lNDays, False)
-                        lSW = New IO.StreamWriter(IO.Path.Combine(OutputDir, "TrendAnalysisLowFlowReport.txt"), False)
-                        lSW.WriteLine(lTrendLowGridText)
-                        lSW.Flush()
-                        lSW.Close()
-                        lSW = Nothing
-                        lTrendLowGridText = ""
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done trend low flow analysis.", True)
-                        End If
+
                         'Do freq graphs
-                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
-                        End If
-                        InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
-                        If Not RunModeConsole Then
-                            UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
+                        If lHighFlowFlag Then
+                            InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, True)
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for high flow.", True)
+                            End If
+                        Else
+                            InputNames.DoFrequencyGraph(OutputDir, lDataGroup, lInputArgs, lNDays, lReturnPeriods, False)
+                            If Not RunModeConsole Then
+                                UpdateStatus(IO.Path.GetFileName(OutputDir) & "-Done frequency graph for low flow.", True)
+                            End If
                         End If
                         'ASCIICommon(lTsFlow)
                         'lStation.Message &= lStation.CalcBF.BF_Message.Trim()
@@ -599,9 +626,9 @@ Public Class clsBatchSpec
             'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
             lBFOpnCount += lBFOpn.Count
             If RunModeConsole Then
-                If Not SilentConsole Then Console.WriteLine("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " groups)")
+                If Not SilentConsole Then Console.WriteLine("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " analysis)")
             Else
-                UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " groups)", True)
+                UpdateStatus("SWSTAT Batch Run Group " & lBFOpnId & " (" & lBFOpnCount & " out of total of " & lTotalBFOpn & " analysis)", True)
             End If
 
             'Free up memory

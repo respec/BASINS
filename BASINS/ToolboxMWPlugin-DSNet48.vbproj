@@ -30,8 +30,8 @@
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <OldToolsVersion>4.5.2</OldToolsVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -50,7 +50,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\bin\Debug</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DocumentationFile>ToolboxMWPlugin.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -69,7 +69,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\bin\Debug</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DocumentationFile>ToolboxMWPlugin.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -214,34 +214,34 @@
     <Folder Include="My Project\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher-DSC.vbproj">
+    <ProjectReference Include="..\atcD4EMLauncher\atcD4EMLauncher-DSNet48.vbproj">
       <Project>{6cde2fe3-deba-46ba-b395-8f71f87159b0}</Project>
-      <Name>atcD4EMLauncher-DSC</Name>
+      <Name>atcD4EMLauncher-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSNet48.vbproj">
       <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
-      <Name>atcMwGisUtility-DSC</Name>
+      <Name>atcMwGisUtility-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSC.vbproj">
+    <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSNet48.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
-      <Name>MapWinUtility-DSC</Name>
+      <Name>MapWinUtility-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData-DSC.vbproj">
+    <ProjectReference Include="..\atcData\atcData-DSNet48.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
-      <Name>atcData-DSC</Name>
+      <Name>atcData-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcProjector\atcProjector-DSC.vbproj">
+    <ProjectReference Include="..\atcProjector\atcProjector-DSNet48.vbproj">
       <Project>{863771d3-ea5b-45d2-8416-b75e9ada8d7b}</Project>
-      <Name>atcProjector-DSC</Name>
+      <Name>atcProjector-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-DSC.vbproj">
+    <ProjectReference Include="..\atcUtility\atcUtility-DSNet48.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
-      <Name>atcUtility-DSC</Name>
+      <Name>atcUtility-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

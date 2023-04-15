@@ -65,6 +65,7 @@ Public Module modUtil
 
         Public Shared MultiNDayPlot As String = "MultipleNDayPlots"
         Public Shared MultiStationPlot As String = "MultipleStationPlots"
+        Public Shared IncludeProvisionalData As String = "IncludeProvisionalData"
 
         Public Enum ITAMethod
             NDAYTIMESERIES = 1

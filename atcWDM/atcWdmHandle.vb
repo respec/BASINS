@@ -43,7 +43,7 @@ TestFileName:
                              & aFileName & vbCrLf _
                              & "Browse for file in another folder?" & vbCrLf _
                              & "(Hint: you could copy the file to a folder with a shorter path.)", MsgBoxStyle.YesNo, "WDM Path Too Long") = MsgBoxResult.Yes Then
-                    Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+                    Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
                     With lOpenDialog
                         .Title = "Find '" & IO.Path.GetFileName(lFileName) & "' in another folder"
                         .FileName = aFileName
@@ -52,7 +52,7 @@ TestFileName:
                         End If
                         .Filter = "WDM files|*.wdm"
                         .FilterIndex = 0
-                        If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                        If .ShowDialog = System.Windows.Forms.DialogResult.OK Then
                             lFileName = .FileName
                             GoTo TestFileName
                         End If

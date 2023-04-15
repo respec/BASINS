@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>USGSHydroToolbox</RootNamespace>
     <AssemblyName>USGSHydroToolbox</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -44,11 +44,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Controls.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Data, Version=2.0.0.465, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Data, Version=4.0.656.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Data.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=53ab5a198378d4c1, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Data.Forms, Version=4.0.656.0, Culture=neutral, PublicKeyToken=53ab5a198378d4c1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Data.Forms.dll</HintPath>
     </Reference>
@@ -57,7 +57,7 @@
       <HintPath>..\bin\Debug\DotSpatial.Data.Rasters.GdalExtension.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DotSpatial.Extensions, Version=2.0.0.465, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Extensions, Version=4.0.656.0, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Extensions.dll</HintPath>
     </Reference>
@@ -65,7 +65,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.GeoAPI.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Modeling.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=712bef29a31a9354, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Modeling.Forms, Version=4.0.656.0, Culture=neutral, PublicKeyToken=712bef29a31a9354, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Modeling.Forms.dll</HintPath>
     </Reference>
@@ -73,7 +73,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.NetTopologySuite.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.NTSExtension, Version=2.0.0.465, Culture=neutral, PublicKeyToken=928fbfe39f52ea75, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.NTSExtension, Version=4.0.656.0, Culture=neutral, PublicKeyToken=928fbfe39f52ea75, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.NTSExtension.dll</HintPath>
     </Reference>
@@ -86,23 +86,23 @@
     <Reference Include="DotSpatial.Positioning.Forms">
       <HintPath>..\bin\Debug\DotSpatial.Positioning.Forms.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Projections, Version=2.0.0.465, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Projections, Version=4.0.656.0, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Projections.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Projections.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=52099474f11b7ff0, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Projections.Forms, Version=4.0.656.0, Culture=neutral, PublicKeyToken=52099474f11b7ff0, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Projections.Forms.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Serialization, Version=2.0.0.465, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Serialization, Version=4.0.656.0, Culture=neutral, PublicKeyToken=441f200f827611e7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Symbology, Version=2.0.0.465, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Symbology, Version=4.0.656.0, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
     </Reference>
-    <Reference Include="DotSpatial.Symbology.Forms, Version=2.0.0.465, Culture=neutral, PublicKeyToken=0544cdeefb662382, processorArchitecture=MSIL">
+    <Reference Include="DotSpatial.Symbology.Forms, Version=4.0.656.0, Culture=neutral, PublicKeyToken=0544cdeefb662382, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.Symbology.Forms.dll</HintPath>
     </Reference>
@@ -169,119 +169,119 @@
     <None Include="Resources\enwiki-1.5x.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\atcDataTree\atcDataTree-DSC.vbproj">
+    <ProjectReference Include="..\atcDataTree\atcDataTree-DSNet48.vbproj">
       <Project>{f4ef0925-945b-418c-9a81-8490d89985db}</Project>
-      <Name>atcDataTree-DSC</Name>
+      <Name>atcDataTree-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData-DSC.vbproj">
+    <ProjectReference Include="..\atcData\atcData-DSNet48.vbproj">
       <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
-      <Name>atcData-DSC</Name>
+      <Name>atcData-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare-DSC.vbproj">
+    <ProjectReference Include="..\atcDurationCompare\atcDurationCompare-DSNet48.vbproj">
       <Project>{92ea3681-9ea9-438a-a598-2531f483a0c6}</Project>
-      <Name>atcDurationCompare-DSC</Name>
+      <Name>atcDurationCompare-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcGraphExperimental\atcGraph-DSC.vbproj">
+    <ProjectReference Include="..\atcGraphExperimental\atcGraph-DSNet48.vbproj">
       <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
-      <Name>atcGraph-DSC</Name>
+      <Name>atcGraph-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcIntegratedDesignFlow\atcIDF-DSC.vbproj">
+    <ProjectReference Include="..\atcIntegratedDesignFlow\atcIDF-DSNet48.vbproj">
       <Project>{edb3cf95-e4dd-4d02-97e8-cd3d12cc5f86}</Project>
-      <Name>atcIDF-DSC</Name>
+      <Name>atcIDF-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcList\atcList-DSC.vbproj">
+    <ProjectReference Include="..\atcList\atcList-DSNet48.vbproj">
       <Project>{a1a87cb8-8b9e-4c90-9549-c065357e499f}</Project>
-      <Name>atcList-DSC</Name>
+      <Name>atcList-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSNet48.vbproj">
       <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
-      <Name>atcMwGisUtility-DSC</Name>
+      <Name>atcMwGisUtility-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcSeasonalAttributes\atcSeasonalAttributes-DSC.vbproj">
+    <ProjectReference Include="..\atcSeasonalAttributes\atcSeasonalAttributes-DSNet48.vbproj">
       <Project>{50fef6be-f961-4949-8658-2948de7b777b}</Project>
-      <Name>atcSeasonalAttributes-DSC</Name>
+      <Name>atcSeasonalAttributes-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcSeasons\atcSeasons-DSC.vbproj">
+    <ProjectReference Include="..\atcSeasons\atcSeasons-DSNet48.vbproj">
       <Project>{12f7fdd0-a6ec-4abe-a01b-790ad8caef03}</Project>
-      <Name>atcSeasons-DSC</Name>
+      <Name>atcSeasons-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis-DSC.vbproj">
+    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis-DSNet48.vbproj">
       <Project>{fabf7aa3-dde7-48a4-8226-ecd3ad423597}</Project>
-      <Name>atcSynopticAnalysis-DSC</Name>
+      <Name>atcSynopticAnalysis-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesBaseflow\atcTimeseriesBaseflow-DSNet48.vbproj">
       <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
-      <Name>atcTimeseriesBaseflow-DSC</Name>
+      <Name>atcTimeseriesBaseflow-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-DSNet48.vbproj">
       <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
-      <Name>atcTimeseriesMath-DSC</Name>
+      <Name>atcTimeseriesMath-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSNet48.vbproj">
       <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
-      <Name>atcTimeseriesNdayHighLow-DSC</Name>
+      <Name>atcTimeseriesNdayHighLow-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-DSNet48.vbproj">
       <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
-      <Name>atcTimeseriesRDB-DSC</Name>
+      <Name>atcTimeseriesRDB-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesScript\atcTimeseriesScript-DSNet48.vbproj">
       <Project>{40de1f29-3531-4bc2-9d7e-324dc92689df}</Project>
-      <Name>atcTimeseriesScript-DSC</Name>
+      <Name>atcTimeseriesScript-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DSC.vbproj">
+    <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-DSNet48.vbproj">
       <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
-      <Name>atcTimeseriesStatistics-DSC</Name>
+      <Name>atcTimeseriesStatistics-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow-DSC.vbproj">
+    <ProjectReference Include="..\atcUSGSBaseflow\atcUSGSBaseflow-DSNet48.vbproj">
       <Project>{9f09a31b-de05-4ff8-8e89-867affe0ace7}</Project>
-      <Name>atcUSGSBaseflow-DSC</Name>
+      <Name>atcUSGSBaseflow-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DSC.vbproj">
+    <ProjectReference Include="..\atcUSGSDF2P\atcUSGSDF2P-DSNet48.vbproj">
       <Project>{4cdfeb5c-1808-44ad-9206-0049ff26fa2e}</Project>
-      <Name>atcUSGSDF2P-DSC</Name>
+      <Name>atcUSGSDF2P-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUSGSRecess\atcUSGSRecess-DSC.vbproj">
+    <ProjectReference Include="..\atcUSGSRecess\atcUSGSRecess-DSNet48.vbproj">
       <Project>{3d007252-dd48-4288-97bc-5e1657839fbb}</Project>
-      <Name>atcUSGSRecess-DSC</Name>
+      <Name>atcUSGSRecess-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUSGSRora\atcUSGSRora-DSC.vbproj">
+    <ProjectReference Include="..\atcUSGSRora\atcUSGSRora-DSNet48.vbproj">
       <Project>{28fc1ef2-44d7-44d1-9263-fd4fad14864a}</Project>
-      <Name>atcUSGSRora-DSC</Name>
+      <Name>atcUSGSRora-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcUtility\atcUtility-DSC.vbproj">
+    <ProjectReference Include="..\atcUtility\atcUtility-DSNet48.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
-      <Name>atcUtility-DSC</Name>
+      <Name>atcUtility-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\BASINS\ToolboxMWPlugin-DSC.vbproj">
+    <ProjectReference Include="..\BASINS\ToolboxMWPlugin-DSNet48.vbproj">
       <Project>{9b3bb48b-2caf-4e49-a900-5e08217da078}</Project>
-      <Name>ToolboxMWPlugin-DSC</Name>
+      <Name>ToolboxMWPlugin-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\D4EMDownloadData\D4EMDownloadData-DSC.vbproj">
+    <ProjectReference Include="..\D4EMDownloadData\D4EMDownloadData-DSNet48.vbproj">
       <Project>{add48409-fc1f-4a92-b07c-6b9a9a5bac72}</Project>
-      <Name>D4EMDownloadData-DSC</Name>
+      <Name>D4EMDownloadData-DSNet48</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
