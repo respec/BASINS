@@ -492,7 +492,7 @@ namespace USGSHydroToolbox
         private void RunTSMath(string operation)
         {
             atcDataSource lNewSource = Utilities.TSMath.ComputeClicked(operation);
-            if (!(lNewSource is null || lNewSource.DataSets.ToArray().Length == 0))
+            if (!(lNewSource == null || lNewSource.DataSets.ToArray().Length == 0))
             {
                 //create new dates to decouple from original time series
                 var lTitle = lNewSource.ToString();

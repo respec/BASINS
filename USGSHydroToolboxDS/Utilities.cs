@@ -266,7 +266,7 @@ namespace USGSHydroToolbox
         {
             try
             {
-                if (atcDataManager.DataSources is null)
+                if (atcDataManager.DataSources == null)
                     atcDataManager.Clear();
                 if (atcDataManager.DataPlugins.Count > 0)
                     return true;
