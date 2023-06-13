@@ -182,7 +182,8 @@ Public Class frmUSGSRora
         Else
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
-            If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            'If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             Else
                 Dim lTs As atcTimeseries = Nothing

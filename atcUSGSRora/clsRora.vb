@@ -448,7 +448,8 @@ Public Class clsRora
         Dim lEnd As Double = Args.GetValue("End Date")
         TsStreamFlow = Args.GetValue("Streamflow")(0)
         Dim lTsStreamFlow As atcTimeseries = Nothing
-        If lStart > 0 AndAlso lEnd > 0 AndAlso lEnd > lStart Then
+        'If lStart > 0 AndAlso lEnd > 0 AndAlso lEnd > lStart Then
+        If lEnd > lStart Then
             lTsStreamFlow = SubsetByDate(TsStreamFlow, lStart, lEnd, Nothing)
             pStartDate = lStart
             pEndDate = lEnd

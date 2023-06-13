@@ -211,7 +211,8 @@ Public Class frmUSGSBaseflow
         Else
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
-            If lSDate < 0 OrElse lEDate < 0 Then
+            'If lSDate < 0 OrElse lEDate < 0 Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             ElseIf (lEDate - lSDate) / (JulianHour * 24) < 31 Then
                 lErrMsg &= "- Analysis duration is too short (31 days minimum)." & vbCrLf

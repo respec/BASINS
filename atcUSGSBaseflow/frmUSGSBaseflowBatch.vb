@@ -342,7 +342,8 @@ Public Class frmUSGSBaseflowBatch
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
             If Not pSetGlobal Then
-                If lSDate < 0 OrElse lEDate < 0 Then
+                'If lSDate < 0 OrElse lEDate < 0 Then
+                If lSDate >= lEDate Then
                     lErrMsg &= "- Problematic start and/or end date." & vbCrLf
                 Else
                     Dim lTs As atcTimeseries = Nothing

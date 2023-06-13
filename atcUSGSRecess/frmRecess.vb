@@ -1677,7 +1677,8 @@ Public Class frmRecess
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            'If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             Else
                 Dim lTs As atcTimeseries = Nothing
