@@ -2390,10 +2390,11 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
             Dim request As WebRequest = WebRequest.Create(URL)
             'request.Proxy.Credentials = System.Net.CredentialCache.DefaultCredentials
             'request.Timeout = 30000
+            'request.Credentials = CredentialCache.DefaultCredentials
             Dim response As WebResponse = request.GetResponse()
         Catch ex As Exception
             Logger.Dbg("CheckAddress Failed " & ex.ToString)
-            Return False
+            Return True
         End Try
         Return True
     End Function
@@ -2401,7 +2402,7 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
     Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Boolean
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
-        Dim lBaseURLnew As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
+        Dim lBaseURLnew As String = "ftp://newftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
         Dim lBaseURLga As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
         Dim lHUC8BoundaryOnly As Boolean = False
@@ -2414,13 +2415,13 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
             If Not lHUC8BoundaryOnly Then
-                If Not CheckAddress(lBaseURLnew & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
-                    If Not CheckAddress(lBaseURLga & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
-                        'problem, this file does not exist
-                        'just build project using selected HUC8s without any core data
-                        lHUC8BoundaryOnly = True
-                    End If
+                'If Not CheckAddress(lBaseURLnew & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                If Not CheckAddress(lBaseURLga & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                    'problem, this file does not exist
+                    'just build project using selected HUC8s without any core data
+                    lHUC8BoundaryOnly = True
                 End If
+                'End If
             End If
         Next
         If lHUC8BoundaryOnly Then

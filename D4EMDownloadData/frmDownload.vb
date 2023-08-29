@@ -301,13 +301,13 @@ Public Class frmDownload
                         For Each lHuc8 As String In HUC8s()
                             'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
                             'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                            If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                                MapWinUtility.Logger.Dbg("CheckAddress failed for newftp")
-                                If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                                    MapWinUtility.Logger.Dbg("CheckAddress failed for gaftp")
-                                    lProblem = True
-                                End If
+                            'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                            'MapWinUtility.Logger.Dbg("CheckAddress failed for newftp")
+                            If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                                MapWinUtility.Logger.Dbg("CheckAddress failed for gaftp")
+                                lProblem = True
                             End If
+                            'End If
                         Next
                         If lProblem Then
                             If MapWinUtility.Logger.Msg("NHDPlus v2.1 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
@@ -1267,7 +1267,7 @@ Public Class frmDownload
             Dim response As WebResponse = request.GetResponse()
         Catch ex As Exception
             Logger.Dbg("CheckAddress Failed " & ex.ToString)
-            Return False
+            Return True
         End Try
         Return True
     End Function
@@ -1278,5 +1278,9 @@ Public Class frmDownload
 
     Private Sub numStart_ValueChanged(sender As Object, e As EventArgs) Handles numStart.ValueChanged
         numEnd.Minimum = numStart.Value
+    End Sub
+
+    Private Sub chkUSGS_Seamless_NLCD2004_LandCover_CheckedChanged(sender As Object, e As EventArgs) Handles chkUSGS_Seamless_NLCD2004_LandCover.CheckedChanged
+
     End Sub
 End Class
