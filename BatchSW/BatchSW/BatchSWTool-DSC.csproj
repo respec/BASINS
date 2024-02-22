@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{07723CD8-97D3-45B0-8E06-F397C6EEA6AC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>USGSHydroToolboxBatchSWTool</RootNamespace>
+    <AssemblyName>USGSHydroToolboxBatchSWTool</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\..\Bin\Debug\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\atcBasinsObsWQ\atcBasinsObsWQ-DSC.vbproj">
+      <Project>{7dcb47a0-7b03-4b7c-bc42-b8d920d46604}</Project>
+      <Name>atcBasinsObsWQ-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcBatchProcessing\atcBatchProcessing-DSC.vbproj">
+      <Project>{7e95fcaa-7b7c-4585-8ee2-58db97ed9110}</Project>
+      <Name>atcBatchProcessing-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcControls\atcControls-DSC.vbproj">
+      <Project>{b219575f-1541-41db-9fa4-d9d7cd62b4a5}</Project>
+      <Name>atcControls-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcDataTree\atcDataTree-DSC.vbproj">
+      <Project>{f4ef0925-945b-418c-9a81-8490d89985db}</Project>
+      <Name>atcDataTree-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcData\atcData-DSC.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcGraphExperimental\atcGraph-DSC.vbproj">
+      <Project>{d52e1a9c-e219-4df7-9ca8-b4fd1b28cec9}</Project>
+      <Name>atcGraph-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcIntegratedDesignFlow\atcIDF-DSC.vbproj">
+      <Project>{edb3cf95-e4dd-4d02-97e8-cd3d12cc5f86}</Project>
+      <Name>atcIDF-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcList\atcList-DSC.vbproj">
+      <Project>{a1a87cb8-8b9e-4c90-9549-c065357e499f}</Project>
+      <Name>atcList-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+      <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
+      <Name>atcMwGisUtility-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcSeasonalAttributes\atcSeasonalAttributes-DSC.vbproj">
+      <Project>{50fef6be-f961-4949-8658-2948de7b777b}</Project>
+      <Name>atcSeasonalAttributes-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcSeasons\atcSeasons-DSC.vbproj">
+      <Project>{12f7fdd0-a6ec-4abe-a01b-790ad8caef03}</Project>
+      <Name>atcSeasons-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcTimeseriesBaseflow\atcTimeseriesBaseflow-DSC.vbproj">
+      <Project>{f9a4070c-1faf-4d17-a8e6-7eb19d414b05}</Project>
+      <Name>atcTimeseriesBaseflow-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcTimeseriesMath\atcTimeseriesMath-DSC.vbproj">
+      <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
+      <Name>atcTimeseriesMath-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSC.vbproj">
+      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
+      <Name>atcTimeseriesNdayHighLow-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcTimeseriesRDB\atcTimeseriesRDB-DSC.vbproj">
+      <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
+      <Name>atcTimeseriesRDB-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcTimeseriesStatistics\atcTimeseriesStatistics-DSC.vbproj">
+      <Project>{7e40e3e6-bf8e-45b5-99af-4e11daf039fd}</Project>
+      <Name>atcTimeseriesStatistics-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcUSGSUtility\atcUSGSUtility-DSC.vbproj">
+      <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
+      <Name>atcUSGSUtility-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\atcUtility\atcUtility-DSC.vbproj">
+      <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
+      <Name>atcUtility-DSC15</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MapWinUtility\MapWinUtility-DSC.vbproj">
+      <Project>{3c991ae4-9edb-4c24-baf3-42f7303d7df3}</Project>
+      <Name>MapWinUtility-DSC15</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
