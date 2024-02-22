@@ -1781,6 +1781,8 @@ Public Module modMetCompute
                 Next
                 If lClosestRatio >= 1 - lTolerance Then 'hourly data found to do disaggregation
                     lRatio = aDyTSer.Value(lDyInd) / lClosestDaySum
+                    Dim lObsHr As Integer = lDate(3)
+                    If lObsHr = 24 Then lObsHr = 0
                     lMaxHrVal = 0
                     lDaySum = 0
                     lCarry = 0
@@ -1790,7 +1792,7 @@ Public Module modMetCompute
                         If lHrVals(i) > 0.00001 Then
                             lCarry = lHrVals(i) - (Math.Round(lHrVals(i) / lRndOff) * lRndOff)
                             lHrVals(i) = lHrVals(i) - lCarry
-                            WriteLine(lOutFil, " Hour " & lHrInd + lDate(3) & " " & DumpDate(lClosestHrTser.Dates.Value(lHrInd).ToString) & " " & lHrVals(i))
+                            WriteLine(lOutFil, " Hour " & lHrInd + lObsHr & " " & DumpDate(lClosestHrTser.Dates.Value(lHrInd).ToString) & " " & lHrVals(i))
                         Else
                             lHrVals(i) = 0.0#
                         End If
