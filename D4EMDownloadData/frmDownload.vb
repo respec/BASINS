@@ -407,7 +407,12 @@ Public Class frmDownload
             Dim lProjectionString As String = ""
 #If GISProvider = "DotSpatial" Then
             If pMapWin.Map.Layers.Count > 0 Then
-                lProjectionString = pMapWin.Map.GetLayers()(0).ProjectionString
+                'lProjectionString = pMapWin.Map.GetLayers()(0).ProjectionString
+                'projection string might not be set yet! pbd
+                Dim lprojinfo As DotSpatial.Projections.ProjectionInfo = pMapWin.Map.Projection
+                If lprojinfo.ToProj4String.Length() > 0 Then
+                    lProjectionString = lprojinfo.ToProj4String
+                End If
             End If
             Dim lMapExtent = pMapWin.Map.Extent
 #Else

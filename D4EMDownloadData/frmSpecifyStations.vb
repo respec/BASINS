@@ -43,7 +43,8 @@
                     .txtStations.Text &= lStation & vbCrLf
                 Next
             Else
-                .txtStations.Text = GetSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
+                '.txtStations.Text = GetSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
+                .txtStations.Text = ""
             End If
 
             If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
@@ -54,7 +55,7 @@
                         lStations.Add(lStation.Trim)
                     End If
                 Next
-                SaveSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
+                'SaveSetting(pAppName, "Defaults", "SpecifyStations", .txtStations.Text)
                 Return lStations
             End If
         End With
