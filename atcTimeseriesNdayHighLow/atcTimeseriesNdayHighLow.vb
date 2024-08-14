@@ -587,8 +587,10 @@ Public Class atcTimeseriesNdayHighLow
 
                 If Not ReferenceEquals(aTimeseries, lNdayTs) Then
                     'get rid of intermediate timeseries
-                    lNdayTs.Clear()
-                    lNdayTs = Nothing
+                    If aLogFg Then
+                        lNdayTs.Clear()     'this seems to cause problems for nonlog!  pbd 8/12/2024
+                        lNdayTs = Nothing
+                    End If
                     Me.DataSets.Clear()
                 End If
             End If
