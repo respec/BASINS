@@ -83,7 +83,13 @@ Public Class DownloadDataPlugin
                             ElseIf lResult.Contains("<success>") Then
                                 BASINS.ProcessDownloadResults(lResult)
                             Else
-                                Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                                If lResult.Contains("<error>Error downloading from https://www.mrlc.gov") Then
+                                    'pbd better error message here when server down?
+                                    ''"<error>Error downloading from https://www.mrlc.gov/geoserver/mrlc_download/wms?SERVICE=WMS&request=GetMap&layers=NLCD_2019_Land_Cover_L48&bbox=-84.3885248345288, 33.4322709170764, -75.0747797710852, 38.044461713196&width=25995&height=13002&srs=EPSG:4326&format=image/geotiff&version=1.1.1, file not created: C:\USGSHydroToolboxDS\HydrologicToolbox1.1\data\03020201\NLCD\NLCD_landcover_2019.tif</error>"
+                                    Logger.Msg("NLCD WMS Server not responding, appears to be down", "Data Download")
+                                Else
+                                    Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                                End If
                             End If
                         End If
 

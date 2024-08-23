@@ -75,10 +75,9 @@
       <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinGeoProc, Version=4.8.6.25969, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="MapWinGeoProc, Version=4.8.6.29697, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinGeoProc.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.8.6.42296, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>

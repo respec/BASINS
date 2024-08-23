@@ -1433,6 +1433,6 @@ Partial Class frmDownload
     Friend WithEvents lblEnd As System.Windows.Forms.Label
     Friend WithEvents lblStart As System.Windows.Forms.Label
     Friend WithEvents numStart As System.Windows.Forms.NumericUpDown
-    Friend WithEvents chkUSGS_Seamless_NLCD2019_Impervious As Windows.Forms.CheckBox
-    Friend WithEvents chkUSGS_Seamless_NLCD2019_LandCover As Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2019_Impervious As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUSGS_Seamless_NLCD2019_LandCover As System.Windows.Forms.CheckBox
 End Class
