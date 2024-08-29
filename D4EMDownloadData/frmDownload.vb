@@ -424,7 +424,7 @@ Public Class frmDownload
             Dim lExtents As Extent = Nothing
             Select Case cboRegion.SelectedItem
                 Case pRegionViewRectangle
-                    lExtents = lMapExtent 'pMapWin.View.Extents
+                    lExtents = pMapWin.Map.ViewExtents 'pMapWin.View.Extents
                 Case pRegionExtentSelectedLayer
                     lExtents = lMapExtent 'pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
                 Case pRegionExtentSelectedShapes
