@@ -629,8 +629,12 @@ Public Class frmDownload
             Dim lFilename As String = ""
             Dim lSelectedCount As Integer = 0
             If lLayer IsNot Nothing Then
-                lFilename = IO.Path.GetFileNameWithoutExtension(lLayer.DataSet.Filename).ToLower
-                lSelectedCount = CType(lLayer, IMapFeatureLayer).Selection().Count
+                If lLayer.GetType.Name = "MapRasterLayer" Then
+                    lFilename = ""
+                Else
+                    lFilename = IO.Path.GetFileNameWithoutExtension(lLayer.DataSet.Filename).ToLower
+                    lSelectedCount = CType(lLayer, IMapFeatureLayer).Selection().Count
+                End If
             Else
                 lFilename = ""
             End If
