@@ -59,6 +59,8 @@ namespace USGSHydroToolbox
             }
             ------------------------------------------------ */
 
+            var grp = new DotSpatial.Data.Rasters.GdalExtension.GdalRasterProvider();
+
             if (Utilities.g_AppNameShort == "Hydro Toolbox")
             {
                 this.Icon = Images.USGS;
