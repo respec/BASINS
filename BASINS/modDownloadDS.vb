@@ -154,6 +154,12 @@ Public Module modDownload
                         lOutputFileName = lProjectorNode.InnerText
                         If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
 #If GISProvider = "DotSpatial" Then
+                        Dim lLayer As IMapRasterLayer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg(lOutputFileName, "Failed add grid layer")
+                        Else
+                            lLayersAdded.Add(lLayer.DataSet.Name)
+                        End If
 #Else
                         Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
                         If lLayer Is Nothing Then
@@ -2016,7 +2022,7 @@ StartOver:
         Dim Visible As Boolean
         'Dim Style As atcRenderStyle = New atcRenderStyle
 
-        Dim MWlay As IMapLayer = Nothing
+        Dim MWlay As IMapRasterLayer = Nothing
         Dim g As IMapRasterLayer
 
         'Don't add layer again if we already have it
@@ -2032,7 +2038,9 @@ StartOver:
             'g_StatusBar.Item(1).Text = "Opening " & aFilename
 
             If layerXml Is Nothing Then
-                MWlay = g_MapWin.Map.Layers.Add(aFilename)
+                Dim lr As Raster = Raster.OpenFile(aFilename)
+                Dim lIr As IRaster = lr
+                MWlay = g_MapWin.Map.Layers.Add(lr)
                 MWlay.IsVisible = True
             Else
                 LayerName = layerXml.Attributes.GetNamedItem("Name").InnerText
@@ -2050,25 +2058,27 @@ StartOver:
                         LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
                 End Select
 
-                g = RasterLayer.OpenFile(aFilename)
-                'TODO: ensure correct Nodata value is set in NLCD grids
-                'If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
-                '    If g.Header.NodataValue <> 0 Then
-                '        g.Header.NodataValue = 0
-                '        Try
-                '            g.Save(aFilename)
-                '            g.Close()
-                '            g.Open(aFilename)
-                '        Catch e As Exception
-                '            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
-                '        End Try
-                '    End If
-                'End If
+                'g = RasterLayer.OpenFile(aFilename)
+                Dim lr As Raster = Raster.OpenFile(aFilename)
+                Dim lIr As IRaster = lr
+                'ensure correct Nodata value is set in NLCD grids
+                If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                    If lr.NoDataValue <> 0 Then
+                        lr.NoDataValue = 0
+                        Try
+                            lr.Save()
+                            lr.Close()
+                            lr = Raster.OpenFile(aFilename)
+                        Catch e As Exception
+                            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
+                        End Try
+                    End If
+                End If
                 Dim lProjectProjection As String = g_MapWin.Map.Projection.ToProj4String
                 If lProjectProjection IsNot Nothing AndAlso lProjectProjection.Length > 1 Then
-                    Dim lLayerProjection4 As String = CType(g, IMapRasterLayer).ProjectionString
+                    Dim lLayerProjection4 As String = lr.ProjectionString
                     If lLayerProjection4 Is Nothing OrElse lLayerProjection4.Trim().Length = 0 Then
-                        Dim lPrjFileName As String = IO.Path.ChangeExtension(g.Filename, ".proj4")
+                        Dim lPrjFileName As String = IO.Path.ChangeExtension(lr.Filename, ".proj4")
                         If IO.File.Exists(lPrjFileName) Then
                             lLayerProjection4 = WholeFileString(lPrjFileName)
                             'Else
@@ -2079,7 +2089,7 @@ StartOver:
                         End If
                     End If
                     If lLayerProjection4 IsNot Nothing AndAlso lLayerProjection4.Trim().Length > 0 AndAlso lLayerProjection4 <> lProjectProjection Then
-                        g_MapWin.Map.Layers.Remove(g)
+                        'g_MapWin.Map.Layers.Remove(lr)
                         Logger.Status("Reprojecting Grid, this may take several minutes: " & aFilename)
                         'the problem with GetTemporaryFileName is that we want this file to be permanent, so don't use this
                         'Dim lOutputFileName As String = GetTemporaryFileName(IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)), IO.Path.GetExtension(aFilename))
@@ -2088,16 +2098,22 @@ StartOver:
                         'MapWinGeoProc.SpatialReference.ProjectGrid(lLayerProjection4, g_Project.ProjectProjection, aFilename, lOutputFileName, True)
                         Logger.Status("Opening " & aFilename)
                         If IO.File.Exists(lOutputFileName) Then
-                            g = RasterLayer.OpenFile(lOutputFileName)
+                            'g = RasterLayer.OpenFile(lOutputFileName)
+                            lr = Raster.OpenFile(aFilename)
+                            lIr = lr
                         Else
-                            g = RasterLayer.OpenFile(aFilename)
+                            'g = RasterLayer.OpenFile(aFilename)
+                            lr = Raster.OpenFile(aFilename)
+                            lIr = lr
                         End If
                         Logger.Status("")
                     End If
                 End If
 
-                g = g_MapWin.Map.Layers.Add(LayerName)
-                g.IsVisible = Visible
+                'g = g_MapWin.Map.Layers.Add(LayerName)
+                'g.IsVisible = Visible
+                MWlay = g_MapWin.Map.Layers.Add(lr)
+                MWlay.IsVisible = Visible
                 'g.UseTransparentColor = True
 
                 'TODO: replace hard-coded SetElevationGridColors with full renderer from defaults
@@ -2105,6 +2121,8 @@ StartOver:
                     SetElevationGridColors(MWlay, g)
                 ElseIf aFilename.ToLower.Contains(g_PathChar & "ned" & g_PathChar) Then
                     SetElevationGridColors(MWlay, g)
+                ElseIf aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                    SetLandUseLegend(MWlay)
                 End If
             End If
 
@@ -2115,12 +2133,75 @@ StartOver:
                 DoEvents()
             End If
         Catch ex As Exception
-            Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
+            Logger.Msg("Could Not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
         End Try
         'g_StatusBar.Item(1).Text = ""
 
         Return MWlay
     End Function
+
+    Private Sub SetLandUseLegend(ByVal aMWlay As IMapRasterLayer)
+        Dim lLegItems As DotSpatial.Symbology.ColorCategoryCollection = aMWlay.LegendItems
+        For Each lLegItem As ILegendItem In lLegItems
+            If lLegItem.LegendText = "11" Then
+                lLegItem.LegendText = "Water-Open"
+            ElseIf lLegItem.LegendText = "12" Then
+                lLegItem.LegendText = "IceSnow-Perennial"
+            ElseIf lLegItem.LegendText = "21" Then
+                lLegItem.LegendText = "Developed-Open Space"
+            ElseIf lLegItem.LegendText = "22" Then
+                lLegItem.LegendText = "Developed-Low Intensity"
+            ElseIf lLegItem.LegendText = "23" Then
+                lLegItem.LegendText = "Developed-Medium Intensity"
+            ElseIf lLegItem.LegendText = "24" Then
+                lLegItem.LegendText = "Developed-High Intensity"
+            ElseIf lLegItem.LegendText = "31" Then
+                lLegItem.LegendText = "Barren Land"
+            ElseIf lLegItem.LegendText = "32" Then
+                lLegItem.LegendText = "Unconsolidated Shore"
+            ElseIf lLegItem.LegendText = "33" Then
+                lLegItem.LegendText = "Transitional"
+            ElseIf lLegItem.LegendText = "41" Then
+                lLegItem.LegendText = "Forest-Deciduous"
+            ElseIf lLegItem.LegendText = "42" Then
+                lLegItem.LegendText = "Forest-Evergreen"
+            ElseIf lLegItem.LegendText = "43" Then
+                lLegItem.LegendText = "Forest-Mixed"
+            ElseIf lLegItem.LegendText = "51" Then
+                lLegItem.LegendText = "Scrub-Dwarf"
+            ElseIf lLegItem.LegendText = "52" Then
+                lLegItem.LegendText = "Scrub-Scrub"
+            ElseIf lLegItem.LegendText = "71" Then
+                lLegItem.LegendText = "Grassland"
+            ElseIf lLegItem.LegendText = "81" Then
+                lLegItem.LegendText = "Agriculture-Pasture"
+            ElseIf lLegItem.LegendText = "82" Then
+                lLegItem.LegendText = "Agriculture-Cultivated Crops"
+            ElseIf lLegItem.LegendText = "90" Then
+                lLegItem.LegendText = "Wetlands-Woody"
+            ElseIf lLegItem.LegendText = "91" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Forested"
+            ElseIf lLegItem.LegendText = "92" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Scrub"
+            ElseIf lLegItem.LegendText = "93" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Forested"
+            ElseIf lLegItem.LegendText = "94" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Scrub"
+            ElseIf lLegItem.LegendText = "95" Then
+                lLegItem.LegendText = "Wetlands-Emergent Herbaceous"
+            ElseIf lLegItem.LegendText = "96" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Emergent"
+            ElseIf lLegItem.LegendText = "97" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Emergent"
+            ElseIf lLegItem.LegendText = "98" Then
+                lLegItem.LegendText = "Aquatic Bed-Paustrine"
+            ElseIf lLegItem.LegendText = "99" Then
+                lLegItem.LegendText = "Aquatic Bed-Esturarine"
+            Else
+                lLegItem.LegendItemVisible = False
+            End If
+        Next
+    End Sub
 
     'Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
     '    Dim colorBreak As MapWinGIS.ShapefileColorBreak
