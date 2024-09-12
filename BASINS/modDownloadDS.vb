@@ -2201,6 +2201,14 @@ StartOver:
                 lLegItem.LegendItemVisible = False
             End If
         Next
+        Dim lIndex As Integer = 0
+        Do Until lIndex > lLegItems.Count - 1
+            If lLegItems(lIndex).LegendItemVisible = False Then
+                lLegItems.RemoveAt(lIndex)
+            Else
+                lIndex += 1
+            End If
+        Loop
     End Sub
 
     'Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
