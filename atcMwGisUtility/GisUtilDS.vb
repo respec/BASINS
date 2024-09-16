@@ -72,24 +72,27 @@ Public Class GisUtilDS
             For Each layer As ILayer In pMapWin.Map.Layers
                 Dim lMG As MapGroup = TryCast(layer, MapGroup)
                 If lMG IsNot Nothing Then
-                    For Each mglyr As IMapFeatureLayer In lMG.GetLayers()
-                        If lScreenGeometryType Then
-                            If mglyr.DataSet.FeatureType = fType Then
-                                If lScreenLayerName Then
-                                    If mglyr.LegendText.ToLower() = aLayerName.ToLower() OrElse mglyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
-                                        lFeatureLayers.Add(mglyr)
+                    For Each mglyr As ILayer In lMG.GetLayers()
+                        Dim lMapFlyr As IMapFeatureLayer = TryCast(mglyr, IMapFeatureLayer)
+                        If lMapFlyr IsNot Nothing Then
+                            If lScreenGeometryType Then
+                                If lMapFlyr.DataSet.FeatureType = fType Then
+                                    If lScreenLayerName Then
+                                        If lMapFlyr.LegendText.ToLower() = aLayerName.ToLower() OrElse lMapFlyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
+                                            lFeatureLayers.Add(lMapFlyr)
+                                        End If
+                                    Else
+                                        lFeatureLayers.Add(lMapFlyr)
                                     End If
-                                Else
-                                    lFeatureLayers.Add(mglyr)
-                                End If
-                            End If
-                        Else
-                            If lScreenLayerName Then
-                                If mglyr.LegendText.ToLower() = aLayerName.ToLower() OrElse mglyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
-                                    lFeatureLayers.Add(mglyr)
                                 End If
                             Else
-                                lFeatureLayers.Add(mglyr)
+                                If lScreenLayerName Then
+                                    If lMapFlyr.LegendText.ToLower() = aLayerName.ToLower() OrElse lMapFlyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
+                                        lFeatureLayers.Add(lMapFlyr)
+                                    End If
+                                Else
+                                    lFeatureLayers.Add(lMapFlyr)
+                                End If
                             End If
                         End If
                     Next
