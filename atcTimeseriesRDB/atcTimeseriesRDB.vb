@@ -534,6 +534,9 @@ Public Class atcTimeseriesRDB
                     End While
 
                     lAttributes.AddHistory("Read from " & Specification)
+                    If lAttributes.GetValue("Location") Is Nothing Then
+                        lAttributes.SetValue("Location", FilenameNoExt(FilenameNoPath(Specification)))
+                    End If
 
                     If lSite Then
                         Throw New ApplicationException("Station list does Not contain timeseries data: " & IO.Path.GetFileName(Specification))
@@ -571,9 +574,9 @@ Public Class atcTimeseriesRDB
                 Dim lDateField As Integer = .FieldNumber("measurement_dt")
                 If lDateField = 0 Then Throw New Exception("Required field missing: measurement_dt")
 
-                Dim lValueFieldNames() As String = {"channel_width_va", "xsec_area_va", "velocity_va", "discharge_1", "discharge_va", "gage_height_va", "shift_applied_va"}
-                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "VELOCITY", "DISCHARGE1", "DISCHARGE", "GAGE_HEIGHT", "SHIFT_APPLIED"}
-                Dim lUnits() As String = {"ft", "square feet", "ft/sec", "cfs", "cfs", "ft", "ft"}
+                Dim lValueFieldNames() As String = {"chan_width", "chan_area", "channel_width_va", "xsec_area_va", "velocity_va", "discharge_1", "discharge_va", "gage_height_va", "shift_applied_va"}
+                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "WIDTH", "XSECT", "VELOCITY", "DISCHARGE1", "DISCHARGE", "GAGE_HEIGHT", "SHIFT_APPLIED"}
+                Dim lUnits() As String = {"ft", "square feet", "ft", "square feet", "ft/sec", "cfs", "cfs", "ft", "ft"}
                 Dim lLastValueField As Integer = lValueFieldNames.GetUpperBound(0)
                 Dim lValueFieldNumber(lLastValueField) As Integer
                 Dim lBuilders(lLastValueField) As atcTimeseriesBuilder
@@ -591,8 +594,14 @@ Public Class atcTimeseriesRDB
                             .SetValue("Units", lUnits(lValueFieldIndex))
                             .SetValue("Point", True)
                             .SetValue("Scenario", "OBSERVED")
-                            .SetValue("Location", .GetValue("site_no"))
-                            .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                            If .GetValue("site_no") IsNot Nothing Then
+                                .SetValue("Location", .GetValue("site_no"))
+                            End If
+                            If .GetValue("station_nm") IsNot Nothing Then
+                                .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                            Else
+                                .SetValue("Description", "Measurements at " & .GetValue("Location"))
+                            End If
                             .SetValue("ID", lValueFieldIndex + 1)
                         End With
                     End If

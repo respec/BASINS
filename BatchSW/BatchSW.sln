@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30611.23
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchSWTool", "BatchSW\BatchSWTool.csproj", "{07723CD8-97D3-45B0-8E06-F397C6EEA6AC}"
 EndProject
@@ -153,14 +153,14 @@ Global
 		{6CDE2FE3-DEBA-46BA-B395-8F71F87159B0}.Release|x86.Build.0 = Release|x86
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x64.ActiveCfg = Debug|x64
-		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x64.Build.0 = Debug|x64
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x64.Build.0 = Debug|Any CPU
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x86.ActiveCfg = Debug|x86
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug|x86.Build.0 = Debug|x86
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x64.ActiveCfg = Release|x64
-		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x64.Build.0 = Release|x64
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x64.ActiveCfg = Release|Any CPU
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x64.Build.0 = Release|Any CPU
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x86.ActiveCfg = Release|x86
 		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release|x86.Build.0 = Release|x86
 		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

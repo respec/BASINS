@@ -167,6 +167,7 @@ Public Module SWMMCATHargraevesET
                     ltsHargET.Dates = New atcTimeseries
                     ltsHargET.Dates.Values = NewDates(lSJD, lEJD, atcTimeUnit.TUDay, 1)
                     ltsHargET.Values = lETVals
+                    ltsHargET.Attributes.CalculateAll()
 
                     Dim lSeasonsMonth As New atcSeasonsMonth
                     Dim lMonthlyAnnualStr As String = lStnID & vbTab

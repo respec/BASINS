@@ -175,6 +175,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcData\atcData15.vbproj">
+      <Project>{a9a00cad-9ead-4228-ab08-6dc3baf253aa}</Project>
+      <Name>atcData15</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\BASINS-MapWinUtility15.vbproj">
       <Project>{33E88992-742F-4D13-823F-35D6A07B1AA1}</Project>
       <Name>BASINS-MapWinUtility15</Name>
@@ -183,11 +188,6 @@
     <ProjectReference Include="..\atcControls\atcControls15.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls15</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\atcData\atcData15.vbproj">
-      <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
-      <Name>atcData15</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcGraphExperimental\atcGraph15.vbproj">

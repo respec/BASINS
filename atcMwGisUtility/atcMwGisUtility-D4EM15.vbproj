@@ -152,6 +152,21 @@
       <Name>atcUtility-D4EM15</Name>
       <Private>False</Private>
     </ProjectReference>
+    <Reference Include="Interop.MapWinGIS">
+      <Name>Interop.MapWinGIS</Name>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinGeoProc, Version=1.0.2365.24608, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+      <HintPath>..\bin\MapWinGeoProc.dll</HintPath>
+    </Reference>
+    <Reference Include="MapWinInterfaces, Version=4.7.1.24749, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
