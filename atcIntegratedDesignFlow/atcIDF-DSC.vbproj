@@ -108,8 +108,18 @@
       <HintPath>..\Bin\Debug\DotSpatial.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DotSpatial.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=c29dbf30e059ca9d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DotSpatial.Extensions">
       <HintPath>..\Bin\Debug\DotSpatial.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6178c08da7998387, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\DotSpatial.Symbology.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -179,9 +189,6 @@
     <Compile Include="frmSWSTAT.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmSWSTATDFlowBatch.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmSWSTATmod.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -234,9 +241,6 @@
       <DependentUpon>frmSWSTAT.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmSWSTATDFlowBatch.resx">
-      <DependentUpon>frmSWSTATDFlowBatch.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmSWSTATmod.resx">
       <DependentUpon>frmSWSTATmod.vb</DependentUpon>
     </EmbeddedResource>
@@ -263,6 +267,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility-DSC.vbproj">
+      <Project>{350d3be7-35a4-4b09-9d28-dde2f6b716cd}</Project>
+      <Name>atcMwGisUtility-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSC.vbproj">
+      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
+      <Name>atcTimeseriesNdayHighLow-DSC</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSC.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>
       <Name>MapWinUtility-DSC</Name>
@@ -298,11 +312,6 @@
       <Name>atcSeasons-DSC</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow-DSC.vbproj">
-      <Project>{24eebefb-2b19-489d-b3af-9fe00a56346e}</Project>
-      <Name>atcTimeseriesNdayHighLow-DSC</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\atcUSGSUtility\atcUSGSUtility-DSC.vbproj">
       <Project>{4dbc8159-1072-41fa-9242-933e12a88ee6}</Project>
       <Name>atcUSGSUtility-DSC</Name>
@@ -311,11 +320,6 @@
     <ProjectReference Include="..\atcUtility\atcUtility-DSC.vbproj">
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-DSC</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\DFLOW\DFLOWAnalysis-DSC.vbproj">
-      <Project>{b1998404-5a6c-49ab-be38-ecfdaa8361b0}</Project>
-      <Name>DFLOWAnalysis-DSC</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -7,16 +7,16 @@ Imports System.Data
 
 Public Class ModelParameter
     'This class manages the property of each individual parameter
-    Public ParmID As Integer = 0
-    Public ParmOperationType As String = ""
-    Public ParmOperationNumber As Integer = 0
-    Public ParmOperationName As String = ""
-    Public ParmTable As String = ""
-    Public ParmName As String = ""
-    Public ParmMultFactor As Integer = 0
-    Public ParmLow As Double = -1.0E-30
-    Public ParmHigh As Double = 1.0E+30
-    Public ParmOccurence As Integer = 0
+    Public pParmID As Integer = 0
+    Public pParmOperationType As String = ""
+    Public pParmOperationNumber As Integer = 0
+    Public pParmOperationName As String = ""
+    Public pParmTable As String = ""
+    Public pParmName As String = ""
+    Public pParmMultFactor As Integer = 0
+    Public pParmLow As Double = -1.0E-30
+    Public pParmHigh As Double = 1.0E+30
+    Public pParmOccurence As Integer = 0
 End Class
 
 
@@ -27,93 +27,93 @@ Public Module MultiSimAnalysis
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.wdm") 'Need to figure out why we need this.
         Dim lExitCode As Integer
-        Dim SimID As Integer = 0
+        Dim lSimID As Integer = 0
         Dim lUci As New atcUCI.HspfUci
-        Dim DeleteUCIFiles As Integer = 0
-        Dim uciName As String
-        uciName = "MultiSim.uci"
-        File.Copy(pBaseName & ".uci", uciName, True) 'Saving the original file with MultiSim.uci name
-        lUci.ReadUci(lMsg, uciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file
+        Dim lDeleteUCIFiles As Integer = 0
+        Dim lUciName As String
+        lUciName = "MultiSim.uci"
+        File.Copy(pBaseName & ".uci", lUciName, True) 'Saving the original file with MultiSim.uci name
+        lUci.ReadUci(lMsg, lUciName, -1, False, pBaseName & ".ech") ' Reading the temp uci file
         lUci.GlobalBlock.RunFg = 1
         lUci.Save()
 
-        Dim loutWDMFileName As String = Path.Combine(pTestPath, "MultiSim.wdm")
-        If File.Exists(loutWDMFileName) Then
+        Dim lOutWDMFileName As String = Path.Combine(pTestPath, "MultiSim.wdm")
+        If File.Exists(lOutWDMFileName) Then
             Try
-                File.Delete(loutWDMFileName)
+                File.Delete(lOutWDMFileName)
             Catch ex As Exception
             End Try
         End If
 
-        Dim YearsofSimulation As Single
-        YearsofSimulation = (aEDateJ - aSDateJ) / JulianYear
+        Dim lYearsofSimulation As Single
+        lYearsofSimulation = (aEDateJ - aSDateJ) / JulianYear
 
         'Generate a default Parameter Sensitivity Table file if it does not exist already
         Dim lParameterListFilesIsAvailable As Boolean = False
         Dim lSpecificationFile As String = "MultiSimSpecFile.csv"
 
-        Dim NumberOfOutputDSN As Integer = 0
+        Dim lNumberOfOutputDSN As Integer = 0
 
         If Not IO.File.Exists(lSpecificationFile) Then
-            Dim SensitivityParameterFile As StreamWriter = IO.File.CreateText("MultiSimSpecFile.csv")
-            Dim TextToAddForMultiSimFile As String = "***Initial Parameter List For Sensitivity/Uncertainty Analysis And Output DSN from the UCI file"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file. You can add more."
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            Dim lSensitivityParameterFile As StreamWriter = IO.File.CreateText("MultiSimSpecFile.csv")
+            Dim lTextToAddForMultiSimFile As String = "***Initial Parameter List For Sensitivity/Uncertainty Analysis And Output DSN from the UCI file"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "***Following Output IDs are the first two ID read from the EXT TARGET block of the UCI file. You can add more."
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
 
-            TextToAddForMultiSimFile = "DSN,"
+            lTextToAddForMultiSimFile = "DSN,"
             For Each lEXTTARGET As HspfConnection In lUci.Connections
 
-                If lEXTTARGET.Target.VolName.Contains("WDM") AndAlso NumberOfOutputDSN <= 1 Then
-                    NumberOfOutputDSN += 1
-                    TextToAddForMultiSimFile &= lEXTTARGET.Target.VolId & ","
+                If lEXTTARGET.Target.VolName.Contains("WDM") AndAlso lNumberOfOutputDSN <= 1 Then
+                    lNumberOfOutputDSN += 1
+                    lTextToAddForMultiSimFile &= lEXTTARGET.Target.VolId & ","
 
                 End If
             Next
 
-            If NumberOfOutputDSN = 0 Then
+            If lNumberOfOutputDSN = 0 Then
                 Logger.Msg("The UCI file does not have output datasets specified in the EXT TARGETS Block. HSPEXP+ will quit", vbOKOnly)
                 End
             End If
 
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = """***The operation number, land use, tied with next, and multiplier can be left blank"""
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "ParmID,OPN_Type,Table_Name,Parm_Name,Occur_Or_MLNumber,Mult_Factor_FG,OPN_Number_Or_Name,Lower_Limit,Upper_Limit"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "1,PERLND,PWAT-PARM2,LZSN,,1,,3,8"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "2,PERLND,PWAT-PARM2,INFILT,,1,,0.01,0.5"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "Delete intermediate UCI files?, 0"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "***Following lines list the multiplication factor for each parameter for each simulation."
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "SimID,Parm1,Parm2,,,,,"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "1,0.9,,"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "2,1.1,,"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "3,,0.9,"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
-            TextToAddForMultiSimFile = "4,,1.1,"
-            SensitivityParameterFile.WriteLine(TextToAddForMultiSimFile)
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = """***The operation number, land use, tied with next, and multiplier can be left blank"""
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "ParmID,OPN_Type,Table_Name,Parm_Name,Occur_Or_MLNumber,Mult_Factor_FG,OPN_Number_Or_Name,Lower_Limit,Upper_Limit"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "1,PERLND,PWAT-PARM2,LZSN,,1,,3,8"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "2,PERLND,PWAT-PARM2,INFILT,,1,,0.01,0.5"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "Delete intermediate UCI files?, 0"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "***Following lines list the multiplication factor for each parameter for each simulation."
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "SimID,Parm1,Parm2,,,,,"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "1,0.9,,"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "2,1.1,,"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "3,,0.9,"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
+            lTextToAddForMultiSimFile = "4,,1.1,"
+            lSensitivityParameterFile.WriteLine(lTextToAddForMultiSimFile)
 
 
             MsgBox("A default list of Sensitive parameters was created as MultiSimSpecFile.csv. Additionally two output DSN from the EXT TARGETS blocks were selected for analyzing outputs.
 You can edit this specification file and add more parameters and outputs.", vbOKOnly, "Default List of Outputs & Parameters")
-            SensitivityParameterFile.Close()
+            lSensitivityParameterFile.Close()
         End If
 
         'Dim lOutputFile As StreamWriter = File.CreateText("MultiSimOutput.csv")
-        Dim loutputTable As DataTable
-        loutputTable = New DataTable("MultiSimOutput")
-        loutputTable = AddOutputTableColumns(loutputTable)
+        Dim lOutputTable As DataTable
+        lOutputTable = New DataTable("MultiSimOutput")
+        lOutputTable = AddOutputTableColumns(lOutputTable)
 
-        Dim TextToWrite As String = ""
-        For Each TableColumn As DataColumn In loutputTable.Columns 'Writing the table headings
-            TextToWrite &= TableColumn.Caption & ","
+        Dim lTextToWrite As String = ""
+        For Each lTableColumn As DataColumn In lOutputTable.Columns 'Writing the table headings
+            lTextToWrite &= lTableColumn.Caption & ","
         Next
         'lOutputFile.WriteLine(TextToWrite)
 
@@ -121,133 +121,130 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         Dim lSpecificationFileRecordsNew As New ArrayList
         lSpecificationFileRecordsNew = ReadCSVFile(lSpecificationFile) 'Reading the MultiSim specification file 
 
-        Dim listOfOutputDSN As New atcCollection
-        Dim lcsvRecordIndex As Integer = 0
-        Dim lcsvlinerecord() As String = lSpecificationFileRecordsNew(lcsvRecordIndex)
-        NumberOfOutputDSN = lcsvlinerecord.Length - 1
-        For i = 1 To NumberOfOutputDSN
+        Dim lListOfOutputDSN As New atcCollection
+        Dim lCsvRecordIndex As Integer = 0
+        Dim lCsvLineRecord() As String = lSpecificationFileRecordsNew(lCsvRecordIndex)
+        lNumberOfOutputDSN = lCsvLineRecord.Length - 1
+        For i = 1 To lNumberOfOutputDSN
             If lcsvlinerecord(i) = "" Then
-                NumberOfOutputDSN = i - 1
+                lNumberOfOutputDSN = i - 1
                 Exit For
             Else
-
-                listOfOutputDSN.Add(Int(lcsvlinerecord(i)))
+                lListOfOutputDSN.Add(Int(lCsvLineRecord(i)))
                 'If DSN is not an integer, it will cause an error here. Need to figure out the best way to handle it.
             End If
-
         Next
 
-        Dim loutputLine As String = ""
+        Dim lOutputLine As String = ""
         ChDriveDir(PathNameOnly(pHSPFExe))
-        loutputTable = ModelRunandReportAnswers(SimID, lUci, uciName, lExitCode, pBaseName, pTestPath,
-                                 aSDateJ, aEDateJ, YearsofSimulation, listOfOutputDSN, aHSPFEchofilename, loutputTable)
+        lOutputTable = ModelRunandReportAnswers(lSimID, lUci, lUciName, lExitCode, pBaseName, pTestPath,
+                                 aSDateJ, aEDateJ, lYearsofSimulation, lListOfOutputDSN, aHSPFEchofilename, lOutputTable)
 
-        Dim ListOfParameters As New List(Of ModelParameter)
-        lcsvRecordIndex += 1
-        lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
-        Do Until lcsvlinerecord(0) = "Simulation ID" Or lcsvlinerecord(0).ToLower.Contains("delete")
+        Dim lListOfParameters As New List(Of ModelParameter)
+        lCsvRecordIndex += 1
+        lCsvLineRecord = lSpecificationFileRecordsNew(lCsvRecordIndex)
+        Do Until lCsvLineRecord(0) = "Simulation ID" Or lCsvLineRecord(0).ToLower.Contains("delete")
             'Going through the CSV file and getting the list of parameters.
-            Dim NewParameter As New ModelParameter
-            With NewParameter
+            Dim lNewParameter As New ModelParameter
+            With lNewParameter
                 Try
-                    .ParmID = Trim(Int(lcsvlinerecord(0))) 'Need to figure out better error messages if the values are not correct.
+                    .pParmID = Trim(Int(lCsvLineRecord(0))) 'Need to figure out better error messages if the values are not correct.
                 Catch ex As Exception
 
                 End Try
-                If Not Trim(lcsvlinerecord(1)).Length = 0 Then
-                    .ParmOperationType = Trim(lcsvlinerecord(1))
+                If Not Trim(lCsvLineRecord(1)).Length = 0 Then
+                    .pParmOperationType = Trim(lCsvLineRecord(1))
                 End If
 
-                .ParmTable = Trim(lcsvlinerecord(2))
+                .pParmTable = Trim(lCsvLineRecord(2))
 
-                If lcsvlinerecord.Length > 3 AndAlso Not Trim(lcsvlinerecord(3)).Length = 0 Then
-                    .ParmName = Trim(lcsvlinerecord(3))
+                If lCsvLineRecord.Length > 3 AndAlso Not Trim(lCsvLineRecord(3)).Length = 0 Then
+                    .pParmName = Trim(lCsvLineRecord(3))
                 End If
 
                 Try
-                    .ParmOccurence = CInt(Trim(lcsvlinerecord(4)))
+                    .pParmOccurence = CInt(Trim(lCsvLineRecord(4)))
                 Catch
-                    .ParmOccurence = 0
+                    .pParmOccurence = 0
                 End Try
 
-                .ParmMultFactor = 0
+                .pParmMultFactor = 0
 
                 Try
-                    .ParmMultFactor = CInt(Trim(lcsvlinerecord(5)))
+                    .pParmMultFactor = CInt(Trim(lCsvLineRecord(5)))
                 Catch
-                    .ParmMultFactor = 0
+                    .pParmMultFactor = 0
                 End Try
 
                 'Assume that the fixed value for parameters will be provided for a MultiSim analysis for each individual simulation.
 
-                If .ParmTable.ToLower.StartsWith("mon-") Then .ParmMultFactor = 1 'If a monthly table is provided, a multiplication factor has to be provided.
+                If .pParmTable.ToLower.StartsWith("mon-") Then .pParmMultFactor = 1 'If a monthly table is provided, a multiplication factor has to be provided.
 
-                If Not Trim(lcsvlinerecord(6)).Length = 0 Then
+                If Not Trim(lCsvLineRecord(6)).Length = 0 Then
                     Try
-                        .ParmOperationNumber = CInt(Trim(lcsvlinerecord(6)))
-                        .ParmOperationName = ""
+                        .pParmOperationNumber = CInt(Trim(lCsvLineRecord(6)))
+                        .pParmOperationName = ""
                     Catch
-                        .ParmOperationName = Trim(lcsvlinerecord(6))
-                        .ParmOperationNumber = 0
+                        .pParmOperationName = Trim(lCsvLineRecord(6))
+                        .pParmOperationNumber = 0
                     End Try
                 End If
 
                 Try
-                    .ParmLow = CDbl(Trim(lcsvlinerecord(7)))
+                    .pParmLow = CDbl(Trim(lCsvLineRecord(7)))
                 Catch
                 End Try
 
                 Try
-                    .ParmHigh = CDbl(Trim(lcsvlinerecord(8)))
+                    .pParmHigh = CDbl(Trim(lCsvLineRecord(8)))
                 Catch
                 End Try
 
             End With
 
-            ListOfParameters.Add(NewParameter)
-            lcsvRecordIndex += 1
-            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
+            lListOfParameters.Add(lNewParameter)
+            lCsvRecordIndex += 1
+            lCsvLineRecord = lSpecificationFileRecordsNew(lCsvRecordIndex)
         Loop
         If File.Exists(Path.Combine(pTestPath, "MultiSim_" & pBaseName & ".wdm")) Then File.Delete(Path.Combine(pTestPath, "MultiSim_" & pBaseName & ".wdm"))
 
         Do
-            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
-            If lcsvlinerecord(0).ToLower.Contains("delete") Then
-                DeleteUCIFiles = CInt(Trim(lcsvlinerecord(1)))
-                lcsvRecordIndex += 1
-
+            lCsvLineRecord = lSpecificationFileRecordsNew(lCsvRecordIndex)
+            If lCsvLineRecord(0).ToLower.Contains("delete") Then
+                lDeleteUCIFiles = CInt(Trim(lCsvLineRecord(1)))
+                lCsvRecordIndex += 1
             End If
-            lcsvRecordIndex += 1
-            lcsvlinerecord = lSpecificationFileRecordsNew(lcsvRecordIndex)
-            SimID = lcsvlinerecord(0)
+            lCsvRecordIndex += 1
+            lCsvLineRecord = lSpecificationFileRecordsNew(lCsvRecordIndex)
+            lSimID = lCsvLineRecord(0)
 
-            IO.File.Copy(Path.Combine(pTestPath, uciName), Path.Combine(pTestPath, SimID & uciName), True)
+            IO.File.Copy(Path.Combine(pTestPath, lUciName), Path.Combine(pTestPath, lSimID & lUciName), True)
             lUci = New HspfUci
-            lUci.ReadUci(lMsg, Path.Combine(pTestPath, SimID & uciName), -1, False, Path.Combine(pTestPath, pBaseName & ".ech"))
+            lUci.ReadUci(lMsg, Path.Combine(pTestPath, lSimID & lUciName), -1, False, Path.Combine(pTestPath, pBaseName & ".ech"))
 
-            Dim MFactorOrParmValue As Double = 0.0
+            Dim lMFactorOrParmValue As Double = 0.0
 
-            For Each Parm As ModelParameter In ListOfParameters
+            For Each lParm As ModelParameter In lListOfParameters
                 Try
-                    MFactorOrParmValue = CDbl(lcsvlinerecord((Parm.ParmID)))
+                    lMFactorOrParmValue = CDbl(lCsvLineRecord((lParm.pParmID)))
                 Catch
-                    MFactorOrParmValue = Double.NaN
+                    lMFactorOrParmValue = Double.NaN
                 End Try
-                If Not (Double.IsNaN(MFactorOrParmValue) Or (Parm.ParmMultFactor = 0 AndAlso MFactorOrParmValue = 1.0)) Then
-                    ChangeUCIParameterAndSave(lUci, Parm, MFactorOrParmValue)
+                If Not (Double.IsNaN(lMFactorOrParmValue) Or (lParm.pParmMultFactor = 0 AndAlso lMFactorOrParmValue = 1.0)) Then
+                    ChangeUCIParameterAndSave(lUci, lParm, lMFactorOrParmValue)
                 End If
             Next
 
-            loutputTable = ModelRunandReportAnswers(SimID, lUci, SimID & uciName, lExitCode, pBaseName, pTestPath,
-                                 aSDateJ, aEDateJ, YearsofSimulation, listOfOutputDSN, aHSPFEchofilename, loutputTable)
+            lOutputTable = ModelRunandReportAnswers(lSimID, lUci, lSimID & lUciName, lExitCode, pBaseName, pTestPath,
+                                 aSDateJ, aEDateJ, lYearsofSimulation, lListOfOutputDSN, aHSPFEchofilename, lOutputTable)
 
-            If DeleteUCIFiles = 1 Then
-                File.Delete(SimID & uciName)
+            If lDeleteUCIFiles = 1 Then
+                File.Delete(lSimID & lUciName)
             End If
 
-        Loop While lcsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
+        Loop While lCsvRecordIndex < lSpecificationFileRecordsNew.Count - 1
         Dim lOutputFile2 As StreamWriter = File.CreateText(Path.Combine(pTestPath, "MultiSimOutput.xml"))
-        loutputTable.WriteXml(lOutputFile2)
+        lOutputTable.WriteXml(lOutputFile2)
         'For Each TableRow As DataRow In loutputTable.Rows 'Writing the table contents
         '    TextToWrite = ""
         '    For Each TableColumn As DataColumn In loutputTable.Columns
@@ -257,33 +254,33 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         'Next TableRow
         'lOutputFile.Close()
         lOutputFile2.Close()
-
     End Sub
+
     Private Function ReadCSVFile(aSensitivitySpecificationFile As String)
         Dim lSensitivityRecordsNew As New ArrayList()
-        Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(aSensitivitySpecificationFile)
-            Dim lines() As String = {}
-            If System.IO.File.Exists(aSensitivitySpecificationFile) Then
-                MyReader.TextFieldType = FileIO.FieldType.Delimited
-                MyReader.SetDelimiters(",")
-                Dim CurrentRow As String()
+        Using lMyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(aSensitivitySpecificationFile)
+            Dim lLines() As String = {}
+            If File.Exists(aSensitivitySpecificationFile) Then
+                lMyReader.TextFieldType = FileIO.FieldType.Delimited
+                lMyReader.SetDelimiters(",")
+                Dim lCurrentRow As String()
 
-                While Not MyReader.EndOfData
+                While Not lMyReader.EndOfData
                     Try
-                        If (MyReader.PeekChars(10000).Contains("***") Or
-                                    Trim(MyReader.PeekChars(10000)) = "" Or
-                                    Trim(MyReader.PeekChars(10000).ToLower.StartsWith("parameter")) Or
-                                    Trim(MyReader.PeekChars(10000).ToLower.StartsWith("parmid")) Or
-                                    Trim(MyReader.PeekChars(10000).ToLower.StartsWith(","))) Then
-                            CurrentRow = MyReader.ReadFields
+                        If (lMyReader.PeekChars(10000).Contains("***") Or
+                                    Trim(lMyReader.PeekChars(10000)) = "" Or
+                                    Trim(lMyReader.PeekChars(10000).ToLower.StartsWith("parameter")) Or
+                                    Trim(lMyReader.PeekChars(10000).ToLower.StartsWith("parmid")) Or
+                                    Trim(lMyReader.PeekChars(10000).ToLower.StartsWith(","))) Then
+                            lCurrentRow = lMyReader.ReadFields
                         Else
-                            CurrentRow = MyReader.ReadFields
+                            lCurrentRow = lMyReader.ReadFields
                             Dim i As Integer = 0
-                            For Each testtring As String In CurrentRow
-                                CurrentRow(i) = testtring
+                            For Each testtring As String In lCurrentRow
+                                lCurrentRow(i) = testtring
                                 i += 1
                             Next
-                            lSensitivityRecordsNew.Add(CurrentRow)
+                            lSensitivityRecordsNew.Add(lCurrentRow)
                         End If
 
                     Catch ex As Microsoft.VisualBasic.FileIO.MalformedLineException
@@ -310,20 +307,20 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         Dim lOperLowerRange As Integer = -1
         Dim lOperUpperRange As Integer = -1
         Try
-            lOperLowerRange = CInt(aParm.ParmOperationName.Split("-")(0))
-            lOperUpperRange = CInt(aParm.ParmOperationName.Split("-")(1))
+            lOperLowerRange = CInt(aParm.pParmOperationName.Split("-")(0))
+            lOperUpperRange = CInt(aParm.pParmOperationName.Split("-")(1))
             Logger.Dbg("Range of operaion is provided")
         Catch ex As Exception
             Logger.Dbg("Range of Operations is not provided")
         End Try
 
         Select Case True
-            Case aParm.ParmTable.Contains("MASS-LINK")
+            Case aParm.pParmTable.Contains("MASS-LINK")
                 Dim lMassLinkID As Integer
-                lMassLinkID = aParm.ParmOccurence
+                lMassLinkID = aParm.pParmOccurence
                 Dim lMassLinkParts(7) As String
-                If aParm.ParmName.Length > 0 Then
-                    lMassLinkParts = aParm.ParmName.Split(":")
+                If aParm.pParmName.Length > 0 Then
+                    lMassLinkParts = aParm.pParmName.Split(":")
                     ReDim Preserve lMassLinkParts(7)
 
                 End If
@@ -340,7 +337,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                         (lMasslink.Target.MemSub1 = lMassLinkParts(6) Or IsNothing(lMassLinkParts(6))) AndAlso
                         (lMasslink.Target.MemSub2 = lMassLinkParts(7) Or IsNothing(lMassLinkParts(7))) Then
 
-                        If aParm.ParmMultFactor = 1 Then
+                        If aParm.pParmMultFactor = 1 Then
                             lMasslink.MFact = HspfTable.NumFmtRE(lMasslink.MFact * aMFactorOrParmValue, 5)
                         Else
                             lMasslink.MFact = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
@@ -349,92 +346,92 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                     End If
                 Next
 
-            Case aParm.ParmTable.Contains("EXTNL")
+            Case aParm.pParmTable.Contains("EXTNL")
 
-                If aParm.ParmOperationType.ToLower = "point" Then
+                If aParm.pParmOperationType.ToLower = "point" Then
                     Dim lConnections(3) As String
-                    If aParm.ParmName.Length > 0 Then
-                        lConnections = aParm.ParmName.Split(":")
+                    If aParm.pParmName.Length > 0 Then
+                        lConnections = aParm.pParmName.Split(":")
 
                         For Each lID As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
-                            For Each lpointsource As HspfPointSource In lID.PointSources
-                                If lpointsource.Target.Group = "INFLOW" AndAlso lpointsource.Target.Member = lConnections(0) AndAlso
-                                            lpointsource.Target.MemSub1 = lConnections(1) AndAlso lpointsource.Target.MemSub2 = lConnections(2) AndAlso
-                                            (lID.Id = aParm.ParmOperationNumber OrElse lID.Description = aParm.ParmOperationName OrElse
+                            For Each lPointSource As HspfPointSource In lID.PointSources
+                                If lPointSource.Target.Group = "INFLOW" AndAlso lPointSource.Target.Member = lConnections(0) AndAlso
+                                            lPointSource.Target.MemSub1 = lConnections(1) AndAlso lPointSource.Target.MemSub2 = lConnections(2) AndAlso
+                                            (lID.Id = aParm.pParmOperationNumber OrElse lID.Description = aParm.pParmOperationName OrElse
                                             (lID.Id >= lOperLowerRange AndAlso lID.Id <= lOperUpperRange) OrElse
-                                            (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
-                                    If aParm.ParmMultFactor = 1 Then
-                                        lpointsource.MFact = HspfTable.NumFmtRE(lpointsource.MFact * aMFactorOrParmValue, 5)
+                                            (aParm.pParmOperationNumber = 0 AndAlso aParm.pParmOperationName = "")) Then
+                                    If aParm.pParmMultFactor = 1 Then
+                                        lPointSource.MFact = HspfTable.NumFmtRE(lPointSource.MFact * aMFactorOrParmValue, 5)
                                     Else
-                                        lpointsource.MFact = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
+                                        lPointSource.MFact = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
                                     End If
                                 End If
                             Next
                         Next
                     End If
-                ElseIf aParm.ParmOperationType.ToLower = "point_ts" Then
+                ElseIf aParm.pParmOperationType.ToLower = "point_ts" Then
                     Dim lConnections(3) As String
-                    If aParm.ParmName.Length > 0 Then
-                        lConnections = aParm.ParmName.Split(":")
+                    If aParm.pParmName.Length > 0 Then
+                        lConnections = aParm.pParmName.Split(":")
 
                         For Each lID As HspfOperation In aUCI.OpnBlks("RCHRES").Ids
-                            For Each lpointsource As HspfPointSource In lID.PointSources
-                                If lpointsource.Target.Group = "INFLOW" AndAlso lpointsource.Target.Member = lConnections(0) AndAlso
-                                            lpointsource.Target.MemSub1 = lConnections(1) AndAlso lpointsource.Target.MemSub2 = lConnections(2) AndAlso
-                                            (lID.Id = aParm.ParmOperationNumber OrElse lID.Description = aParm.ParmOperationName OrElse
-                                            (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
-                                    lpointsource.Source.VolId = aMFactorOrParmValue
+                            For Each lPointSource As HspfPointSource In lID.PointSources
+                                If lPointSource.Target.Group = "INFLOW" AndAlso lPointSource.Target.Member = lConnections(0) AndAlso
+                                            lPointSource.Target.MemSub1 = lConnections(1) AndAlso lPointSource.Target.MemSub2 = lConnections(2) AndAlso
+                                            (lID.Id = aParm.pParmOperationNumber OrElse lID.Description = aParm.pParmOperationName OrElse
+                                            (aParm.pParmOperationNumber = 0 AndAlso aParm.pParmOperationName = "")) Then
+                                    lPointSource.Source.VolId = aMFactorOrParmValue
                                 End If
                             Next
                         Next
                     End If
                 End If
 
-                Dim MetSegRec As Integer = -1
+                Dim lMetSegRec As Integer = -1
                 For Each lMetSeg As HspfMetSeg In aUCI.MetSegs
 
-                    Select Case aParm.ParmName.ToLower
+                    Select Case aParm.pParmName.ToLower
                         Case "prec"
-                            MetSegRec = 0
+                            lMetSegRec = 0
                         Case "atem"
-                            MetSegRec = 2
+                            lMetSegRec = 2
                         Case "solr"
-                            MetSegRec = 5
+                            lMetSegRec = 5
                         Case Else
-                            MetSegRec = -1
+                            lMetSegRec = -1
                     End Select
-                    If MetSegRec = -1 Then Exit For
+                    If lMetSegRec = -1 Then Exit For
                     Try
-                        If aParm.ParmMultFactor = 1 Then
-                            lMetSeg.MetSegRecs(MetSegRec).MFactP = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(MetSegRec).MFactP * aMFactorOrParmValue, 5)
+                        If aParm.pParmMultFactor = 1 Then
+                            lMetSeg.MetSegRecs(lMetSegRec).MFactP = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(lMetSegRec).MFactP * aMFactorOrParmValue, 5)
 
-                            lMetSeg.MetSegRecs(MetSegRec).MFactR = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(MetSegRec).MFactR * aMFactorOrParmValue, 5)
+                            lMetSeg.MetSegRecs(lMetSegRec).MFactR = HspfTable.NumFmtRE(lMetSeg.MetSegRecs(lMetSegRec).MFactR * aMFactorOrParmValue, 5)
                         Else
-                            lMetSeg.MetSegRecs(MetSegRec).MFactP = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
+                            lMetSeg.MetSegRecs(lMetSegRec).MFactP = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
 
-                            lMetSeg.MetSegRecs(MetSegRec).MFactR = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
+                            lMetSeg.MetSegRecs(lMetSegRec).MFactR = HspfTable.NumFmtRE(aMFactorOrParmValue, 5)
                         End If
 
                     Catch ex As Exception
-                        Logger.Msg("Could not find the Table " & aParm.ParmTable &
-                                   " Parameter " & aParm.ParmName & " for " & lMetSeg.Name, MsgBoxStyle.Critical)
+                        Logger.Msg("Could not find the Table " & aParm.pParmTable &
+                                   " Parameter " & aParm.pParmName & " for " & lMetSeg.Name, MsgBoxStyle.Critical)
                         End
                     End Try
                 Next
 
             Case Else
 
-                For Each lOper As HspfOperation In aUCI.OpnBlks(aParm.ParmOperationType).Ids
-                    If (lOper.Id = aParm.ParmOperationNumber OrElse lOper.Description = aParm.ParmOperationName OrElse
+                For Each lOper As HspfOperation In aUCI.OpnBlks(aParm.pParmOperationType).Ids
+                    If (lOper.Id = aParm.pParmOperationNumber OrElse lOper.Description = aParm.pParmOperationName OrElse
                             (lOper.Id >= lOperLowerRange AndAlso lOper.Id <= lOperUpperRange) OrElse
-                            (aParm.ParmOperationNumber = 0 AndAlso aParm.ParmOperationName = "")) Then
+                            (aParm.pParmOperationNumber = 0 AndAlso aParm.pParmOperationName = "")) Then
                         Try
                             Dim lTable As HspfTable
 
-                            If aParm.ParmOccurence = 0 Or aParm.ParmOccurence = 1 Then
-                                lTable = lOper.Tables(aParm.ParmTable)
+                            If aParm.pParmOccurence = 0 Or aParm.pParmOccurence = 1 Then
+                                lTable = lOper.Tables(aParm.pParmTable)
                             Else
-                                lTable = lOper.Tables(aParm.ParmTable & ":" & aParm.ParmOccurence)
+                                lTable = lOper.Tables(aParm.pParmTable & ":" & aParm.pParmOccurence)
                             End If
 
 
@@ -442,27 +439,27 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                                 For Mon = 0 To 11 'For monthly parameters, only a multiplication factor can be provided
 
                                     lTable.Parms(Mon).Value = HspfTable.NumFmtRE(lTable.Parms(Mon).Value * aMFactorOrParmValue, 5)
-                                    If (lTable.Parms(Mon).Value < aParm.ParmLow) Then
-                                        lTable.Parms(Mon).Value = aParm.ParmLow
-                                    ElseIf (lTable.Parms(Mon).Value > aParm.ParmHigh) Then
-                                        lTable.Parms(Mon).Value = aParm.ParmHigh
+                                    If (lTable.Parms(Mon).Value < aParm.pParmLow) Then
+                                        lTable.Parms(Mon).Value = aParm.pParmLow
+                                    ElseIf (lTable.Parms(Mon).Value > aParm.pParmHigh) Then
+                                        lTable.Parms(Mon).Value = aParm.pParmHigh
                                     End If
                                 Next
                             Else
-                                If aParm.ParmMultFactor = 1 Then
-                                    lTable.ParmValue(aParm.ParmName) = HspfTable.NumFmtRE(lTable.ParmValue(aParm.ParmName) * aMFactorOrParmValue, lTable.Parms(aParm.ParmName).Def.Length)
+                                If aParm.pParmMultFactor = 1 Then
+                                    lTable.ParmValue(aParm.pParmName) = HspfTable.NumFmtRE(lTable.ParmValue(aParm.pParmName) * aMFactorOrParmValue, lTable.Parms(aParm.pParmName).Def.Length)
                                 Else
-                                    lTable.ParmValue(aParm.ParmName) = HspfTable.NumFmtRE(aMFactorOrParmValue, lTable.Parms(aParm.ParmName).Def.Length)
+                                    lTable.ParmValue(aParm.pParmName) = HspfTable.NumFmtRE(aMFactorOrParmValue, lTable.Parms(aParm.pParmName).Def.Length)
                                 End If
-                                If (lTable.ParmValue(aParm.ParmName) < aParm.ParmLow) Then
-                                    lTable.ParmValue(aParm.ParmName) = aParm.ParmLow
-                                ElseIf (lTable.ParmValue(aParm.ParmName) > aParm.ParmHigh) Then
-                                    lTable.ParmValue(aParm.ParmName) = aParm.ParmHigh
+                                If (lTable.ParmValue(aParm.pParmName) < aParm.pParmLow) Then
+                                    lTable.ParmValue(aParm.pParmName) = aParm.pParmLow
+                                ElseIf (lTable.ParmValue(aParm.pParmName) > aParm.pParmHigh) Then
+                                    lTable.ParmValue(aParm.pParmName) = aParm.pParmHigh
                                 End If
                             End If
                         Catch ex As Exception
-                            Logger.Msg("Could not find the Table " & aParm.ParmTable &
-                                       " Parameter " & aParm.ParmName & " for " & lOper.Id, MsgBoxStyle.Critical)
+                            Logger.Msg("Could not find the Table " & aParm.pParmTable &
+                                       " Parameter " & aParm.pParmName & " for " & lOper.Id, MsgBoxStyle.Critical)
                             End
                         End Try
 
@@ -474,34 +471,34 @@ You can edit this specification file and add more parameters and outputs.", vbOK
         aUCI.Save()
     End Sub
 
-    Private Function ModelRunandReportAnswers(ByVal SimID As Integer,
-                                 ByVal lUci As atcUCI.HspfUci,
-                                 ByVal uciName As String,
-                                 ByVal lExitCode As Integer,
-                                 ByVal pBaseName As String,
-                                 ByVal pTestPath As String,
+    Private Function ModelRunandReportAnswers(ByVal aSimID As Integer,
+                                 ByVal aUci As atcUCI.HspfUci,
+                                 ByVal aUciName As String,
+                                 ByVal aExitCode As Integer,
+                                 ByVal aBaseName As String,
+                                 ByVal aTestPath As String,
                                  ByVal aSDateJ As Double,
                                  ByVal aEDateJ As Double,
-                                 ByVal YearsofSimulation As Single,
+                                 ByVal aYearsofSimulation As Single,
                                  ByVal aOutputDSN As atcCollection,
                                  ByRef aHSPFEchofileName As String,
                                  ByRef aOutputTable As DataTable)
 
-        lExitCode = LaunchProgram(pHSPFExe, pTestPath, "-1 -1 " & uciName) 'Run HSPF program
+        aExitCode = LaunchProgram(pHSPFExe, aTestPath, "-1 -1 " & aUciName) 'Run HSPF program
 
-        Dim HSPFRan As Boolean = False
+        Dim lHSPFRan As Boolean = False
         Dim lRunMade As String
-        Dim echoFileInfo As System.IO.FileInfo
+        Dim lEchoFileInfo As System.IO.FileInfo
         If IO.File.Exists(aHSPFEchofileName) Then
-            echoFileInfo = New System.IO.FileInfo(aHSPFEchofileName)
-            lRunMade = echoFileInfo.LastWriteTime.ToString
-            Using echoFileReader As StreamReader = File.OpenText(aHSPFEchofileName)
-                While Not echoFileReader.EndOfStream
-                    Dim nextLine As String = echoFileReader.ReadLine()
-                    If Not nextLine.ToUpper.Contains("END OF JOB") Then
-                        HSPFRan = False
+            lEchoFileInfo = New System.IO.FileInfo(aHSPFEchofileName)
+            lRunMade = lEchoFileInfo.LastWriteTime.ToString
+            Using lEchoFileReader As StreamReader = File.OpenText(aHSPFEchofileName)
+                While Not lEchoFileReader.EndOfStream
+                    Dim lNextLine As String = lEchoFileReader.ReadLine()
+                    If Not lNextLine.ToUpper.Contains("END OF JOB") Then
+                        lHSPFRan = False
                     Else
-                        HSPFRan = True
+                        lHSPFRan = True
                     End If
                 End While
             End Using
@@ -513,331 +510,331 @@ You can edit this specification file and add more parameters and outputs.", vbOK
 
         Dim lOutputline As String = ""
 
-        If HSPFRan Then
-            Dim lWdmFileName As String = pBaseName & ".wdm"
-            Dim lOutWDMFileName As String = "MultiSim_" & pBaseName & ".wdm"
+        If lHSPFRan Then
+            Dim lWdmFileName As String = aBaseName & ".wdm"
+            Dim lOutWDMFileName As String = "MultiSim_" & aBaseName & ".wdm"
 
             Dim lWdmDataSource As atcWDM.atcDataSourceWDM
             Dim lWdmDataSource2 As atcWDM.atcDataSourceWDM
 
-            If atcDataManager.DataSources.Contains(pTestPath & lWdmFileName) Then
-                atcDataManager.RemoveDataSource(pTestPath & lWdmFileName)
+            If atcDataManager.DataSources.Contains(aTestPath & lWdmFileName) Then
+                atcDataManager.RemoveDataSource(aTestPath & lWdmFileName)
             End If
-            If atcDataManager.DataSources.Contains(pTestPath & lOutWDMFileName) Then
-                atcDataManager.RemoveDataSource(pTestPath & lOutWDMFileName)
+            If atcDataManager.DataSources.Contains(aTestPath & lOutWDMFileName) Then
+                atcDataManager.RemoveDataSource(aTestPath & lOutWDMFileName)
             End If
 
-            atcDataManager.OpenDataSource(pTestPath & lWdmFileName)
-            lWdmDataSource = atcDataManager.DataSourceBySpecification(pTestPath & lWdmFileName)
-            atcDataManager.OpenDataSource(pTestPath & lOutWDMFileName)
-            lWdmDataSource2 = atcDataManager.DataSourceBySpecification(pTestPath & lOutWDMFileName)
+            atcDataManager.OpenDataSource(aTestPath & lWdmFileName)
+            lWdmDataSource = atcDataManager.DataSourceBySpecification(aTestPath & lWdmFileName)
+            atcDataManager.OpenDataSource(aTestPath & lOutWDMFileName)
+            lWdmDataSource2 = atcDataManager.DataSourceBySpecification(aTestPath & lOutWDMFileName)
 
 
             If lWdmDataSource2 Is Nothing Then
                 lWdmDataSource2 = New atcWDM.atcDataSourceWDM
-                lWdmDataSource2.Open(pTestPath & lOutWDMFileName)
+                lWdmDataSource2.Open(aTestPath & lOutWDMFileName)
             End If
 
             Dim lYearlyAttributes As New atcDataAttributes
 
-            Dim DatasetID As Integer = lWdmDataSource2.DataSets.Count
-            For Each WDMDataset As Integer In aOutputDSN
+            Dim lDatasetID As Integer = lWdmDataSource2.DataSets.Count
+            For Each lWDMDataset As Integer In aOutputDSN
                 Try
-                    Dim SimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(WDMDataset), aSDateJ, aEDateJ, Nothing)
+                    Dim lSimulatedTS As atcTimeseries = SubsetByDate(lWdmDataSource.DataSets.ItemByKey(lWDMDataset), aSDateJ, aEDateJ, Nothing)
 
-                    DatasetID += 1
-                    If DatasetID < 10000 Then
-                        SimulatedTS.Attributes.SetValue("ID", DatasetID)
-                        SimulatedTS.Attributes.SetValue("Scenario", "SIMID" & SimID)
+                    lDatasetID += 1
+                    If lDatasetID < 10000 Then
+                        lSimulatedTS.Attributes.SetValue("ID", lDatasetID)
+                        lSimulatedTS.Attributes.SetValue("Scenario", "SIMID" & aSimID)
 
-                        lWdmDataSource2.AddDataset(SimulatedTS)
+                        lWdmDataSource2.AddDataset(lSimulatedTS)
                     End If
 
-                    Dim AnnSimulatedTS As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
+                    Dim lAnnSimulatedTS As atcTimeseries = Aggregate(lSimulatedTS, atcTimeUnit.TUYear, 1, atcTran.TranMax)
 
-                    Dim row As DataRow
-                    row = aOutputTable.NewRow
-                    For Each TableColumn As DataColumn In aOutputTable.Columns
-                        Dim ColumnName As String = TableColumn.ColumnName
-                        Select Case ColumnName
+                    Dim lRow As DataRow
+                    lRow = aOutputTable.NewRow
+                    For Each lTableColumn As DataColumn In aOutputTable.Columns
+                        Dim lColumnName As String = lTableColumn.ColumnName
+                        Select Case lColumnName
                             Case "SimID"
-                                row(ColumnName) = SimID
+                                lRow(lColumnName) = aSimID
                             Case "ID"
-                                row(ColumnName) = WDMDataset
+                                lRow(lColumnName) = lWDMDataset
                             Case "AvAnnPeak"
-                                row(ColumnName) = AnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
+                                lRow(lColumnName) = lAnnSimulatedTS.Attributes.GetDefinedValue("Mean").Value
                             Case "10%High"
-                                row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
+                                lRow(lColumnName) = lSimulatedTS.Attributes.GetDefinedValue("Sum").Value - lSimulatedTS.Attributes.GetDefinedValue("%Sum90").Value
                             Case "25%High"
-                                row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
+                                lRow(lColumnName) = lSimulatedTS.Attributes.GetDefinedValue("Sum").Value - lSimulatedTS.Attributes.GetDefinedValue("%Sum75").Value
                             Case "50%High"
-                                row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue("Sum").Value - SimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
+                                lRow(lColumnName) = lSimulatedTS.Attributes.GetDefinedValue("Sum").Value - lSimulatedTS.Attributes.GetDefinedValue("%Sum50").Value
                             Case "max(30-day GeoMean)"
-                                Dim lDailyTs As atcTimeseries = Aggregate(SimulatedTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                                Dim lDailyTs As atcTimeseries = Aggregate(lSimulatedTS, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
                                 If lDailyTs.Values.Count >= 30 Then
-                                    Dim GeoMean As New List(Of Double)
+                                    Dim lGeoMean As New List(Of Double)
                                     Dim lCount As Integer = 0
-                                    Dim Test As Double = 0.0
+                                    Dim lTest As Double = 0.0
                                     For i As Integer = 1 To lDailyTs.Values.Count - 1
                                         If lDailyTs.Value(i) > 0 Then
-                                            Test += Math.Log10(lDailyTs.Value(i))
+                                            lTest += Math.Log10(lDailyTs.Value(i))
                                         End If
                                         If i >= 30 Then
-                                            If lDailyTs.Value(i - 30) > 0 Then Test -= Math.Log10(lDailyTs.Value(i - 30))
+                                            If lDailyTs.Value(i - 30) > 0 Then lTest -= Math.Log10(lDailyTs.Value(i - 30))
 
-                                            GeoMean.Add(10 ^ (Test / 30))
+                                            lGeoMean.Add(10 ^ (lTest / 30))
                                         End If
 
                                     Next i
-                                    Test = 0.0
-                                    For Each lValue As Double In GeoMean
-                                        If lValue > Test Then Test = lValue
+                                    lTest = 0.0
+                                    For Each lValue As Double In lGeoMean
+                                        If lValue > lTest Then lTest = lValue
                                     Next
-                                    row(ColumnName) = Test
+                                    lRow(lColumnName) = lTest
                                 End If
 
                             Case Else
                                 Try
-                                    row(ColumnName) = SimulatedTS.Attributes.GetDefinedValue(ColumnName).Value
+                                    lRow(lColumnName) = lSimulatedTS.Attributes.GetDefinedValue(lColumnName).Value
                                 Catch ex As Exception
-                                    Logger.Dbg("The " & ColumnName & " could not be calculated for DSN " & WDMDataset)
+                                    Logger.Dbg("The " & lColumnName & " could not be calculated for DSN " & lWDMDataset)
                                 End Try
 
                         End Select
 
-                    Next TableColumn
-                    aOutputTable.Rows.Add(row)
+                    Next lTableColumn
+                    aOutputTable.Rows.Add(lRow)
 
                 Catch
-                    Logger.Dbg("Could not compute statistics for SimID:" & SimID & " And DatasetID:" & WDMDataset)
+                    Logger.Dbg("Could not compute statistics for SimID:" & aSimID & " And DatasetID:" & lWDMDataset)
                 End Try
 
-            Next WDMDataset
+            Next lWDMDataset
             lWdmDataSource.Clear()
             lWdmDataSource2.Clear()
         Else
-            Logger.Dbg("The simulation " & SimID & " didn't complete successfully!")
+            Logger.Dbg("The simulation " & aSimID & " didn't complete successfully!")
         End If
-        Logger.Status("Number of simulations complete: " & SimID)
+        Logger.Status("Number of simulations complete: " & aSimID)
         Return aOutputTable
     End Function
+
     Private Function Observed() 'Possible function to save observed values in future.
         Return "Observed"
     End Function
 
     Private Function AddOutputTableColumns(ByRef aDataTable As Data.DataTable) As DataTable
 
+        Dim lColumn As DataColumn
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Int32")
+        lColumn.ColumnName = "SimID"
+        lColumn.Caption = "Simulation ID"
+        aDataTable.Columns.Add(lColumn)
 
-        Dim column As DataColumn
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Int32")
-        column.ColumnName = "SimID"
-        column.Caption = "Simulation ID"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Int32")
+        lColumn.ColumnName = "ID"
+        lColumn.Caption = "DataSet ID"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Int32")
-        column.ColumnName = "ID"
-        column.Caption = "DataSet ID"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "Sum"
+        lColumn.Caption = "Sum"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "Sum"
-        column.Caption = "Sum"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "mean"
+        lColumn.Caption = "Mean"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "mean"
-        column.Caption = "Mean"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "SumAnnual"
+        lColumn.Caption = "Annual Sum"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "SumAnnual"
-        column.Caption = "Annual Sum"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "geometric mean"
+        lColumn.Caption = "Geometric Mean"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "geometric mean"
-        column.Caption = "Geometric Mean"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "max(30-day GeoMean)"
+        lColumn.Caption = "Max(30-day Geometric Mean)"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "max(30-day GeoMean)"
-        column.Caption = "Max(30-day Geometric Mean)"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "AvAnnPeak"
+        lColumn.Caption = "Average Annual Peak"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "AvAnnPeak"
-        column.Caption = "Average Annual Peak"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "10%High"
+        lColumn.Caption = "Sum of 10% High"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "10%High"
-        column.Caption = "Sum of 10% High"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "25%High"
+        lColumn.Caption = "Sum of 25% High"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "25%High"
-        column.Caption = "Sum of 25% High"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "50%High"
+        lColumn.Caption = "Sum of 50% High"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "50%High"
-        column.Caption = "Sum of 50% High"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%Sum50"
+        lColumn.Caption = "Sum of 50% Low"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%Sum50"
-        column.Caption = "Sum of 50% Low"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%Sum25"
+        lColumn.Caption = "Sum of 25% Low"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%Sum25"
-        column.Caption = "Sum of 25% Low"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%Sum10"
+        lColumn.Caption = "Sum of 10% Low"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%Sum10"
-        column.Caption = "Sum of 10% Low"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%Sum05"
+        lColumn.Caption = "Sum of 5% Low"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%Sum05"
-        column.Caption = "Sum of 5% Low"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%Sum02"
+        lColumn.Caption = "Sum of 2% Low"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%Sum02"
-        column.Caption = "Sum of 2% Low"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%0.10"
+        lColumn.Caption = "0.1 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%0.10"
-        column.Caption = "0.1 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%1.00"
+        lColumn.Caption = "1 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%1.00"
-        column.Caption = "1 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%2.00"
+        lColumn.Caption = "2 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%2.00"
-        column.Caption = "2 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%2.50"
+        lColumn.Caption = "2.5 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%2.50"
-        column.Caption = "2.5 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%5.00"
+        lColumn.Caption = "5 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%5.00"
-        column.Caption = "5 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%10.00"
+        lColumn.Caption = "10 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%10.00"
-        column.Caption = "10 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%20.00"
+        lColumn.Caption = "20 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%20.00"
-        column.Caption = "20 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%30.00"
+        lColumn.Caption = "30 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%30.00"
-        column.Caption = "30 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%40.00"
+        lColumn.Caption = "40 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%40.00"
-        column.Caption = "40 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%50.00"
+        lColumn.Caption = "50 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%50.00"
-        column.Caption = "50 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%60.00"
+        lColumn.Caption = "60 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%60.00"
-        column.Caption = "60 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%70.00"
+        lColumn.Caption = "70 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%70.00"
-        column.Caption = "70 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%80.00"
+        lColumn.Caption = "80 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%80.00"
-        column.Caption = "80 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%90.00"
+        lColumn.Caption = "90 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%90.00"
-        column.Caption = "90 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%95.00"
+        lColumn.Caption = "95 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%95.00"
-        column.Caption = "95 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%97.5"
+        lColumn.Caption = "97.5 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%97.5"
-        column.Caption = "97.5 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%98.00"
+        lColumn.Caption = "98 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%98.00"
-        column.Caption = "98 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%99.00"
+        lColumn.Caption = "99 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%99.00"
-        column.Caption = "99 Percentile"
-        aDataTable.Columns.Add(column)
-
-        column = New DataColumn()
-        column.DataType = Type.GetType("System.Double")
-        column.ColumnName = "%99.90"
-        column.Caption = "99.9 Percentile"
-        aDataTable.Columns.Add(column)
+        lColumn = New DataColumn()
+        lColumn.DataType = Type.GetType("System.Double")
+        lColumn.ColumnName = "%99.90"
+        lColumn.Caption = "99.9 Percentile"
+        aDataTable.Columns.Add(lColumn)
 
         Return aDataTable
     End Function

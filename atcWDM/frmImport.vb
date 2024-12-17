@@ -16,13 +16,13 @@ Public Class frmImport
     'End Sub
 
     Private Sub btnBrowseFiles_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseFiles.Click
-        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+        Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
         With lOpenDialog
             .Title = "Select Data File(s) to import"
             .Filter = "All Files|*.*"
             .FilterIndex = 0
             .Multiselect = True
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Filenames = .FileNames
             End If
         End With
@@ -53,14 +53,14 @@ Public Class frmImport
     End Sub
 
     Private Sub btnBrowseSaveIn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowseSaveIn.Click
-        Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
         With lSaveDialog
             .Title = "Save in WDM"
             .Filter = "WDM Files (*.wdm)|*.wdm"
             .FilterIndex = 0
             .CheckFileExists = False
             .CheckPathExists = False
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 txtSaveIn.Text = .FileName
                 SaveSetting("BASINS", "WDMImport", "SaveIn", txtSaveIn.Text)
             End If
@@ -76,20 +76,20 @@ Public Class frmImport
         End Set
     End Property
 
-    Private Sub Form_DragEnter( _
-        ByVal sender As Object, ByVal e As Windows.Forms.DragEventArgs) _
+    Private Sub Form_DragEnter(
+        ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) _
         Handles Me.DragEnter, txtDataFiles.DragEnter, txtScript.DragEnter, btnBrowseScript.DragEnter, txtSaveFolder.DragEnter, txtSaveIn.DragEnter, btnBrowseSaveIn.DragEnter
 
-        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-            e.Effect = Windows.Forms.DragDropEffects.All
+        If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = System.Windows.Forms.DragDropEffects.All
         End If
     End Sub
 
     Private Sub Form_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) _
         Handles Me.DragDrop, txtDataFiles.DragDrop
         Try
-            If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-                Filenames = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+                Filenames = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)
             End If
         Catch
         End Try
@@ -97,8 +97,8 @@ Public Class frmImport
 
     Private Sub txtScript_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles txtScript.DragDrop, btnBrowseScript.DragDrop
         Try
-            If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-                txtScript.Text = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)(0)
+            If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+                txtScript.Text = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)(0)
                 SaveSetting("BASINS", "WDMImport", "Script", txtScript.Text)
             End If
         Catch
@@ -107,8 +107,8 @@ Public Class frmImport
 
     Private Sub txtSaveFolder_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles txtSaveFolder.DragDrop
         Try
-            If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-                txtSaveFolder.Text = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)(0)
+            If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+                txtSaveFolder.Text = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)(0)
                 SaveSetting("BASINS", "WDMImport", "SaveFolder", txtSaveFolder.Text)
             End If
         Catch
@@ -117,8 +117,8 @@ Public Class frmImport
 
     Private Sub txtSaveIn_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles txtSaveIn.DragDrop, btnBrowseSaveIn.DragDrop
         Try
-            If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
-                txtSaveIn.Text = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)(0)
+            If e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop) Then
+                txtSaveIn.Text = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop)(0)
                 SaveSetting("BASINS", "WDMImport", "SaveIn", txtSaveIn.Text)
             End If
         Catch

@@ -335,7 +335,8 @@ Module modFreq
                         If aLogFg Then
                             lCILow(i) = 10 ^ lCILow(i)
                             lCIHigh(i) = 10 ^ lCIHigh(i)
-                            lVarEst(i) = 10 ^ lVarEstArray(0, 0, i)
+                            'lVarEst(i) = 10 ^ lVarEstArray(0, 0, i)
+                            lVarEst(i) = lVarEstArray(0, 0, i)   'pbd fix 8/13/2024?
                         Else
                             lVarEst(i) = lVarEstArray(0, 0, i)
                         End If
@@ -444,6 +445,8 @@ Module modFreq
                                 .DefaultValue = GetNaN()
                             End With
                         End If
+                        'check for 'huge' value output from FORTRAN call to LGPSTX
+                        If lQnew(lIndex) > 1.0E+29 Then lQnew(lIndex) = 0.0
                         aAttributesStorage.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
                         lNonLogTS.Attributes.SetValue(lNewAttribute, lQnew(lIndex), lArguments)
 

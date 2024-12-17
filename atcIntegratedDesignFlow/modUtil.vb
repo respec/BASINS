@@ -65,6 +65,7 @@ Public Module modUtil
 
         Public Shared MultiNDayPlot As String = "MultipleNDayPlots"
         Public Shared MultiStationPlot As String = "MultipleStationPlots"
+        Public Shared IncludeProvisionalData As String = "IncludeProvisionalData"
 
         Public Enum ITAMethod
             NDAYTIMESERIES = 1
@@ -463,7 +464,7 @@ Public Module modUtil
                             .IncludeMonths = False
                         End With
                         .Text = "N-Day " & lHighLowText & " Annual Time Series and Ranking"
-                        .Initialize(lRankedAnnual.Clone, NDayAttributes(), True, , False) 'show value, but not show form
+                        .Initialize(lRankedAnnual, NDayAttributes(), True, , False) 'show value, but not show form
                         .DisplayValueAttributes = True
                         lTserListing = .ToString()
                         '.Icon = Me.Icon
@@ -1493,7 +1494,7 @@ Public Module modUtil
             End If
             If lTs Is Nothing Then Return Nothing
 
-            Dim lExcursionCount As Integer = ExcursionCountArray(lIndex)
+            Dim lExcursionCount As Double = ExcursionCountArray(lIndex)
             Dim lClusters As ArrayList = ClustersArray(lIndex)
             Dim lExcursions As ArrayList = ExcursionsArray(lIndex)
 
@@ -1523,7 +1524,7 @@ Public Module modUtil
                     lRow = 1 ' First cluster is always invalid, so it gets skipped
                 Else
                     lagsExcursions.CellValue(lRow, 0) = pDateFormat.JDateToString(lFirstDate + lCluster.Start)
-                    lagsExcursions.CellValue(lRow, 1) = lCluster.Excursions & " "
+                    lagsExcursions.CellValue(lRow, 1) = Sig2(lCluster.Excursions) & " "
                     lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
 
                     Dim lNExc As Integer = 0
@@ -1532,8 +1533,8 @@ Public Module modUtil
                         lExcursion = lExcursions(lRow)
                         With lExcursion
                             lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
-                            lagsExcursions.CellValue(lRow, 3) = .Count & " "
-                            lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
+                            lagsExcursions.CellValue(lRow, 3) = .Finish - .Start + 1 & " "
+                            lagsExcursions.CellValue(lRow, 4) = Format((.SumMag / (.Count) - 1), "Percent") & " "
 
                             lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
                             lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
@@ -1546,9 +1547,19 @@ Public Module modUtil
             Next
 
             lagsExcursions.CellValue(lRow, 0) = "Total"
-            lagsExcursions.CellValue(lRow, 1) = lExcursionCount
+            lagsExcursions.CellValue(lRow, 1) = Sig2(lExcursionCount)
             lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
             Return lagsExcursions
+        End Function
+
+        Public Shared Function Sig2(ByVal x As Double) As String
+            If x >= 100 Then
+                Sig2 = Format(x, "Scientific")
+            ElseIf x >= 10 Then
+                Sig2 = Format(x, "00.0")
+            Else
+                Sig2 = Format(x, "0.00")
+            End If
         End Function
     End Class
 

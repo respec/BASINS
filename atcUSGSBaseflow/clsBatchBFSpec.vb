@@ -669,25 +669,32 @@ Public Class clsBatchBFSpec
             End If
         End If
         If lDataReady Then
-            Dim lGroup As atcTimeseriesGroup = Nothing
-            If aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "Streamflow" Then
-                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
-            ElseIf aStation.DataSource.DataSets(0).Attributes.GetValue("Constituent", "") = "FLOW" Then
-                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "FLOW")
+            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+            If lGroup.Count = 0 Then
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Flow")
             End If
 
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
                 Dim lTsFlow As atcTimeseries = Nothing
+                For Each lTs As atcTimeseries In lGroup
+                    If lTs.Attributes.GetValue("TSFORM") = 1 Then
+                        ' only keeps mean (1)
+                        lTsFlow = lTs
+                        aStation.BFInputs.SetValue("StaNam", lTsFlow.Attributes.GetValue("StaNam", "Unknown"))
+                        aStation.BFInputs.SetValue("STAID", lTsFlow.Attributes.GetValue("STAID", "Unknown"))
+                    Else
+                        ' throw away other types of data such as min (4), max (5), or sum (2)
+                        lTs.Clear()
+                    End If
+                Next
                 If aPreserve Then
-                    lTsFlow = lGroup(0)
-                    'Return lGroup(0)
+                    ' Just use the original flow data, i.e., lTsFlow
                 Else
-                    lTsFlow = lGroup(0).Clone()
-                    'aStation.DataSource.Clear()
-                    'aStation.DataSource = Nothing
-                    'Return lTsFlow
+                    ' Use a clone of the flow data
+                    lTsFlow = lTsFlow.Clone()
                 End If
-                aStation.BFInputs.SetValue("StaNam", lTsFlow.Attributes.GetValue("StaNam", "Unknown"))
+
+                lGroup.Clear()
                 If aIncludeProvisional Then
                     Return lTsFlow
                 Else
@@ -700,6 +707,7 @@ Public Class clsBatchBFSpec
                                 lProvisionalTS.Clear()
                                 lProvisionalTS = Nothing
                             End If
+                            lTsFlow.Clear()
                             Return lNonProvisionalTS
                         End If
                     Else
@@ -962,7 +970,7 @@ Public Class clsBatchBFSpec
                     MkDirPath(lStationOutDir)
                     Dim linclude_provisional As String = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.INCLUDE_PROVISIONAL_DATA, "")
                     Dim lTsFlow As atcTimeseries = Nothing
-                    If linclude_provisional = "YES" OrElse linclude_provisional = "yes" Then
+                    If String.Compare(linclude_provisional, "YES", True) = 0 Then
                         lTsFlow = GetStationStreamFlowData(lStation, , True)
                     Else
                         lTsFlow = GetStationStreamFlowData(lStation)
@@ -1132,14 +1140,14 @@ Public Class clsBatchBFSpec
                             'Dim lTmpGroup As New atcTimeseriesGroup()
                             'lTmpGroup.Add(lTsFlow)
                             'lTmpGroup.Add(lTserFullDateRange)
-                            Logger.Dbg("mem0: " & MemUsage())
+                            'Logger.Dbg("mem0: " & MemUsage())
                             Dim lTsFlowFullRange As atcTimeseries = MergeBaseflowTimeseries(lTserFullDateRange, lTsFlow, False, True)  'MergeTimeseries(lTmpGroup, True)
-                            Logger.Dbg("mem1: " & MemUsage())
+                            'Logger.Dbg("mem1: " & MemUsage())
                             If lTsFlowFullRange IsNot Nothing AndAlso lTsFlowFullRange.Attributes.GetValue("count positive") > 0 Then
                                 AdjustDatesOfReportingTimeseries(lTsFlowFullRange, lBFReportGroups)
-                                Logger.Dbg("mem2: " & MemUsage())
+                                'Logger.Dbg("mem2: " & MemUsage())
                                 ASCIICommon(lTsFlowFullRange, lBFReportGroups)
-                                Logger.Dbg("mem3: " & MemUsage())
+                                'Logger.Dbg("mem3: " & MemUsage())
                                 lGraphs = lStation.BFInputs.GetValue(atcTimeseriesBaseflow.BFInputNames.Graph, "")
                                 If Not String.IsNullOrEmpty(lGraphs) Then
                                     lArr = lGraphs.Split(",")
@@ -1150,7 +1158,7 @@ Public Class clsBatchBFSpec
                                         End Select
                                     Next
                                 End If
-                                Logger.Dbg("mem4: " & MemUsage())
+                                'Logger.Dbg("mem4: " & MemUsage())
                             Else
                                 Try
                                     lDateFormat.Midnight24 = False
@@ -1164,7 +1172,7 @@ Public Class clsBatchBFSpec
                             End If
                             lTsFlowFullRange.Clear()
                             lTsFlowFullRange = Nothing
-                            Logger.Dbg("mem5: " & MemUsage())
+                            'Logger.Dbg("mem5: " & MemUsage())
                         Catch ex As Exception
                             lStation.Message &= vbCrLf & "Error: Base-flow separation and/or reporting failed:" & vbCrLf & ex.Message & vbCrLf
                             If ex.Message.Contains("out of range") Then
@@ -1177,7 +1185,7 @@ Public Class clsBatchBFSpec
                     'RaiseEvent StatusUpdate(lBFOpnCount & "," & lTotalBFOpn & "," & "Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")")
                     'UpdateStatus("Base-flow Separation for station: " & lStation.StationID & " (" & lBFOpnCount & " out of " & lTotalBFOpn & ")", True)
                     lStationCtr += 1
-                    Logger.Dbg("mem6: " & MemUsage())
+                    'Logger.Dbg("mem6: " & MemUsage())
                 Next 'lStation}
             End Using
             'If lStationFoundData IsNot Nothing Then Exit For
@@ -1192,6 +1200,12 @@ Public Class clsBatchBFSpec
                 End If
                 lConfigFile.WriteLine("Station " & lStation.StationID & ", " & lStation.StationDrainageArea & ", " & lDataFilename)
             Next
+
+            ' free up memory in data source collection
+            For Each lStation As clsBatchUnitStation In lBFOpn
+                lStation.Clear()
+            Next
+
             For Each lAttrib As atcDefinedValue In CType(lBFOpn.ItemByIndex(0), clsBatchUnitStation).BFInputs
                 Dim lName As String = lAttrib.Definition.Name
                 Select Case lName.ToLower()
@@ -1218,7 +1232,7 @@ Public Class clsBatchBFSpec
             Dim lHasError As Boolean = False
             For Each lStation As clsBatchUnitStation In lBFOpn
                 If Not String.IsNullOrEmpty(lStation.Message) Then
-                    lSummary.WriteLine("---- Station: " & lStation.StationID & "----")
+                    lSummary.WriteLine("---- Station: " & lStation.StationID & " ----")
                     lSummary.WriteLine(lStation.Message)
                     lSummary.WriteLine("---------------------------------------------")
                     If lStation.Message.ToLower().Contains("error") Then lHasError = True

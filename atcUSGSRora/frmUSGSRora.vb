@@ -182,7 +182,8 @@ Public Class frmUSGSRora
         Else
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
-            If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            'If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             Else
                 Dim lTs As atcTimeseries = Nothing
@@ -802,11 +803,19 @@ PlotOutput:
 
     Private Sub frmUSGSRora_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.F1 Then
-            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("GW-Tools/Recharge Estimation with RORA.html")
+            Else
+                ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
+            End If
         End If
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("GW-Tools/Recharge Estimation with RORA.html")
+        Else
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/RORA.html")
+        End If
     End Sub
 End Class

@@ -411,6 +411,22 @@ Public Class frmFilterData
             End If
 
             If lWasModified Then
+                Dim lDisplayAttributes As Generic.List(Of String) = atcDataManager.SelectionAttributes()
+                lDisplayAttributes.Add("Data Source")
+                For Each lTSer As atcTimeseries In lModifiedGroup
+                    lTSer.Attributes.SetValueIfMissing("Data Source", "<In Memory>")
+                    If lTSer.Attributes.ContainsAttribute("History 1") Then
+                        lDisplayAttributes.Add("History 1")
+                    End If
+                    If lTSer.Attributes.ContainsAttribute("History 2") Then
+                        lDisplayAttributes.Add("History 2")
+                    End If
+                    If lTSer.Attributes.ContainsAttribute("History 3") Then
+                        lDisplayAttributes.Add("History 3")
+                    End If
+                Next
+                atcDataManager.SelectionAttributesSet(lDisplayAttributes)
+
                 pSelectedGroup.ChangeTo(lModifiedGroup)
                 pSelectedOK = True
                 pAsking = False
@@ -490,6 +506,11 @@ Public Class frmFilterData
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
             Dim SeasonTypeLabel As String = atcSeasonBase.SeasonClassNameToLabel(typ.Name)
             If SeasonTypeLabel <> "Year Subset" Then
+#If Toolbox = "Hydro" Then
+                If SeasonTypeLabel = "Traditional" Then
+                    SeasonTypeLabel = "Seasons"
+                End If
+#End If
                 cboSeasons.Items.Add(SeasonTypeLabel)
             End If
         Next
@@ -567,8 +588,14 @@ Public Class frmFilterData
     End Sub
 
     Private Function CurrentSeason() As Type
+        Dim lSeasonTypeLabel As String = cboSeasons.Text
+#If Toolbox = "Hydro" Then
+        If lSeasonTypeLabel = "Seasons" Then
+            lSeasonTypeLabel = "Traditional"
+        End If
+#End If
         For Each typ As Type In atcData.atcSeasonBase.AllSeasonTypes
-            If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = cboSeasons.Text Then
+            If atcSeasonBase.SeasonClassNameToLabel(typ.Name) = lSeasonTypeLabel Then
                 Return typ
             End If
         Next

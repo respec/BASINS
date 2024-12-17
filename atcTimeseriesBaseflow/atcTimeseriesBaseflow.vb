@@ -643,12 +643,25 @@ Public Class atcTimeseriesBaseflow
                 End If
                 .ReportBy = lReportBy
             End With
-            lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
+            Try
+                lBFDatagroup = ClsBaseFlow.DoBaseFlowSeparation()
+            Catch ex As Exception
+                If lBFDatagroup IsNot Nothing Then
+                    lBFDatagroup.Clear()
+                End If
+                lBFDatagroup = Nothing
+            End Try
             If lBFDatagroup IsNot Nothing AndAlso lBFDatagroup.Count > 0 Then
                 lBFDataGroupFinal.AddRange(lBFDatagroup)
             End If
-            pBF_Message &= ClsBaseFlow.gError & vbCrLf
+            If Not String.IsNullOrEmpty(ClsBaseFlow.gError) AndAlso Not String.IsNullOrEmpty(ClsBaseFlow.gError.Replace(vbCrLf, "")) Then
+                pBF_Message &= ClsBaseFlow.gError & vbCrLf
+            End If
         Next
+
+        If Not ClsBaseFlow.gBatchRun AndAlso Not String.IsNullOrEmpty(pBF_Message) Then
+            Logger.Msg(pBF_Message)
+        End If
 
         'If Me.DataSets.Count > 0 Then
         If lBFDataGroupFinal IsNot Nothing AndAlso lBFDataGroupFinal.Count > 0 Then

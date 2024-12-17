@@ -650,14 +650,21 @@ Friend Class frmTrend
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    Private pHelpLocation As String = "BASINS Details\Analysis\USGS Surface Water Statistics\Trend.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp(pHelpLocation)
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Trend.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics\Trend.html")
+        End If
     End Sub
 
     Private Sub frmTrend_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = Keys.F1 Then
-            ShowHelp(pHelpLocation)
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("Time-Series Tools/Trend.html")
+            Else
+                ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics\Trend.html")
+            End If
         End If
     End Sub
 
@@ -704,7 +711,25 @@ Friend Class frmTrend
                                                        pDataGroup, Nothing, True, True, Me.Icon)
         End If
 
+        'Ensure STAID is set in all timeseries
+        For Each lTs As atcTimeseries In pDataGroup
+            Logger.Dbg("IDF: station " & STAID(lTs))
+        Next
         If pDataGroup.Count > 0 Then
+            Dim lwhatdatalist As New List(Of String)
+            For I As Integer = 0 To pDataGroup.Count - 1
+                If Not lwhatdatalist.Contains(pDataGroup(I).Attributes.GetValue("Constituent")) Then
+                    lwhatdatalist.Add(pDataGroup(I).Attributes.GetValue("Constituent"))
+                End If
+            Next
+            If lwhatdatalist.Count > 1 Then
+                For I As Integer = 0 To pDataGroup.Count - 1
+                    pDataGroup(I).Attributes.SetValue("WhatData", pDataGroup(I).Attributes.GetValue("Constituent"))
+                Next
+                pBasicAttributes.Insert(1, "WhatData")
+                pTrendAttributes.Insert(1, "WhatData")
+                pNDayAttributes.Insert(1, "WhatData")
+            End If
             PopulateForm()
             If aShowForm Then Me.Show()
         Else 'user declined to specify timeseries
@@ -763,14 +788,26 @@ Friend Class frmTrend
         pYearStartMonth = cboStartMonth.SelectedIndex + 1
         pYearEndMonth = cboEndMonth.SelectedIndex + 1
         If IsNumeric(txtStartDay.Text) Then
-            pYearStartDay = txtStartDay.Text
+            If CInt(txtStartDay.Text) > 0 Then
+                pYearStartDay = Math.Min(CInt(txtStartDay.Text), DayMon(1901, pYearStartMonth))
+            Else
+                pYearStartDay = 1
+            End If
+            txtStartDay.Text = pYearStartDay
         Else
             pYearStartDay = 0
+            txtStartDay.Text = ""
         End If
         If IsNumeric(txtEndDay.Text) Then
-            pYearEndDay = txtEndDay.Text
+            If CInt(txtEndDay.Text) > 0 Then
+                pYearEndDay = Math.Min(CInt(txtEndDay.Text), DayMon(1901, pYearEndMonth))
+            Else
+                pYearEndDay = DayMon(1901, pYearEndMonth)
+            End If
+            txtEndDay.Text = pYearEndDay
         Else
             pYearEndDay = 0
+            txtEndDay.Text = ""
         End If
         If IsNumeric(txtOmitBeforeYear.Text) Then
             pFirstYear = CInt(txtOmitBeforeYear.Text)
@@ -782,7 +819,7 @@ Friend Class frmTrend
         Else
             pLastYear = 0
         End If
-        SaveSettings()
+        'SaveSettings()
     End Sub
 
     Private Sub ShowCustomYears(ByVal aShowCustom As Boolean)
@@ -1019,10 +1056,12 @@ Friend Class frmTrend
         End If
 
         Dim lName As String = HighOrLowString()
-        pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
-        pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
-        pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
-        pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+        'This is for getting default date boundary for the high or low, 
+        ' so shouldn't try to get it from archived values.
+        'pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+        'pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+        'pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+        'pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
         SeasonsYearsToForm()
     End Sub
 
@@ -1055,14 +1094,23 @@ Friend Class frmTrend
                     lArgs.SetValue("HighFlag", False)
                 End If
 
+                If pYearStartDay > 0 AndAlso pYearEndDay > 0 Then
+                    lArgs.SetValue("BoundaryMonth", pYearStartMonth)
+                    lArgs.SetValue("BoundaryDay", pYearStartDay)
+                    lArgs.SetValue("EndMonth", pYearEndMonth)
+                    lArgs.SetValue("EndDay", pYearEndDay)
+                End If
+
                 If lHiLow.Open("n-day high timeseries", lArgs) Then
                     Dim lDisplayThese As atcTimeseriesGroup = GroupWithinLimits(lHiLow.DataSets)
                     If lDisplayThese IsNot Nothing AndAlso lDisplayThese.Count > 0 Then
+                        Dim lFromDateFormat As atcDateFormat = New atcDateFormat(pDateFormat.ToString())
+                        lFromDateFormat.Midnight24 = False
                         For Each lTS As atcTimeseries In lDisplayThese
                             With lTS.Attributes
                                 lHiLow.ComputeTau(lTS, .GetValue("NDay"), .GetValue("HighFlag"), lTS.Attributes)
                                 .SetValue("Original ID", lTS.OriginalParentID)
-                                .SetValue("From", pDateFormat.JDateToString(lTS.Dates.Value(1)))
+                                .SetValue("From", lFromDateFormat.JDateToString(lTS.Dates.Value(0)))
                                 .SetValue("To", pDateFormat.JDateToString(lTS.Dates.Value(lTS.numValues)))
                                 .SetValue("Not Used", .GetValue("Count Missing"))
                             End With

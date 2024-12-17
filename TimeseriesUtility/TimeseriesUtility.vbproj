@@ -68,6 +68,9 @@
     <ApplicationIcon>SARA.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcWdmVb">
+      <HintPath>..\bin-D4EM10\x86Debug\atcWdmVb.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />

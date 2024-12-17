@@ -12,6 +12,7 @@ Imports DotSpatial.Controls
 Public Class atcDataManager
 #If GISProvider = "DotSpatial" Then
     Public Shared DataPlugins As New Generic.List(Of atcDataPlugin)
+    Public Shared UserSelectDataOptions As New atcDataAttributes
     Private Shared pMapWin As AppManager
     ''' <summary>Pointer to the root interface for MapWindow 4</summary>
     <CLSCompliant(False)>
@@ -376,10 +377,28 @@ Public Class atcDataManager
             If aNewSource.Name <> "Timeseries::Math" Then
                 RemoveDataSource(aSpecification)
             End If
-            If aNewSource.Open(aSpecification, aAttributes) Then
-                Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
-                pDataSources.Add(aNewSource)
-                RaiseEvent OpenedData(aNewSource)
+
+            Logger.Dbg("Specification:" & aSpecification)
+            If aNewSource.Open(aSpecification, aAttributes) Then  'file dialog happens here
+                If aNewSource.Specification.Contains(",") Then
+                    'multiple file selection
+                    Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
+                    Dim lFileNames() As String
+                    lFileNames = aNewSource.Specification.Split(",")
+                    For Each lFileName As String In lFileNames
+                        Logger.Dbg("FileName:" & lFileName)
+                        Dim lNewSourceMulti As atcTimeseriesSource = atcDataManager.DataSourceByName(aNewSource.Name)
+                        lNewSourceMulti.Specification = aNewSource.Specification
+                        lNewSourceMulti.Open(lFileName, aAttributes)
+                        Logger.Dbg("DataSetCount:" & lNewSourceMulti.DataSets.Count & ":Specification:" & lNewSourceMulti.Specification)
+                        pDataSources.Add(lNewSourceMulti)
+                        RaiseEvent OpenedData(lNewSourceMulti)
+                    Next
+                    Return True
+                Else
+                    Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
+                    pDataSources.Add(aNewSource)
+                    RaiseEvent OpenedData(aNewSource)
 
 #If GISProvider = "DotSpatial" Then
 #Else
@@ -391,12 +410,13 @@ Public Class atcDataManager
                     End If
                 End If
 #End If
-                Return True
+                    Return True
+                End If
             Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Dbg("When opening '" & aNewSource.Specification & "'" & vbCrLf & _
-                               aNewSource.Name & " gave the message:" & vbCrLf & _
-                               Logger.LastDbgText)
+                    Logger.Dbg("When opening '" & aNewSource.Specification & "'" & vbCrLf &
+                                   aNewSource.Name & " gave the message:" & vbCrLf &
+                                   Logger.LastDbgText)
                 End If
                 Return False
             End If
@@ -620,6 +640,14 @@ Public Class atcDataManager
 
         'Try automatically selecting data based on what is selected on the map
 #If GISProvider = "DotSpatial" Then
+        Dim lAllowFilterOptionKey As String = "ShowFilterOption"
+        Dim lAllowFilterOption As Boolean = UserSelectDataOptions.GetValue(lAllowFilterOptionKey, True)
+        If lAllowFilterOption Then
+            lForm.chkFilter.Visible = True
+        Else
+            lForm.chkFilter.Visible = False
+        End If
+        UserSelectDataOptions.RemoveByKey(lAllowFilterOptionKey)
 #Else
         If aSelected Is Nothing Then
             aSelected = DatasetsAtMapSelectedLocations()
@@ -725,7 +753,7 @@ Public Class atcDataManager
                             lAttributeValues &= " " & lAttributeName & "='" & lAttributeValue & "'"
                         End If
                     Next
-                    lSaveXML.Append("<DataSource Specification='" & lSource.Specification & "'" & lAttributeValues & ">" & lSource.Name & "</DataSource>")
+                    lSaveXML.Append("<DataSource Specification='" & RelativeFilename(lSource.Specification, CurDir) & "'" & lAttributeValues & ">" & lSource.Name & "</DataSource>")
                 End If
             Next
             lSaveXML.Append("</DataManager>")
@@ -746,10 +774,7 @@ Public Class atcDataManager
                             Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
                         Else
                             Dim lNewDataSource As atcTimeseriesSource = Nothing
-#If GISProvider = "DotSpatial" Then
-#Else
                             lNewDataSource = DataSourceByName(lDataSourceType)
-#End If
                             If lNewDataSource Is Nothing Then
                                 Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                             ElseIf lNewDataSource.Category = "File" Then

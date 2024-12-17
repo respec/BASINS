@@ -64,7 +64,7 @@ Public Class GisUtilDS
 
     Public Shared Function GetFeatureLayers(ByVal fType As FeatureType, Optional ByVal aLayerName As String = "") As List(Of IMapFeatureLayer)
         Dim lScreenGeometryType As Boolean = True
-        If fType = Nothing Then lScreenGeometryType = False
+        If fType = Nothing OrElse fType = FeatureType.Unspecified Then lScreenGeometryType = False
         Dim lScreenLayerName As Boolean = False
         If Not String.IsNullOrEmpty(aLayerName) Then lScreenLayerName = True
         Dim lFeatureLayers As New List(Of IMapFeatureLayer)()
@@ -72,24 +72,27 @@ Public Class GisUtilDS
             For Each layer As ILayer In pMapWin.Map.Layers
                 Dim lMG As MapGroup = TryCast(layer, MapGroup)
                 If lMG IsNot Nothing Then
-                    For Each mglyr As IMapFeatureLayer In lMG.GetLayers()
-                        If lScreenGeometryType Then
-                            If mglyr.DataSet.FeatureType = fType Then
-                                If lScreenLayerName Then
-                                    If mglyr.LegendText.ToLower() = aLayerName.ToLower() OrElse mglyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
-                                        lFeatureLayers.Add(mglyr)
+                    For Each mglyr As ILayer In lMG.GetLayers()
+                        Dim lMapFlyr As IMapFeatureLayer = TryCast(mglyr, IMapFeatureLayer)
+                        If lMapFlyr IsNot Nothing Then
+                            If lScreenGeometryType Then
+                                If lMapFlyr.DataSet.FeatureType = fType Then
+                                    If lScreenLayerName Then
+                                        If lMapFlyr.LegendText.ToLower() = aLayerName.ToLower() OrElse lMapFlyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
+                                            lFeatureLayers.Add(lMapFlyr)
+                                        End If
+                                    Else
+                                        lFeatureLayers.Add(lMapFlyr)
                                     End If
-                                Else
-                                    lFeatureLayers.Add(mglyr)
-                                End If
-                            End If
-                        Else
-                            If lScreenLayerName Then
-                                If mglyr.LegendText.ToLower() = aLayerName.ToLower() OrElse mglyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
-                                    lFeatureLayers.Add(mglyr)
                                 End If
                             Else
-                                lFeatureLayers.Add(mglyr)
+                                If lScreenLayerName Then
+                                    If lMapFlyr.LegendText.ToLower() = aLayerName.ToLower() OrElse lMapFlyr.DataSet.Name.ToLower() = aLayerName.ToLower() Then
+                                        lFeatureLayers.Add(lMapFlyr)
+                                    End If
+                                Else
+                                    lFeatureLayers.Add(lMapFlyr)
+                                End If
                             End If
                         End If
                     Next
@@ -181,6 +184,10 @@ Public Class GisUtilDS
         End If
     End Function
 
+    Public Shared Function GetSelectedMapFeatures(ByVal aLayer As IMapFeatureLayer) As List(Of IFeature)
+        Return aLayer.Selection.ToFeatureList
+    End Function
+
     ''' <summary>Layer type from a layer name</summary>
     ''' <param name="aLayerName">
     '''     <para>Name of layer.</para>
@@ -238,7 +245,11 @@ Public Class GisUtilDS
     ''' <param name="aAddToMap"></param>
     Public Shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String,
                                            Optional ByVal aAddToMap As Boolean = True)
-        Dim lSourceLayer As IMapFeatureLayer = GetFeatureLayers(Nothing, aInputLayerName)
+        Dim layerList = GetFeatureLayers(Nothing, aInputLayerName)
+        If layerList Is Nothing OrElse layerList.Count = 0 Then
+            Exit Sub
+        End If
+        Dim lSourceLayer As IMapFeatureLayer = layerList(0)
         If lSourceLayer Is Nothing Then Exit Sub
 
         Dim lOutLayer As Shapefile = Nothing

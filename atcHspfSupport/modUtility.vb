@@ -307,201 +307,203 @@ Public Module Utility
                 End With
 #End Region
 #Region "Case TotalN"
-            Case "TotalN", "TN" 'use PQUAL
+            Case "TotalN", "TAM", "TN", "TKN", "NO2NO3" 'use PQUAL
                 With lConstituentsToOutput
-                    .Add("P:Header1", "Nitrogen Loss (lb/ac)")
-                    .Add("P:Header1a", "  NO3 Loss")
-                    .Add("P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "    Surface")
-                    .Add("P:NO3+NO2-N - UPPER LAYER OUTFLOW", "    Interflow")
-                    .Add("P:NO3+NO2-N - GROUNDWATER OUTFLOW", "    Baseflow")
-                    .Add("P:Total3", "    Total")
-                    .Add("P:Header1b", "  NH3 Loss")
-                    .Add("P:NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", "    Surface")
-                    .Add("P:NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "    Interflow")
-                    .Add("P:NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "    Baseflow")
-                    .Add("P:NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "    Sediment")
-                    .Add("P:Total4", "    Total")
-                    .Add("P:Header1c", "  Labile ORGN Loss")
-                    .Add("P:LABILE ORGN - SURFACE LAYER OUTFLOW", "    Surface")
-                    .Add("P:LABILE ORGN - UPPER LAYER OUTFLOW", "    Interflow")
-                    .Add("P:LABILE ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
-                    .Add("P:LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
-                    .Add("P:ORGN - TOTAL OUTFLOW1", "    Labile N as fraction of TORN")
+                    If aType = "TN" OrElse aType = "TotalN" Then
+                        .Add("P:Header1", "Nitrogen Loss (lb/ac)")
+                        .Add("P:Header1a", "  NO3 Loss")
+                        .Add("P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "    Surface")
+                        .Add("P:NO3+NO2-N - UPPER LAYER OUTFLOW", "    Interflow")
+                        .Add("P:NO3+NO2-N - GROUNDWATER OUTFLOW", "    Baseflow")
+                        .Add("P:Total3", "    Total")
+                        .Add("P:Header1b", "  NH3 Loss")
+                        .Add("P:NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", "    Surface")
+                        .Add("P:NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "    Interflow")
+                        .Add("P:NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "    Baseflow")
+                        .Add("P:NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+                        .Add("P:Total4", "    Total")
+                        .Add("P:Header1c", "  Labile ORGN Loss")
+                        .Add("P:LABILE ORGN - SURFACE LAYER OUTFLOW", "    Surface")
+                        .Add("P:LABILE ORGN - UPPER LAYER OUTFLOW", "    Interflow")
+                        .Add("P:LABILE ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
+                        .Add("P:LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+                        .Add("P:ORGN - TOTAL OUTFLOW1", "    Labile N as fraction of TORN")
 
-                    .Add("P:Header1d", "  Refractory ORGN Loss")
-                    .Add("P:REFRAC ORGN - SURFACE LAYER OUTFLOW", "    Surface")
-                    .Add("P:REFRAC ORGN - UPPER LAYER OUTFLOW", "    Interflow")
-                    .Add("P:REFRAC ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
-                    .Add("P:REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
-                    .Add("P:ORGN - TOTAL OUTFLOW2", "    Refractory N as fraction of TORN")
-                    .Add("P:Header1e", "    ")
-                    .Add("P:ORGN - TOTAL OUTFLOW", "  Total ORGN Loss")
-                    .Add("P:NITROGEN - TOTAL OUTFLOW", "  Total N Loss")
+                        .Add("P:Header1d", "  Refractory ORGN Loss")
+                        .Add("P:REFRAC ORGN - SURFACE LAYER OUTFLOW", "    Surface")
+                        .Add("P:REFRAC ORGN - UPPER LAYER OUTFLOW", "    Interflow")
+                        .Add("P:REFRAC ORGN - GROUNDWATER OUTFLOW", "    Baseflow")
+                        .Add("P:REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+                        .Add("P:ORGN - TOTAL OUTFLOW2", "    Refractory N as fraction of TORN")
+                        .Add("P:Header1e", "    ")
+                        .Add("P:ORGN - TOTAL OUTFLOW", "  Total ORGN Loss")
+                        .Add("P:NITROGEN - TOTAL OUTFLOW", "  Total N Loss")
 
-                    .Add("P:Header2", "Nitrogen Storages (lb/ac)")
+                        .Add("P:Header2", "Nitrogen Storages (lb/ac)")
 
-                    .Add("P:Header2a", "  NH4-N Soln Storage")
-                    .Add("P:NH4-N SOL - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:NH4-N SOL - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:NH4-N SOL - UPPER TRANSITORY STORAGE", "    Interflow")
-                    .Add("P:NH4-N SOL - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:NH4-N SOL - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:NH4-N SOL - TOTAL STORAGE", "    Total")
-                    .Add("P:Header2b", "  NH4-N Ads Storage")
-                    .Add("P:NH4-N ADS - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:NH4-N ADS - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:NH4-N ADS - UPPER TRANSITORY STORAGE", "    Interflow")
-                    .Add("P:NH4-N ADS - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:NH4-N ADS - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:Header2a", "  NH4-N Soln Storage")
+                        .Add("P:NH4-N SOL - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:NH4-N SOL - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:NH4-N SOL - UPPER TRANSITORY STORAGE", "    Interflow")
+                        .Add("P:NH4-N SOL - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:NH4-N SOL - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:NH4-N SOL - TOTAL STORAGE", "    Total")
+                        .Add("P:Header2b", "  NH4-N Ads Storage")
+                        .Add("P:NH4-N ADS - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:NH4-N ADS - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:NH4-N ADS - UPPER TRANSITORY STORAGE", "    Interflow")
+                        .Add("P:NH4-N ADS - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:NH4-N ADS - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
 
-                    .Add("P:NH4-N ADS - TOTAL STORAGE", "    Total")
-                    .Add("P:Header2c", "  NO3/2-N Storage")
-                    .Add("P:NO3/2-N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:NO3/2-N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:NO3/2-N - UPPER TRANSITORY STORAGE", "    Interflow")
-                    .Add("P:NO3/2-N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:NO3/2-N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:NO3/2-N - TOTAL STORAGE", "    Total")
+                        .Add("P:NH4-N ADS - TOTAL STORAGE", "    Total")
+                        .Add("P:Header2c", "  NO3/2-N Storage")
+                        .Add("P:NO3/2-N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:NO3/2-N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:NO3/2-N - UPPER TRANSITORY STORAGE", "    Interflow")
+                        .Add("P:NO3/2-N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:NO3/2-N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:NO3/2-N - TOTAL STORAGE", "    Total")
 
-                    .Add("P:Header2d", "  Labile ORGN Soln")
-                    .Add("P:SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:SOL LABIL ORGANIC N - UPPER TRANSITORY STORAGE", "    Interflow")
-                    .Add("P:SOL LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:SOL LABIL ORGANIC N - TOTAL STORAGE", "    Total")
+                        .Add("P:Header2d", "  Labile ORGN Soln")
+                        .Add("P:SOL LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:SOL LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:SOL LABIL ORGANIC N - UPPER TRANSITORY STORAGE", "    Interflow")
+                        .Add("P:SOL LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:SOL LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:SOL LABIL ORGANIC N - TOTAL STORAGE", "    Total")
 
-                    .Add("P:Header2e", "  Labile ORGN Ads")
-                    .Add("P:ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:ADS LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:ADS LABIL ORGANIC N - TOTAL STORAGE", "    Total")
+                        .Add("P:Header2e", "  Labile ORGN Ads")
+                        .Add("P:ADS LABIL ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:ADS LABIL ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:ADS LABIL ORGANIC N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:ADS LABIL ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:ADS LABIL ORGANIC N - TOTAL STORAGE", "    Total")
 
-                    .Add("P:Header2f", "  Refractory ORGN Soln")
-                    .Add("P:SOL REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:SOL REFR ORGANIC N - UPPER TRANSITORY STORAGE", "    Interflow")
-                    .Add("P:SOL REFR ORGANIC N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:SOL REFR ORGANIC N - TOTAL STORAGE", "    Total")
+                        .Add("P:Header2f", "  Refractory ORGN Soln")
+                        .Add("P:SOL REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:SOL REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:SOL REFR ORGANIC N - UPPER TRANSITORY STORAGE", "    Interflow")
+                        .Add("P:SOL REFR ORGANIC N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:SOL REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:SOL REFR ORGANIC N - TOTAL STORAGE", "    Total")
 
-                    .Add("P:Header2g", "  Refractory ORGN Ads")
-                    .Add("P:ADS REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:ADS REFR ORGANIC N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:ADS REFR ORGANIC N - TOTAL STORAGE", "    Total")
-                    .Add("P:ABOVE-GROUND PLANT STORAGE", "  Above Ground Plant N")
-                    .Add("P:LITTER STORAGE", "  Litter N")
+                        .Add("P:Header2g", "  Refractory ORGN Ads")
+                        .Add("P:ADS REFR ORGANIC N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:ADS REFR ORGANIC N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:ADS REFR ORGANIC N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:ADS REFR ORGANIC N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:ADS REFR ORGANIC N - TOTAL STORAGE", "    Total")
+                        .Add("P:ABOVE-GROUND PLANT STORAGE", "  Above Ground Plant N")
+                        .Add("P:LITTER STORAGE", "  Litter N")
 
-                    .Add("P:Header2h", "  Below Ground Plant N")
-                    .Add("P:PLANT N - SURFACE LAYER STORAGE", "    Surface")
-                    .Add("P:PLANT N - UPPER PRINCIPAL STORAGE", "    Upper")
-                    .Add("P:PLANT N - LOWER LAYER STORAGE", "    Lower")
-                    .Add("P:PLANT N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
-                    .Add("P:PLANT N - TOTAL STORAGE", "    Total AG, BG, Litter PLTN")
-                    .Add("P:TOTAL N - TOTAL STORAGE", "    Total Soil, Litter, & Plant N")
+                        .Add("P:Header2h", "  Below Ground Plant N")
+                        .Add("P:PLANT N - SURFACE LAYER STORAGE", "    Surface")
+                        .Add("P:PLANT N - UPPER PRINCIPAL STORAGE", "    Upper")
+                        .Add("P:PLANT N - LOWER LAYER STORAGE", "    Lower")
+                        .Add("P:PLANT N - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+                        .Add("P:PLANT N - TOTAL STORAGE", "    Total AG, BG, Litter PLTN")
+                        .Add("P:TOTAL N - TOTAL STORAGE", "    Total Soil, Litter, & Plant N")
 
-                    .Add("P:Header3", "Nitrogen Fluxes")
-                    .Add("P:Header3a", "  Atmospheric Deposition")
-                    .Add("P:NO3-N - SURFACE LAYER - TOTAL AD", "    NO3-N - SURFACE")
-                    .Add("P:NO3-N - UPPER LAYER - TOTAL AD", "    NO3-N - UPPER")
-                    .Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "    NH3-N - SURFACE")
-                    .Add("P:NH4-N - UPPER LAYER - TOTAL AD", "    NH3-N - UPPER")
-                    .Add("P:ORGN - SURFACE LAYER - TOTAL AD", "    ORGN - SURFACE")
-                    .Add("P:ORGN - UPPER LAYER - TOTAL AD", "    ORGN - UPPER")
-                    '.Add("P:add these up to get a total of each species ?", "")
-                    .Add("P:Header3b", "  Applications (lb/a)")
-                    .Add("P:NITRATE APPLICATION", "    NO3-N")
-                    .Add("P:AMMONIA APPLICATION", "    NH3-N")
-                    .Add("P:ORGANIC N APPLICATION", "    ORGN")
-                    .Add("P:Header3c", "  Above Ground Plant Uptake")
-                    .Add("P:TNIUPA", "    NO3-N")
-                    .Add("P:TAMUPA", "    NH3-N")
-                    .Add("P:Header3d", "  Below Ground Plant Uptake")
-                    .Add("P:TNIUPB", "    NO3-N")
-                    .Add("P:TAMUPB", "    NH3-N")
-                    .Add("P:RETAGN", "  Above Gr Plant N to Litter")
-                    .Add("P:Header3e", "  Litter N Return to Labile ORGN")
-                    .Add("P:SRTLLN", "    Surface")
-                    .Add("P:URTLLN", "    Upper")
-                    .Add("P:TRTLLN", "    Total")
-                    .Add("P:Header3f", "  Litter N Return to Refractory ORGN")
-                    .Add("P:SRTRLN", "    Surface")
-                    .Add("P:URTRLN", "    Upper")
-                    .Add("P:TRTRLN", "    Total")
-                    .Add("P:Header3g", "  BG Plant N Return to Labile ORGN")
-                    .Add("P:SRTLBN", "    Surface")
-                    .Add("P:URTLBN", "    Upper")
-                    .Add("P:LRTLBN", "    Lower")
-                    .Add("P:TRTLBN", "    Total")
-                    .Add("P:Header3h", "  BG Plant N Return to Refractory ORGN")
-                    .Add("P:SRTRBN", "    Surface")
-                    .Add("P:URTRBN", "    Upper")
-                    .Add("P:LRTRBN", "    Lower")
-                    .Add("P:TRTRBN", "    Total")
+                        .Add("P:Header3", "Nitrogen Fluxes")
+                        .Add("P:Header3a", "  Atmospheric Deposition")
+                        .Add("P:NO3-N - SURFACE LAYER - TOTAL AD", "    NO3-N - SURFACE")
+                        .Add("P:NO3-N - UPPER LAYER - TOTAL AD", "    NO3-N - UPPER")
+                        .Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "    NH3-N - SURFACE")
+                        .Add("P:NH4-N - UPPER LAYER - TOTAL AD", "    NH3-N - UPPER")
+                        .Add("P:ORGN - SURFACE LAYER - TOTAL AD", "    ORGN - SURFACE")
+                        .Add("P:ORGN - UPPER LAYER - TOTAL AD", "    ORGN - UPPER")
+                        '.Add("P:add these up to get a total of each species ?", "")
+                        .Add("P:Header3b", "  Applications (lb/a)")
+                        .Add("P:NITRATE APPLICATION", "    NO3-N")
+                        .Add("P:AMMONIA APPLICATION", "    NH3-N")
+                        .Add("P:ORGANIC N APPLICATION", "    ORGN")
+                        .Add("P:Header3c", "  Above Ground Plant Uptake")
+                        .Add("P:TNIUPA", "    NO3-N")
+                        .Add("P:TAMUPA", "    NH3-N")
+                        .Add("P:Header3d", "  Below Ground Plant Uptake")
+                        .Add("P:TNIUPB", "    NO3-N")
+                        .Add("P:TAMUPB", "    NH3-N")
+                        .Add("P:RETAGN", "  Above Gr Plant N to Litter")
+                        .Add("P:Header3e", "  Litter N Return to Labile ORGN")
+                        .Add("P:SRTLLN", "    Surface")
+                        .Add("P:URTLLN", "    Upper")
+                        .Add("P:TRTLLN", "    Total")
+                        .Add("P:Header3f", "  Litter N Return to Refractory ORGN")
+                        .Add("P:SRTRLN", "    Surface")
+                        .Add("P:URTRLN", "    Upper")
+                        .Add("P:TRTRLN", "    Total")
+                        .Add("P:Header3g", "  BG Plant N Return to Labile ORGN")
+                        .Add("P:SRTLBN", "    Surface")
+                        .Add("P:URTLBN", "    Upper")
+                        .Add("P:LRTLBN", "    Lower")
+                        .Add("P:TRTLBN", "    Total")
+                        .Add("P:Header3h", "  BG Plant N Return to Refractory ORGN")
+                        .Add("P:SRTRBN", "    Surface")
+                        .Add("P:URTRBN", "    Upper")
+                        .Add("P:LRTRBN", "    Lower")
+                        .Add("P:TRTRBN", "    Total")
 
-                    .Add("P:Header3i", "  Labile/Refractory ORGN Conversion")
-                    .Add("P:SREFON", "    Surface")
-                    .Add("P:UREFON", "    Upper")
-                    .Add("P:LREFON", "    Lower")
-                    .Add("P:AREFON", "    Groundwater")
-                    .Add("P:TREFON", "    Total")
+                        .Add("P:Header3i", "  Labile/Refractory ORGN Conversion")
+                        .Add("P:SREFON", "    Surface")
+                        .Add("P:UREFON", "    Upper")
+                        .Add("P:LREFON", "    Lower")
+                        .Add("P:AREFON", "    Groundwater")
+                        .Add("P:TREFON", "    Total")
 
-                    .Add("P:Header3j", "  Labile ORGN Mineralization")
-                    .Add("P:SORNMN", "    Surface")
-                    .Add("P:UORNMN", "    Upper")
-                    .Add("P:LORNMN", "    Lower")
-                    .Add("P:AORNMN", "    Groundwater")
-                    .Add("P:TORNMN", "    Total")
+                        .Add("P:Header3j", "  Labile ORGN Mineralization")
+                        .Add("P:SORNMN", "    Surface")
+                        .Add("P:UORNMN", "    Upper")
+                        .Add("P:LORNMN", "    Lower")
+                        .Add("P:AORNMN", "    Groundwater")
+                        .Add("P:TORNMN", "    Total")
 
-                    .Add("P:Header3k", "  Denitrification")
-                    .Add("P:SDENI", "    Surface")
-                    .Add("P:UDENI", "    Upper")
-                    .Add("P:LDENI", "    Lower")
-                    .Add("P:ADENI", "    Groundwater")
-                    .Add("P:TDENI", "    Total")
+                        .Add("P:Header3k", "  Denitrification")
+                        .Add("P:SDENI", "    Surface")
+                        .Add("P:UDENI", "    Upper")
+                        .Add("P:LDENI", "    Lower")
+                        .Add("P:ADENI", "    Groundwater")
+                        .Add("P:TDENI", "    Total")
 
-                    .Add("P:Header3l", "  NH3 Nitrification")
-                    .Add("P:SAMNIT", "    Surface")
-                    .Add("P:UAMNIT", "    Upper")
-                    .Add("P:LAMNIT", "    Lower")
-                    .Add("P:AAMNIT", "    Groundwater")
-                    .Add("P:TAMNIT", "    Total")
+                        .Add("P:Header3l", "  NH3 Nitrification")
+                        .Add("P:SAMNIT", "    Surface")
+                        .Add("P:UAMNIT", "    Upper")
+                        .Add("P:LAMNIT", "    Lower")
+                        .Add("P:AAMNIT", "    Groundwater")
+                        .Add("P:TAMNIT", "    Total")
 
-                    .Add("P:Header3m", "  NH3 Immobilization")
-                    .Add("P:SAMIMB", "    Surface")
-                    .Add("P:UAMIMB", "    Upper")
-                    .Add("P:LAMIMB", "    Lower")
-                    .Add("P:AAMIMB", "    Groundwater")
-                    .Add("P:TAMIMB", "    Total")
+                        .Add("P:Header3m", "  NH3 Immobilization")
+                        .Add("P:SAMIMB", "    Surface")
+                        .Add("P:UAMIMB", "    Upper")
+                        .Add("P:LAMIMB", "    Lower")
+                        .Add("P:AAMIMB", "    Groundwater")
+                        .Add("P:TAMIMB", "    Total")
 
-                    .Add("P:Header3n", "  NO3 Immobilization")
-                    .Add("P:SNIIMB", "    Surface")
-                    .Add("P:UNIIMB", "    Upper")
-                    .Add("P:LNIIMB", "    Lower")
-                    .Add("P:ANIIMB", "    Groundwater")
-                    .Add("P:TNIIMB", "    Total")
+                        .Add("P:Header3n", "  NO3 Immobilization")
+                        .Add("P:SNIIMB", "    Surface")
+                        .Add("P:UNIIMB", "    Upper")
+                        .Add("P:LNIIMB", "    Lower")
+                        .Add("P:ANIIMB", "    Groundwater")
+                        .Add("P:TNIIMB", "    Total")
 
-                    .Add("P:Header3o", "  NH3 Volatilization")
-                    .Add("P:SAMVOL", "    Surface")
-                    .Add("P:UAMVOL", "    Upper")
-                    .Add("P:LAMVOL", "    Lower")
-                    .Add("P:AAMVOL", "    Groundwater")
-                    .Add("P:TAMVOL", "    Total")
+                        .Add("P:Header3o", "  NH3 Volatilization")
+                        .Add("P:SAMVOL", "    Surface")
+                        .Add("P:UAMVOL", "    Upper")
+                        .Add("P:LAMVOL", "    Lower")
+                        .Add("P:AAMVOL", "    Groundwater")
+                        .Add("P:TAMVOL", "    Total")
+                    End If
 
                     Dim headerLabel() As String = {"a", "b", "c", "d"}
                     Dim headerLabelCount As Integer = 0
                     For Each ConstProperty As ConstituentProperties In aConstProperties
                         If ConstProperty.ConstNameForEXPPlus = "TN" Then Continue For
                         Select Case ConstProperty.ConstNameForEXPPlus
-                            Case "NO3"
+                            Case "NO3", "NO2NO3"
                                 .Add("P:Header4", "NO3+NO2 (PQUAL)")
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Surface Flow")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Groundwater Flow")
-                            Case "TAM"
+                            Case "TAM", "TKN"
                                 .Add("P:Header5", "NH3+NH4 (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Sediment Attached")
                                 .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Scoured Sediment Attached")
@@ -509,7 +511,7 @@ Public Module Utility
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Groundwater Flow")
 
-                            Case "lab-OrgN"
+                            Case "lab-OrgN", "TKN"
                                 .Add("P:Header6", "LabileOrgN (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Sediment Attached")
                                 .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Scoured Sediment Attached")
@@ -517,7 +519,7 @@ Public Module Utility
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Dissolved with Groundwater Flow")
 
-                            Case "Ref-OrgN"
+                            Case "Ref-OrgN", "TKN"
                                 .Add("P:Header7", "RefOrgN (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Sediment Attached")
                                 .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Scoured Sediment Attached")
@@ -532,63 +534,71 @@ Public Module Utility
 
                     For Each ConstProperty As ConstituentProperties In aConstProperties
                         Select Case ConstProperty.ConstNameForEXPPlus
-                            Case "NO3"
+                            Case "NO3", "NO2NO3"
                                 .Add("I:Header8", "NO3+NO2 (IQUAL)")
-                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow")
+                                .Add("I:SOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
 
-                            Case "TAM"
+                            Case "TAM", "TKN"
                                 .Add("I:Header9", "NH3+NH4 (IQUAL)")
                                 .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
                                 .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
 
-                            Case "lab-OrgN"
+                            Case "lab-OrgN", "TKN"
                                 .Add("I:Header10", "RefOrgN (IQUAL)")
                                 .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow with Sediment")
                                 .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
 
-                            Case "Ref-OrgN"
+                            Case "Ref-OrgN", "TKN"
                                 .Add("I:Header11", "LabileOrgN (IQUAL)")
                                 .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
                                 .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
                         End Select
                     Next
 
-                    .Add("R:Header12", "NO3 as N")
-                    .Add("R:NO3-INTOT", "  Total NO3 Inflow")
-                    .Add("R:NO3-PROCFLUX-TOT", "  NO3 Process Fluxes")
-                    .Add("R:NO3-ATMDEPTOT", " Atmospheric NO3 Deposition")
-                    .Add("R:NO3-OUTTOT", " Total NO3 Outflow")
+                    If aType = "TN" OrElse aType = "NO2NO3" Then
+                        .Add("R:Header12", "NO3 as N")
+                        .Add("R:NO3-INTOT", "  Total NO3 Inflow")
+                        .Add("R:NO3-PROCFLUX-TOT", "  NO3 Process Fluxes")
+                        .Add("R:NO3-ATMDEPTOT", " Atmospheric NO3 Deposition")
+                        .Add("R:NO3-OUTTOT", " Total NO3 Outflow")
+                    End If
 
 
-                    .Add("R:Header13", "Total NH3 as N")
-                    .Add("R:TAM-INTOT", "  Total Ammonia Inflow")
-                    .Add("R:TAM-INDIS", "  Dissolved TAM inflow")
-                    .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
-                    .Add("R:TAM-PROCFLUX-TOT", "  TAM Process Fluxes")
-                    .Add("R:TAM-ADSDES-TOT", "  TAM Adsorption/Desorption")
-                    .Add("R:TAM-SCOURDEP-TOT", "  TAM Scour/Deposition")
-                    .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
-                    .Add("R:TAM-OUTTOT", "  Total TAM Outflow")
-                    .Add("R:TAM-OUTDIS", "  Dissolved TAM Outflow")
-                    .Add("R:TAM-OUTPART-TOT", "  Particulate TAM Outflow")
+                    If aType = "TN" OrElse aType = "TAM" OrElse aType = "TKN" Then
+                        .Add("R:Header13", "Total NH3 as N")
+                        .Add("R:TAM-INTOT", "  Total Ammonia Inflow")
+                        .Add("R:TAM-INDIS", "  Dissolved TAM inflow")
+                        .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
+                        .Add("R:TAM-PROCFLUX-TOT", "  TAM Process Fluxes")
+                        .Add("R:TAM-ADSDES-TOT", "  TAM Adsorption/Desorption")
+                        .Add("R:TAM-SCOURDEP-TOT", "  TAM Scour/Deposition")
+                        .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
+                        .Add("R:TAM-OUTTOT", "  Total TAM Outflow")
+                        .Add("R:TAM-OUTDIS", "  Dissolved TAM Outflow")
+                        .Add("R:TAM-OUTPART-TOT", "  Particulate TAM Outflow")
+                    End If
 
-                    .Add("R:Header14", "Refractory-N")
-                    .Add("R:N-REFORG-IN", "  Refr-N Inflow")
-                    .Add("R:N-REFORG-TOTPROCFLUX-TOT", "  Refr-N Process Fluxes")
-                    .Add("R:N-REFORG-OUT", "  Refr-N Outflow")
+                    If aType = "TN" OrElse aType = "TKN" Then
+                        .Add("R:Header14", "Refractory-N")
+                        .Add("R:N-REFORG-IN", "  Refr-N Inflow")
+                        .Add("R:N-REFORG-TOTPROCFLUX-TOT", "  Refr-N Process Fluxes")
+                        .Add("R:N-REFORG-OUT", "  Refr-N Outflow")
 
-                    .Add("R:Header15", "Org-N")
-                    .Add("R:N-TOTORG-IN", "  Total Org-N Inflow")
-                    .Add("R:N-TOTORG-OUT", "  Total Org-N Outflow")
+                        .Add("R:Header15", "Org-N")
+                        .Add("R:N-TOTORG-IN", "  Total Org-N Inflow")
+                        .Add("R:N-TOTORG-OUT", "  Total Org-N Outflow")
+                    End If
 
-                    .Add("R:Header16", "Total N")
-                    .Add("R:N-TOT-IN", "  Total N Inflow")
-                    .Add("R:N-TOT-OUT", "  Total N Outflow")
-                    .Add("R:N-TOT-OUT-EXIT1", "  Total N OutflowExit1")
-                    .Add("R:N-TOT-OUT-EXIT2", "  Total N OutflowExit2")
-                    .Add("R:N-TOT-OUT-EXIT3", "  Total N OutflowExit3")
-                    .Add("R:N-TOT-OUT-EXIT4", "  Total N OutflowExit4")
-                    .Add("R:N-TOT-OUT-EXIT5", "  Total N OutflowExit5")
+                    If aType = "TN" Then
+                        .Add("R:Header16", "Total N")
+                        .Add("R:N-TOT-IN", "  Total N Inflow")
+                        .Add("R:N-TOT-OUT", "  Total N Outflow")
+                        .Add("R:N-TOT-OUT-EXIT1", "  Total N OutflowExit1")
+                        .Add("R:N-TOT-OUT-EXIT2", "  Total N OutflowExit2")
+                        .Add("R:N-TOT-OUT-EXIT3", "  Total N OutflowExit3")
+                        .Add("R:N-TOT-OUT-EXIT4", "  Total N OutflowExit4")
+                        .Add("R:N-TOT-OUT-EXIT5", "  Total N OutflowExit5")
+                    End If
 
                 End With
             '.Add("R:TAM-OUTTOT-EXIT3", "  Total NH3 Outflow-Exit3")
@@ -600,6 +610,111 @@ Public Module Utility
             '.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
             '.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
             '.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
+#End Region
+#Region "Case TAM"
+            'Case "TAM" 'use PQUAL
+            '    With lConstituentsToOutput
+            '        '.Add("P:Header1", "Nitrogen Loss (lb/ac)")
+            '        '.Add("P:Header1b", "  NH3 Loss")
+            '        '.Add("P:NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", "    Surface")
+            '        '.Add("P:NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "    Interflow")
+            '        '.Add("P:NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "    Baseflow")
+            '        '.Add("P:NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "    Sediment")
+
+            '        '.Add("P:Header2", "Nitrogen Storages (lb/ac)")
+
+            '        '.Add("P:Header2a", "  NH4-N Soln Storage")
+            '        '.Add("P:NH4-N SOL - SURFACE LAYER STORAGE", "    Surface")
+            '        '.Add("P:NH4-N SOL - UPPER PRINCIPAL STORAGE", "    Upper")
+            '        '.Add("P:NH4-N SOL - UPPER TRANSITORY STORAGE", "    Interflow")
+            '        '.Add("P:NH4-N SOL - LOWER LAYER STORAGE", "    Lower")
+            '        '.Add("P:NH4-N SOL - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+            '        '.Add("P:NH4-N SOL - TOTAL STORAGE", "    Total")
+            '        '.Add("P:Header2b", "  NH4-N Ads Storage")
+            '        '.Add("P:NH4-N ADS - SURFACE LAYER STORAGE", "    Surface")
+            '        '.Add("P:NH4-N ADS - UPPER PRINCIPAL STORAGE", "    Upper")
+            '        '.Add("P:NH4-N ADS - UPPER TRANSITORY STORAGE", "    Interflow")
+            '        '.Add("P:NH4-N ADS - LOWER LAYER STORAGE", "    Lower")
+            '        '.Add("P:NH4-N ADS - ACTIVE GROUNDWATER STORAGE", "    Groundwater")
+
+            '        '.Add("P:Header3", "Nitrogen Fluxes")
+            '        '.Add("P:Header3a", "  Atmospheric Deposition")
+            '        '.Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "    NH3-N - SURFACE")
+            '        '.Add("P:NH4-N - UPPER LAYER - TOTAL AD", "    NH3-N - UPPER")
+            '        '.Add("P:Header3b", "  Applications (lb/a)")
+            '        '.Add("P:AMMONIA APPLICATION", "    NH3-N")
+            '        '.Add("P:Header3c", "  Above Ground Plant Uptake")
+            '        '.Add("P:TAMUPA", "    NH3-N")
+
+            '        '.Add("P:Header3k", "  Denitrification")
+            '        '.Add("P:SDENI", "    Surface")
+            '        '.Add("P:UDENI", "    Upper")
+            '        '.Add("P:LDENI", "    Lower")
+            '        '.Add("P:ADENI", "    Groundwater")
+            '        '.Add("P:TDENI", "    Total")
+
+            '        '.Add("P:Header3l", "  NH3 Nitrification")
+            '        '.Add("P:SAMNIT", "    Surface")
+            '        '.Add("P:UAMNIT", "    Upper")
+            '        '.Add("P:LAMNIT", "    Lower")
+            '        '.Add("P:AAMNIT", "    Groundwater")
+            '        '.Add("P:TAMNIT", "    Total")
+
+            '        '.Add("P:Header3m", "  NH3 Immobilization")
+            '        '.Add("P:SAMIMB", "    Surface")
+            '        '.Add("P:UAMIMB", "    Upper")
+            '        '.Add("P:LAMIMB", "    Lower")
+            '        '.Add("P:AAMIMB", "    Groundwater")
+            '        '.Add("P:TAMIMB", "    Total")
+
+            '        '.Add("P:Header3o", "  NH3 Volatilization")
+            '        '.Add("P:SAMVOL", "    Surface")
+            '        '.Add("P:UAMVOL", "    Upper")
+            '        '.Add("P:LAMVOL", "    Lower")
+            '        '.Add("P:AAMVOL", "    Groundwater")
+            '        '.Add("P:TAMVOL", "    Total")
+
+            '        Dim headerLabel() As String = {"a", "b", "c", "d"}
+            '        Dim headerLabelCount As Integer = 0
+            '        For Each ConstProperty As ConstituentProperties In aConstProperties
+            '            If ConstProperty.ConstNameForEXPPlus = "TN" Then Continue For
+            '            Select Case ConstProperty.ConstNameForEXPPlus
+            '                Case "TAM"
+            '                    .Add("P:Header5", "NH3+NH4 (PQUAL)")
+            '                    .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Sediment Attached")
+            '                    .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Scoured Sediment Attached")
+            '                    .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Surface Flow")
+            '                    .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Interflow")
+            '                    .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Dissolved with Groundwater Flow")
+
+            '            End Select
+            '            .Add("P:Total3" & headerLabel(headerLabelCount), "  Total")
+            '            headerLabelCount += 1
+            '        Next
+
+            '        For Each ConstProperty As ConstituentProperties In aConstProperties
+            '            Select Case ConstProperty.ConstNameForEXPPlus
+            '                Case "TAM"
+            '                    .Add("I:Header9", "NH3+NH4 (IQUAL)")
+            '                    .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+            '                    .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
+
+            '            End Select
+            '        Next
+
+            '        .Add("R:Header13", "Total NH3 as N")
+            '        .Add("R:TAM-INTOT", "  Total Ammonia Inflow")
+            '        .Add("R:TAM-INDIS", "  Dissolved TAM inflow")
+            '        .Add("R:NH4-INPART-TOT", "  Particulate NH3 Inflow")
+            '        .Add("R:TAM-PROCFLUX-TOT", "  TAM Process Fluxes")
+            '        .Add("R:TAM-ADSDES-TOT", "  TAM Adsorption/Desorption")
+            '        .Add("R:TAM-SCOURDEP-TOT", "  TAM Scour/Deposition")
+            '        .Add("R:TAM-ATMDEPTOT", " Atmospheric TAM Deposition")
+            '        .Add("R:TAM-OUTTOT", "  Total TAM Outflow")
+            '        .Add("R:TAM-OUTDIS", "  Dissolved TAM Outflow")
+            '        .Add("R:TAM-OUTPART-TOT", "  Particulate TAM Outflow")
+
+            '    End With
 #End Region
 #Region "Case TotalP"
             Case "TP"
@@ -685,7 +800,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
-                                .Add("P:Total3c", "  Total")
+                                .Add("P:Total5c", "  Total")
                             Case "Ref-OrgP"
                                 .Add("P:Header8", "RefOrgP (PQUAL)")
                                 .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow with Sediment")
@@ -693,7 +808,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "1", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "1", "  Groundwater Flow")
-                                .Add("P:Total3d", "  Total")
+                                .Add("P:Total5d", "  Total")
 
                             Case "lab-OrgP"
                                 .Add("P:Header9", "LabileOrgP (PQUAL)")
@@ -702,7 +817,7 @@ Public Module Utility
                                 .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI & "2", "  Surface Flow as Dissolved")
                                 .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Interflow")
                                 .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI & "2", "  Groundwater Flow")
-                                .Add("P:Total3e", "  Total")
+                                .Add("P:Total5e", "  Total")
 
                         End Select
                     Next
@@ -757,6 +872,85 @@ Public Module Utility
                     .Add("R:P-TOT-OUT-EXIT3", "  Total P OutflowExit3")
                     .Add("R:P-TOT-OUT-EXIT4", "  Total P OutflowExit4")
                     .Add("R:P-TOT-OUT-EXIT5", "  Total P OutflowExit5")
+
+                End With
+#End Region
+#Region "Case Ortho P"
+            Case "ORTHO P"
+
+                With lConstituentsToOutput
+                    .Add("P:Header1", "Phosphorus Loss (lb/ac")
+                    .Add("P:PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW", "    Surface")
+                    .Add("P:PO4-P IN SOLUTION - INTERFLOW - OUTFLOW", "    Interflow")
+                    .Add("P:PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW", "    Baseflow")
+                    .Add("P:SDP4A", "    Sediment")
+                    .Add("P:Total4", "    Total")
+
+                    .Add("P:Total3", "    Total P Loss")
+
+                    .Add("P:Header3a", "P Storages (lb/ac)")
+                    .Add("P:Header3b", "  PO4-P Soln Storage")
+                    .Add("P:PO4-P SOL - SURFACE LAYER", "    Surface")
+                    .Add("P:PO4-P SOL - UPPER PRINCIPAL", "    Upper")
+                    .Add("P:PO4-P SOL - UPPER TRANSITORY", "    Interflow")
+                    .Add("P:PO4-P SOL - LOWER LAYER", "    Lower")
+                    .Add("P:PO4-P SOL - ACTIVE GROUNDWATER", "    GW")
+                    .Add("P:PO4-P SOL - TOTALS", "    Total")
+                    .Add("P:Header4", "  PO4-P Ads Storage")
+                    .Add("P:PO4-P ADS - SURFACE LAYER", "    Surface")
+                    .Add("P:PO4-P ADS - UPPER PRINCIPAL", "    Upper")
+                    .Add("P:PO4-P ADS - LOWER LAYER", "    Lower")
+                    .Add("P:PO4-P ADS - ACTIVE GROUNDWATER", "    GW")
+                    .Add("P:PO4-P ADS - TOTALS", "    Total")
+
+                    .Add("P:Header6", "P FLUXES")
+                    .Add("P:Header6a", "  Atmospheric Deposition (lb/a)")
+                    .Add("P:PO4-P - SURFACELAYER - TOTAL", "    PO4-P - Surface")
+                    .Add("P:PO4-P - UPPER LAYER - TOTAL", "    PO4-P - Upper")
+                    '.Add("P:add these up to get a total of each species ?", "")
+                    .Add("P:Header6b", "  Applications (lb/a)")
+                    .Add("P:IPO4", "    PO4-P")
+
+                    .Add("P:Header6e", "    PO4-P Immobilization")
+                    .Add("P:SP4IMB", "    Surface")
+                    .Add("P:UP4IMB", "    Upper")
+                    .Add("P:LP4IMB", "    Lower")
+                    .Add("P:AP4IMB", "    Groundwater")
+                    .Add("P:TP4IMB", "    Total")
+
+                    For Each ConstProperty As ConstituentProperties In aConstProperties
+                        Select Case ConstProperty.ConstNameForEXPPlus
+                            Case "PO4"
+                                .Add("P:Header7", "ORTHO P (PQUAL)")
+                                .Add("P:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+                                .Add("P:SCRQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Scoured Sediment")
+                                .Add("P:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
+                                .Add("P:IOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Interflow")
+                                .Add("P:AOQUAL-" & ConstProperty.ConstituentNameInUCI, "  Groundwater Flow")
+                                .Add("P:Total5c", "  Total")
+                        End Select
+                    Next
+                    For Each ConstProperty As ConstituentProperties In aConstProperties
+                        Select Case ConstProperty.ConstNameForEXPPlus
+                            Case "PO4"
+                                .Add("I:Header10", "ORTHO P (IQUAL)")
+                                .Add("I:WASHQS-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow with Sediment")
+                                .Add("I:SOQO-" & ConstProperty.ConstituentNameInUCI, "  Surface Flow as Dissolved")
+                        End Select
+
+                    Next
+
+                    .Add("R:Header13", "Total PO4 as P")
+                    .Add("R:PO4-INTOT", "  Total PO4 Inflow")
+                    .Add("R:PO4-INDIS", "  Dissolved PO4 Inflow")
+                    .Add("R:PO4-INPART-TOT", "  Particulate PO4 Inflow")
+                    .Add("R:PO4-PROCFLUX-TOT", "  PO4 Process Fluxes")
+                    .Add("R:PO4-ADSDES-TOT", "  PO4 Adsorption/Desorption")
+                    .Add("R:PO4-SCOURDEP-TOT", "  PO4 Scour/Deposition")
+                    .Add("R:PO4-OUTTOT", "  Total PO4 Outflow")
+                    .Add("R:PO4-ATMDEPTOT", " Atmospheric PO4 Deposition")
+                    .Add("R:PO4-OUTDIS", "  Dissolved PO4 Outflow")
+                    .Add("R:PO4-OUTPART-TOT", "  Particulate PO4 Outflow")
 
                 End With
 #End Region
@@ -1183,7 +1377,7 @@ Public Module Utility
                         Exit For
                     End If
 
-                Case "TN"
+                Case "TN", "TAM", "TKN", "NO2NO3"
                     Select Case True
                         Case (aConstituent = "SOQUAL-NH3+NH4" OrElse aConstituent = "SOQO-NH3+NH4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 2 AndAlso
                                 (lMassLink.Source.Member = "SOQUAL" OrElse lMassLink.Source.Member = "POQUAL")
@@ -1324,7 +1518,7 @@ Public Module Utility
                     'End If
 
 
-                Case "TP"
+                Case "TP", "ORTHO P"
                     'If aConstituent.Contains("SOQUAL") Then Stop
                     Select Case True
                         Case (aConstituent = "SOQUAL-PO4" OrElse aConstituent = "SOQO-PO4") AndAlso lMassLink.Target.Member.ToString = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 4 AndAlso
@@ -1703,9 +1897,9 @@ Public Module Utility
         Dim CVBP As Double = 31 * BPCNTC / 1200 / CVBPC
         'conversion from biomass to P
         Dim CVOP As Double = CVBP / CVBO
-        If aBalanceType = "TN" Then
+        If aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN" OrElse aBalanceType = "NO2NO3" Then
             aConversionFactorFromOxygen = CVON
-        ElseIf aBalanceType = "TP" Then
+        ElseIf aBalanceType = "TP" OrElse aBalanceType = "ORTHO P" Then
             aConversionFactorFromOxygen = CVOP
         End If
 
@@ -1791,9 +1985,10 @@ Public Module Utility
 
                     End If
 
-                Case "TN"
+                Case "TN", "TAM", "NO2NO3", "TKN"
 
-                    If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    If (aBalanceType = "TN" OrElse aBalanceType = "NO2NO3") AndAlso
+                       (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                         lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 1 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -1814,8 +2009,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1834,8 +2030,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 3 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1854,8 +2051,9 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
-                        lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
+                    ElseIf (aBalanceType = "TN" OrElse aBalanceType = "TKN") AndAlso
+                           (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                            lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
                         If QUALID <> 1 Then
@@ -1876,7 +2074,7 @@ Public Module Utility
 
                     End If
 
-                Case "TP"
+                Case "TP", "ORTHO P"
 
                     If (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "NUIF1" AndAlso lML.Target.MemSub1 = 4 Then
@@ -1898,7 +2096,7 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    ElseIf aBalanceType = "TP" AndAlso (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "PKIF" AndAlso lML.Target.MemSub1 = 4 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -1918,7 +2116,7 @@ Public Module Utility
                         ListContains = CheckQUALList(QUALNames, QUALs)
                         If ListContains = False Then QUALs.Add(QUALNames)
 
-                    ElseIf (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
+                    ElseIf aBalanceType = "TP" AndAlso (lML.Source.Group = "PQUAL" OrElse lML.Source.Group = "IQUAL") AndAlso
                             lML.Target.Group = "INFLOW" AndAlso lML.Target.Member = "OXIF" AndAlso lML.Target.MemSub1 = 2 Then
                         QUALNames = New ConstituentProperties
                         QUALID = lML.Source.MemSub1
@@ -2028,7 +2226,7 @@ Public Module Utility
                 QUALNames.ReportType = aBalanceType
                 QUALs.Add(QUALNames)
                 Return QUALs
-            Case "BOD-Labile"
+            Case "BOD-Labile", "ORTHO P", "TAM", "TKN", "NO2NO3"
                 Return QUALs
 
             Case Else
@@ -2131,7 +2329,7 @@ Public Module Utility
                 lOutflowDataType.Add("AOHT", "AOHT")
                 lOutflowDataType.Add("TotalOutflow", "TotalOutflow")
 
-            Case "TotalN", "TotalP", "TN", "TP"
+            Case "TotalN", "TotalP", "TN", "TP", "TAM", "TKN"
                 If EXPPlusName = "TAM" Then EXPPlusName = "NH3+NH4"
                 If aOperName = "PERLND" Then
                     lOutflowDataType.Add("WASHQS" & "-" & EXPPlusName, "WASHQS" & "-" & QualityConstituent)

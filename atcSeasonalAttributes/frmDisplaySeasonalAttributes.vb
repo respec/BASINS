@@ -225,7 +225,11 @@ Friend Class frmDisplaySeasonalAttributes
     Private Sub PopulateGrid()
         Dim lWasSwapped As Boolean = Not pSwapperSource Is Nothing AndAlso pSwapperSource.SwapRowsColumns
         pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
-        If pSource.Columns < 3 Then
+        Dim lChooseSeasonTypeANew As Boolean = False
+#If Toolbox = "Hydro" Then
+        lChooseSeasonTypeANew = True
+#End If
+        If pSource.Columns < 3 OrElse lChooseSeasonTypeANew Then
             UserSpecifyAttributes()
             pSource = New atcSeasonalAttributesGridSource(pTimeseriesGroup)
         End If
@@ -235,6 +239,9 @@ Friend Class frmDisplaySeasonalAttributes
         agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
         SizeToGrid()
+#If Toolbox = "Hydro" Then
+        Me.Text = "Time-Series Attributes"
+#End If
     End Sub
 
     Private Sub SizeToGrid()
@@ -369,7 +376,11 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Seasonal Attributes.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Attributes.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Seasonal Attributes.html")
+        End If
     End Sub
 
 End Class

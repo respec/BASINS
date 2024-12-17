@@ -52,9 +52,9 @@ Public Module modBasinsPlugin
 #ElseIf ProgramName = "USGS Hydrologic Toolbox" Then
     Public Const g_AppNameRegistry As String = "USGS-Hydro" 'For preferences in registry
     Friend Const g_AppNameShort As String = "Hydro Toolbox"
-    Friend Const g_AppNameLong As String = "USGS Hydro Toolbox 1.0.0"
+    Friend Const g_AppNameLong As String = "USGS Hydrologic Toolbox" & vbCrLf & "(1.1.0)"
     'Friend Const g_URL_Home As String = "https://water.usgs.gov/ogw/gwtoolbox/"
-    Friend Const g_URL_Home As String = "https://www.usgs.gov/software/groundwater-toolbox-a-graphical-and-mapping-interface-analysis-hydrologic-data"
+    Friend Const g_URL_Home As String = "https://www.sciencebase.gov/catalog/item/6197980bd34eb622f692b481"
     Friend Const g_URL_Register As String = "http://hspf.com/pub/USGS-SW/register.html"
 #Else
     Public Const g_AppNameRegistry As String = "BASINS" 'For preferences in registry
@@ -108,6 +108,7 @@ Public Module modBasinsPlugin
     Private Const Basins42DataPath As String = "Basins42\data\"
     Friend BasinsDataPath As String = Basins41DataPath
     Private Const NationalProjectFilename As String = "national.mwprj"
+    Private Const NationalProjectFilenameDS As String = "national.dspx"
 
     ''' <summary>
     ''' Find all of the data paths for this application on this system and add them to g_BasinsDataDirs
@@ -119,7 +120,14 @@ Public Module modBasinsPlugin
             ElseIf g_AppNameShort = "SW Toolbox" Then
                 g_BasinsDataDirs.Add("C:\USGS-SWToolbox\data\")
             ElseIf g_AppNameShort = "Hydro Toolbox" Then
+#If GISProvider = "DotSpatial" Then
+                If String.IsNullOrEmpty(g_ProgramDir) Then
+                    g_ProgramDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & g_PathChar
+                End If
+                g_BasinsDataDirs.Add(IO.Path.Combine(g_ProgramDir, "data") & g_PathChar)
+#Else
                 g_BasinsDataDirs.Add("C:\USGS-HydroToolbox\data\")
+#End If
             End If
             Dim lSavedPaths As String = GetSetting(g_AppNameRegistry, "Folders", "DataPaths")
             If lSavedPaths.Length > 0 Then
@@ -219,6 +227,20 @@ Public Module modBasinsPlugin
     ''' </summary>
     Public Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
+#If GISProvider = "DotSpatial" Then
+            Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilenameDS)
+            If Not FileExists(lFileName) Then
+                For Each lDir As String In g_BasinsDataDirs
+                    lFileName = lDir & "national" & g_PathChar & NationalProjectFilenameDS
+                    If FileExists(lFileName) Then 'found existing national project
+                        Exit For
+                    End If
+                Next
+            End If
+            If Not FileExists(lFileName) Then
+                lFileName = FindFile("Please locate BASINS national project", NationalProjectFilenameDS, , , True)
+            End If
+#Else
             Dim lFileName As String = IO.Path.Combine(g_ProgramDir, "Data\national" & g_PathChar & NationalProjectFilename)
             If Not FileExists(lFileName) Then
                 For Each lDir As String In g_BasinsDataDirs
@@ -231,6 +253,7 @@ Public Module modBasinsPlugin
             If Not FileExists(lFileName) Then
                 lFileName = FindFile("Please locate BASINS national project", NationalProjectFilename, , , True)
             End If
+#End If
             If FileExists(lFileName) Then  'load national project
 #If GISProvider = "DotSpatial" Then
                 g_Project.OpenProject(lFileName)
@@ -307,7 +330,8 @@ Public Module modBasinsPlugin
 #If GISProvider = "DotSpatial" Then
         Return (g_Project IsNot Nothing) _
             AndAlso (g_Project.CurrentProjectFile IsNot Nothing) _
-            AndAlso g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower)
+            AndAlso (g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilename.ToLower) OrElse
+            g_Project.CurrentProjectFile.ToLower.EndsWith(NationalProjectFilenameDS.ToLower))
 #Else
         Return (g_Project IsNot Nothing) _
             AndAlso (g_Project.FileName IsNot Nothing) _
@@ -322,7 +346,7 @@ Public Module modBasinsPlugin
         Dim lHaveCatLayer As Boolean = False
         Dim lHaveStateLayer As Boolean = False
 #If GISProvider = "DotSpatial" Then
-        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.GetLayers()
+        For Each lLayer As IMapFeatureLayer In g_MapWin.Map.MapFrame().GetAllFeatureLayers()
 #Else
         For Each lLayer As MapWindow.Interfaces.Layer In g_MapWin.Layers
 #End If

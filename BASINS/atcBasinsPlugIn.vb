@@ -155,11 +155,11 @@ Public Class atcBasinsPlugIn
                     .Add("Build BASINS Project", "Build New Project")
                 End With
             Case "Hydro Toolbox"
-                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\GWToolbox.chm")
+                lHelpFilename = FindFile("Please Find Help Document", g_ProgramDir & "docs\HydroToolbox.chm")
                 BasinsDataPath = "USGS-WATER\data\"
                 With atcUtility.HelpSubstitutions
-                    .Add("BASINS Details", "GW Toolbox Details")
-                    .Add("Welcome to BASINS 4.5 Window", "Welcome to GW Toolbox Window")
+                    .Add("BASINS Details", "Hydrologic Toolbox Details")
+                    .Add("Welcome to BASINS 4.5 Window", "Welcome to Hydrologic Toolbox Window")
                     .Add("Build BASINS Project", "Build New Project")
                 End With
 
@@ -404,6 +404,7 @@ Public Class atcBasinsPlugIn
                     End If
                 ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
 #If GISProvider = "DotSpatial" Then
+                    aHandled = UserOpenProject(aItemName)
 #Else
                     aHandled = UserOpenProject(g_Menus(aItemName).Text)
 #End If
@@ -626,12 +627,34 @@ FoundDir:
 
 #If GISProvider = "DotSpatial" Then
     Public Shared Sub ShapesSelected(ByVal sender As Object, ByVal aSelectChangedArgs As EventArgs)
+        If sender.Layers.SelectedLayer IsNot Nothing Then
+            Try
+                If CType(sender.Layers.SelectedLayer, IMapFeatureLayer).Selection.Count = 0 Then
+                    Exit Sub
+                Else
+                    For Each imap As IMapFeatureLayer In atcMwGisUtility.GisUtilDS.GetFeatureLayers(Nothing)
+                        If imap.Checked Then
+                            If imap.DataSet.Name <> sender.Layers.SelectedLayer.DataSet.Name Then
+                                imap.Selection.Clear()
+                            End If
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                Exit Sub
+            End Try
+        Else
+            Exit Sub
+        End If
         If NationalProjectIsOpen() Then
             UpdateSelectedFeatures()
         End If
     End Sub
 
     Public Shared Sub LayerSelected(ByVal sender As Object, ByVal aLayerSelectedEventArgs As DotSpatial.Symbology.LayerSelectedEventArgs)
+        If sender.SelectedLayer Is Nothing Then
+            Exit Sub
+        End If
         If NationalProjectIsOpen() Then
             UpdateSelectedFeatures()
         End If
@@ -768,6 +791,29 @@ FoundDir:
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub ProjectLoadingDS(sender As Object, evt As SerializingEventArgs)
+        Dim lSettingsString As String = ""
+        Dim lProjectFile As String = sender.CurrentProjectFile
+        If lProjectFile.EndsWith("mwprj") Then
+            Dim lxmlDoc As New Xml.XmlDocument()
+            lxmlDoc.Load(lProjectFile)
+            Dim nodes As Xml.XmlNodeList = lxmlDoc.DocumentElement.SelectNodes("/Mapwin/MapWindow4/Plugins")
+            For Each node As Xml.XmlNode In nodes(0).ChildNodes
+                If node IsNot Nothing Then
+                    lSettingsString = node.Attributes(0).InnerText
+                    If lSettingsString.StartsWith("<BASINS><DataManager>") Then
+                        Exit For
+                    End If
+                End If
+            Next
+        ElseIf lProjectFile.EndsWith("dspx") Then
+            lSettingsString = sender.GetCustomSetting("ProjectData", "")
+        End If
+        If Not String.IsNullOrEmpty(lSettingsString) Then
+            ProjectLoading(lProjectFile, lSettingsString)
+        End If
+    End Sub
+
     Public Sub ProjectLoading(ByVal aProjectFile As String, ByVal aSettingsString As String)
 #Else
 
@@ -802,10 +848,22 @@ FoundDir:
     End Sub
 
 #If GISProvider = "DotSpatial" Then
+    Public Sub ProjectSavingDS(sender As Object, evt As SerializingEventArgs)
+        Dim manager As SerializationManager = CType(sender, SerializationManager)
+        Dim lProjectFile As String = manager.CurrentProjectFile
+        Dim lSettingsString As String = ""
+        ProjectSaving(lProjectFile, lSettingsString)
+        manager.SetCustomSetting("ProjectData", lSettingsString)
+    End Sub
+
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String)
 #Else
     Public Sub ProjectSaving(ByVal aProjectFile As String, ByRef aSettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
 #End If
+        Dim lPath As String = PathNameOnly(aProjectFile)
+        If IO.Directory.Exists(lPath) Then
+            ChDir(lPath)
+        End If
         aSettingsString = "<BASINS>" & atcDataManager.XML & "</BASINS>"
     End Sub
 

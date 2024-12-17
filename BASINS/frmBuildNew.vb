@@ -124,11 +124,7 @@ Public Class frmBuildNew
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildTop", Me.Top)
         SaveSetting(g_AppNameRegistry, "Window Positions", "BuildLeft", Me.Left)
         Me.Close()
-#If GISProvider = "DotSpatial" Then
         SpecifyAndCreateNewProject()
-#Else
-        SpecifyAndCreateNewProject()
-#End If
     End Sub
 
     'Private Sub frmBuildNew_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
@@ -147,7 +143,11 @@ Public Class frmBuildNew
 
     Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Project Creation and Management\Build BASINS Project.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("Getting Started (File, Project, and Data Menus)/Build New Project.html")
+            Else
+                ShowHelp("BASINS Details\Project Creation and Management\Build BASINS Project.html")
+            End If
         End If
     End Sub
 

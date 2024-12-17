@@ -94,7 +94,7 @@ Public Module ConstituentBudget
                 lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ISED-TOT"))
                 lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "ROSED-TOT"))
                 lDepScourData.Add(aScenarioResults.DataSets.FindData("Constituent", "DEPSCOUR-TOT"))
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "NITROGEN - TOTAL OUTFLOW"))
@@ -113,20 +113,40 @@ Public Module ConstituentBudget
                     Next
                 End If
 
-                lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
-                lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
-                lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
-                lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
+                If aBalanceType = "TN" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-IN"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOT-OUT"))
+                ElseIf aBalanceType = "TAM" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-INTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-OUTTOT"))
+                ElseIf aBalanceType = "TKN" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-INTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOTORG-IN"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "TAM-OUTTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "N-TOTORG-OUT"))
+                ElseIf aBalanceType = "NO2NO3" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-INTOT"))
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-INTOT"))
+                    lAtmDepData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-ATMDEPTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO2-OUTTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "NO3-OUTTOT"))
+                End If
 
-            Case "TP"
+            Case "TP", "ORTHO P"
                 lUnits = "lbs"
 
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - SURFACE LAYER - OUTFLOW"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - INTERFLOW - OUTFLOW"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-P IN SOLUTION - GROUNDWATER - OUTFLOW"))
                 lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDP4A")) ' Outflow of sediment-associated PO4
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
-                lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
+                If aBalanceType = "TP" Then
+                    lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "SDORP")) ' Organic P Outflow (will be multiplied by 0.6)
+                    lNonpointData.Add(aScenarioResults.DataSets.FindData("Constituent", "ORGN - TOTAL OUTFLOW")) ' Organic N Outflow (will be multiplied by 0.05534793)
+                End If
                 'lNonpointData.AddRange((aScenarioResults.DataSets.FindData("Constituent", "POPHOS")))
                 If aConstProperties IsNot Nothing Then
                     Dim ConstituentList As New List(Of String)
@@ -144,8 +164,13 @@ Public Module ConstituentBudget
                 End If
                 lAtmDepData.Add((aScenarioResults.DataSets.FindData("Constituent", "PO4-ATMDEPTOT")))
 
-                lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-IN"))
-                lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-OUT"))
+                If aBalanceType = "TP" Then
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-IN"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "P-TOT-OUT"))
+                Else
+                    lTotalInflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-INTOT"))
+                    lOutflowData.Add(aScenarioResults.DataSets.FindData("Constituent", "PO4-OUTTOT"))
+                End If
         End Select
 
         Dim lUpstreamInflows As New atcCollection
@@ -179,7 +204,7 @@ Public Module ConstituentBudget
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
 
-        aReport7LoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & "Loading rates " & lUnits & "ac/yr.")
+        aReport7LoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & " Loading rates " & lUnits & "/ac/yr.")
         aReport7LoadingRate.AppendLine("   Run Made " & aRunMade)
         aReport7LoadingRate.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         aReport7LoadingRate.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
@@ -552,7 +577,7 @@ Public Module ConstituentBudget
                     aReport1ReachBudget.Append(.ToString)
                 End With
 
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 aReport2NPSLoads.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
 
@@ -774,7 +799,7 @@ Public Module ConstituentBudget
                     aReport1ReachBudget.Append(.ToString)
                 End With
 
-            Case "TP"
+            Case "TP", "ORTHO P"
                 aReport2NPSLoads.AppendLine("Reach" & vbTab & "Nonpoint Source" & vbTab & "Area (ac)" & vbTab &
                                     "Rate (lbs/ac)" & vbTab & "Total Load (lbs)")
 
@@ -991,7 +1016,9 @@ Public Module ConstituentBudget
                 End With
         End Select
 
-        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "Sediment" Then
+        If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "ORTHO P" Or
+           aBalanceType = "TAM" Or aBalanceType = "TKN" Or aBalanceType = "NO2NO3" Or
+           aBalanceType = "Sediment" Then
             'do load allocation reports
             Dim lLandUses As New List(Of String)
             Dim lReaches As New List(Of String)

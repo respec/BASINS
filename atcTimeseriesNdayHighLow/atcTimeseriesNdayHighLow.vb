@@ -320,6 +320,17 @@ Public Class atcTimeseriesNdayHighLow
                                 newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
                             End Try
                             lSJday = lNextSJday
+
+                            For A As Integer = 0 To lCurrentYear.Attributes.Count - 1
+                                With lCurrentYear.Attributes(A)
+                                    If .Arguments IsNot Nothing Then .Arguments.Clear()
+                                    If .Value.GetType().Name = "atcTimeseries" Then
+                                        .Value.Clear()
+                                    End If
+                                End With
+                            Next
+                            lCurrentYear.Clear()
+                            lCurrentYear = Nothing
                         Next
 
                         Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
@@ -576,8 +587,10 @@ Public Class atcTimeseriesNdayHighLow
 
                 If Not ReferenceEquals(aTimeseries, lNdayTs) Then
                     'get rid of intermediate timeseries
-                    lNdayTs.Clear()
-                    lNdayTs = Nothing
+                    If aLogFg Then
+                        lNdayTs.Clear()     'this seems to cause problems for nonlog!  pbd 8/12/2024
+                        lNdayTs = Nothing
+                    End If
                     Me.DataSets.Clear()
                 End If
             End If
@@ -751,6 +764,17 @@ Public Class atcTimeseriesNdayHighLow
         For Each lOperation As atcDefinedValue In AvailableOperations
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
+    End Sub
+
+    ''' <summary>
+    ''' Add operations to atcDataAttributes so they can be computed as needed
+    ''' </summary>
+    ''' <remarks>
+    ''' Same effect as the non-shared Initialize
+    ''' </remarks>
+    Public Shared Sub InitializeShared()
+        Dim lTemp As New atcTimeseriesNdayHighLow()
+        lTemp.Initialize()
     End Sub
 #Else
     <CLSCompliant(False)> _

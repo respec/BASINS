@@ -111,10 +111,18 @@ Public Class clsBaseflowPart
         PrintDataSummary(lTsDaily)
         Dim lNumMissing As Integer = lTsDaily.Attributes.GetValue("Count Missing")
         If lNumMissing <= 1 Then
-            Logger.Dbg( _
-                  "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf & _
+            Logger.Dbg(
+                  "NUMBER OF DAYS (WITH DATA) COUNTED =            " & lTsDaily.numValues - lNumMissing & vbCrLf &
                   "NUMBER OF DAYS THAT SHOULD BE IN THIS INTERVAL =" & lTsDaily.numValues, MsgBoxStyle.Information, "Perform PART")
-            Part(lTsDaily)
+            Try
+                Part(lTsDaily)
+            Catch ex As Exception
+                gError &= vbCrLf & "PART base-flow separation failed. Exception: " & ex.InnerException.Message
+                If gBatchRun Then
+                    Throw New ApplicationException(gError)
+                End If
+                Return Nothing
+            End Try
         Else
             Logger.Dbg( _
                    "***************************************" & vbCrLf & _
@@ -124,6 +132,7 @@ Public Class clsBaseflowPart
                    "***************************************", MsgBoxStyle.Critical, "PART Method Stopped")
             If gBatchRun Then
                 gError &= vbCrLf & "Error:PART:Flow Data Has Gap."
+                Throw New ApplicationException(gError)
             End If
             Return Nothing
         End If

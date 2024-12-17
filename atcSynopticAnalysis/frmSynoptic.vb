@@ -2,6 +2,7 @@ Imports atcControls
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class frmSynoptic
     'The group of atcTimeseries displayed
@@ -203,7 +204,7 @@ Public Class frmSynoptic
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
         End With
@@ -218,7 +219,7 @@ Public Class frmSynoptic
             If FileExists(IO.Path.GetDirectoryName(.FileName), True, False) Then
                 .InitialDirectory = IO.Path.GetDirectoryName(.FileName)
             End If
-            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+            If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 Logger.Progress("Saving Synoptic Analysis", 0, cboGroupBy.Items.Count - 1)
                 SaveFileString(.FileName, "")
                 For lGroupBy As Integer = cboGroupBy.Items.Count - 1 To 0 Step -1
@@ -282,7 +283,11 @@ Public Class frmSynoptic
     End Function
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Events.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
+        End If
     End Sub
 
     ''' <summary>

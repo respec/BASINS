@@ -86,13 +86,13 @@ Public Class frmDownload
 
 #If GISProvider = "DotSpatial" Then
     Public Function AskUser(ByVal aMapWin As AppManager, ByVal aParentHandle As Integer) As String
+        pMapWin = aMapWin
         pApplicationName = "Hydro Toolbox"
 #Else
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) As String
+        pMapWin = aMapWin
         pApplicationName = pMapWin.ApplicationInfo.ApplicationName
 #End If
-        pMapWin = aMapWin
-
         'The following line hot-wires the form to just do met data download
         'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Me.Height = 141 ': Return Me.XML
 
@@ -192,25 +192,37 @@ Public Class frmDownload
         If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             lGroups.Add(grpNWISStations_GW)
             lGroups.Add(grpNWIS_GW)
-            lGroups.Add(grpBASINS)
-            lGroups.Add(grpNHDplus)
+            'lGroups.Add(grpBASINS)
+            lGroups.Add(grpNHDplus2)
             lGroups.Add(grpUSGS_Seamless)
 
-            chkBASINS_LSTORET.Visible = False
-            chkBASINS_Census.Visible = False
-            chkBASINS_MetStations.Left = chkBASINS_Census.Left
-            chkBASINS_303d.Visible = False
+            chkUSGS_Seamless_NLCD2001_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2001_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2004_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2006_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2006_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2008_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2011_Impervious.Visible = False
+            chkUSGS_Seamless_NLCD2011_LandCover.Visible = False
+            chkUSGS_Seamless_NLCD2013_LandCover.Visible = False
+
+            'chkBASINS_LSTORET.Visible = False
+            'chkBASINS_Census.Visible = False
+            'chkBASINS_MetStations.Left = chkBASINS_Census.Left
+            'chkBASINS_DEMG.Left = chkBASINS_NED.Left
+            'chkBASINS_303d.Visible = False
             'chkBASINS_MetData.Left = chkBASINS_303d.Left
         Else
             lGroups.Add(grpBASINS)
             'lGroups.Add(grpNCDC)
-            lGroups.Add(grpNHDplus)
+            'lGroups.Add(grpNHDplus)
             lGroups.Add(grpNHDplus2)
             lGroups.Add(grpNWISStations)
             lGroups.Add(grpNWIS)
             lGroups.Add(grpUSGS_Seamless)
             'lGroups.Add(grpSTORET)
             lGroups.Add(grpNLDAS)
+            lGroups.Add(grpSoils)
         End If
 
         For Each lGroup As System.Windows.Forms.GroupBox In lGroups
@@ -233,9 +245,30 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
+        If System.Windows.Forms.Application.ProductName = "USGSHydroToolbox" Then
+            chkGetNewest.CheckState = System.Windows.Forms.CheckState.Checked
+        End If
+
         SetCheckboxVisibilityFromMapOrRegion()
         TallyPreChecked(lGroups)
         SetColorsFromAvailability()
+        lstParameters.Items.Add("Precip")   '"APCPsfc"
+        lstParameters.Items.Add("PET")      '"PEVAPsfc"
+        lstParameters.Items.Add("Air Temp") '"TMP2m"
+        lstParameters.Items.Add("Wind")     '"UGRD10m" '"VGRD10m"
+        lstParameters.Items.Add("Sol Rad")  '"DSWRFsfc"
+        lstParameters.Items.Add("Cloud")    '"DSWRFsfc"
+        lstParameters.Items.Add("Dewp")     '"SPFH2m"
+        If lstParameters.Enabled Then
+            For i As Integer = 0 To lstParameters.Items.Count - 1
+                lstParameters.SetSelected(i, True)
+            Next
+            'show from top
+            Dim ltemp As Integer = lstParameters.TopIndex
+            lstParameters.TopIndex = 0   'not working???
+        End If
+        numEnd.Maximum = DateTime.Now.Year
+        numEnd.Value = DateTime.Now.Year
 
         Do
             Me.ShowDialog(System.Windows.Forms.Control.FromHandle(New IntPtr(aParentHandle)))
@@ -251,25 +284,30 @@ Public Class frmDownload
 
                     'check to see if nhdplus desired and available
                     Dim lProblem As Boolean = False
-                    If chkNHDplus_All.Checked Or chkNHDplus_Catchment.Checked Or chkNHDplus_elev_cm.Checked Or chkNHDplus_hydrography.Checked Then
-                        For Each lHuc8 As String In HUC8s()
-                            If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV1/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
-                                lProblem = True
-                            End If
-                        Next
-                        If lProblem Then
-                            If MapWinUtility.Logger.Msg("NHDPlus v1.0 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
-                                                         MsgBoxStyle.YesNo, "Desired Data Not Available") = MsgBoxResult.No Then
-                                Return CancelString
-                            End If
-                        End If
-                    End If
+                    'If chkNHDplus_All.Checked Or chkNHDplus_Catchment.Checked Or chkNHDplus_elev_cm.Checked Or chkNHDplus_hydrography.Checked Then
+                    '    For Each lHuc8 As String In HUC8s()
+                    '        If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV1/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
+                    '            lProblem = True
+                    '        End If
+                    '    Next
+                    '    If lProblem Then
+                    '        If MapWinUtility.Logger.Msg("NHDPlus v1.0 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
+                    '                                     MsgBoxStyle.YesNo, "Desired Data Not Available") = MsgBoxResult.No Then
+                    '            Return CancelString
+                    '        End If
+                    '    End If
+                    'End If
                     If chkNHDplus2_All.Checked Or chkNHDplus2_Catchment.Checked Or chkNHDplus2_elev_cm.Checked Or chkNHDplus2_hydrography.Checked Then
                         For Each lHuc8 As String In HUC8s()
                             'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
-                            If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                            'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                            'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                            'MapWinUtility.Logger.Dbg("CheckAddress failed for newftp")
+                            If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                                MapWinUtility.Logger.Dbg("CheckAddress failed for gaftp")
                                 lProblem = True
                             End If
+                            'End If
                         Next
                         If lProblem Then
                             If MapWinUtility.Logger.Msg("NHDPlus v2.1 data is not available for download for the selected region." & vbCrLf & "Continue anyway?",
@@ -369,7 +407,12 @@ Public Class frmDownload
             Dim lProjectionString As String = ""
 #If GISProvider = "DotSpatial" Then
             If pMapWin.Map.Layers.Count > 0 Then
-                lProjectionString = pMapWin.Map.GetLayers()(0).ProjectionString
+                'lProjectionString = pMapWin.Map.GetLayers()(0).ProjectionString
+                'projection string might not be set yet! pbd
+                Dim lprojinfo As DotSpatial.Projections.ProjectionInfo = pMapWin.Map.Projection
+                If lprojinfo.ToProj4String.Length() > 0 Then
+                    lProjectionString = lprojinfo.ToProj4String
+                End If
             End If
             Dim lMapExtent = pMapWin.Map.Extent
 #Else
@@ -381,7 +424,7 @@ Public Class frmDownload
             Dim lExtents As Extent = Nothing
             Select Case cboRegion.SelectedItem
                 Case pRegionViewRectangle
-                    lExtents = lMapExtent 'pMapWin.View.Extents
+                    lExtents = pMapWin.Map.ViewExtents 'pMapWin.View.Extents
                 Case pRegionExtentSelectedLayer
                     lExtents = lMapExtent 'pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
                 Case pRegionExtentSelectedShapes
@@ -478,7 +521,7 @@ Public Class frmDownload
         Dim lStations As New Generic.List(Of String)
         Dim layers As List(Of IMapFeatureLayer) = GisUtilDS.GetFeatureLayers(FeatureType.Point)
         For Each lyr As IMapFeatureLayer In layers
-            If lyr.Checked Then
+            If lyr.IsSelected Then
                 If lyr.Selection().Count > 0 Then
                     Dim lKeyFld As DataColumn = Nothing
                     Dim lKeyFldIndex As Integer = -1
@@ -540,7 +583,7 @@ Public Class frmDownload
 
         If pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
             chkNWIS_GetNWISDailyDischarge_GW.Visible = True
-            chkNWIS_GetNWISIdaDischarge_GW.Visible = True
+            chkNWIS_GetNWISIdaDischarge_GW.Visible = False
             chkNWIS_GetNWISDailyGW_GW.Visible = True
             chkNWIS_GetNWISPeriodicGW_GW.Visible = True
             chkNWIS_GetNWISPrecipitation_GW.Visible = True
@@ -586,8 +629,12 @@ Public Class frmDownload
             Dim lFilename As String = ""
             Dim lSelectedCount As Integer = 0
             If lLayer IsNot Nothing Then
-                lFilename = IO.Path.GetFileNameWithoutExtension(lLayer.DataSet.Filename).ToLower
-                lSelectedCount = CType(lLayer, IMapFeatureLayer).Selection().Count
+                If lLayer.GetType.Name = "MapRasterLayer" Then
+                    lFilename = ""
+                Else
+                    lFilename = IO.Path.GetFileNameWithoutExtension(lLayer.DataSet.Filename).ToLower
+                    lSelectedCount = CType(lLayer, IMapFeatureLayer).Selection().Count
+                End If
             Else
                 lFilename = ""
             End If
@@ -646,6 +693,12 @@ Public Class frmDownload
                             chkNLDAS_GetNLDASParameter.Enabled = True
                             txtTimeZone.Enabled = True
                             lblTimeZone.Enabled = True
+                            lstParameters.Enabled = True
+                            numStart.Enabled = True
+                            numEnd.Enabled = True
+                            lblConstituents.Enabled = True
+                            lblStart.Enabled = True
+                            lblEnd.Enabled = True
                             chkNLDAS_GetNLDASParameter.Text = "Hourly Data"
                             chkNLDAS_GetNLDASParameter.Checked = True
                     End Select
@@ -851,6 +904,36 @@ Public Class frmDownload
                                         Dim lWDMfrm As New frmWDM
                                         lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDAS", IO.Path.Combine(lSaveFolderOnly, "nldas"), "NLDAS Processing Options")
                                         lWDMxml &= "<TimeZoneShift>" & txtTimeZone.Text & "</TimeZoneShift>" & vbCrLf
+                                        If lstParameters.SelectedItems.Count <> 7 And lstParameters.SelectedItems.Count <> 0 Then
+                                            'user doens't want all the parameters
+                                            If lstParameters.SelectedItems.Contains("Precip") Then
+                                                lWDMxml &= "<datatype>APCPsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("PET") Then
+                                                lWDMxml &= "<datatype>PEVAPsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Air Temp") Then
+                                                lWDMxml &= "<datatype>TMP2m</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Wind") Then
+                                                lWDMxml &= "<datatype>UGRD10m</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>VGRD10m</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Sol Rad") Then
+                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Cloud") Then
+                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                            End If
+                                            If lstParameters.SelectedItems.Contains("Dewp") Then
+                                                lWDMxml &= "<datatype>SPFH2m</datatype>" & vbCrLf
+                                            End If
+                                        End If
+                                        If numStart.Value > 1979 Or numEnd.Value < DateTime.Now.Year Then
+                                            'user doesn't want the whole available span, add one hour for start of day 
+                                            lWDMxml &= "<startdate>1/1/" & numStart.Value & " 1:00:00</startdate>" & vbCrLf
+                                            lWDMxml &= "<enddate>1/1/" & numEnd.Value + 1 & "</enddate>" & vbCrLf
+                                        End If
                                     End If
                                     'If lChild Is chkNWIS_GetNWISPrecipitation Then
                                     '    Dim lWDMfrm As New frmWDM
@@ -1080,7 +1163,11 @@ Public Class frmDownload
     End Sub
 
     Private Sub ShowHelp()
-        atcUtility.ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+        If pApplicationName = "Hydro Toolbox" Then
+            atcUtility.ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data.html")
+        Else
+            atcUtility.ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Download.html")
+        End If
     End Sub
 
     Private Function RegionValid(ByVal aRegionType As String, ByRef aReason As String) As Boolean
@@ -1189,8 +1276,20 @@ Public Class frmDownload
             Dim response As WebResponse = request.GetResponse()
         Catch ex As Exception
             Logger.Dbg("CheckAddress Failed " & ex.ToString)
-            Return False
+            Return True
         End Try
         Return True
     End Function
+
+    Private Sub numEnd_ValueChanged(sender As Object, e As EventArgs) Handles numEnd.ValueChanged
+        numStart.Maximum = numEnd.Value
+    End Sub
+
+    Private Sub numStart_ValueChanged(sender As Object, e As EventArgs) Handles numStart.ValueChanged
+        numEnd.Minimum = numStart.Value
+    End Sub
+
+    Private Sub chkUSGS_Seamless_NLCD2004_LandCover_CheckedChanged(sender As Object, e As EventArgs) Handles chkUSGS_Seamless_NLCD2004_LandCover.CheckedChanged
+
+    End Sub
 End Class

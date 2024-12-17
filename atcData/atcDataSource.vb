@@ -153,8 +153,9 @@ Public Class atcDataSource
                             Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
         'assume the best
         Open = True
+        Dim lFiles As New atcCollection
 
-        If String.IsNullOrEmpty(aSpecification) OrElse _
+        If String.IsNullOrEmpty(aSpecification) OrElse
            (Not CanSave AndAlso Not (FileExists(aSpecification))) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
@@ -167,9 +168,26 @@ Public Class atcDataSource
                 .Filter = Filter
                 .FilterIndex = 1
                 .CheckFileExists = Not CanSave
+                If System.Windows.Forms.Application.ProductName = "USGSHydroToolbox" Then
+                    'allow multiselect from hydro toolbox for rdb files
+                    .Multiselect = True
+                End If
                 If .ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-                    aSpecification = AbsolutePath(.FileName, CurDir)
-                    Logger.Dbg("User specified file '" & aSpecification & "'")
+                    If .FileNames.GetLength(0) > 1 Then
+                        For Each lFileName As String In .FileNames
+                            lFiles.Add(AbsolutePath(lFileName, CurDir))
+                            If aSpecification.Length = 0 Then
+                                aSpecification = AbsolutePath(lFileName, CurDir)
+                            Else
+                                aSpecification = aSpecification & "," & AbsolutePath(lFileName, CurDir)
+                            End If
+                        Next
+                        Logger.Dbg("User specified files '" & aSpecification & "'")
+                    Else
+                        lFiles.Add(AbsolutePath(.FileName, CurDir))
+                        aSpecification = AbsolutePath(.FileName, CurDir)
+                        Logger.Dbg("User specified file '" & aSpecification & "'")
+                    End If
                 Else 'Return empty string if user clicked Cancel
                     aSpecification = ""
                     Logger.Dbg("User Cancelled File Selection Dialog for " & lString)
@@ -179,16 +197,18 @@ Public Class atcDataSource
         End If
         If aSpecification.Length = 0 Then 'cancel case
             Open = False
-        ElseIf Not CanSave AndAlso Not FileExists(aSpecification) Then
-            Logger.Dbg("File '" & aSpecification & "' not found")
-            Open = False
-        Else 'check already open
-            aSpecification = AbsolutePath(aSpecification, CurDir())
-            If atcDataManager.DataSourceBySpecification(aSpecification) IsNot Nothing Then
-                Logger.Dbg("AlreadyOpen")
-                Open = True
-            End If
         End If
+        For Each lFile As String In lFiles
+            If Not CanSave AndAlso Not FileExists(lFile) Then
+                Logger.Dbg("File '" & lFile & "' not found")
+                Open = False
+            Else 'check already open
+                If atcDataManager.DataSourceBySpecification(lFile) IsNot Nothing Then
+                    Logger.Dbg("AlreadyOpen")
+                    Open = True
+                End If
+            End If
+        Next
         Me.Specification = aSpecification 'save regardless for messages or further processing
         'If Open Then 'looks good to try data type specific open
         '    Logger.Dbg("Process:" & aSpecification)

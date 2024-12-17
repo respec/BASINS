@@ -416,6 +416,8 @@ Public Class atcGraphForm
     Private Sub ShowHelpForGraph()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             ShowHelp("View\Graph.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools\Graph.html")
         Else
             ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
         End If

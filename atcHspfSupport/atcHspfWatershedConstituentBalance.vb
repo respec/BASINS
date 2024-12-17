@@ -177,15 +177,18 @@ Public Module WatershedConstituentBalance
                     lReport.AppendLine(lGroup)
                     lConstituents = lGroups.ItemByKey(lGroup)
                     For Each lConstituent As String In lConstituents.Keys
-                        lSummaryDetails = lConstituents.ItemByKey(lConstituent)
-                        lReport.Append("  " & lConstituent.PadRight(12))
-                        For Each lSummaryDetail In lSummaryDetails
-                            With lSummaryDetail
-                                lReport.Append(vbTab & DecimalAlign(.UnitValue) _
-                                               & vbTab & DecimalAlign(.Mass, , 1))
-                            End With
-                        Next
-                        lReport.AppendLine()
+                        If lConstituent = "Surface Flow as Dissolved" And lGroup = "TKN" Then
+                        Else
+                            lSummaryDetails = lConstituents.ItemByKey(lConstituent)
+                            lReport.Append("  " & lConstituent.PadRight(12))
+                            For Each lSummaryDetail In lSummaryDetails
+                                With lSummaryDetail
+                                    lReport.Append(vbTab & DecimalAlign(.UnitValue) _
+                                                   & vbTab & DecimalAlign(.Mass, , 1))
+                                End With
+                            Next
+                            lReport.AppendLine()
+                        End If
                     Next
                 Next lGroup
                 SaveFileString(aOutFilePrefix & SafeFilename(ShortConstituentName(aBalanceType) & "_" & aScenario & "_OvAll_Avg_By_Mult_Locs.txt"), lReport.ToString)
@@ -344,9 +347,10 @@ Public Module WatershedConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons/ac)" & vbCrLf
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (tons)" & vbCrLf
-                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND", "ORTHO P_PERLND",
+                                                     "ORTHO P_IMPLND", "TAM_PERLND", "TAM_IMPLND", "TKN_PERLND", "TKN_IMPLND", "NO2NO3_PERLND", "NO2NO3_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs/ac)" & vbCrLf
-                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES", "ORTHO P_RCHRES", "TAM_RCHRES", "TKN_RCHRES", "NO2NO3_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLandUse & "  (lbs)" & vbCrLf
                                                 Case Else
                                                     Dim lPrefix As String = ""
@@ -439,7 +443,7 @@ Public Module WatershedConstituentBalance
                                                         If lConnection.Target.VolName = "RCHRES" Then
                                                             Dim aReach As HspfOperation = aUci.OpnBlks("RCHRES").OperFromID(lConnection.Target.VolId)
                                                             Dim aConversionFactor As Double = 0.0
-                                                            If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                                            If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "TKN" Then
                                                                 aConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, aReach)
                                                             End If
                                                             lMassLinkID = lConnection.MassLink
@@ -1082,12 +1086,12 @@ Public Module WatershedConstituentBalance
                     lSummaryReport.AppendLine()
                     lSummaryReport.AppendLine(aBalanceType)
                     For Each lLoad As Load In lLoadTotals
-                        If lLoad.Count > 1 Then
-                            lSummaryReport.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab &
+                        'If lLoad.Count > 1 Then
+                        lSummaryReport.AppendLine(lLoad.Name.PadRight(lRowIdLength) & vbTab &
                                                   DecimalAlign(lLoad.Unit(0)) & vbTab &
                                                   DecimalAlign(lLoad.Total) & vbTab &
                                                   DecimalAlign(lLoad.Overall))
-                        End If
+                        'End If
                     Next
                 End If
             Next lOperationType

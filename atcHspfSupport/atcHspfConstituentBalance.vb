@@ -143,9 +143,10 @@ Public Module ConstituentBalance
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons/ac)"
                                                 Case "Sediment_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (tons)"
-                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND"
+                                                Case "TN_PERLND", "TN_IMPLND", "TP_PERLND", "TP_IMPLND", "BOD-Labile_PERLND", "BOD-Labile_IMPLND",
+                                                     "ORTHO P_PERLND", "ORTHO P_IMPLND", "TKN_PERLND", "TKN_IMPLND", "NO2NO3_PERLND", "NO2NO3_IMPLND"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs/ac)"
-                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES"
+                                                Case "TN_RCHRES", "TP_RCHRES", "BOD-Labile_RCHRES", "ORTHO P_RCHRES", "TKN_RCHRES", "NO2NO3_RCHRES"
                                                     .Header = aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ") (lbs)"
                                                 Case Else
                                                     Dim lPrefix As String = ""
@@ -209,7 +210,7 @@ Public Module ConstituentBalance
 
                                                     End If
                                                     Dim lConversionFactor As Double = 0.0
-                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                                    If aBalanceType = "TN" Or aBalanceType = "TP" Or aBalanceType = "TKN" Then
                                                         lConversionFactor = ConversionFactorfromOxygen(aUci, aBalanceType, lReach)
                                                     End If
 

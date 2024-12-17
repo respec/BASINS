@@ -71,7 +71,7 @@ Public Class frmMain
         With atcDataManager.DataPlugins
             .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
             .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
-            '.Add(New atcWdmVb.atcWDMfile)
+            .Add(New atcWdmVb.atcWDMfile)
             .Add(New atcWDM.atcDataSourceWDM)
             .Add(New atcTimeseriesNCDC.atcTimeseriesNCDC)
             .Add(New atcTimeseriesRDB.atcTimeseriesRDB)

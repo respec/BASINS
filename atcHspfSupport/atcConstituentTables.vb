@@ -740,7 +740,8 @@ Public Module atcConstituentTables
                                             lOperationIsConnected = True
 
                                             Dim aConversionFactor As Double = 0.0
-                                            If aBalanceType = "TN" Or aBalanceType = "TP" Then
+                                            If aBalanceType = "TN" OrElse aBalanceType = "TAM" OrElse aBalanceType = "TKN" OrElse
+                                               aBalanceType = "NO2NO3" OrElse aBalanceType = "TP" OrElse aBalanceType = "ORTHO P" Then
                                                 aConversionFactor = ConversionFactorfromOxygen(aUCI, lConstituent.ReportType, lReach)
                                             End If
                                             Dim lMassLinkID As Integer = lConnection.MassLink
@@ -1522,7 +1523,7 @@ Public Module atcConstituentTables
                 SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "TotalN Case"
-            Case "TN"
+            Case "TN", "TAM", "TKN", "NO2NO3"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     pReach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus
@@ -1676,7 +1677,7 @@ Public Module atcConstituentTables
 #End Region
 
 #Region "TotalP Case"
-            Case "TP"
+            Case "TP", "ORTHO P"
                 For Each lConstituent As ConstituentProperties In aConstProperties
                     pReach_Budget_Table = New DataTable
                     Dim lReachConstituent As String = lConstituent.ConstNameForEXPPlus

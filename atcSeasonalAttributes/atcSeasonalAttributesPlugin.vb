@@ -1,12 +1,17 @@
 Imports atcUtility
 Imports atcData
+Imports System.Windows.Forms
 
 Public Class atcSeasonalAttributesPlugin
     Inherits atcData.atcDataDisplay
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Analysis::Seasonal Attributes"
+            If Application.ProductName = "USGSHydroToolbox" Then
+                Return "Analysis::Attributes"
+            Else
+                Return "Analysis::Seasonal Attributes"
+            End If
         End Get
     End Property
 

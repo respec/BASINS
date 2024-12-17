@@ -16,9 +16,8 @@ Public Class frmAddPoint
 
         cboReach.Items.Clear()
         Dim lOpnBlk As HspfOpnBlk = pUCI.OpnBlks("RCHRES")
-        For lOper As Integer = 1 To lOpnBlk.Count
-            Dim lHspfOperation As HspfOperation = lOpnBlk.OperFromID(lOper)
-            cboReach.Items.Add("RCHRES " & lHspfOperation.Id & " - " & lHspfOperation.Description)
+        For Each lOper As HspfOperation In lOpnBlk.Ids
+            cboReach.Items.Add("RCHRES " & lOper.Id & " - " & lOper.Description)
         Next lOper
         cboReach.SelectedIndex = 0
 

@@ -8,7 +8,8 @@ Friend Class frmDisplayFrequencyGrid
     Private pInitializing As Boolean
     Public WithEvents SWSTATform As frmSWSTAT
     Public WithEvents SWSTATformmod As frmSWSTATmod
-    Public WithEvents SWSTATDFlowBatchfrm As frmSWSTATDFlowBatch
+    'Appears frmSWSTATDFlowBatch has been replaced by frmsWSTAT for batch development
+    'Public WithEvents SWSTATDFlowBatchfrm As frmSWSTATDFlowBatch
 
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcTimeseriesGroup
@@ -438,7 +439,11 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("SW-Tools.html")
+        Else
+            ShowHelp("BASINS Details\Analysis\USGS Surface Water Statistics.html")
+        End If
     End Sub
 
     Private Sub mnuFileSaveViewNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveViewNDay.Click

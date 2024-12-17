@@ -6,7 +6,7 @@ using System.Text;
 
 namespace atcFtableBuilder
 {
-    class FTableCalcNaturalFP : FTableCalculator, IFTableOperations
+    public class FTableCalcNaturalFP : FTableCalculator, IFTableOperations
     {
         public double inpChannelSlope;
         public double inpChannelLength;

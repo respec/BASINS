@@ -31,6 +31,9 @@ Public Module modDownload
         Next
         If lMessage.Length > 2 AndAlso Logger.DisplayMessageBoxes Then
             Logger.Msg(lMessage, "Data Download")
+            If Not String.IsNullOrEmpty(g_Project.CurrentProjectFile) AndAlso IO.File.Exists(g_Project.CurrentProjectFile) Then
+                g_Project.SaveProject(g_Project.CurrentProjectFile)
+            End If
             If lMessage.Contains(" Data file") AndAlso g_AppNameShort <> "GW Toolbox" Then
                 atcDataManager.UserManage()
             End If
@@ -130,7 +133,7 @@ Public Module modDownload
 #End If
                         If lUSGSApplication Then
                             Select Case IO.Path.GetFileNameWithoutExtension(lOutputFileName).ToLowerInvariant()
-                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad"
+                                Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad", "catpt", "cntypt"
                                     TryDeleteShapefile(lOutputFileName)
                                     Continue For  'Skip trying to add this shapefile to the map
                             End Select
@@ -151,6 +154,12 @@ Public Module modDownload
                         lOutputFileName = lProjectorNode.InnerText
                         If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
 #If GISProvider = "DotSpatial" Then
+                        Dim lLayer As IMapRasterLayer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+                        If lLayer Is Nothing Then
+                            Logger.Msg(lOutputFileName, "Failed add grid layer")
+                        Else
+                            lLayersAdded.Add(lLayer.DataSet.Name)
+                        End If
 #Else
                         Dim lLayer As MapWindow.Interfaces.Layer = AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
                         If lLayer Is Nothing Then
@@ -633,9 +642,9 @@ Public Module modDownload
             lDirName = aDataPath & aDefDirName & "-" & lSuffix
         End While
         If lSuffix > 1 Then 'Also add suffix to project file name
-            Return IO.Path.Combine(lDirName, aDefDirName & "-" & lSuffix & ".mwprj")
+            Return IO.Path.Combine(lDirName, aDefDirName & "-" & lSuffix & ".dspx")
         Else
-            Return IO.Path.Combine(lDirName, aDefDirName & ".mwprj")
+            Return IO.Path.Combine(lDirName, aDefDirName & ".dspx")
         End If
     End Function
 
@@ -709,6 +718,7 @@ Public Module modDownload
             'prompt about creating a project with no data
             lProjectName = CreateNewProjectAndDownloadCoreDataInteractive(lRegion)
         End If
+
         If Not String.IsNullOrEmpty(lProjectName) Then
             Logger.Msg(lProjectName, "Created Project")
         End If
@@ -973,10 +983,12 @@ StartOver:
                     g_Project.SaveProject(lProjectFileName)
                 Else
                     'new check to see if the core data is available before attempting to download it
-                    Dim lHUC8BoundaryOnly As Boolean = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
-                    If Not lHUC8BoundaryOnly Then
+                    Dim lHUC8Status As Integer = CheckCore(aRegion, lNewDataDir, lDataPath, lProjectFileName)
+                    If lHUC8Status = 0 Then
                         'download and project core data
                         CreateNewProjectAndDownloadCoreData(aRegion, lDataPath, lNewDataDir, lProjectFileName)
+                    ElseIf lHUC8Status = 2 Then
+                        lProjectFileName = ""    'cancel
                     End If
                 End If
                 Return lProjectFileName
@@ -1686,7 +1698,7 @@ StartOver:
                 Case FeatureType.Point, FeatureType.MultiPoint
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    MWlay.DataSet.Name = LayerName
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
                     'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
@@ -1713,7 +1725,7 @@ StartOver:
                 Case FeatureType.Line
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    MWlay.DataSet.Name = LayerName
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
                     'MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
@@ -1721,7 +1733,7 @@ StartOver:
                 Case FeatureType.Polygon
                     'If Style Is Nothing Then
                     MWlay = g_MapWin.Map.Layers.Add(shpFileFS)
-                    'MWlay.DataSet.Name = LayerName 'no need here
+                    MWlay.LegendText = LayerName
                     'Else
                     'RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
                     'RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
@@ -1797,9 +1809,10 @@ StartOver:
                     GisUtilDS.ZoomToLayer(MWlay)
                 End If
                 If Group.Length > 0 Then
-                    If Not GisUtilDS.IsLayer(MWlay.LegendText) Then
-                        AddLayerToGroup(MWlay, Group)
-                    End If
+                    If Not String.IsNullOrEmpty(Group) Then AddLayerToGroup(MWlay, Group)
+                    'If Not GisUtilDS.IsLayer(MWlay.LegendText) Then
+                    '    AddLayerToGroup(MWlay, Group)
+                    'End If
                 End If
                 If MWlay.IsVisible Then
                     g_MapWin.Map.Refresh()
@@ -1853,6 +1866,7 @@ StartOver:
         If lGroupHandle >= 0 AndAlso lGroupHandle < g_MapWin.Map.Layers.Count Then
             Dim lMapGroup As IMapGroup = g_MapWin.Map.Layers.Item(lGroupHandle)
             lMapGroup.Layers.Add(aLay)
+            g_MapWin.Map.Layers.Remove(aLay)
         Else
             'g_MapWin.Map.AddLayer(aLay.DataSet.Filename)
         End If
@@ -1880,7 +1894,7 @@ StartOver:
             Dim lGroup As MapGroup = TryCast(g_MapWin.Map.Layers.Item(lGroupIndex), MapGroup)
             If lGroup IsNot Nothing Then
                 Try
-                    If lGroup IsNot Nothing AndAlso lGroup.LayerCount = 0 Then
+                    If lGroup IsNot Nothing AndAlso lGroup.Layers.Count = 0 Then
                         lGroupToRemove.Add(lGroup)
                     End If
                 Catch ex As Exception
@@ -1896,12 +1910,15 @@ StartOver:
         Next
     End Sub
 
-    Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Boolean
+    Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Integer
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
-        Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
+        'Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
+        Dim lBaseURL As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
-        Dim lHUC8BoundaryOnly As Boolean = False
+        Dim lMissingHuc8s As String = ""
+        'Dim lHUC8BoundaryOnly As Boolean = False
+        Dim lHUC8Status As Integer = 0              '0 - ok (download or cache), 1 - use only huc8 boundary, 2- cancel
         'get huc8s in this region
         Dim lXDoc As New Xml.XmlDocument
         lXDoc.LoadXml(aRegion)
@@ -1910,16 +1927,36 @@ StartOver:
         For Each lNode As Xml.XmlNode In lNodeList
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
-            If Not lHUC8BoundaryOnly Then
+            If lHUC8Status = 0 Then
                 If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
                     'problem, this file does not exist
                     'just build project using selected HUC8s without any core data
-                    lHUC8BoundaryOnly = True
+                    lHUC8Status = 1
+                    lMissingHuc8s &= " " & lHUC8
                 End If
             End If
         Next
-        If lHUC8BoundaryOnly Then
-            If Logger.Msg("One (or more) of the core data sets is not available for download." & vbCr & "Do you want to build a project using only the HUC8 boundary?", MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
+
+        If lHUC8Status = 1 Then
+            Dim lStr As String = Logger.MsgCustom("One (or more) of the core data sets is temporarily unavailable for download." & vbCrLf & vbCrLf &
+                                                    lMissingHuc8s & vbCrLf & vbCrLf &
+                                                    "Select 'Use HUC8' to build project using only the HUC8 boundary." & vbCrLf &
+                                                    "Select 'Use Cache' to build project using data from the program cache." & vbCrLf &
+                                                    "Select 'Cancel' to stop Build New Project and return to Main dialog box.",
+                                                    "New Project", "Use HUC8", "Use Cache", "Cancel")
+            If lStr = "Use HUC8" Then
+                lHUC8Status = 1
+            ElseIf lStr = "Use Cache" Then
+                lHUC8Status = 0
+            Else
+                lHUC8Status = 2  'cancel
+            End If
+            If lHUC8Status = 1 Then
+                'If Logger.Msg("One (or more) of the core data sets is temporarily unavailable for download." & vbCrLf & vbCrLf &
+                '        lMissingHuc8s & vbCrLf & vbCrLf &
+                '        "Do you want to build a project using only the HUC8 boundary?" &
+                '         vbCr & vbCr & "(Cancel will attempt to build using data from the program cache.)",
+                '        MsgBoxStyle.OkCancel, "New Project") = MsgBoxResult.Ok Then
                 'save the HUC8s as a new shapefile
                 Dim lHUC8ShapefileName As String = GisUtilDS.LayerFileName("Cataloging Units")
                 Dim lNewShapefileName As String = aNewDataDir & FilenameNoPath(lHUC8ShapefileName)
@@ -1970,12 +2007,11 @@ StartOver:
                 ClearLayers()
                 AddAllShapesInDir(aNewDataDir, aNewDataDir)
                 'g_MapWin.PreviewMap.GetPictureFromMap()
-                g_Project.SaveProject(aProjectFileName)
-            Else
-                lHUC8BoundaryOnly = False
+                Dim lProjectFileName As String = IO.Path.ChangeExtension(aProjectFileName, "dspx")
+                g_Project.SaveProject(lProjectFileName)
             End If
         End If
-        Return lHUC8BoundaryOnly
+        Return lHUC8Status
     End Function
 
     'Given a file name and the XML describing how to render it, add a grid layer to MapWindow
@@ -1986,7 +2022,7 @@ StartOver:
         Dim Visible As Boolean
         'Dim Style As atcRenderStyle = New atcRenderStyle
 
-        Dim MWlay As IMapLayer = Nothing
+        Dim MWlay As IMapRasterLayer = Nothing
         Dim g As IMapRasterLayer
 
         'Don't add layer again if we already have it
@@ -2002,7 +2038,9 @@ StartOver:
             'g_StatusBar.Item(1).Text = "Opening " & aFilename
 
             If layerXml Is Nothing Then
-                MWlay = g_MapWin.Map.Layers.Add(aFilename)
+                Dim lr As Raster = Raster.OpenFile(aFilename)
+                Dim lIr As IRaster = lr
+                MWlay = g_MapWin.Map.Layers.Add(lr)
                 MWlay.IsVisible = True
             Else
                 LayerName = layerXml.Attributes.GetNamedItem("Name").InnerText
@@ -2020,25 +2058,27 @@ StartOver:
                         LayerName &= " (" & IO.Path.GetFileNameWithoutExtension(aFilename) & ")"
                 End Select
 
-                g = RasterLayer.OpenFile(aFilename)
-                'TODO: ensure correct Nodata value is set in NLCD grids
-                'If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
-                '    If g.Header.NodataValue <> 0 Then
-                '        g.Header.NodataValue = 0
-                '        Try
-                '            g.Save(aFilename)
-                '            g.Close()
-                '            g.Open(aFilename)
-                '        Catch e As Exception
-                '            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
-                '        End Try
-                '    End If
-                'End If
+                'g = RasterLayer.OpenFile(aFilename)
+                Dim lr As Raster = Raster.OpenFile(aFilename)
+                Dim lIr As IRaster = lr
+                'ensure correct Nodata value is set in NLCD grids
+                If aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                    If lr.NoDataValue <> 0 Then
+                        lr.NoDataValue = 0
+                        Try
+                            lr.Save()
+                            lr.Close()
+                            lr = Raster.OpenFile(aFilename)
+                        Catch e As Exception
+                            Logger.Msg(aFilename & vbLf & e.Message & vbLf & "This may cause unwanted display of areas with missing data", "Unable to set zero as NoData value")
+                        End Try
+                    End If
+                End If
                 Dim lProjectProjection As String = g_MapWin.Map.Projection.ToProj4String
                 If lProjectProjection IsNot Nothing AndAlso lProjectProjection.Length > 1 Then
-                    Dim lLayerProjection4 As String = CType(g, IMapRasterLayer).ProjectionString
+                    Dim lLayerProjection4 As String = lr.ProjectionString
                     If lLayerProjection4 Is Nothing OrElse lLayerProjection4.Trim().Length = 0 Then
-                        Dim lPrjFileName As String = IO.Path.ChangeExtension(g.Filename, ".proj4")
+                        Dim lPrjFileName As String = IO.Path.ChangeExtension(lr.Filename, ".proj4")
                         If IO.File.Exists(lPrjFileName) Then
                             lLayerProjection4 = WholeFileString(lPrjFileName)
                             'Else
@@ -2049,7 +2089,7 @@ StartOver:
                         End If
                     End If
                     If lLayerProjection4 IsNot Nothing AndAlso lLayerProjection4.Trim().Length > 0 AndAlso lLayerProjection4 <> lProjectProjection Then
-                        g_MapWin.Map.Layers.Remove(g)
+                        'g_MapWin.Map.Layers.Remove(lr)
                         Logger.Status("Reprojecting Grid, this may take several minutes: " & aFilename)
                         'the problem with GetTemporaryFileName is that we want this file to be permanent, so don't use this
                         'Dim lOutputFileName As String = GetTemporaryFileName(IO.Path.Combine(PathNameOnly(aFilename), FilenameNoExt(aFilename)), IO.Path.GetExtension(aFilename))
@@ -2058,16 +2098,22 @@ StartOver:
                         'MapWinGeoProc.SpatialReference.ProjectGrid(lLayerProjection4, g_Project.ProjectProjection, aFilename, lOutputFileName, True)
                         Logger.Status("Opening " & aFilename)
                         If IO.File.Exists(lOutputFileName) Then
-                            g = RasterLayer.OpenFile(lOutputFileName)
+                            'g = RasterLayer.OpenFile(lOutputFileName)
+                            lr = Raster.OpenFile(aFilename)
+                            lIr = lr
                         Else
-                            g = RasterLayer.OpenFile(aFilename)
+                            'g = RasterLayer.OpenFile(aFilename)
+                            lr = Raster.OpenFile(aFilename)
+                            lIr = lr
                         End If
                         Logger.Status("")
                     End If
                 End If
 
-                g = g_MapWin.Map.Layers.Add(LayerName)
-                g.IsVisible = Visible
+                'g = g_MapWin.Map.Layers.Add(LayerName)
+                'g.IsVisible = Visible
+                MWlay = g_MapWin.Map.Layers.Add(lr)
+                MWlay.IsVisible = Visible
                 'g.UseTransparentColor = True
 
                 'TODO: replace hard-coded SetElevationGridColors with full renderer from defaults
@@ -2075,6 +2121,8 @@ StartOver:
                     SetElevationGridColors(MWlay, g)
                 ElseIf aFilename.ToLower.Contains(g_PathChar & "ned" & g_PathChar) Then
                     SetElevationGridColors(MWlay, g)
+                ElseIf aFilename.ToLower.Contains(g_PathChar & "nlcd" & g_PathChar) Then
+                    SetLandUseLegend(MWlay)
                 End If
             End If
 
@@ -2085,12 +2133,83 @@ StartOver:
                 DoEvents()
             End If
         Catch ex As Exception
-            Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
+            Logger.Msg("Could Not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
         End Try
         'g_StatusBar.Item(1).Text = ""
 
         Return MWlay
     End Function
+
+    Private Sub SetLandUseLegend(ByVal aMWlay As IMapRasterLayer)
+        Dim lLegItems As DotSpatial.Symbology.ColorCategoryCollection = aMWlay.LegendItems
+        For Each lLegItem As ILegendItem In lLegItems
+            If lLegItem.LegendText = "11" Then
+                lLegItem.LegendText = "Water-Open"
+            ElseIf lLegItem.LegendText = "12" Then
+                lLegItem.LegendText = "IceSnow-Perennial"
+            ElseIf lLegItem.LegendText = "21" Then
+                lLegItem.LegendText = "Developed-Open Space"
+            ElseIf lLegItem.LegendText = "22" Then
+                lLegItem.LegendText = "Developed-Low Intensity"
+            ElseIf lLegItem.LegendText = "23" Then
+                lLegItem.LegendText = "Developed-Medium Intensity"
+            ElseIf lLegItem.LegendText = "24" Then
+                lLegItem.LegendText = "Developed-High Intensity"
+            ElseIf lLegItem.LegendText = "31" Then
+                lLegItem.LegendText = "Barren Land"
+            ElseIf lLegItem.LegendText = "32" Then
+                lLegItem.LegendText = "Unconsolidated Shore"
+            ElseIf lLegItem.LegendText = "33" Then
+                lLegItem.LegendText = "Transitional"
+            ElseIf lLegItem.LegendText = "41" Then
+                lLegItem.LegendText = "Forest-Deciduous"
+            ElseIf lLegItem.LegendText = "42" Then
+                lLegItem.LegendText = "Forest-Evergreen"
+            ElseIf lLegItem.LegendText = "43" Then
+                lLegItem.LegendText = "Forest-Mixed"
+            ElseIf lLegItem.LegendText = "51" Then
+                lLegItem.LegendText = "Scrub-Dwarf"
+            ElseIf lLegItem.LegendText = "52" Then
+                lLegItem.LegendText = "Scrub-Scrub"
+            ElseIf lLegItem.LegendText = "71" Then
+                lLegItem.LegendText = "Grassland"
+            ElseIf lLegItem.LegendText = "81" Then
+                lLegItem.LegendText = "Agriculture-Pasture"
+            ElseIf lLegItem.LegendText = "82" Then
+                lLegItem.LegendText = "Agriculture-Cultivated Crops"
+            ElseIf lLegItem.LegendText = "90" Then
+                lLegItem.LegendText = "Wetlands-Woody"
+            ElseIf lLegItem.LegendText = "91" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Forested"
+            ElseIf lLegItem.LegendText = "92" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Scrub"
+            ElseIf lLegItem.LegendText = "93" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Forested"
+            ElseIf lLegItem.LegendText = "94" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Scrub"
+            ElseIf lLegItem.LegendText = "95" Then
+                lLegItem.LegendText = "Wetlands-Emergent Herbaceous"
+            ElseIf lLegItem.LegendText = "96" Then
+                lLegItem.LegendText = "Wetlands-Palustrine Emergent"
+            ElseIf lLegItem.LegendText = "97" Then
+                lLegItem.LegendText = "Wetlands-Estuarine Emergent"
+            ElseIf lLegItem.LegendText = "98" Then
+                lLegItem.LegendText = "Aquatic Bed-Paustrine"
+            ElseIf lLegItem.LegendText = "99" Then
+                lLegItem.LegendText = "Aquatic Bed-Esturarine"
+            Else
+                lLegItem.LegendItemVisible = False
+            End If
+        Next
+        Dim lIndex As Integer = 0
+        Do Until lIndex > lLegItems.Count - 1
+            If lLegItems(lIndex).LegendItemVisible = False Then
+                lLegItems.RemoveAt(lIndex)
+            Else
+                lIndex += 1
+            End If
+        Loop
+    End Sub
 
     'Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
     '    Dim colorBreak As MapWinGIS.ShapefileColorBreak
@@ -2490,6 +2609,7 @@ StartOver:
             Logger.Dbg("CheckAddress " & URL)
             Dim request As WebRequest = WebRequest.Create(URL)
             Dim response As WebResponse = request.GetResponse()
+            response.Close()
         Catch ex As Exception
             Logger.Dbg("CheckAddress Failed " & ex.ToString)
             Return False

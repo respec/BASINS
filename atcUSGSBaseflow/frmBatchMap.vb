@@ -3,6 +3,7 @@ Imports atcData
 Imports MapWinUtility
 Imports atcTimeseriesBaseflow
 Imports atcBatchProcessing
+Imports System.Windows.Forms
 
 Public Class frmBatchMap
     Private pListStations As atcCollection
@@ -72,29 +73,33 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnCreateGroup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCreateGroup.Click
-        Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
-        Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lGroupName)
-        treeBFGroups.Nodes.Add(lnewTreeNode)
-        For I As Integer = 0 To lstStations.RightCount - 1
-            With lnewTreeNode
-                .Nodes.Add(lstStations.RightItem(I))
-            End With
-        Next
-
-        Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
-        If lBFInputs Is Nothing Then
-            lBFInputs = New atcDataAttributes()
-            lBFInputs.SetValue("Operation", "GroupSetParm")
-            lBFInputs.SetValue("Group", lGroupName)
-            pBFInputsGroups.Add(lGroupName, lBFInputs)
-            Dim lStationsInfo As New ArrayList()
+        If lstStations.RightCount > 0 Then
+            Dim lGroupName As String = "BatchGroup_" & pBatchGroupCount
+            Dim lnewTreeNode As New System.Windows.Forms.TreeNode(lGroupName)
+            treeBFGroups.Nodes.Add(lnewTreeNode)
             For I As Integer = 0 To lstStations.RightCount - 1
-                lStationsInfo.Add("Station" & vbTab & lstStations.RightItem(I) & ",0.0,unknown")
+                With lnewTreeNode
+                    .Nodes.Add(lstStations.RightItem(I))
+                End With
             Next
-            lBFInputs.SetValue("StationInfo", lStationsInfo)
-        End If
 
-        pBatchGroupCount += 1
+            Dim lBFInputs As atcDataAttributes = pBFInputsGroups.ItemByKey(lGroupName)
+            If lBFInputs Is Nothing Then
+                lBFInputs = New atcDataAttributes()
+                lBFInputs.SetValue("Operation", "GroupSetParm")
+                lBFInputs.SetValue("Group", lGroupName)
+                pBFInputsGroups.Add(lGroupName, lBFInputs)
+                Dim lStationsInfo As New ArrayList()
+                For I As Integer = 0 To lstStations.RightCount - 1
+                    lStationsInfo.Add("Station" & vbTab & lstStations.RightItem(I) & ",0.0,unknown")
+                Next
+                lBFInputs.SetValue("StationInfo", lStationsInfo)
+            End If
+
+            pBatchGroupCount += 1
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
+        End If
     End Sub
 
     Private Sub treeBFGroups_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles treeBFGroups.MouseUp
@@ -353,7 +358,7 @@ Public Class frmBatchMap
 
     Private Sub ParmetersSet(ByVal aArgs As atcDataAttributes) Handles pfrmBFParms.ParametersSet
         Dim lText As String = ParametersToText(aArgs)
-        
+
         If String.IsNullOrEmpty(lText) Then
             txtParameters.Text = ""
         Else
@@ -668,6 +673,12 @@ Public Class frmBatchMap
         End If
     End Sub
 
+    Private Sub txtDataDir_GotFocus(sender As Object, e As EventArgs) Handles txtDataDir.GotFocus
+        Dim lVisibleTime As Integer = 5000  'In milliseconds
+        Dim ltt As ToolTip = New ToolTip()
+        ltt.Show("This is a directory that has data files in a 'NWIS' subdirectory", sender, 0, 15, lVisibleTime)
+    End Sub
+
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
@@ -688,8 +699,8 @@ Public Class frmBatchMap
                 .SetValue("CacheFolder", BASINS.g_CacheDir)
 #End If
             End With
-#If GISProvider = "DotSpatial" Then
-#Else
+            '#If GISProvider = "DotSpatial" Then
+            '#Else
             Try
                 If lStationsNeedDownload.Count > 0 OrElse chkGetNewest.Checked Then
                     If lStationsNeedDownload.Count = 0 Then
@@ -706,29 +717,61 @@ Public Class frmBatchMap
                            pDataPath, "Batch Map")
                 Return
             End Try
-#End If
+            '#End If
         End If
     End Sub
 
     Private Sub btnPlotDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDuration.Click
-        Dim lTsGroup As New atcTimeseriesGroup()
+        If lstStations.RightCount > 0 Then
+            Dim lTsGroup As New atcTimeseriesGroup()
+            For I As Integer = 0 To lstStations.RightCount - 1
+                Dim lstationId As String = lstStations.RightItem(I)
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTs As atcTimeseries = GetFlowData(lDataPath)
+                If lTs IsNot Nothing Then
+                    lTsGroup.Add(lTs)
+                End If
+            Next
+            If lTsGroup.Count > 0 Then
+                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+            End If
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
+        End If
+    End Sub
+
+    Private Function GetSelectedDatasets() As atcTimeseriesGroup
+        Dim lTsGroup As New atcTimeseriesGroup
+        For Each lGroupNode As TreeNode In treeBFGroups.Nodes
+            For Each lStnNode As TreeNode In lGroupNode.Nodes
+                Dim lstationId As String = lStnNode.Text
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTs As atcTimeseries = GetFlowData(lDataPath)
+                If lTs IsNot Nothing Then
+                    lTsGroup.Add(lTs)
+                End If
+            Next
+        Next
+        Return lTsGroup
+    End Function
+
+    Private Function GetFlowData(ByVal aDataPath As String) As atcTimeseries
         Dim lArgs As New atcDataAttributes()
         lArgs.Add("Constituent", "streamflow,flow")
-        For I As Integer = 0 To lstStations.RightCount - 1
-            Dim lstationId As String = lstStations.RightItem(I)
-            Dim lDataPath As String = GetDataFileFullPath(lstationId)
-            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+        Try
+            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(aDataPath, lArgs)
             If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
                 If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
                     lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
                 End If
-                lTsGroup.Add(lTsGroupTemp(0))
+                Return lTsGroupTemp(0)
+            Else
+                Return Nothing
             End If
-        Next
-        If lTsGroup.Count > 0 Then
-            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
-        End If
-    End Sub
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
 
     Private Sub btnDoBatch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDoBatch.Click
         If pBFInputsGlobal.Count = 0 Then
@@ -888,6 +931,25 @@ Public Class frmBatchMap
 
     Private Sub btnGroupGlobal_Click(sender As Object, e As EventArgs) Handles btnGroupGlobal.Click
         pBFInputsGlobal.SetValue("Operation", "GlobalSetParm")
+        'this means the global run duration is set to full extent every time
+        Dim lNeedToSetDatesAuto As Boolean = False
+        If lNeedToSetDatesAuto Then
+            Dim lSelected As atcTimeseriesGroup = GetSelectedDatasets()
+            If lSelected.Count > 0 Then
+                Dim lcstart As Double
+                Dim lcend As Double
+                Dim lstart As Double
+                Dim lend As Double
+                CommonDates(lSelected, lstart, lend, lcstart, lcend)
+                pBFInputsGlobal.SetValue("SJDATE", lstart)
+                pBFInputsGlobal.SetValue("EJDATE", lend)
+                lSelected.Clear()
+                lSelected = Nothing
+            End If
+        Else
+            pBFInputsGlobal.SetValue("SJDATE", pDataStart)
+            pBFInputsGlobal.SetValue("EJDATE", pDataEnd)
+        End If
         pfrmBFParms = New frmUSGSBaseflowBatch()
         pfrmBFParms.Initialize(Nothing, pBFInputsGlobal)
     End Sub
@@ -1088,11 +1150,11 @@ Public Class frmBatchMap
 
         Dim lTsGroup As New atcTimeseriesGroup()
         Dim lArgs As New atcDataAttributes()
-        lArgs.Add("Constituent", "streamflow")
+        lArgs.Add("Constituent", "streamflow,flow")
 
         Dim lTotalGroups As Integer = pBFInputsGroups.Count
         Dim lTotalStations As Integer
-        Dim lGroupCtr As Integer = 1
+        Dim lGroupCtr As Integer = 0
         Dim lStnCtr As Integer
         For Each lBFGroupAttribs As atcDataAttributes In pBFInputsGroups
             Logger.Progress("Reading group: " & lBFGroupAttribs.GetValue("Group"), lGroupCtr, lTotalGroups)
@@ -1101,7 +1163,7 @@ Public Class frmBatchMap
                 If lStationInfo IsNot Nothing Then
                     lTotalStations = lStationInfo.Count
                     Using lProgressLevel As New ProgressLevel(False, lStationInfo.Count = 0)
-                        lStnCtr = 1
+                        lStnCtr = 0
                         For Each lStation As String In lStationInfo
                             Dim lStationID As String = ""
                             Try
@@ -1126,6 +1188,8 @@ Public Class frmBatchMap
             End If
             lGroupCtr += 1
         Next
+        Logger.Progress(lTotalGroups, lTotalGroups)
+        Logger.Status("HIDE")
         If lTsGroup.Count > 0 Then
             CommonDates(lTsGroup, pDataStart, pDataEnd, pDataStartCommon, pDataEndCommon)
         Else

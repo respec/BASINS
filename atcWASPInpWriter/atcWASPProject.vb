@@ -9,6 +9,7 @@ Public Class atcWASPProject
     Public EDate As Date = Date.MaxValue
     Public ModelType As Integer = 11 '2
     Public Version As Integer = 3
+    Public BenthicSegments As Boolean = False
     Public Name As String = ""
     Public INPFileName As String = ""
     Public WASPTimeFunctions As New atcCollection
@@ -39,6 +40,11 @@ Public Class atcWASPProject
     ''' <returns>True if is boundary segment</returns>
     Public Function IsBoundary(ByVal aSegment As atcWASPSegment) As Boolean
         Dim lBoundary As Boolean = False
+
+        If aSegment.DownID = "b" Then
+            'this is a benthic segment, not a boundary
+            Return lBoundary
+        End If
 
         Dim lDownBoundary As Boolean = True
         For Each lSegment As atcWASPSegment In Segments
@@ -210,11 +216,39 @@ Public Class atcWASPProject
                                       .WaspID, 0, 1, vol, 0, 0, .Depth,
                                       0, .Length * 1000, .Slope, .Width, .Roughness, 0.001)
                         Else
-                            aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
+                            If Not BenthicSegments Then
+                                aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
                                       "{8,15:0.00000}{9,15:0.00000}{10,15:0.00000}{11,15:0.00000}{12,15:0.00000}{13,15:0.00000}" &
                                       "{14,15:0.00000}{15,15:0.00000}{16,15:0.00000}{17,15:0.00000}{18,15:0.00000}{19,15:0.00000}",
                                       .WaspID, 0, 1, 4, vol, 0, 0, .Depth,
                                       0, .Length * 1000, .Slope, .Width, .Roughness, 0.001, 0, 0, 0, .Depth, 0, 0)
+                            Else
+                                'if waspid is 1, 4, 7, etc this is surface
+                                If (i + 2) Mod 3 = 0 Then
+                                    'if waspid is 1, 4, 7, etc this is surface
+                                    aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
+                                      "{8,15:0.00000}{9,15:0.00000}{10,15:0.00000}{11,15:0.00000}{12,15:0.00000}{13,15:0.00000}" &
+                                      "{14,15:0.00000}{15,15:0.00000}{16,15:0.00000}{17,15:0.00000}{18,15:0.00000}{19,15:0.00000}",
+                                      .WaspID, .WaspID + 1, 1, 4, vol, 0, 0, .Depth,
+                                      0, .Length * 1000, .Slope, .Width, .Roughness, 0.001, 0, 0, 0, .Depth, 0, 0)
+                                ElseIf (i + 2) Mod 3 = 1 Then
+                                    'this is first benthic layer
+                                    vol = .Length * 1000.0 * .Width * .Depth
+                                    aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
+                                      "{8,15:0.00000}{9,15:0.00000}{10,15:0.00000}{11,15:0.00000}{12,15:0.00000}{13,15:0.00000}" &
+                                      "{14,15:0.00000}{15,15:0.00000}{16,15:0.00000}{17,15:0.00000}{18,15:0.00000}{19,15:0.00000}",
+                                      .WaspID, .WaspID + 1, 3, 7, vol, 0, 0, .Depth,
+                                      0, .Length * 1000, .Slope, .Width, .Roughness, 0.0001, 0, 0, 0, .Depth, 0, 0)
+                                ElseIf (i + 2) Mod 3 = 2 Then
+                                    'this is second benthic layer
+                                    vol = .Length * 1000.0 * .Width * .Depth
+                                    aSW.WriteLine("{0,5}{1,5}{2,5}{3,5}{4,15:0.00000}{5,15:0.00000}{6,15:0.00000}{7,15:0.00000}" &
+                                      "{8,15:0.00000}{9,15:0.00000}{10,15:0.00000}{11,15:0.00000}{12,15:0.00000}{13,15:0.00000}" &
+                                      "{14,15:0.00000}{15,15:0.00000}{16,15:0.00000}{17,15:0.00000}{18,15:0.00000}{19,15:0.00000}",
+                                      .WaspID, 0, 4, 7, vol, 0, 0, .Depth,
+                                      0, .Length * 1000, .Slope, .Width, .Roughness, 0.0001, 0, 0, 0, .Depth, 0, 0)
+                                End If
+                            End If
                         End If
                         Exit For
                     End If
@@ -244,7 +278,7 @@ Public Class atcWASPProject
         'Build a list of headwater segments
         Dim lHeadwatersIndexes As New List(Of Integer)
         For i As Integer = 0 To Segments.Count - 1
-            If UpstreamKey(i) = String.Empty Then
+            If UpstreamKey(i) = String.Empty And Segments.Item(i).DownID <> "b" Then
                 lHeadwatersIndexes.Add(i + 1)
             End If
         Next

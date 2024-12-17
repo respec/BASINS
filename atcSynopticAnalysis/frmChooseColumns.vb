@@ -3,17 +3,17 @@ Public Class frmChooseColumns
     Private pInitialTitles() As String
     Private pInitialAttributes() As String
     Private pAvailableAttributes() As String = {"Max", "Min", "Sum", "Cumulative", "Mean", "Geometric Mean", "Variance", "Standard Deviation", "Skew"}
-    Private pLists() As Windows.Forms.CheckedListBox
-    Private pCheckboxes() As Windows.Forms.CheckBox
+    Private pLists() As System.Windows.Forms.CheckedListBox
+    Private pCheckboxes() As System.Windows.Forms.CheckBox
 
     Public Sub AskUser(ByRef aTitles() As String, ByRef aAttributes() As String)
         pInitialTitles = aTitles.Clone
         pInitialAttributes = aAttributes.Clone
 
         'Initializing these outside a routine is too early, and can't use {} to assign, just in declaration
-        Dim lLists() As Windows.Forms.CheckedListBox = {lstVolume, lstDuration, lstIntensity, lstTimeSinceLast}
+        Dim lLists() As System.Windows.Forms.CheckedListBox = {lstVolume, lstDuration, lstIntensity, lstTimeSinceLast}
         pLists = lLists
-        Dim lCheckboxes() As Windows.Forms.CheckBox = {chkEvents, chkMeasurements, chkStartDate, chkStartTime}
+        Dim lCheckboxes() As System.Windows.Forms.CheckBox = {chkEvents, chkMeasurements, chkStartDate, chkStartTime}
         pCheckboxes = lCheckboxes
 
         For Each lAttributeName As String In aAttributes
@@ -25,18 +25,18 @@ Public Class frmChooseColumns
 
         PopulateForm(aTitles, aAttributes)
 
-        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If Me.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             GetSelected(aTitles, aAttributes)
         End If
     End Sub
 
     Private Sub PopulateForm(ByVal aTitles() As String, ByVal aAttributes() As String)
-        For Each lCheckbox As Windows.Forms.CheckBox In pCheckboxes
-            If array.IndexOf(aTitles, lCheckbox.Text) >= 0 Then
+        For Each lCheckbox As System.Windows.Forms.CheckBox In pCheckboxes
+            If Array.IndexOf(aTitles, lCheckbox.Text) >= 0 Then
                 lCheckbox.Checked = True
             End If
         Next
-        For Each lList As Windows.Forms.CheckedListBox In pLists
+        For Each lList As System.Windows.Forms.CheckedListBox In pLists
             SetListAttributes(lList, aTitles, aAttributes)
         Next
     End Sub
@@ -55,8 +55,8 @@ Public Class frmChooseColumns
 
     Private Sub GetSelected(ByRef aTitles() As String, ByRef aAttributes() As String)
         Dim lNumSelected As Integer = 0
-        Dim lCheckbox As Windows.Forms.CheckBox
-        Dim lList As Windows.Forms.CheckedListBox
+        Dim lCheckbox As System.Windows.Forms.CheckBox
+        Dim lList As System.Windows.Forms.CheckedListBox
 
         For Each lCheckbox In pCheckboxes
             If lCheckbox.Checked Then lNumSelected += 1

@@ -309,7 +309,7 @@ Public Class frmDFLOWResults
 
                     Dim lExcursions As New ArrayList
                     Dim lClusters As New ArrayList
-                    Dim lExcQ = DFLOWCalcs.CountExcursions(lxQy, 1, 120, 5, lTSN, lExcursions, lClusters)
+                    Dim lExcQ As Double = DFLOWCalcs.CountExcursions(lxQy, 1, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursions, lClusters)
                     lExcursions.Clear()
                     lClusters.Clear()
 
@@ -325,23 +325,25 @@ Public Class frmDFLOWResults
                     lSum = 0
                     lN = 0
 
-                    For lI = 0 To UBound(lTS) - 1
+                    Dim lTSrhm As Double()           'the xBy uses a running harmonic mean
+                    ReDim lTSrhm(UBound(lTS))
 
+                    For lI = 0 To UBound(lTS) - 1
                         If Double.IsNaN(lTS(lI)) Then
                             lSum = 0
                             lN = 0
                         Else
-                            lSum = lSum + lTS(lI)
+                            lSum = lSum + (1.0 / lTS(lI))
                             lN = lN + 1
                             If lN > DFLOWCalcs.fBioPeriod Then
-                                lSum = lSum - lTS(lI - DFLOWCalcs.fBioPeriod)
+                                lSum = lSum - (1.0 / lTS(lI - DFLOWCalcs.fBioPeriod))
                             End If
                         End If
 
                         If lN >= DFLOWCalcs.fBioPeriod Then
-                            lTSN(lI) = lSum / DFLOWCalcs.fBioPeriod
+                            lTSrhm(lI) = DFLOWCalcs.fBioPeriod / lSum
                         Else
-                            lTSN(lI) = lNaN
+                            lTSrhm(lI) = lNaN
                         End If
                     Next
 
@@ -351,10 +353,10 @@ Public Class frmDFLOWResults
 
                     ' ----- 3. Do xBy calculation
 
-                    Dim lExcursionCount As Integer
+                    Dim lExcursionCount As Double
 
 
-                    lxBy = DFLOWCalcs.xBy(lxBy, DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSN, lExcursionCount, lExcursions, lClusters, lfrmProgress)
+                    lxBy = DFLOWCalcs.xBy(lxBy, DFLOWCalcs.fBioPeriod, DFLOWCalcs.fBioYears, DFLOWCalcs.fBioCluster, DFLOWCalcs.fBioExcursions, lTSrhm, lExcursionCount, lExcursions, lClusters, lfrmProgress)
                     Dim pAttrName As String = DFLOWCalcs.fBioPeriod & "B" & DFLOWCalcs.fBioYears
                     lHydrologicTS.Attributes.SetValue(pAttrName, lxBy)
 
@@ -380,7 +382,7 @@ Public Class frmDFLOWResults
                         lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy"
                         Application.DoEvents()
 
-                        lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, pTimeseriesGroup(lDSIndex))
+                        lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lYears, lHydrologicDS)
                         If lEquivalentxQy > lxBy Then
 
                             lReturnPeriod = lYears
@@ -397,7 +399,7 @@ Public Class frmDFLOWResults
                             While lEquivalentxQy >= lxBy And lReturnPeriod < lYears
 
                                 lReturnPeriod = lReturnPeriod + 1
-                                lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, pTimeseriesGroup(lDSIndex))
+                                lEquivalentxQy = DFLOWCalcs.xQy(DFLOWCalcs.fAveragingPeriod, lReturnPeriod, lHydrologicDS)
 
                                 lfrmProgress.Label1.Text = (1 + lItemIdx) & " of " & lTotalItems & " - xQy (" & lReturnPeriod & " of up to " & lYears & ")"
                                 Application.DoEvents()
@@ -582,7 +584,7 @@ Public Class frmDFLOWResults
 
             End With
 
-            Dim lExcursionCount As Integer
+            Dim lExcursionCount As Double
             lExcursionCount = pExcursionCountArray(pRow - 1)
 
             Dim lClusters As ArrayList
@@ -625,7 +627,7 @@ Public Class frmDFLOWResults
                 Else
 
                     lagsExcursions.CellValue(lRow, 0) = pDateFormat.JDateToString(lFirstDate + lCluster.Start)
-                    lagsExcursions.CellValue(lRow, 1) = lCluster.Excursions & " "
+                    lagsExcursions.CellValue(lRow, 1) = DFLOWCalcs.Sig2(lCluster.Excursions) & " "
                     lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
 
                     Dim lNExc As Integer = 0
@@ -638,8 +640,8 @@ Public Class frmDFLOWResults
                         With lExcursion
 
                             lagsExcursions.CellValue(lRow, 2) = pDateFormat.JDateToString(lFirstDate + .Start)
-                            lagsExcursions.CellValue(lRow, 3) = .Count & " "
-                            lagsExcursions.CellValue(lRow, 4) = Format(.SumMag / .SumLength - 1, "Percent") & " "
+                            lagsExcursions.CellValue(lRow, 3) = .Finish - .Start + 1 & " "
+                            lagsExcursions.CellValue(lRow, 4) = Format((.SumMag / (.Count) - 1), "Percent") & " "
 
                             lagsExcursions.Alignment(lRow, 3) = atcControls.atcAlignment.HAlignRight
                             lagsExcursions.Alignment(lRow, 4) = atcControls.atcAlignment.HAlignRight
@@ -657,7 +659,7 @@ Public Class frmDFLOWResults
             Next
 
             lagsExcursions.CellValue(lRow, 0) = "Total"
-            lagsExcursions.CellValue(lRow, 1) = lExcursionCount
+            lagsExcursions.CellValue(lRow, 1) = DFLOWCalcs.Sig2(lExcursionCount)
             lagsExcursions.Alignment(lRow, 1) = atcControls.atcAlignment.HAlignRight
 
             Dim lfrmExcursions As New frmDFLOWExcursions

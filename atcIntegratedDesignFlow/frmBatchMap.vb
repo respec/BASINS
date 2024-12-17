@@ -19,7 +19,7 @@ Public Class frmBatchMap
     Private pBatchSpecFilefullname As String = ""
 
     Private WithEvents pfrmParams As frmSWSTAT
-    Public BatchAnalysis As clsBatch.ANALYSIS
+    Public BatchAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.NONE
 
     Private ReadOnly Property GetDataFileFullPath(ByVal aStationId As String) As String
         Get
@@ -37,13 +37,13 @@ Public Class frmBatchMap
 
     Private Sub frmBatchMap_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If IO.Directory.Exists(txtDataDir.Text) Then
-            SaveSetting("atcUSGSBaseflow", "Default", "DataDir", txtDataDir.Text)
+            SaveSetting("atcIntegratedDesignFlow", "Default", "DataDir", txtDataDir.Text)
         End If
     End Sub
 
     Private Sub frmBatchMap_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-        lstStations.LeftLabel = "Stations from map"
-        lstStations.RightLabel = "Selected for a group"
+        lstStations.LeftLabel = "Stations"
+        lstStations.RightLabel = "Selected Stations"
         Dim lindex As Integer = 0
         If pListStations IsNot Nothing AndAlso pListStations.Count > 0 Then
             Dim lStnIDinKey As Boolean = True
@@ -68,7 +68,7 @@ Public Class frmBatchMap
         pGroupsInputsDFLOW = New atcCollection()
         pGroupsInputsSWSTAT = New atcCollection()
 
-        Dim lDataDir As String = GetSetting("atcUSGSBaseflow", "Default", "DataDir", "")
+        Dim lDataDir As String = GetSetting("atcIntegratedDesignFlow", "Default", "DataDir", "")
         If IO.Directory.Exists(lDataDir) Then
             txtDataDir.Text = lDataDir
         End If
@@ -86,6 +86,7 @@ Public Class frmBatchMap
                 lCount = pBatchGroupCountDFLOW
         End Select
         If lstStations.RightCount = 0 OrElse String.IsNullOrEmpty(lAnalysis) Then
+            If lstStations.RightCount = 0 Then Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
             Exit Sub
         End If
         Dim listStations As New List(Of String)
@@ -509,6 +510,12 @@ Public Class frmBatchMap
         End If
     End Sub
 
+    Private Sub txtDataDir_GotFocus(sender As Object, e As EventArgs) Handles txtDataDir.GotFocus
+        Dim lVisibleTime As Integer = 5000  'In milliseconds
+        Dim ltt As ToolTip = New ToolTip()
+        ltt.Show("This is a directory that has data files in a 'NWIS' subdirectory", sender, 0, 15, lVisibleTime)
+    End Sub
+
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         If Not String.IsNullOrEmpty(pDataPath) AndAlso IO.Directory.Exists(pDataPath) Then
             Dim lStationsNeedDownload As New atcCollection()
@@ -535,22 +542,26 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnPlotDuration_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPlotDuration.Click
-        Dim lTsGroup As New atcTimeseriesGroup()
-        Dim lArgs As New atcDataAttributes()
-        lArgs.Add("Constituent", "streamflow,flow")
-        For I As Integer = 0 To lstStations.RightCount - 1
-            Dim lstationId As String = lstStations.RightItem(I)
-            Dim lDataPath As String = GetDataFileFullPath(lstationId)
-            Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
-            If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
-                If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
-                    lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
+        If lstStations.RightCount > 0 Then
+            Dim lTsGroup As New atcTimeseriesGroup()
+            Dim lArgs As New atcDataAttributes()
+            lArgs.Add("Constituent", "streamflow,flow")
+            For I As Integer = 0 To lstStations.RightCount - 1
+                Dim lstationId As String = lstStations.RightItem(I)
+                Dim lDataPath As String = GetDataFileFullPath(lstationId)
+                Dim lTsGroupTemp As atcTimeseriesGroup = clsBatchUtil.ReadTSFromRDB(lDataPath, lArgs)
+                If lTsGroupTemp IsNot Nothing AndAlso lTsGroupTemp.Count > 0 Then
+                    If String.Compare(lTsGroupTemp(0).Attributes.GetValue("Constituent").ToString(), "flow", True) = 0 Then
+                        lTsGroupTemp(0).Attributes.SetValue("Constituent", "Streamflow")
+                    End If
+                    lTsGroup.Add(lTsGroupTemp(0))
                 End If
-                lTsGroup.Add(lTsGroupTemp(0))
+            Next
+            If lTsGroup.Count > 0 Then
+                atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
             End If
-        Next
-        If lTsGroup.Count > 0 Then
-            atcUSGSUtility.atcUSGSScreen.GraphDataDuration(lTsGroup)
+        Else
+            Logger.Msg("One or more stations must be in the 'Selected' list to perform this action.", "Batch Map Issue")
         End If
     End Sub
 
@@ -669,11 +680,14 @@ Public Class frmBatchMap
             lGroupName = lGroupNode.Parent.Text
             lGroupNode = lGroupNode.Parent
         End If
+        Dim lArgs As atcDataAttributes = Nothing
         Dim lAnalysis As clsBatch.ANALYSIS = clsBatch.ANALYSIS.DFLOW
         If lGroupName.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
             lAnalysis = clsBatch.ANALYSIS.SWSTAT
+            lArgs = pGroupsInputsSWSTAT.ItemByKey(lGroupName)
+        Else
+            lArgs = pGroupsInputsDFLOW.ItemByKey(lGroupName)
         End If
-        Dim lArgs As atcDataAttributes = pGroupsInputsBF.ItemByKey(lGroupName)
         If lArgs IsNot Nothing Then
             lArgs.SetValue("Constituent", "streamflow,flow")
             Dim lCon As String = ""
@@ -708,21 +722,22 @@ Public Class frmBatchMap
                 End If
             Next
             If lTsGroup.Count > 0 Then
-                Select Case lAnalysis
-                    Case clsBatch.ANALYSIS.DFLOW
-                    Case clsBatch.ANALYSIS.SWSTAT
-                End Select
+                pfrmParams = New atcIDF.frmSWSTAT()
+                pfrmParams.BatchAnalysis = BatchAnalysis
+                pfrmParams.Initialize(lTsGroup, lArgs)
             End If
         End If
     End Sub
 
     Private Sub btnGroupGlobal_Click(sender As Object, e As EventArgs) Handles btnGroupGlobal.Click
-        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
-        Dim lnode As TreeNode = treeBFGroups.SelectedNode
-        Dim lNodeText As String = lnode.Text
+        If BatchAnalysis = clsBatch.ANALYSIS.NONE Then Exit Sub
+        'If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        'Dim lnode As TreeNode = treeBFGroups.SelectedNode
+        'Dim lNodeText As String = lnode.Text
         pfrmParams = New atcIDF.frmSWSTAT()
         pfrmParams.BatchAnalysis = BatchAnalysis
-        If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+        'If lNodeText.Contains(clsBatch.ANALYSIS.SWSTAT.ToString()) Then
+        If BatchAnalysis = clsBatch.ANALYSIS.SWSTAT Then
             pGlobalInputsSWSTAT.SetValue("Operation", "GlobalSetParm")
             atcIDF.modUtil.InputNames.BuildInputSet(pGlobalInputsSWSTAT, Nothing)
             Dim lNDay() As Double = pGlobalInputsSWSTAT.GetValue(atcIDF.modUtil.InputNames.NDay, Nothing)

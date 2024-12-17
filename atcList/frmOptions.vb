@@ -1,3 +1,5 @@
+Imports System.Windows.Forms
+
 Public Class frmOptions
 
     Friend List As atcListForm
@@ -30,6 +32,8 @@ Public Class frmOptions
     Private Sub ShowHelpForListOptions()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             atcUtility.ShowHelp("View\List.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            atcUtility.ShowHelp("Time-Series Tools\List.html")
         Else
             atcUtility.ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
         End If

@@ -282,6 +282,11 @@ Friend Class frmManager
     End Sub
 
     Private Sub Populate(ByVal aNodeKey As Integer)
+
+        If Application.ProductName = "USGSHydroToolbox" Then
+            RemoveDataFromFileToolStripMenuItem.Visible = False
+        End If
+
         If Not pDelayPopulate Then
             treeFiles.Nodes.Clear()
             SaveInToolStripMenuItem.DropDownItems.Clear()
@@ -711,12 +716,20 @@ Friend Class frmManager
 
     Private Sub frmManager_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
+            Else
+                ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
+            End If
         End If
     End Sub
 
     Private Sub HelpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HelpToolStripMenuItem.Click
-        ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Getting Started (File, Project, and Data Menus)/GIS and Time-Series Data/Download and Manage Data/Time-Series Management.html")
+        Else
+            ShowHelp("BASINS Details\Project Creation and Management\GIS and Time-Series Data\Time-Series Management.html")
+        End If
     End Sub
 
 #Region "TreeViewMultiSelect"

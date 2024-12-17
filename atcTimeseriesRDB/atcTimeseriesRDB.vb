@@ -398,7 +398,9 @@ Public Class atcTimeseriesRDB
             If Not IO.File.Exists(Specification) Then
                 Logger.Dbg("Opening new file " & Specification)
                 Return True
-
+            ElseIf Specification.Contains(",") Then
+                Logger.Dbg("Multiple files selected " & Specification)
+                Return True
             ElseIf IO.Path.GetFileName(Specification).ToLower.StartsWith("nwis_stations") Then
                 Throw New ApplicationException("Station file does not contain timeseries data: " & IO.Path.GetFileName(Specification))
             Else
@@ -481,7 +483,7 @@ Public Class atcTimeseriesRDB
                             Exit While
                         ElseIf lCurLine.Replace(" ", "").ToLower().Contains("tsparameterstatistic") Then
                             lDailyDischargeData = True
-                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase))
+                            lAttributes.SetValue(lDefStartDefinition, lCurLine.IndexOf("Description", StringComparison.OrdinalIgnoreCase) - 4)
                             Exit While
                         ElseIf lCurLine.Replace(" ", "").ToLower().Contains("ts_idparameterstatistic") Then
                             lDailyDischargeData = True
@@ -532,6 +534,9 @@ Public Class atcTimeseriesRDB
                     End While
 
                     lAttributes.AddHistory("Read from " & Specification)
+                    If lAttributes.GetValue("Location") Is Nothing Then
+                        lAttributes.SetValue("Location", FilenameNoExt(FilenameNoPath(Specification)))
+                    End If
 
                     If lSite Then
                         Throw New ApplicationException("Station list does Not contain timeseries data: " & IO.Path.GetFileName(Specification))
@@ -569,9 +574,9 @@ Public Class atcTimeseriesRDB
                 Dim lDateField As Integer = .FieldNumber("measurement_dt")
                 If lDateField = 0 Then Throw New Exception("Required field missing: measurement_dt")
 
-                Dim lValueFieldNames() As String = {"channel_width_va", "xsec_area_va", "velocity_va", "discharge_1", "discharge_va", "gage_height_va", "shift_applied_va"}
-                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "VELOCITY", "DISCHARGE1", "DISCHARGE", "GAGE_HEIGHT", "SHIFT_APPLIED"}
-                Dim lUnits() As String = {"ft", "square feet", "ft/sec", "cfs", "cfs", "ft", "ft"}
+                Dim lValueFieldNames() As String = {"chan_width", "chan_area", "channel_width_va", "xsec_area_va", "velocity_va", "discharge_1", "discharge_va", "gage_height_va", "shift_applied_va"}
+                Dim lConstituentNames() As String = {"WIDTH", "XSECT", "WIDTH", "XSECT", "VELOCITY", "DISCHARGE1", "DISCHARGE", "GAGE_HEIGHT", "SHIFT_APPLIED"}
+                Dim lUnits() As String = {"ft", "square feet", "ft", "square feet", "ft/sec", "cfs", "cfs", "ft", "ft"}
                 Dim lLastValueField As Integer = lValueFieldNames.GetUpperBound(0)
                 Dim lValueFieldNumber(lLastValueField) As Integer
                 Dim lBuilders(lLastValueField) As atcTimeseriesBuilder
@@ -589,8 +594,14 @@ Public Class atcTimeseriesRDB
                             .SetValue("Units", lUnits(lValueFieldIndex))
                             .SetValue("Point", True)
                             .SetValue("Scenario", "OBSERVED")
-                            .SetValue("Location", .GetValue("site_no"))
-                            .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                            If .GetValue("site_no") IsNot Nothing Then
+                                .SetValue("Location", .GetValue("site_no"))
+                            End If
+                            If .GetValue("station_nm") IsNot Nothing Then
+                                .SetValue("Description", "Measurements at " & .GetValue("station_nm"))
+                            Else
+                                .SetValue("Description", "Measurements at " & .GetValue("Location"))
+                            End If
                             .SetValue("ID", lValueFieldIndex + 1)
                         End With
                     End If
@@ -932,6 +943,15 @@ Public Class atcTimeseriesRDB
                 End Select
             Next
 
+            Dim lUSGSToolboxProgram As Boolean = False
+            Try
+                Dim lProgramName As String = System.Reflection.Assembly.GetEntryAssembly.Location
+                If lProgramName.Contains("USGSToolbox") OrElse lProgramName.Contains("USGSHydroToolbox") Then
+                    lUSGSToolboxProgram = True
+                End If
+            Catch ex As Exception
+                lUSGSToolboxProgram = False
+            End Try
             Dim lParsedDate As Date
             While lTable.CurrentRecord < lTable.NumRecords
                 lTable.MoveNext()
@@ -968,26 +988,17 @@ Public Class atcTimeseriesRDB
                                 Dim lUnits As String = Nothing
                                 Select Case lConstituent
                                     Case "00045"
-                                        Try
-                                            If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                                lConstituent = "Precipitation" : lUnits = "inches"
-                                            Else
-                                                lConstituent = "PREC" : lUnits = "in"
-                                            End If
-                                        Catch
+                                        If lUSGSToolboxProgram Then
+                                            lConstituent = "Precipitation" : lUnits = "inches"
+                                        Else
                                             lConstituent = "PREC" : lUnits = "in"
-                                        End Try
+                                        End If
                                     Case "00060"
-                                        Try
-                                            If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                                lConstituent = "Streamflow" : lUnits = "cubic feet per second"
-                                            Else
-                                                lConstituent = "FLOW" : lUnits = "cfs"
-                                            End If
-                                        Catch
+                                        If lUSGSToolboxProgram Then
+                                            lConstituent = "Streamflow" : lUnits = "cubic feet per second"
+                                        Else
                                             lConstituent = "FLOW" : lUnits = "cfs"
-                                        End Try
-
+                                        End If
                                     Case "61055" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Water level, depth below measuring point, feet 
                                     Case "62611" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level above NAVD 1988, feet 
                                     Case "72019" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Depth to water level, feet below land surface 
@@ -1009,24 +1020,17 @@ Public Class atcTimeseriesRDB
                                 End If
 
                                 If lUnits IsNot Nothing Then
-                                    Try
-                                        If System.Reflection.Assembly.GetEntryAssembly.Location.Contains("USGSToolbox") Then
-                                            Select Case lUnits
-                                                Case "ft" : lUnits = "feet"
-                                                Case "cfs" : lUnits = "cubic feet per second"
-                                            End Select
-                                        Else
-                                            Select Case lUnits
-                                                Case "feet" : lUnits = "ft"
-                                                Case "cubic feet per second" : lUnits = "cfs"
-                                            End Select
-                                        End If
-                                    Catch ex As Exception
+                                    If lUSGSToolboxProgram Then
+                                        Select Case lUnits
+                                            Case "ft" : lUnits = "feet"
+                                            Case "cfs" : lUnits = "cubic feet per second"
+                                        End Select
+                                    Else
                                         Select Case lUnits
                                             Case "feet" : lUnits = "ft"
                                             Case "cubic feet per second" : lUnits = "cfs"
                                         End Select
-                                    End Try
+                                    End If
                                     lData.Attributes.SetValue("Units", lUnits)
                                 End If
 
@@ -1076,6 +1080,19 @@ Public Class atcTimeseriesRDB
             DataSets.Add(FillValues(lData, atcTimeUnit.TUDay, 1, GetNaN, lMissingVal, , Me))
         Next
         lRawDataSets.Clear()
+
+        For A As Integer = 0 To lData.Attributes.Count - 1
+            With lData.Attributes(A)
+                If .Arguments IsNot Nothing Then .Arguments.Clear()
+                If .Value.GetType().Name = "atcTimeseries" Then
+                    .Value.Clear()
+                End If
+            End With
+        Next
+        lData.Clear()
+        lData = Nothing
+        lTable.Clear()
+        lTable = Nothing
     End Sub
 
     ''' <summary>

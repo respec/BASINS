@@ -2,7 +2,6 @@
 Imports atcUtility
 Imports atcUSGSUtility
 Imports MapWinUtility
-Imports atcTimeseriesRDB
 Imports atcTimeseriesBaseflow
 Imports atcGraph
 Imports ZedGraph
@@ -1597,7 +1596,8 @@ Public Class frmDF2P
         If pDataGroup.Count = 0 Then
             lErrMsg &= "- No streamflow data selected" & vbCrLf
         Else
-            If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            'If lSDate < 0 OrElse lEDate < 0 OrElse lSDate >= lEDate Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             Else
                 Dim lTs As atcTimeseries = Nothing
@@ -2264,12 +2264,20 @@ Public Class frmDF2P
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
+        Else
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+        End If
     End Sub
 
     Private Sub frmDF2P_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("GW-Tools/Estimate Hydrograph Parameters/Two-Parameter Digital Filter.html")
+            Else
+                ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Recess.html")
+            End If
         End If
     End Sub
 

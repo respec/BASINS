@@ -57,26 +57,27 @@ Partial Class frmAbout
         Me.lblVersion.Name = "lblVersion"
         Me.lblVersion.Size = New System.Drawing.Size(103, 13)
         Me.lblVersion.TabIndex = 21
-        Me.lblVersion.Text = "Release 2015-08-13"
+        Me.lblVersion.Text = "Release 2024-02-16"
         '
         'UpdateLink
         '
         Me.UpdateLink.AutoSize = True
-        Me.UpdateLink.LinkArea = New System.Windows.Forms.LinkArea(21, 39)
+        Me.UpdateLink.LinkArea = New System.Windows.Forms.LinkArea(21, 77)
         Me.UpdateLink.LinkBehavior = System.Windows.Forms.LinkBehavior.AlwaysUnderline
         Me.UpdateLink.Location = New System.Drawing.Point(138, 80)
         Me.UpdateLink.Name = "UpdateLink"
-        Me.UpdateLink.Size = New System.Drawing.Size(308, 17)
+        Me.UpdateLink.Size = New System.Drawing.Size(506, 17)
         Me.UpdateLink.TabIndex = 22
         Me.UpdateLink.TabStop = True
-        Me.UpdateLink.Text = "Updates and Support: http://aquaterra.com/TimeseriesUtility/"
+        Me.UpdateLink.Text = "Updates and Support: https://www.respec.com/product/modeling-optimization/sara-ti" &
+    "meseries-utility/"
         Me.UpdateLink.UseCompatibleTextRendering = True
         '
         'frmAbout
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(541, 120)
+        Me.ClientSize = New System.Drawing.Size(661, 120)
         Me.Controls.Add(Me.UpdateLink)
         Me.Controls.Add(Me.lblVersion)
         Me.Controls.Add(Me.lblSARA)

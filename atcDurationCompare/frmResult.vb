@@ -3,6 +3,7 @@ Imports atcUtility
 Imports atcGraph
 Imports ZedGraph
 Imports MapWinUtility
+Imports System.Windows.Forms
 
 Public Class frmResult
     Private WithEvents pDataGroup As atcTimeseriesGroup
@@ -39,16 +40,29 @@ Public Class frmResult
 
     Public ReadOnly Property HelpLocation() As String
         Get
-            Select Case pAnalysis.ToLower
-                Case "duration"
-                    Return pHelpLocationDuration
-                Case "compare"
-                    Return pHelpLocationCompare
-                Case "durationhydrograph"
-                    Return pHelpLocationDurationHydrograph
-                Case Else
-                    Return pHelpLocationDuration
-            End Select
+            If Application.ProductName = "USGSHydroToolbox" Then
+                Select Case pAnalysis.ToLower
+                    Case "duration"
+                        Return "SW-Tools\Duration Compare.html"
+                    Case "compare"
+                        Return "SW-Tools\Duration Compare.html"
+                    Case "durationhydrograph"
+                        Return "SW-Tools\Duration Hydrograph.html"
+                    Case Else
+                        Return "SW-Tools\Duration Compare.html"
+                End Select
+            Else
+                Select Case pAnalysis.ToLower
+                    Case "duration"
+                        Return pHelpLocationDuration
+                    Case "compare"
+                        Return pHelpLocationCompare
+                    Case "durationhydrograph"
+                        Return pHelpLocationDurationHydrograph
+                    Case Else
+                        Return pHelpLocationDuration
+                End Select
+            End If
         End Get
     End Property
 
@@ -228,24 +242,27 @@ Public Class frmResult
             'Next
 
             .Legend.IsVisible = False
-        End With
-        Dim lPEDecimals As String = "Percentiles" & vbCrLf
-        For lGroupIndex As Integer = 0 To aDataGroup.Count - 1
-            lPEDecimals &= aDataGroup(lGroupIndex).Attributes.GetValue("PEDecimal")
-            If lGroupIndex + 1 Mod 5 = 0 Then
-                lPEDecimals &= Environment.NewLine
-            End If
-        Next
-        Dim lText As New TextObj(lPEDecimals, 0.45F, 0.05F)
-        With lText
-            .Location.CoordinateFrame = CoordType.ChartFraction
-            .Location.AlignH = AlignH.Left
-            .FontSpec.Family = "Courier"
-            .FontSpec.Border.IsVisible = False
-            .FontSpec.StringAlignment = Drawing.StringAlignment.Near
+            Dim lPEDecimals As String = "Percentiles" & vbCrLf
+            Dim lPEDecimal As String
+            For lGroupIndex As Integer = 0 To aDataGroup.Count - 1
+                lPEDecimal = aDataGroup(lGroupIndex).Attributes.GetValue("PEDecimal")
+                lPEDecimals &= lPEDecimal
+                If lGroupIndex + 1 Mod 5 = 0 Then
+                    lPEDecimals &= Environment.NewLine
+                End If
+                .CurveList.Item(lGroupIndex).Label.Text = lPEDecimal & .CurveList.Item(lGroupIndex).Label.Text
+            Next
+            Dim lText As New TextObj(lPEDecimals, 0.45F, 0.05F)
+            With lText
+                .Location.CoordinateFrame = CoordType.ChartFraction
+                .Location.AlignH = AlignH.Left
+                .FontSpec.Family = "Courier"
+                .FontSpec.Border.IsVisible = False
+                .FontSpec.StringAlignment = Drawing.StringAlignment.Near
+            End With
+            .GraphObjList.Add(lText)
         End With
 
-        lGraphDurHyd.ZedGraphCtrl.GraphPane.GraphObjList.Add(lText)
         lGraphForm.Width = 720
         lGraphForm.Height = 560
 

@@ -240,6 +240,7 @@
     <ProjectReference Include="..\BASINS\ToolboxMWPlugin-DSC.vbproj">
       <Project>{9b3bb48b-2caf-4e49-a900-5e08217da078}</Project>
       <Name>ToolboxMWPlugin-DSC</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MapWinUtility\MapWinUtility-DSC.vbproj">
       <Project>{33e88992-742f-4d13-823f-35d6a07b1aa1}</Project>

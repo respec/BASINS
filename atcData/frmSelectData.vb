@@ -392,6 +392,10 @@ Friend Class frmSelectData
         pInitializing = True 'Gets set back to False in Populate below
         mnuSelectMap.Checked = False
 
+        If Application.ProductName = "USGSHydroToolbox" Then
+            chkFilter.Text = "Subset and Filter Time Series"
+        End If
+
         If aGroup IsNot Nothing AndAlso aGroup.Count > 10 Then
             Select Case Logger.Msg("Select all " & aGroup.Count & " datasets?", vbYesNoCancel, "Several datasets available")
                 Case vbNo : aGroup = Nothing
@@ -1269,6 +1273,8 @@ NextName:
     Private Sub ShowHelpForSelect()
         If System.Reflection.Assembly.GetEntryAssembly.Location.EndsWith("TimeseriesUtility.exe") Then
             ShowHelp("Tutorial.html")
+        ElseIf Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("Time-Series Tools/Subset and Filter Time Series.html")
         Else
             ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
         End If

@@ -740,7 +740,7 @@ Public Class atcExpertSystem
                         pStats(14, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - lDailyTSer.Attributes.GetDefinedValue("%Sum50").Value  '50% high
 
                         Dim lTmpDate(5) As Integer
-                        J2Date(SDateJ, lTmpDate)
+                        J2Date(AdjSDateJ, lTmpDate)
 
                         pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
                         pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume

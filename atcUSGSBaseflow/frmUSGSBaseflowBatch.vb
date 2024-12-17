@@ -109,6 +109,7 @@ Public Class frmUSGSBaseflowBatch
         pCommonEnd = GetMaxValue()
         Dim lRow As Integer = 1
         Dim lDates(5) As Integer
+        Dim lDatesUser(5) As Integer
 
         If Not pSetGlobal Then
             btnExamineData.Visible = True
@@ -160,12 +161,24 @@ Public Class frmUSGSBaseflowBatch
             pCommonEnd = pBasicAttributes.GetValue("EJDATECommon", 0)
             Dim lStartDate As Double = pBasicAttributes.GetValue("SJDATE", 0)
             Dim lEndDate As Double = pBasicAttributes.GetValue("EJDATE", 0)
+            Dim lStartDateUser As Double = pBasicAttributes.GetValue("StartDate", 0)
+            Dim lEndDateUser As Double = pBasicAttributes.GetValue("EndDate", 0)
             J2Date(lStartDate, lDates)
             If lStartDate > 0 Then txtDataStart.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
-            If lStartDate > 0 Then txtStartDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            J2Date(lStartDateUser, lDatesUser)
+            If lStartDateUser > 0 Then
+                txtStartDateUser.Text = lDatesUser(0) & "/" & lDatesUser(1) & "/" & lDatesUser(2)
+            ElseIf lStartDate > 0 Then
+                txtStartDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            End If
             J2Date(lEndDate, lDates)
             If lEndDate > 0 Then txtDataEnd.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
-            If lEndDate > 0 Then txtEndDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            J2Date(lEndDateUser, lDatesUser)
+            If lEndDateUser > 0 Then
+                txtEndDateUser.Text = lDatesUser(0) & "/" & lDatesUser(1) & "/" & lDatesUser(2)
+            ElseIf lEndDate > 0 Then
+                txtEndDateUser.Text = lDates(0) & "/" & lDates(1) & "/" & lDates(2)
+            End If
         End If
 
         If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
@@ -329,7 +342,8 @@ Public Class frmUSGSBaseflowBatch
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
             If Not pSetGlobal Then
-                If lSDate < 0 OrElse lEDate < 0 Then
+                'If lSDate < 0 OrElse lEDate < 0 Then
+                If lSDate >= lEDate Then
                     lErrMsg &= "- Problematic start and/or end date." & vbCrLf
                 Else
                     Dim lTs As atcTimeseries = Nothing

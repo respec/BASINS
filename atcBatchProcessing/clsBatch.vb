@@ -33,6 +33,7 @@ Public Class clsBatch
     Implements IBatchProcessing
 
     Public Enum ANALYSIS
+        NONE
         ITA
         SWSTAT
         DFLOW
@@ -96,7 +97,8 @@ Public Class clsBatch
     ''' <remarks></remarks>
     Public Function GetStationStreamFlowData(ByVal aStation As clsBatchUnitStation,
                                              ByVal aListBatchUnitsData As atcCollection,
-                                             Optional ByVal aPreserve As Boolean = False) As atcTimeseries
+                                             Optional ByVal aPreserve As Boolean = False,
+                                             Optional ByVal aIncludeProvisional As Boolean = False) As atcTimeseries
         Dim lDataFilename As String = ""
         If aListBatchUnitsData.Keys.Contains(aStation.StationID) Then
             lDataFilename = aListBatchUnitsData.ItemByKey(aStation.StationID)
@@ -162,18 +164,50 @@ Public Class clsBatch
             End If
         End If
         If lDataReady Then
-            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Flow")
+            Dim lGroup As atcTimeseriesGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
             If lGroup.Count = 0 Then
-                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Streamflow")
+                lGroup = aStation.DataSource.DataSets.FindData("Constituent", "Flow")
             End If
             If lGroup IsNot Nothing AndAlso lGroup.Count > 0 Then
+                Dim lTsFlow As atcTimeseries = Nothing
+                For Each lTs As atcTimeseries In lGroup
+                    If lTs.Attributes.GetValue("TSFORM") = 1 Then
+                        ' only keeps mean (1)
+                        lTsFlow = lTs
+                        aStation.BFInputs.SetValue("StaNam", lTsFlow.Attributes.GetValue("StaNam", "Unknown"))
+                        aStation.BFInputs.SetValue("STAID", lTsFlow.Attributes.GetValue("STAID", "Unknown"))
+                    Else
+                        ' throw away other types of data such as min (4), max (5), or sum (2)
+                        lTs.Clear()
+                    End If
+                Next
+
                 If aPreserve Then
-                    Return lGroup(0)
+                    ' Just use the original flow data, i.e., lTsFlow
                 Else
-                    Dim lTsFlow As atcTimeseries = lGroup(0).Clone()
-                    'aStation.DataSource.Clear()
-                    'aStation.DataSource = Nothing
+                    ' Use a clone of the flow data
+                    lTsFlow = lTsFlow.Clone()
+                End If
+
+                lGroup.Clear()
+                If aIncludeProvisional Then
                     Return lTsFlow
+                Else
+                    If HasProvisionalValues(lTsFlow) Then
+                        Dim lProvisionalTS As atcTimeseries = Nothing
+                        Dim lNonProvisionalTS As atcTimeseries = Nothing
+                        SplitProvisional(lTsFlow, lProvisionalTS, lNonProvisionalTS)
+                        If lNonProvisionalTS IsNot Nothing Then
+                            If lProvisionalTS IsNot Nothing Then
+                                lProvisionalTS.Clear()
+                                lProvisionalTS = Nothing
+                            End If
+                            lTsFlow.Clear()
+                            Return lNonProvisionalTS
+                        End If
+                    Else
+                        Return lTsFlow
+                    End If
                 End If
             End If
         End If

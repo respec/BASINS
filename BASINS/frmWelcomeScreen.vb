@@ -204,10 +204,11 @@ Public Class frmWelcomeScreen
         Dim lOpenFileDialog As New OpenFileDialog
 
         With lOpenFileDialog
-            .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
-            .CheckFileExists = True
 #If GISProvider = "DotSpatial" Then
             If lProject IsNot Nothing Then
+                '.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+                .Filter = "DotSpatial Project Files (*.dspx)|*.dspx|MapWindow Project Files (*.mwprj)|*.mwprj"
+                .CheckFileExists = True
                 .InitialDirectory = lProject.CurrentProjectDirectory
                 If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                     lProject.OpenProject(.FileName)
@@ -216,6 +217,8 @@ Public Class frmWelcomeScreen
                 End If
             End If
 #Else
+            .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+            .CheckFileExists = True
             .InitialDirectory = lAppInfo.DefaultDir
             If .ShowDialog(Me) = System.Windows.Forms.DialogResult.OK Then
                 lProject.Load(.FileName)
@@ -251,6 +254,7 @@ Public Class frmWelcomeScreen
 #End If
         If lProjectOpenOK Then
             Logger.Dbg("Loaded Project '" & fileName & "'")
+            Logger.Status("HIDE")
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Close()
         Else
@@ -299,6 +303,32 @@ Public Class frmWelcomeScreen
         Dim lProjectId As String
         Dim lblProject As Label
 #If GISProvider = "DotSpatial" Then
+        Dim recentFiles As New ArrayList()
+        For Each lfile As String In DotSpatial.Data.Properties.Settings.Default.RecentFiles
+            If Not String.IsNullOrEmpty(lfile) Then
+                If lfile.EndsWith("dspx") Then
+                    recentFiles.Add(lfile)
+                End If
+            End If
+        Next
+
+        While lRecentCount < 4 And lCurrent < recentFiles.Count
+            lProjectName = recentFiles(lCurrent)
+            lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
+            If FileExists(lProjectName) AndAlso LCase(lProjectId) <> "national" Then
+                Select Case lRecentCount
+                    Case 0 : lblProject = lblProject1
+                    Case 1 : lblProject = lblProject2
+                    Case 2 : lblProject = lblProject3
+                    Case Else : lblProject = lblProject4
+                End Select
+                lblProject.Text = lProjectId
+                lblProject.Tag = lProjectName
+                lblProject.Visible = True
+                lRecentCount += 1
+            End If
+            lCurrent += 1
+        End While
 #Else
         While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
             lProjectName = CType(lProject.RecentProjects(lCurrent), String)

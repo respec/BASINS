@@ -1622,8 +1622,22 @@ Finished:
             Throw New ApplicationException(aOperationName & " did not get a Timeseries argument")
         End If
 
-        Dim lTSFirst As atcTimeseries = lTSgroup.Item(0)
+        Dim lTSFirst As atcTimeseries
         Dim lTSOriginal As atcTimeseries = Nothing
+        If aOperationName.ToLower.Contains("each date") Then
+            Dim lCommonFirst As Double
+            Dim lCommonLast As Double
+            Dim lFirst As Double
+            Dim lLast As Double
+            If CommonDates(lTSgroup, lFirst, lLast, lCommonFirst, lCommonLast) Then
+                For i As Integer = 0 To lTSgroup.Count - 1
+                    lTSgroup.Item(i) = SubsetByDate(lTSgroup.Item(i), lCommonFirst, lCommonLast, Nothing)
+                Next
+            Else 'can't perform operation without common period
+                Throw New ApplicationException(aOperationName & " requires a common period for selected data - none found")
+            End If
+        End If
+        lTSFirst = lTSgroup.Item(0)
         If lTSgroup.Count > 1 Then
             lTSOriginal = lTSgroup.Item(1) 'default the current ts to the one after the first
         End If
@@ -1697,7 +1711,7 @@ Finished:
                     Next
                 Next
 
-            Case "mean"
+            Case "mean", "mean each date"
                 For lValueIndex = 0 To lValueIndexLast
                     If lHaveNumber Then lNewVals(lValueIndex) += lNumber
                     For lTSIndex = 1 To lTSgroup.Count - 1
@@ -1707,7 +1721,7 @@ Finished:
                     lNewVals(lValueIndex) /= lArgCount
                 Next
 
-            Case "geometric mean"
+            Case "geometric mean", "geometric mean each date"
                 For lValueIndex = 0 To lValueIndexLast
                     lNewVals(lValueIndex) = Math.Log10(lNewVals(lValueIndex))
                     If lHaveNumber Then lNewVals(lValueIndex) += Math.Log10(lNumber)

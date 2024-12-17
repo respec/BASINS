@@ -211,7 +211,8 @@ Public Class frmUSGSBaseflow
         Else
             lSDate = StartDateFromForm()
             lEDate = EndDateFromForm()
-            If lSDate < 0 OrElse lEDate < 0 Then
+            'If lSDate < 0 OrElse lEDate < 0 Then
+            If lSDate >= lEDate Then
                 lErrMsg &= "- Problematic start and/or end date." & vbCrLf
             ElseIf (lEDate - lSDate) / (JulianHour * 24) < 31 Then
                 lErrMsg &= "- Analysis duration is too short (31 days minimum)." & vbCrLf
@@ -975,12 +976,20 @@ Public Class frmUSGSBaseflow
 
     Private Sub frmUSGSBaseflow_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyValue = System.Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+            If Application.ProductName = "USGSHydroToolbox" Then
+                ShowHelp("GW-Tools/Base-Flow Separation.html")
+            Else
+                ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+            End If
         End If
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+        If Application.ProductName = "USGSHydroToolbox" Then
+            ShowHelp("GW-Tools/Base-Flow Separation.html")
+        Else
+            ShowHelp("BASINS Details/Analysis/GW Toolbox Hydrograph Analysis/Base-Flow Separation.html")
+        End If
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

@@ -22,7 +22,7 @@ Public Class frmSave
             End If
         End If
         Me.ShowDialog()
-        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+        If Me.DialogResult = System.Windows.Forms.DialogResult.OK Then
             Return pDataGroup
         Else
             Return Nothing
@@ -67,12 +67,12 @@ Public Class frmSave
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
 
     Private Sub frmSave_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
+        If e.KeyValue = System.Windows.Forms.Keys.F1 Then
             btnHelp_Click(Nothing, Nothing)
         End If
     End Sub

@@ -8,114 +8,113 @@ Public Module modListUCIParameters
     Private pIMPLND As atcCollection
     Private pRCHRES As atcCollection
     Private pBlockDefs As HspfBlockDefs
-    Sub ListReachParameters(ByVal aHSPFUCI As HspfUci, ByVal lOutputFolder As String)
+    Sub ListReachParameters(ByVal aHSPFUCI As HspfUci, ByVal aOutputFolder As String)
         pPERLND = New atcCollection
         pIMPLND = New atcCollection
         pRCHRES = New atcCollection
-        Dim s As String = ""
-        Dim ModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
-        Dim ParameterList As System.IO.StreamWriter
-        Dim NumberOfReaches As Integer = 0
-        ParameterList = My.Computer.FileSystem.OpenTextFileWriter(lOutputFolder & "\" & ModelName & "_RCHRES_ParameterList.txt", False)
-        ParameterList.WriteLine("Parameter list for " & ModelName)
+
+        Dim lModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
+        Dim lParameterList As System.IO.StreamWriter
+        Dim lNumberOfReaches As Integer = 0
+        lParameterList = My.Computer.FileSystem.OpenTextFileWriter(aOutputFolder & "\" & lModelName & "_RCHRES_ParameterList.txt", False)
+        lParameterList.WriteLine("Parameter list for " & lModelName)
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "RCHRES" AndAlso Not pRCHRES.Contains(lOperation.Id) Then
                 pRCHRES.Add(lOperation.Id)
-                NumberOfReaches += 1
+                lNumberOfReaches += 1
             End If
         Next
 
-        ParameterList.WriteLine("Number Of Reaches in the UCI File = " & NumberOfReaches)
-        ParameterList.WriteLine("OperationType, OperationID, TableName, TableOccurrence, PrameterName, ParameterValue")
+        lParameterList.WriteLine("Number Of Reaches in the UCI File = " & lNumberOfReaches)
+        lParameterList.WriteLine("OperationType, OperationID, TableName, TableOccurrence, PrameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "RCHRES" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lTable.Name & ", " &
+                        lParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " & lTable.Name & ", " &
                                                 lTable.OccurIndex & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
             End If
         Next
 
-        ParameterList.Close()
-
+        lParameterList.Close()
 
     End Sub
-    Sub ListPERLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal lOutputFolder As String)
+
+    Sub ListPERLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal aOutputFolder As String)
         pPERLND = New atcCollection
         pIMPLND = New atcCollection
         pRCHRES = New atcCollection
-        Dim s As String = ""
-        Dim ModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
-        Dim ParameterList As System.IO.StreamWriter
-        Dim NumberOfPERLNDOperations As Integer = 0
-        ParameterList = My.Computer.FileSystem.OpenTextFileWriter(lOutputFolder & "\" & ModelName & "_PERLND_ParameterList.txt", False)
-        ParameterList.WriteLine("Parameter list for " & ModelName)
+
+        Dim lModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
+        Dim lParameterList As System.IO.StreamWriter
+        Dim lNumberOfPERLNDOperations As Integer = 0
+        lParameterList = My.Computer.FileSystem.OpenTextFileWriter(aOutputFolder & "\" & lModelName & "_PERLND_ParameterList.txt", False)
+        lParameterList.WriteLine("Parameter list for " & lModelName)
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "PERLND" AndAlso Not pRCHRES.Contains(lOperation.Id) Then
                 pRCHRES.Add(lOperation.Id)
-                NumberOfPERLNDOperations += 1
+                lNumberOfPERLNDOperations += 1
             End If
         Next
 
-        ParameterList.WriteLine("Number Of PERLND Operations in the UCI File = " & NumberOfPERLNDOperations)
-        ParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
+        lParameterList.WriteLine("Number Of PERLND Operations in the UCI File = " & lNumberOfPERLNDOperations)
+        lParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "PERLND" Then
                 For Each lTable As HspfTable In lOperation.Tables
-                    For Each lparm As HspfParm In lTable.Parms
+                    For Each lParm As HspfParm In lTable.Parms
                         'If lparm.Value.Contains("ORTHO") Then Stop
                         'If lTable.OccurIndex > 1 Then Stop
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
-                                                lTable.Name & "," & lTable.OccurNum & ", " & lTable.OccurCount & ", " & lparm.Name & ", " & lparm.Value)
+                        lParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
+                                                lTable.Name & "," & lTable.OccurNum & ", " & lTable.OccurCount & ", " & lParm.Name & ", " & lParm.Value)
                     Next
                 Next
             End If
         Next
 
-        ParameterList.Close()
-
+        lParameterList.Close()
 
     End Sub
-    Sub ListIMPLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal lOutputFolder As String)
+
+    Sub ListIMPLNDParameters(ByVal aHSPFUCI As HspfUci, ByVal aOutputFolder As String)
         pPERLND = New atcCollection
         pIMPLND = New atcCollection
         pRCHRES = New atcCollection
-        Dim s As String = ""
-        Dim ModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
-        Dim ParameterList As System.IO.StreamWriter
-        Dim NumberOfReaches As Integer = 0
-        ParameterList = My.Computer.FileSystem.OpenTextFileWriter(lOutputFolder & "\" & ModelName & "_IMPLND_ParameterList.txt", False)
-        ParameterList.WriteLine("Parameter list for " & ModelName)
+
+        Dim lModelName As String = IO.Path.GetFileNameWithoutExtension(aHSPFUCI.Name)
+        Dim lParameterList As System.IO.StreamWriter
+        Dim lNumberOfReaches As Integer = 0
+        lParameterList = My.Computer.FileSystem.OpenTextFileWriter(aOutputFolder & "\" & lModelName & "_IMPLND_ParameterList.txt", False)
+        lParameterList.WriteLine("Parameter list for " & lModelName)
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "IMPLND" AndAlso Not pRCHRES.Contains(lOperation.Id) Then
                 pRCHRES.Add(lOperation.Id)
-                NumberOfReaches += 1
+                lNumberOfReaches += 1
             End If
         Next
 
-        ParameterList.WriteLine("Number Of IMPLND Operations in the UCI File = " & NumberOfReaches)
-        ParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
+        lParameterList.WriteLine("Number Of IMPLND Operations in the UCI File = " & lNumberOfReaches)
+        lParameterList.WriteLine("OperationType, OperationID, TableName, Table Occurrence Number, Table Occurrence Count, ParameterName, ParameterValue")
 
         For Each lOperation As HspfOperation In aHSPFUCI.OpnSeqBlock.Opns
             If lOperation.Name = "IMPLND" Then
                 For Each lTable As HspfTable In lOperation.Tables
                     For Each lparm As HspfParm In lTable.Parms
-                        ParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
+                        lParameterList.WriteLine(lOperation.Name & ", " & lOperation.Id & ", " &
                                                 lTable.Name & "," & lTable.OccurNum & ", " & lTable.OccurCount & ", " & lparm.Name & ", " & lparm.Value)
                     Next
                 Next
             End If
         Next
 
-        ParameterList.Close()
-
+        lParameterList.Close()
 
     End Sub
 

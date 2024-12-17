@@ -362,7 +362,7 @@ Public Class frmAbout
             If lblProgramName.Text.Length < 10 Then
                 lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
             Else
-                lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 20.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+                lblProgramName.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
             End If
 
             lblProgramURL.Text = g_URL_Home
@@ -370,7 +370,8 @@ Public Class frmAbout
             'lblProgramURL.Left = Me.Width - lblProgramURL.Width - 20
 
             Try
-                lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                'lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
+                lblPluginVersion.Text = " Release Date: January 31, 2023"
             Catch
             End Try
             Try

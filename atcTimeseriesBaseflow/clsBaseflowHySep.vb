@@ -61,6 +61,8 @@ Public Class clsBaseflowHySep
             Return Nothing
         End If
 
+        gError = ""
+
         'Start organizing here using the original HYSEP scheme
         'that is to do one year at a time
         '
@@ -92,11 +94,35 @@ Public Class clsBaseflowHySep
 
         Select Case Method
             Case BFMethods.HySEPFixed
-                lTsBF = HySepFixed(lTsDaily)
+                Try
+                    lTsBF = HySepFixed(lTsDaily)
+                Catch ex As Exception
+                    gError &= "HySep.Fixed method failed. Exception: " & ex.InnerException.Message
+                    If gBatchRun Then
+                        Throw New ApplicationException(gError)
+                    End If
+                    Return Nothing
+                End Try
             Case BFMethods.HySEPSlide
-                lTsBF = HySepSlide(lTsDaily)
+                Try
+                    lTsBF = HySepSlide(lTsDaily)
+                Catch ex As Exception
+                    gError &= "HySep.Slide method failed. Exception: " & ex.InnerException.Message
+                    If gBatchRun Then
+                        Throw New ApplicationException(gError)
+                    End If
+                    Return Nothing
+                End Try
             Case BFMethods.HySEPLocMin
-                lTsBF = HySepLocMin(lTsDaily)
+                Try
+                    lTsBF = HySepLocMin(lTsDaily)
+                Catch ex As Exception
+                    gError &= "HySep.LocMin method failed. Exception: " & ex.InnerException.Message
+                    If gBatchRun Then
+                        Throw New ApplicationException(gError)
+                    End If
+                    Return Nothing
+                End Try
         End Select
 
         'Adjust for pre- and post- duration dates
