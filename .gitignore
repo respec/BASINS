@@ -222,9 +222,3 @@ Resources.resx
 *.manifest
 *.chm
 *.wdu
-*.json
-*.xml
-/.vs
-/atcWASPInpWriter
-*.vsidx
-*.nlp
