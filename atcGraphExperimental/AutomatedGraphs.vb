@@ -6,6 +6,7 @@ Imports MapWinUtility 'this has to be downloaded separately from http://svn.mapw
 Imports ZedGraph 'this is coming from a DLL as the original project was a C# project and not a VB project
 Imports System.Collections.Specialized
 Imports System.Linq
+Imports System.Drawing
 
 
 
@@ -509,15 +510,10 @@ Public Module AutomatedGraphs
             If (aGraphInit.length > 16 AndAlso Not String.IsNullOrEmpty(Trim(aGraphInit(16))) AndAlso Trim(aGraphInit(16)).ToLower = "yes") Then
                 lAuxPane.YAxis.Type = AxisType.Log
             End If
-            lAuxPane.YAxis.Title.Text = Trim(aGraphInit(5))
+
         Else
             lPaneMain = aZgc.MasterPane.PaneList(0)
         End If
-        lPaneMain.YAxis.Title.Text = Trim(aGraphInit(3))
-        lPaneMain.XAxis.Title.Text = Trim(aGraphInit(4))
-        lPaneMain.Y2Axis.Title.Text = Trim(aGraphInit(6))
-        lPaneMain.YAxis.Scale.Min = 0
-        lPaneMain.Y2Axis.Scale.Min = 0
 
 
         If (aGraphInit.length > 9 AndAlso Not String.IsNullOrEmpty(Trim(aGraphInit(9)))) Then
@@ -619,6 +615,63 @@ Public Module AutomatedGraphs
             End If
             aRecordIndex += 1
         Next CurveNumber
+
+        lPaneMain.YAxis.Title.Text = Trim(aGraphInit(3))
+        lPaneMain.XAxis.Title.Text = Trim(aGraphInit(4))
+        lPaneMain.Y2Axis.Title.Text = Trim(aGraphInit(6))
+        lPaneMain.YAxis.Scale.Min = 0
+        lPaneMain.Y2Axis.Scale.Min = 0
+
+        lPaneMain.YAxis.Title.FontSpec.IsBold = True
+        lPaneMain.YAxis.Title.FontSpec.Size += 8
+        lPaneMain.YAxis.Scale.FontSpec.Size += 4
+        lPaneMain.YAxis.Scale.FontSpec.IsBold = False
+
+        lPaneMain.Y2Axis.Title.FontSpec.IsBold = True
+        lPaneMain.Y2Axis.Title.FontSpec.Size += 8
+        lPaneMain.Y2Axis.Scale.FontSpec.Size += 4
+        lPaneMain.Y2Axis.Scale.FontSpec.IsBold = False
+        lPaneMain.Y2Axis.Scale.Max *= 1.0
+
+        lPaneMain.YAxis.Scale.IsUseTenPower = False
+        If lPaneMain.YAxis.Scale.Max > 9999 Then
+            lPaneMain.YAxis.Scale.IsUseTenPower = True
+        End If
+
+        lPaneMain.Legend.FontSpec.Size += 4
+        lPaneMain.Legend.FontSpec.IsBold = True
+
+        lPaneMain.XAxis.Title.FontSpec.IsBold = True
+        lPaneMain.XAxis.Title.FontSpec.Size += 8
+        lPaneMain.XAxis.Scale.FontSpec.Size += 4
+        lPaneMain.XAxis.Scale.FontSpec.IsBold = False
+
+        If aZgc.MasterPane.PaneList.Count > 1 Then
+            lAuxPane.YAxis.Title.Text = Trim(aGraphInit(5))
+            lAuxPane.YAxis.Title.FontSpec.IsBold = True
+            lAuxPane.YAxis.Title.FontSpec.Size += 8
+            lAuxPane.YAxis.Scale.FontSpec.Size += 4
+            lAuxPane.YAxis.Scale.FontSpec.IsBold = False
+            lAuxPane.Legend.FontSpec.Size += 4
+            lAuxPane.Legend.FontSpec.IsBold = True
+
+            Dim lChartWidthReduction As Single = 15
+
+            lAuxPane.YAxis.Scale.IsUseTenPower = False
+            If lAuxPane.YAxis.Scale.Max > 999 Then
+                lAuxPane.YAxis.Scale.IsUseTenPower = True
+                lChartWidthReduction = 25
+                lAuxPane.Margin.All = 100
+            End If
+            'Somehow IsUseTenPower is not working for Auxiliary Axis and therefore I changed chart width, if numbers are big, and also increased margin. 
+            'I am sure there might be a better way to accomplish this.
+
+            Dim lChartWidth As Single = Math.Min(lAuxPane.Chart.Rect.Width, lPaneMain.Chart.Rect.Width) - lChartWidthReduction
+            Dim lChartX As Single = Math.Max(lAuxPane.Chart.Rect.X, lPaneMain.Chart.Rect.X) + lChartWidthReduction
+            lPaneMain.Chart.Rect = New RectangleF(lChartX, lPaneMain.Chart.Rect.Y, lChartWidth, lPaneMain.Chart.Rect.Height)
+            lAuxPane.Chart.Rect = New RectangleF(lChartX, lAuxPane.Chart.Rect.Y, lChartWidth, lAuxPane.Chart.Rect.Height)
+        End If
+
         aTimeseriesgroup = Nothing
         Return aZgc
     End Function
@@ -691,6 +744,20 @@ Public Module AutomatedGraphs
             aRecordIndex += 1
             lNumberOfMainPaneCurves += 1
         Next CurveNumber
+        lPaneMain.YAxis.Title.FontSpec.IsBold = True
+        lPaneMain.YAxis.Title.FontSpec.Size += 8
+        lPaneMain.YAxis.Scale.FontSpec.Size += 4
+        lPaneMain.YAxis.Scale.FontSpec.IsBold = False
+
+        lPaneMain.Legend.FontSpec.Size += 4
+        lPaneMain.Legend.FontSpec.IsBold = True
+
+        lPaneMain.XAxis.Title.FontSpec.IsBold = True
+        lPaneMain.XAxis.Title.FontSpec.Size += 8
+        lPaneMain.XAxis.Scale.FontSpec.Size += 4
+        lPaneMain.XAxis.Scale.FontSpec.IsBold = False
+
+
         Return aZgc
     End Function
     Private Function ScatterPlotGraph(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
@@ -836,6 +903,19 @@ Public Module AutomatedGraphs
             lPaneMain.Legend.IsVisible = True
 
         Next
+
+        lPaneMain.YAxis.Title.FontSpec.IsBold = True
+        lPaneMain.YAxis.Title.FontSpec.Size += 8
+        lPaneMain.YAxis.Scale.FontSpec.Size += 4
+        lPaneMain.YAxis.Scale.FontSpec.IsBold = False
+
+        lPaneMain.Legend.FontSpec.Size += 4
+        lPaneMain.Legend.FontSpec.IsBold = True
+
+        lPaneMain.XAxis.Title.FontSpec.IsBold = True
+        lPaneMain.XAxis.Title.FontSpec.Size += 8
+        lPaneMain.XAxis.Scale.FontSpec.Size += 4
+        lPaneMain.XAxis.Scale.FontSpec.IsBold = False
         Return aZgc
     End Function
     Private Function CumulativeProbability(ByVal aTimeseriesgroup As atcTimeseriesGroup, ByVal aZgc As ZedGraphControl,
