@@ -2380,16 +2380,12 @@ OuttaHere:
 
     ''' <summary>uses Hargreaves method to compute daily evaporation rate from 
     ''' daily average temperatures And Julian day.</summary>
-    ''' <param name="aMonth">Month</param>
-    ''' <param name="aDay">Day</param>
     ''' <param name="aLatDeg">Latitude, in degrees</param>
     ''' <param name="aTAve">Average daily temperature (C)</param>
     ''' <param name="aTRng">Average daily temperature (C)</param>
     ''' <param name="aDegF">Temperature in Fahrenheit (True) or Celsius (False)</param>
     ''' <param name="aMissingValue">Value to return if problem occurs</param>
     ''' <remarks>returns evaporation rate in in/day</remarks>
-    'Public Function ETValueComputedbyHargraeves(ByVal aMonth As Integer,
-    '                                            ByVal aDay As Integer,
     Public Function ETValueComputedbyHargraeves(ByVal JulDay As Integer,
                                                 ByVal aLatDeg As Double,
                                                 ByVal aTAve As Double,

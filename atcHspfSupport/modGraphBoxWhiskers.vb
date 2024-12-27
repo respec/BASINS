@@ -39,7 +39,6 @@ Public Class BoxWhiskerItem
 
     'Public SortedList As New List(Of Double)
 
-
 End Class
 
 Public Module modGraphBoxWhiskers
@@ -97,7 +96,6 @@ Public Module modGraphBoxWhiskers
         End With
         lGrapher.DataColors = data_colors
 
-
         'specify the orientation angle of the x-axis label texts
         '-90 (default) is vertical orientation, 0 is horizontal
         lGrapher.XLabelAngle = -90
@@ -126,24 +124,9 @@ Public Module modGraphBoxWhiskers
 
         End If
 
-        'specify if to use legend
-        'True: use legend to show box category instead of x-axis labels
-        'False: use x-axis labels but not legend
         lGrapher.ShowLegend = False
 
-        'call routine to make the graph
-        'input argument: 
-        '   True, write the graph to output file previously specified
-        '   False, don't write to output file              
         lGrapher.SetUpGraph(True)
-
-        'Final note: all of the above clsGraphBoxWhisker attributes are optional
-        'if none is specified, then the default values will be used
-        'Example plots are:
-        '  boxwhisker_collection_labels.png --> lGrapher.ShowLegend = False
-        '  boxwhisker_collection_legend.png --> lGrapher.ShowLegend = True
-
-
 
 
         lZgc.Dispose()

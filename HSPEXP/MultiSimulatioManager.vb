@@ -346,7 +346,7 @@ You can edit this specification file and add more parameters and outputs.", vbOK
                     End If
                 Next
 
-            Case aParm.pParmTable.Contains("EXTNL")
+            Case aParm.pParmTable.Contains("EXT SOURCES")
 
                 If aParm.pParmOperationType.ToLower = "point" Then
                     Dim lConnections(3) As String
