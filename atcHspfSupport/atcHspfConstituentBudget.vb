@@ -623,6 +623,7 @@ Public Module ConstituentBudget
                             'find point load
                             Dim lTotalPointlbs As Double = 0.0
                             For Each lSource As HspfPointSource In lROper.PointSources
+
                                 If lSource.Target.Group = "INFLOW" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
                                                                             (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                             (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3) OrElse
@@ -632,33 +633,51 @@ Public Module ConstituentBudget
                                                                             (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                             (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
                                     Dim lPointlbs As Double = 0.0
-                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
-                                    If lSource.Tran.ToString.Trim = "DIV" Then
-                                        TimeSeriesTransformaton = atcTran.TranSumDiv
-                                    End If
-                                    Dim VolName As String = lSource.Source.VolName
-                                    Dim lDSN As Integer = lSource.Source.VolId
-                                    Dim lMfact As Double = lSource.MFact
-                                    If lSource.Target.Member = "OXIF" Then lMfact *= lCVON
-                                    If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
-                                    For i As Integer = 0 To aUci.FilesBlock.Count
 
-                                        If aUci.FilesBlock.Value(i).Typ = VolName Then
-                                            Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                            Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                            If lDataSource Is Nothing Then
-                                                If atcDataManager.OpenDataSource(lFileName) Then
-                                                    lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                End If
-                                            End If
-                                            Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                            ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
-                                            lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                                    If aBalanceType = "NO2NO3" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                        lSource.Target.Member = "OXIF" OrElse lSource.Target.Member = "NUIF2" OrElse
+                                        lSource.Target.MemSub1 = 2) Then
+                                        Continue For
+                                    End If
+                                    If aBalanceType = "TAM" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                        lSource.Target.Member = "OXIF" OrElse lSource.Target.MemSub1 = 1 OrElse
+                                        lSource.Target.MemSub1 = 3) Then
+                                        Continue For
+                                    End If
+                                    If aBalanceType = "TKN" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                        (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3)) Then
+                                        Continue For
+                                    End If
+
+
+
+                                    Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
+                                        If lSource.Tran.ToString.Trim = "DIV" Then
+                                            TimeSeriesTransformaton = atcTran.TranSumDiv
                                         End If
-                                    Next
-                                    lTotalPointlbs += lPointlbs
-                                End If
+                                        Dim VolName As String = lSource.Source.VolName
+                                        Dim lDSN As Integer = lSource.Source.VolId
+                                        Dim lMfact As Double = lSource.MFact
+                                        If lSource.Target.Member = "OXIF" Then lMfact *= lCVON
+                                        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
+                                        For i As Integer = 0 To aUci.FilesBlock.Count
+
+                                            If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                                Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                                If lDataSource Is Nothing Then
+                                                    If atcDataManager.OpenDataSource(lFileName) Then
+                                                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                                    End If
+                                                End If
+                                                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                                ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
+                                                lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                                            End If
+                                        Next
+                                        lTotalPointlbs += lPointlbs
+                                    End If
                             Next
 
                             'find GENER loads
@@ -683,6 +702,24 @@ Public Module ConstituentBudget
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
                                                                         (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
+
+                                                If aBalanceType = "NO2NO3" AndAlso (lMassLink.Target.Member = "PKIF" OrElse
+                                                            lMassLink.Target.Member = "OXIF" OrElse lMassLink.Target.Member = "NUIF2" OrElse
+                                                            lMassLink.Target.MemSub1 = 2) Then
+                                                    Continue For
+                                                End If
+                                                If aBalanceType = "TAM" AndAlso (lMassLink.Target.Member = "PKIF" OrElse
+                                                            lMassLink.Target.Member = "OXIF" OrElse lMassLink.Target.MemSub1 = 1 OrElse
+                                                            lMassLink.Target.MemSub1 = 3) Then
+                                                    Continue For
+                                                End If
+                                                If aBalanceType = "TKN" AndAlso ((lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
+                                                            (lMassLink.Target.Member = "NUIF1" AndAlso lMassLink.Target.MemSub1 = 3)) Then
+                                                    Continue For
+                                                End If
+
+
+
                                                 lGENERMassLinkMFact = lMassLink.MFact
                                                 If lMassLink.Target.Member = "OXIF" Then lGENERMassLinkMFact = lMassLink.MFact * lCVON
                                                 If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then lGENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
@@ -700,6 +737,21 @@ Public Module ConstituentBudget
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                         (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                        If aBalanceType = "NO2NO3" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                                            lSource.Target.Member = "OXIF" OrElse lSource.Target.Member = "NUIF2" OrElse
+                                                            lSource.Target.MemSub1 = 2) Then
+                                            Continue For
+                                        End If
+                                        If aBalanceType = "TAM" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                                            lSource.Target.Member = "OXIF" OrElse lSource.Target.MemSub1 = 1 OrElse
+                                                            lSource.Target.MemSub1 = 3) Then
+                                            Continue For
+                                        End If
+                                        If aBalanceType = "TKN" AndAlso ((lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 1) OrElse
+                                                            (lSource.Target.Member = "NUIF1" AndAlso lSource.Target.MemSub1 = 3)) Then
+                                            Continue For
+                                        End If
+
                                         Dim lGENERTSSourceMFact As Double = lSource.MFact
                                         If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= lCVON
                                         If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
@@ -852,6 +904,12 @@ Public Module ConstituentBudget
                                                                             (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
                                                                             (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                             (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+
+                                    If aBalanceType = "ORTHO P" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                                            lSource.Target.Member = "OXIF") Then
+                                        Continue For
+                                    End If
+
                                     Dim lPointlbs As Double = 0.0
                                     Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
                                     If lSource.Tran.ToString.Trim = "DIV" Then
@@ -902,6 +960,10 @@ Public Module ConstituentBudget
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 1) OrElse
                                                                         (lMassLink.Target.Member = "PKIF" AndAlso lMassLink.Target.MemSub1 = 2) OrElse
                                                                         (lMassLink.Target.Member = "OXIF" AndAlso lMassLink.Target.MemSub1 = 2)) Then
+                                                If aBalanceType = "ORTHO P" AndAlso (lMassLink.Target.Member = "PKIF" OrElse
+                                                            lMassLink.Target.Member = "OXIF") Then
+                                                    Continue For
+                                                End If
                                                 lGENERMassLinkMFact = lMassLink.MFact
                                                 If lMassLink.Target.Member = "OXIF" Then lGENERMassLinkMFact = lMassLink.MFact * lCVOP
                                                 If lMassLink.Target.Member = "PKIF" And (lMassLink.Target.MemSub1 = 1 Or lMassLink.Target.MemSub1 = 2) Then lGENERMassLinkMFact = lMassLink.MFact * ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
@@ -916,6 +978,10 @@ Public Module ConstituentBudget
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 1) OrElse
                                                                         (lSource.Target.Member = "PKIF" AndAlso lSource.Target.MemSub1 = 2) OrElse
                                                                         (lSource.Target.Member = "OXIF" AndAlso lSource.Target.MemSub1 = 2)) Then
+                                        If aBalanceType = "ORTHO P" AndAlso (lSource.Target.Member = "PKIF" OrElse
+                                                            lSource.Target.Member = "OXIF") Then
+                                            Continue For
+                                        End If
                                         Dim lGENERTSSourceMFact As Double = lSource.MFact
                                         If lSource.Target.Member = "OXIF" Then lGENERTSSourceMFact *= lCVOP
                                         If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lGENERTSSourceMFact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
@@ -1191,14 +1257,14 @@ Public Module ConstituentBudget
                     Next
                 End If
             Next
-            aReport3LoadAllocationAll.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            aReport3LoadAllocationAll.AppendLine("*The additional sources may include sources other than nonpoint sources, point sources, atmospheric deposition, and upstream contribution.")
             aReport3LoadAllocationAll.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
-            lReport4.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport4.AppendLine("*The additional sources may include sources other than nonpoint sources, point sources, atmospheric deposition, and upstream contribution.")
             lReport4.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
 
-            aReport5LoadAllocationLocations.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            aReport5LoadAllocationLocations.AppendLine("*The additional sources may include sources other than nonpoint sources, point sources, atmospheric deposition, and upstream contribution.")
             aReport5LoadAllocationLocations.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
-            lReport6.AppendLine("*The additional sources may include sources other than non-point sources, point sources, atmospheric deposition, and upstream contribution.")
+            lReport6.AppendLine("*The additional sources may include sources other than nonpoint sources, point sources, atmospheric deposition, and upstream contribution.")
             lReport6.AppendLine("**The totals do not include losses as they have already been applied to the respective sources")
 
             aReport3LoadAllocationAll.Append(lReport4.ToString)
