@@ -1598,7 +1598,8 @@ Public Module atcConstituentTables
                                 lTotalAtmDep = 0.0
                             End If
                             Dim lProcFluxTot As Double = SafeSumAnnual(aBinaryData, lLocationName, lReachConstituent & "-PROCFLUX-TOT", aSDateJ, aEDateJ)
-                            If lReachConstituent = "NO3" Then
+                            If lReachConstituent = "NO3" AndAlso SafeSumAnnual(aBinaryData, lLocationName, "NO2-OUTTOT", aSDateJ, aEDateJ) > 0 Then
+                                'if NO2 didn't exist then sumannual resulted in a value of -999, so Anurag added a check on 12/26/2024
                                 Try
                                     lOutflow += SafeSumAnnual(aBinaryData, lLocationName, "NO2-OUTTOT", aSDateJ, aEDateJ)
                                     lTotalIn += SafeSumAnnual(aBinaryData, lLocationName, "NO2-INTOT", aSDateJ, aEDateJ)
@@ -1672,6 +1673,7 @@ Public Module atcConstituentTables
                         lReport.AppendLine("   Run Made " & aRunMade)
                         lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
                         SaveFileString(aOutFolderName & lConstituent.ConstNameForEXPPlus & "_Reach_Budget.txt", lReport.ToString)
+                        'For Reaches another report _Per_RCH_Ann_Avg_Budget.txt is produced with better information, so this report is redundant.
                     End If
                 Next lConstituent
 #End Region

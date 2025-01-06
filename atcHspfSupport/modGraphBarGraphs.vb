@@ -32,13 +32,25 @@ Public Module modBarGraph
 
         Select Case items.Constituent
             Case "Sediment"
-                lGrapher.Title = "Sediment load allocation for all the sources at " & items.Location & " in " &
+                lGrapher.Title = "Sediment load allocation for all the sources at " & vbCrLf & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
             Case "TP"
-                lGrapher.Title = "Total Phosphorus load allocation for all the sources at " & items.Location & " in " &
+                lGrapher.Title = "Total Phosphorus load allocation for all the sources at " & vbCrLf & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
             Case "TN"
-                lGrapher.Title = "Total Nitrogen load allocation for all the sources at " & items.Location & " in " &
+                lGrapher.Title = "Total Nitrogen load allocation for all the sources at " & vbCrLf & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
+            Case "NO2NO3"
+                lGrapher.Title = "Nitrite and Nitrate as Nitrogen load allocation for all the sources at " & vbCrLf & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
+            Case "TAM"
+                lGrapher.Title = "Total Ammonia as Nitrogen load allocation for all the sources at " & vbCrLf & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
+            Case "ORTHO P"
+                lGrapher.Title = "Ortho-Phosphorus as Phosphorus load allocation for all the sources at " & vbCrLf & items.Location & " in " &
+                items.Scenario & " model. " & vbCrLf & items.TimeSpan
+            Case "TKN"
+                lGrapher.Title = "TKN as Nitrogen load allocation for all the sources at " & vbCrLf & items.Location & " in " &
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
         End Select
 

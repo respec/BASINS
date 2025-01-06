@@ -222,8 +222,3 @@ Resources.resx
 *.manifest
 *.chm
 *.wdu
-packages/*
-USGS.Baseflow/*
-BinDS/*
-BASINSDS/bin/*
-BASINSDS/obj/*

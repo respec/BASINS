@@ -6,6 +6,7 @@ Imports MapWinUtility
 Imports atcGraph
 Imports ZedGraph
 Imports System.Collections
+Imports System.Linq
 
 Public Class BoxWhiskerItem
 
@@ -38,7 +39,6 @@ Public Class BoxWhiskerItem
 
     'Public SortedList As New List(Of Double)
 
-
 End Class
 
 Public Module modGraphBoxWhiskers
@@ -57,24 +57,8 @@ Public Module modGraphBoxWhiskers
             vbCrLf & items.TimeSpan
         End If
 
-
-
-        'Select Case items.Constituent
-        '    Case "Sediment"
-        '        lGrapher.Title = "Box-Whisker plot of sediment loading rate from all land uses in " & items.Scenario & " model." &
-        '            vbCrLf & items.TimeSpan
-        '    Case "TotalP"
-        '        lGrapher.Title = "Box-Whisker plot of total phosphorus loading rate from all land uses in " & items.Scenario & " model." &
-        '            vbCrLf & items.TimeSpan
-        '    Case "TotalN"
-        '        lGrapher.Title = "Box-Whisker plot of total nitrogen loading rate from all land uses in " & items.Scenario & " model." &
-        '            vbCrLf & items.TimeSpan
-        '    Case Else
-        '        Exit Sub
-        'End Select
         lGrapher.DatasetsCollection = items.LabelValueCollection
         lGrapher.ShowOutliers = False
-
 
         lGrapher.OutputFile = aOutputFileName
 
@@ -112,7 +96,6 @@ Public Module modGraphBoxWhiskers
         End With
         lGrapher.DataColors = data_colors
 
-
         'specify the orientation angle of the x-axis label texts
         '-90 (default) is vertical orientation, 0 is horizontal
         lGrapher.XLabelAngle = -90
@@ -121,24 +104,29 @@ Public Module modGraphBoxWhiskers
         'if not specified, then default Y axis title will be constructed
         lGrapher.YTitle = items.Constituent & " " & items.Units
 
-        'specify if to use legend
-        'True: use legend to show box category instead of x-axis labels
-        'False: use x-axis labels but not legend
+        Dim values As New List(Of Double)
+        For Each key As String In items.LabelValueCollection.Keys
+            For Each value As Double In items.LabelValueCollection.ItemByKey(key)
+                values.Add(value)
+            Next
+        Next
+
+
+        Dim YMinScale As Double = values.ToArray.Min
+        Dim YMaxScale As Double = values.ToArray.Max
+        If YMaxScale / YMinScale > 100 Then
+            lGrapher.YUseLog = True
+            lGrapher.ZedGraphCtrl.GraphPane.YAxis.Scale.Min = Math.Pow(10, Math.Floor(Math.Log10(YMinScale))) / 10
+            lGrapher.ZedGraphCtrl.GraphPane.YAxis.Scale.Max = Math.Pow(10, Math.Ceiling(Math.Log10(YMaxScale))) * 10
+
+            'This is not the most elegant way to select better scales for Fecal Coliform or E.Coli Graph,
+            'but it is better than what we had. Anurag - 12/26/2024
+
+        End If
+
         lGrapher.ShowLegend = False
 
-        'call routine to make the graph
-        'input argument: 
-        '   True, write the graph to output file previously specified
-        '   False, don't write to output file              
         lGrapher.SetUpGraph(True)
-
-        'Final note: all of the above clsGraphBoxWhisker attributes are optional
-        'if none is specified, then the default values will be used
-        'Example plots are:
-        '  boxwhisker_collection_labels.png --> lGrapher.ShowLegend = False
-        '  boxwhisker_collection_legend.png --> lGrapher.ShowLegend = True
-
-
 
 
         lZgc.Dispose()
