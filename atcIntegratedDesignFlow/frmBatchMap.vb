@@ -673,7 +673,10 @@ Public Class frmBatchMap
     End Sub
     Private Sub btnParmForm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnParmForm.Click
         Dim lGroupNode As TreeNode = treeBFGroups.SelectedNode
-        If lGroupNode Is Nothing Then Return
+        If lGroupNode Is Nothing Then
+            Logger.Msg("One or more groups must be selected in the 'Batch Groups' list to perform this action.", "Batch Map Issue")
+            Return
+        End If
 
         Dim lGroupName As String = lGroupNode.Text
         If Not lGroupName.StartsWith("BatchGroup") Then
@@ -757,7 +760,10 @@ Public Class frmBatchMap
     End Sub
 
     Private Sub btnGroupGroup_Click(sender As Object, e As EventArgs) Handles btnGroupGroup.Click
-        If treeBFGroups.SelectedNode Is Nothing Then Exit Sub
+        If treeBFGroups.SelectedNode Is Nothing Then
+            Logger.Msg("One or more groups must be selected in the 'Batch Groups' list to perform this action.", "Batch Map Issue")
+            Exit Sub
+        End If
         Dim lnode As TreeNode = treeBFGroups.SelectedNode
         Dim lGroupingName As String = "BatchGroup"
         Dim lGroupName As String = ""
@@ -794,7 +800,10 @@ Public Class frmBatchMap
 
     Private Sub btnGroupRemove_Click(sender As Object, e As EventArgs) Handles btnGroupRemove.Click
         Dim node As TreeNode = treeBFGroups.SelectedNode
-        If node Is Nothing Then Exit Sub
+        If node Is Nothing Then
+            Logger.Msg("One or more groups must be selected in the 'Batch Groups' list to perform this action.", "Batch Map Issue")
+            Exit Sub
+        End If
         Dim lGroupingName As String = "BatchGroup"
         If node.Text.StartsWith(lGroupingName) Then
             RemoveBFGroup(node)
@@ -830,7 +839,10 @@ Public Class frmBatchMap
 
     Private Sub btnGroupPlot_Click(sender As Object, e As EventArgs) Handles btnGroupPlot.Click
         Dim node As TreeNode = treeBFGroups.SelectedNode
-        If node Is Nothing Then Exit Sub
+        If node Is Nothing Then
+            Logger.Msg("One or more groups must be selected in the 'Batch Groups' list to perform this action.", "Batch Map Issue")
+            Exit Sub
+        End If
         Dim lGroupingName As String = "BatchGroup"
         Dim lTsGroup As New atcTimeseriesGroup()
         Dim lArgs As New atcDataAttributes()
