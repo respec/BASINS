@@ -20,7 +20,9 @@ Public Class atcTimeseriesGDS
 
     Private Shared pFilter As String = "NASA NLDAS (*.nldas.txt)|*.nldas.txt|NASA GDS (*.gds)|*.gds|Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
     Private Shared pASC2FirstLine As String = "Metadata of the Time Series file:"
+    Private Shared pASC2FirstLine2 As String = "Metadata for Requested Time Series:"
     Private Shared pASC2DataHeader As String = "           Date&Time       Data"
+    Private Shared pASC2DataHeader2 As String = "Date&Time               Data"
     Private pErrorDescription As String
     Private pJulianOffset As Double = New Date(1900, 1, 1).Subtract(New Date(1, 1, 1)).TotalDays
 
@@ -73,6 +75,8 @@ Public Class atcTimeseriesGDS
                         Return False
                     ElseIf lFirstLine.Equals(pASC2FirstLine) Then
                         lOpened = ReadASC2(lInputReader)
+                    ElseIf lFirstLine.Equals(pASC2FirstLine2) Then
+                        lOpened = ReadASC2r(lInputReader)
                     Else
                         lOpened = ReadGDS(lFirstLine, lInputReader)
                     End If
@@ -124,7 +128,7 @@ Public Class atcTimeseriesGDS
         Do
             Try
                 lCurLineString = NextLine(lInputReader)
-                If Date.TryParse(SafeSubstring(lCurLineString, 0, 20).Trim.Replace("Z", ":00"), lDate) AndAlso _
+                If Date.TryParse(SafeSubstring(lCurLineString, 0, 20).Trim.Replace("Z", ":00"), lDate) AndAlso
                     Double.TryParse(SafeSubstring(lCurLineString, 21), lValue) Then
                     lBuilder.AddValue(lDate, lValue)
                 End If
@@ -140,6 +144,80 @@ Public Class atcTimeseriesGDS
                 .SetValue("Scenario", "NLDAS")
                 .SetValue("Location", "X" & .GetValue("grid_x", "").ToString.PadLeft(3, "0"c) _
                                     & "Y" & .GetValue("grid_y", "").ToString.PadLeft(3, "0"c))
+            End With
+            lTimeseries.SetInterval(atcTimeUnit.TUHour, 1)
+            DataSets.Add(lTimeseries)
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Function ReadASC2r(ByVal lInputReader As BinaryReader) As Boolean
+        'pbd 2025 revised format
+        Dim lNaN As Double = GetNaN()
+        Dim lUndef As String = ""
+        Dim lBuilder As New atcTimeseriesBuilder(Me)
+
+        Dim lCurLineString As String = NextLine(lInputReader)
+        Dim lCurLine() As String
+
+        While lCurLineString <> pASC2DataHeader2
+            lCurLine = lCurLineString.Split("=")
+            If lCurLine.Length = 2 Then
+                Dim lAttName As String = lCurLine(0).Trim
+                Dim lAttValue As String = lCurLine(1).Trim
+                Select Case lAttName
+                    Case "time_interval(hour)", "tot_record", "start_lat", "start_lon", "dlat", "dlon"
+                        'Skip these
+                    Case "param_short_name"
+                        lBuilder.Attributes.SetValue("Constituent", lAttValue)
+                    Case "param_name"
+                        lBuilder.Attributes.SetValue("Description", lAttValue)
+                    Case "undef"
+                        lUndef = lAttValue
+                    Case "unit"
+                        lBuilder.Attributes.SetValue("Units", lAttValue)
+                    Case "lat"
+                        lBuilder.Attributes.SetValue("Latitude", lAttValue)
+                    Case "lon"
+                        lBuilder.Attributes.SetValue("Longitude", lAttValue)
+                    Case Else
+                        lBuilder.Attributes.SetValue(lAttName, lAttValue)
+                End Select
+            End If
+            lCurLineString = NextLine(lInputReader)
+        End While
+
+        Dim lDate As Date, lValue As Double
+        Do
+            Try
+                lCurLineString = NextLine(lInputReader)
+                If Date.TryParse(SafeSubstring(lCurLineString, 0, 20).Trim.Replace("Z", ":00"), lDate) AndAlso
+                    Double.TryParse(SafeSubstring(lCurLineString, 20), lValue) Then
+                    lBuilder.AddValue(lDate, lValue)
+                End If
+            Catch ex As EndOfStreamException
+                Exit Do
+            End Try
+        Loop
+        Logger.Dbg("Read " & DoubleToString(lBuilder.NumValues) & " values from " & Specification)
+        If lBuilder.NumValues > 0 Then
+            Dim lTimeseries As atcTimeseries = lBuilder.CreateTimeseries()
+            With lTimeseries.Attributes
+                .AddHistory("Read from " & Specification)
+                .SetValue("Scenario", "NLDAS")
+                Dim lDegreesPerGridCell As Double = 1 / 8
+                Dim lWestmostGridEdge As Double = -125
+                Dim lSouthmostGridEdge As Double = 25
+                Dim lWestmostGridCenter As Double = lWestmostGridEdge + lDegreesPerGridCell / 2
+                Dim lSouthmostGridCenter As Double = lSouthmostGridEdge + lDegreesPerGridCell / 2
+                Dim lLongitude As Double = .GetValue("Longitude", 0.0)
+                Dim lLatitude As Double = .GetValue("Latitude", 0.0)
+                Dim lX As Integer = ((lLongitude - lWestmostGridCenter) / lDegreesPerGridCell)
+                Dim lY As Integer = ((lLatitude - lSouthmostGridCenter) / lDegreesPerGridCell)
+                .SetValue("Location", "X" & lX.ToString.PadLeft(3, "0"c) _
+                                    & "Y" & lY.ToString.PadLeft(3, "0"c))
             End With
             lTimeseries.SetInterval(atcTimeUnit.TUHour, 1)
             DataSets.Add(lTimeseries)

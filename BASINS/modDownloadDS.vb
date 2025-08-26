@@ -1914,7 +1914,8 @@ StartOver:
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
         'Dim lBaseURL As String = "ftp://newftp.epa.gov/exposure/BasinsData/BasinsCoreData/"
-        Dim lBaseURL As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
+        'Dim lBaseURL As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
+        Dim lBaseURL As String = "https://usgs.osn.mghpcc.org/mdmf/epa_basins/BasinsCoreData/"
         Dim lHUC8s As New atcCollection
         Dim lMissingHuc8s As String = ""
         'Dim lHUC8BoundaryOnly As Boolean = False
@@ -1928,7 +1929,8 @@ StartOver:
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
             If lHUC8Status = 0 Then
-                If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                'If Not CheckAddress(lBaseURL & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                If Not CheckAddress(lBaseURL & lHUC8 & "_core31.exe") Then
                     'problem, this file does not exist
                     'just build project using selected HUC8s without any core data
                     lHUC8Status = 1
