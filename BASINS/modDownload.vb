@@ -2402,9 +2402,9 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
     Public Function CheckCore(ByVal aRegion As String, ByVal aNewDataDir As String, ByVal aDataPath As String, ByVal aProjectFileName As String) As Boolean
         'new check to see if the core data is available before attempting to download it
         'Dim lBaseURL As String = "http://www3.epa.gov/ceampubl/basins/gis_data/huc/"
-        'Dim lBaseURLnew As String = "ftp://newftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
-        'Dim lBaseURLga As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
-        Dim lBaseURL As String = "https://usgs.osn.mghpcc.org/mdmf/epa_basins/BasinsCoreData/"
+        Dim lBaseURLnew As String = "ftp://newftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
+        Dim lBaseURLga As String = "https://gaftp.epa.gov/Exposure/BasinsData/BasinsCoreData/"
+        'Dim lBaseURL As String = "https://usgs.osn.mghpcc.org/mdmf/epa_basins/BasinsCoreData/"  'USGS version
         Dim lHUC8s As New atcCollection
         Dim lHUC8BoundaryOnly As Boolean = False
         'get huc8s in this region
@@ -2416,8 +2416,8 @@ NoIcon:                             Logger.Dbg("Icon not found for met station a
             Dim lHUC8 As String = lNode.InnerText
             lHUC8s.Add(lHUC8)
             If Not lHUC8BoundaryOnly Then
-                'If Not CheckAddress(lBaseURLga & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
-                If Not CheckAddress(lBaseURL & lHUC8 & "_core31.exe") Then
+                'If Not CheckAddress(lBaseURLnew & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
+                If Not CheckAddress(lBaseURLga & lHUC8 & "/" & lHUC8 & "_core31.exe") Then
                     'problem, this file does not exist
                     'just build project using selected HUC8s without any core data
                     lHUC8BoundaryOnly = True

@@ -301,10 +301,10 @@ Public Class frmDownload
                         For Each lHuc8 As String In HUC8s()
                             'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
                             'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                            'If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                            'If Not CheckAddress("https://usgs.osn.mghpcc.org/mdmf/epa_basins/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then  'USGS version
                             'MapWinUtility.Logger.Dbg("CheckAddress failed for newftp")
-                            If Not CheckAddress("https://usgs.osn.mghpcc.org/mdmf/epa_basins/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                                MapWinUtility.Logger.Dbg("CheckAddress failed for usgs.osn.mghpcc.org")
+                            If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                                MapWinUtility.Logger.Dbg("CheckAddress failed for gaftp")
                                 lProblem = True
                             End If
                             'End If
