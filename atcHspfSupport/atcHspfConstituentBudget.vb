@@ -21,6 +21,7 @@ Public Module ConstituentBudget
                       ByVal aSDateJ As Double,
                       ByVal aEDateJ As Double,
                       ByVal aConstProperties As List(Of ConstituentProperties),
+                      ByVal aSeasonsLabel As String,
                       ByRef aReport1ReachBudget As atcReport.ReportText,
                       ByRef aReport2NPSLoads As atcReport.ReportText,
                       ByRef aReport3LoadAllocationAll As atcReport.ReportText,
@@ -175,22 +176,35 @@ Public Module ConstituentBudget
 
         Dim lUpstreamInflows As New atcCollection
         Dim lCumulativePointNonpointColl As New atcCollection
+        Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+        If Len(aSeasonsLabel) > 0 Then
+            lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+        End If
 
         aReport1ReachBudget.AppendLine(aScenario & " " & "Average Annual " & aBalanceType & " Budget by Reach " & lUnits & ".")
         aReport1ReachBudget.AppendLine("   Run Made " & aRunMade)
         aReport1ReachBudget.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        aReport1ReachBudget.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        aReport1ReachBudget.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            aReport1ReachBudget.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
 
         aReport2NPSLoads.AppendLine(aScenario & " " & "Average Annual Nonpoint Loading of " & aBalanceType & " by Each Land Use to Each Reach " & lUnits & ".")
         aReport2NPSLoads.AppendLine("   Run Made " & aRunMade)
         aReport2NPSLoads.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        aReport2NPSLoads.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        aReport2NPSLoads.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            aReport2NPSLoads.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
 
         aReport3LoadAllocationAll.AppendLine(aScenario & " " & " Average Annual Load Allocation of " & aBalanceType & " to Each Source by Reach " & lUnits & ".")
         aReport3LoadAllocationAll.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         aReport3LoadAllocationAll.AppendLine("   Run Made " & aRunMade)
         aReport3LoadAllocationAll.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        aReport3LoadAllocationAll.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        aReport3LoadAllocationAll.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            aReport3LoadAllocationAll.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
 
         lReport4.AppendLine("")
         lReport4.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches (%).")
@@ -199,7 +213,10 @@ Public Module ConstituentBudget
         aReport5LoadAllocationLocations.AppendLine("The Losses at Each Reach have been applied to the source, and the Gains are accumulated.")
         aReport5LoadAllocationLocations.AppendLine("   Run Made " & aRunMade)
         aReport5LoadAllocationLocations.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        aReport5LoadAllocationLocations.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        aReport5LoadAllocationLocations.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            aReport5LoadAllocationLocations.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
 
         lReport6.AppendLine("")
         lReport6.AppendLine("Percent of loadings of " & aBalanceType & " from each individual source to the Reaches of Interest(%).")
@@ -207,7 +224,10 @@ Public Module ConstituentBudget
         aReport7LoadingRate.AppendLine(aScenario & " " & " Average Annual " & aBalanceType & " Loading rates " & lUnits & "/ac/yr.")
         aReport7LoadingRate.AppendLine("   Run Made " & aRunMade)
         aReport7LoadingRate.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        aReport7LoadingRate.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+        aReport7LoadingRate.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            aReport7LoadingRate.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
         aReport7LoadingRate.AppendLine("")
 
         Dim YearsOfSimulation As Double = YearCount(aSDateJ, aEDateJ)
@@ -652,32 +672,32 @@ Public Module ConstituentBudget
 
 
                                     Dim TimeSeriesTransformaton As atcTran = atcTran.TranAverSame
-                                        If lSource.Tran.ToString.Trim = "DIV" Then
-                                            TimeSeriesTransformaton = atcTran.TranSumDiv
-                                        End If
-                                        Dim VolName As String = lSource.Source.VolName
-                                        Dim lDSN As Integer = lSource.Source.VolId
-                                        Dim lMfact As Double = lSource.MFact
-                                        If lSource.Target.Member = "OXIF" Then lMfact *= lCVON
-                                        If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
-                                        For i As Integer = 0 To aUci.FilesBlock.Count
-
-                                            If aUci.FilesBlock.Value(i).Typ = VolName Then
-                                                Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                                Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                If lDataSource Is Nothing Then
-                                                    If atcDataManager.OpenDataSource(lFileName) Then
-                                                        lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
-                                                    End If
-                                                End If
-                                                Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
-                                                ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
-                                                ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
-                                                lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
-                                            End If
-                                        Next
-                                        lTotalPointlbs += lPointlbs
+                                    If lSource.Tran.ToString.Trim = "DIV" Then
+                                        TimeSeriesTransformaton = atcTran.TranSumDiv
                                     End If
+                                    Dim VolName As String = lSource.Source.VolName
+                                    Dim lDSN As Integer = lSource.Source.VolId
+                                    Dim lMfact As Double = lSource.MFact
+                                    If lSource.Target.Member = "OXIF" Then lMfact *= lCVON
+                                    If lSource.Target.Member = "PKIF" And (lSource.Target.MemSub1 = 1 Or lSource.Target.MemSub1 = 2) Then lMfact *= ConversionFactorfromBiomass(aUci, aBalanceType, lROper)
+                                    For i As Integer = 0 To aUci.FilesBlock.Count
+
+                                        If aUci.FilesBlock.Value(i).Typ = VolName Then
+                                            Dim lFileName As String = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                            Dim lDataSource As atcDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                            If lDataSource Is Nothing Then
+                                                If atcDataManager.OpenDataSource(lFileName) Then
+                                                    lDataSource = atcDataManager.DataSourceBySpecification(lFileName)
+                                                End If
+                                            End If
+                                            Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
+                                            ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+                                            ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
+                                            lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+                                        End If
+                                    Next
+                                    lTotalPointlbs += lPointlbs
+                                End If
                             Next
 
                             'find GENER loads

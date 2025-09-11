@@ -27,6 +27,7 @@ Module HSPFOutputReports
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
     Private pModelQAQC As Boolean = False
     Private pSDateJ, pEDateJ As Double
+    Private pSeasonStartMonth, pSeasonEndMonth As Integer   'for load allocation reports
     Private pOutFolderName As String
     Private pMultiSimulation As Boolean = False
     Private pAdditionalGraphs As Boolean = False
@@ -158,6 +159,8 @@ Module HSPFOutputReports
             Using lProgress As New ProgressLevel
                 pSDateJ = StartUp.DateTimePicker1.Value.ToOADate()
                 pEDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
+                pSeasonStartMonth = StartUp.cboStartMonth.SelectedIndex + 1   'for load allocation reports
+                pSeasonEndMonth = StartUp.cboEndMonth.SelectedIndex + 1
 
                 'get echo file name from files block
                 Dim lHspfEchoFileName As String = pTestPath & "hspfecho.out" 'Get the default name of echo file
@@ -683,8 +686,33 @@ Module HSPFOutputReports
                     Dim lReport7LoadingRates As New atcReport.ReportText
                     Dim lDataForBarGraphs As New atcCollection
 
+                    'pbd season handling here
+                    Dim lSeasonStartMonth As Integer = pSeasonStartMonth
+                    Dim lSeasonEndMonth As Integer = pSeasonEndMonth
+                    Dim lSeasonsLabel As String = ""
+                    Dim lSeasonScenarioResults As New atcDataSource
+                    Dim lSeasons As New atcSeasonsYearSubset(lSeasonStartMonth, 1, lSeasonEndMonth, 31)
+                    Dim lSeasonsMonth As New atcSeasonsMonth()
+                    Dim lSeasonFrac As Double = 0.0
+                    For lMon As Integer = lSeasonStartMonth To lSeasonEndMonth
+                        lSeasonFrac += lSeasonsMonth.SeasonYearFraction(lMon)
+                    Next
+                    lSeasons.SeasonSelected(0) = False  'outside
+                    lSeasons.SeasonSelected(1) = True   'inside
+                    If lSeasonStartMonth <> 1 Or lSeasonEndMonth <> 12 Then
+                        lSeasonsLabel = "for months " & MonthName(lSeasonStartMonth) & " thru " & MonthName(lSeasonEndMonth)
+                        For Each lTimeseries As atcTimeseries In lScenarioResults.DataSets
+                            Dim lSplitTS As atcTimeseriesGroup = lSeasons.Split(lTimeseries, Nothing)
+                            lSplitTS(1) = lSplitTS(1) * lSeasonFrac
+                            lSeasonScenarioResults.AddDataSet(lSplitTS(1))
+                        Next
+                    Else
+                        lSeasonScenarioResults = lScenarioResults
+                    End If
+
                     HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                                                         lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ, lConstProperties,
+                                                         lSeasonScenarioResults, pOutputLocations, aRunMade,
+                                                         pSDateJ, pEDateJ, lConstProperties, lSeasonsLabel,
                                                          lReport1ReachBudget,
                                                          lReport2NPSLoads,
                                                          lReport3LoadAllocationAll,

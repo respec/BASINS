@@ -259,6 +259,8 @@ Public Class StartUp
             cmbUCIPath.Items.Add(lUCI)
             cmbUCIPath.SelectedIndex = 0
         End If
+        cboStartMonth.SelectedIndex = 0
+        cboEndMonth.SelectedIndex = 11
         'UciChanged()
     End Sub
 
@@ -481,4 +483,5 @@ Public Class StartUp
     Private Sub chkAreaReports_CheckedChanged(sender As Object, e As EventArgs)
 
     End Sub
+
 End Class

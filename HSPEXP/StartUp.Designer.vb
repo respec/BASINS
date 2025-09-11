@@ -68,10 +68,16 @@ Partial Class StartUp
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.chkWASP = New System.Windows.Forms.CheckBox()
         Me.chkBathtub = New System.Windows.Forms.CheckBox()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.cboEndMonth = New System.Windows.Forms.ComboBox()
+        Me.cboStartMonth = New System.Windows.Forms.ComboBox()
         Me.GroupBox3.SuspendLayout()
         Me.Plotting.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdStart
@@ -79,7 +85,7 @@ Partial Class StartUp
         Me.cmdStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdStart.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.cmdStart.Enabled = False
-        Me.cmdStart.Location = New System.Drawing.Point(307, 598)
+        Me.cmdStart.Location = New System.Drawing.Point(307, 646)
         Me.cmdStart.Name = "cmdStart"
         Me.cmdStart.Size = New System.Drawing.Size(75, 23)
         Me.cmdStart.TabIndex = 20
@@ -90,7 +96,7 @@ Partial Class StartUp
         '
         Me.cmdBrowse.AllowDrop = True
         Me.cmdBrowse.Anchor = System.Windows.Forms.AnchorStyles.Right
-        Me.cmdBrowse.Location = New System.Drawing.Point(344, 52)
+        Me.cmdBrowse.Location = New System.Drawing.Point(345, 52)
         Me.cmdBrowse.Name = "cmdBrowse"
         Me.cmdBrowse.Size = New System.Drawing.Size(75, 23)
         Me.cmdBrowse.TabIndex = 2
@@ -110,7 +116,7 @@ Partial Class StartUp
         '
         Me.lblRCH.AutoSize = True
         Me.lblRCH.Enabled = False
-        Me.lblRCH.Location = New System.Drawing.Point(85, 561)
+        Me.lblRCH.Location = New System.Drawing.Point(87, 612)
         Me.lblRCH.MaximumSize = New System.Drawing.Size(500, 0)
         Me.lblRCH.Name = "lblRCH"
         Me.lblRCH.Size = New System.Drawing.Size(295, 13)
@@ -122,7 +128,7 @@ Partial Class StartUp
         '
         Me.txtRCH.BackColor = System.Drawing.SystemColors.Window
         Me.txtRCH.Enabled = False
-        Me.txtRCH.Location = New System.Drawing.Point(27, 558)
+        Me.txtRCH.Location = New System.Drawing.Point(29, 609)
         Me.txtRCH.Name = "txtRCH"
         Me.txtRCH.Size = New System.Drawing.Size(47, 20)
         Me.txtRCH.TabIndex = 19
@@ -133,7 +139,7 @@ Partial Class StartUp
         '
         Me.cmdEnd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdEnd.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdEnd.Location = New System.Drawing.Point(388, 598)
+        Me.cmdEnd.Location = New System.Drawing.Point(388, 646)
         Me.cmdEnd.Name = "cmdEnd"
         Me.cmdEnd.Size = New System.Drawing.Size(75, 23)
         Me.cmdEnd.TabIndex = 21
@@ -157,9 +163,9 @@ Partial Class StartUp
         '
         Me.pnlHighlight.BackColor = System.Drawing.Color.Red
         Me.pnlHighlight.Enabled = False
-        Me.pnlHighlight.Location = New System.Drawing.Point(21, 554)
+        Me.pnlHighlight.Location = New System.Drawing.Point(23, 604)
         Me.pnlHighlight.Name = "pnlHighlight"
-        Me.pnlHighlight.Size = New System.Drawing.Size(58, 28)
+        Me.pnlHighlight.Size = New System.Drawing.Size(58, 29)
         Me.pnlHighlight.TabIndex = 17
         '
         'chkAdditionalgraphs
@@ -179,7 +185,7 @@ Partial Class StartUp
         'btn_help
         '
         Me.btn_help.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btn_help.Location = New System.Drawing.Point(20, 598)
+        Me.btn_help.Location = New System.Drawing.Point(20, 646)
         Me.btn_help.Name = "btn_help"
         Me.btn_help.Size = New System.Drawing.Size(75, 23)
         Me.btn_help.TabIndex = 0
@@ -204,7 +210,7 @@ Partial Class StartUp
         '
         Me.DateTimePicker1.Enabled = False
         Me.DateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DateTimePicker1.Location = New System.Drawing.Point(79, 25)
+        Me.DateTimePicker1.Location = New System.Drawing.Point(79, 22)
         Me.DateTimePicker1.MaxDate = New Date(2200, 12, 31, 0, 0, 0, 0)
         Me.DateTimePicker1.MinDate = New Date(1800, 1, 1, 0, 0, 0, 0)
         Me.DateTimePicker1.Name = "DateTimePicker1"
@@ -251,7 +257,7 @@ Partial Class StartUp
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(44, 28)
+        Me.Label2.Location = New System.Drawing.Point(44, 25)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(29, 13)
         Me.Label2.TabIndex = 47
@@ -331,7 +337,7 @@ Partial Class StartUp
         Me.GroupBox2.Controls.Add(Me.chkWaterBalance)
         Me.GroupBox2.Controls.Add(Me.chkSedimentBalance)
         Me.GroupBox2.Controls.Add(Me.chkTotalNitrogen)
-        Me.GroupBox2.Location = New System.Drawing.Point(18, 302)
+        Me.GroupBox2.Location = New System.Drawing.Point(18, 292)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(445, 181)
         Me.GroupBox2.TabIndex = 10
@@ -564,7 +570,7 @@ Partial Class StartUp
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.chkWASP)
         Me.GroupBox1.Controls.Add(Me.chkBathtub)
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 491)
+        Me.GroupBox1.Location = New System.Drawing.Point(18, 536)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(445, 55)
         Me.GroupBox1.TabIndex = 50
@@ -593,13 +599,67 @@ Partial Class StartUp
         Me.chkBathtub.Text = "BATHTUB"
         Me.chkBathtub.UseVisualStyleBackColor = True
         '
+        'GroupBox4
+        '
+        Me.GroupBox4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox4.Controls.Add(Me.cboStartMonth)
+        Me.GroupBox4.Controls.Add(Me.cboEndMonth)
+        Me.GroupBox4.Controls.Add(Me.Label4)
+        Me.GroupBox4.Controls.Add(Me.Label5)
+        Me.GroupBox4.Location = New System.Drawing.Point(20, 479)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(443, 51)
+        Me.GroupBox4.TabIndex = 51
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Reporting Months"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(255, 25)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(26, 13)
+        Me.Label4.TabIndex = 48
+        Me.Label4.Text = "End"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(44, 25)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(29, 13)
+        Me.Label5.TabIndex = 47
+        Me.Label5.Text = "Start"
+        '
+        'cboEndMonth
+        '
+        Me.cboEndMonth.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboEndMonth.FormattingEnabled = True
+        Me.cboEndMonth.Items.AddRange(New Object() {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"})
+        Me.cboEndMonth.Location = New System.Drawing.Point(287, 22)
+        Me.cboEndMonth.Name = "cboEndMonth"
+        Me.cboEndMonth.Size = New System.Drawing.Size(75, 21)
+        Me.cboEndMonth.TabIndex = 49
+        '
+        'cboStartMonth
+        '
+        Me.cboStartMonth.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboStartMonth.FormattingEnabled = True
+        Me.cboStartMonth.Items.AddRange(New Object() {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"})
+        Me.cboStartMonth.Location = New System.Drawing.Point(79, 22)
+        Me.cboStartMonth.Name = "cboStartMonth"
+        Me.cboStartMonth.Size = New System.Drawing.Size(75, 21)
+        Me.cboStartMonth.TabIndex = 50
+        '
         'StartUp
         '
         Me.AcceptButton = Me.cmdStart
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.cmdEnd
-        Me.ClientSize = New System.Drawing.Size(474, 641)
+        Me.ClientSize = New System.Drawing.Size(474, 689)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.chkModelQAQC)
         Me.Controls.Add(Me.chkMultiSim)
@@ -620,7 +680,7 @@ Partial Class StartUp
         Me.HelpButton = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "StartUp"
-        Me.Padding = New System.Windows.Forms.Padding(5, 5, 5, 5)
+        Me.Padding = New System.Windows.Forms.Padding(5)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "HSPEXP+ "
         Me.GroupBox3.ResumeLayout(False)
@@ -631,6 +691,8 @@ Partial Class StartUp
         Me.GroupBox2.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -679,4 +741,9 @@ Partial Class StartUp
     Friend WithEvents chkKjeldahlN As CheckBox
     Friend WithEvents chkNitriteNitrate As CheckBox
     Friend WithEvents chkOrthoP As CheckBox
+    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents Label4 As Label
+    Friend WithEvents Label5 As Label
+    Friend WithEvents cboStartMonth As ComboBox
+    Friend WithEvents cboEndMonth As ComboBox
 End Class
