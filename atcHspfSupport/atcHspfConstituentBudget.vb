@@ -1061,7 +1061,7 @@ Public Module ConstituentBudget
                             lAdditionalSourcelbs = lTotalInflow - lNonpointlbs - lUpstreamIn - lTotalAtmDep - lTotalPointlbs - lGENERLoad
 
                             'accumulate
-                            Dim lCumulativePointNonpoint As Double = lNonpointlbs + lAdditionalSourcelbs
+                            Dim lCumulativePointNonpoint As Double = lNonpointlbs + lTotalPointlbs + lAdditionalSourcelbs
                             If lCumulativePointNonpointColl.Keys.Contains(lROper.Id) Then
                                 lCumulativePointNonpoint += lCumulativePointNonpointColl.ItemByKey(lROper.Id)
                             End If
