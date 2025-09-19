@@ -1122,8 +1122,13 @@ Public Module ConstituentBudget
                 End If
             Next
             lLandusesHeader = lLandusesHeader.Replace("DirectAtmosphericDeposition", "Direct Atmospheric Deposition on the Reach")
-            lLandusesHeader = lLandusesHeader.Replace("Loss", "Cumulative Instream Losses")
-            lLandusesHeader = lLandusesHeader.Replace("Gain", "Cumulative Instream Gains")
+            If aBalanceType = "Sediment" Then
+                lLandusesHeader = lLandusesHeader.Replace("Loss", "Cumulative Instream Losses (Deposition)")
+                lLandusesHeader = lLandusesHeader.Replace("Gain", "Cumulative Instream Gains (Scour)")
+            Else
+                lLandusesHeader = lLandusesHeader.Replace("Loss", "Cumulative Instream Losses")
+                lLandusesHeader = lLandusesHeader.Replace("Gain", "Cumulative Instream Gains")
+            End If
             lLandusesHeader = lLandusesHeader.Replace("GENERSources", "GENER Sources")
             lLandusesHeader = lLandusesHeader.Replace("AdditionalSources", "Mass Balance Differences/Additional Sources*")
 
@@ -1231,7 +1236,7 @@ Public Module ConstituentBudget
                         Next
                     End If
                     If Not lSourceDescription.Contains("Loss") Then
-                        lTotal += lValue
+                        lTotal += lValue    'pbd everything but the loss column gets added to the total
                     End If
                 Next lSourceDescription
 
