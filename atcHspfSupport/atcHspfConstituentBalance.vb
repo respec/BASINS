@@ -39,6 +39,7 @@ Public Module ConstituentBalance
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double,
                            ByVal aConstProperties As List(Of ConstituentProperties),
+                           ByVal aSeasonsLabel As String,
                   Optional ByVal aDateRows As Boolean = False,
                   Optional ByVal aDecimalPlaces As Integer = 3,
                   Optional ByVal aSignificantDigits As Integer = 5,
@@ -52,7 +53,16 @@ Public Module ConstituentBalance
         lReport.AppendLine("Annual Loadings of " & aBalanceType & " For Each Reach.")
         lReport.AppendLine("   Run Made " & aRunMade)
         lReport.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
-        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+
+        Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+        If Len(aSeasonsLabel) > 0 Then
+            lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+        End If
+        lReport.AppendLine("   " & lTimeSpan)
+        If Len(aSeasonsLabel) > 0 Then
+            lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+        End If
+
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lReport.AppendLine("   (Units:Inches)")

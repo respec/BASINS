@@ -1041,7 +1041,9 @@ Public Module atcConstituentTables
                                      ByVal aRunMade As String,
                                      ByVal aBalanceType As String,
                                      ByVal aConstProperties As List(Of ConstituentProperties),
-                                     ByVal aSDateJ As Double, ByVal aEDateJ As Double, Optional aGQALID As Integer = 0)
+                                     ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                                     ByVal aSeasonsLabel As String,
+                                     Optional aGQALID As Integer = 0)
         Dim lReport As New atcReport.ReportText
         Dim lUpstreamInflows As New atcCollection
         Dim lCumulativePointNonpointColl As New atcCollection
@@ -1230,7 +1232,14 @@ Public Module atcConstituentTables
                 lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                 lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                 lReport.AppendLine("   Run Made " & aRunMade)
-                lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                If Len(aSeasonsLabel) > 0 Then
+                    lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                End If
+                lReport.AppendLine("   " & lTimeSpan)
+                If Len(aSeasonsLabel) > 0 Then
+                    lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                End If
                 SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "Heat Case"
@@ -1374,7 +1383,14 @@ Public Module atcConstituentTables
                 lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                 lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                 lReport.AppendLine("   Run Made " & aRunMade)
-                lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                If Len(aSeasonsLabel) > 0 Then
+                    lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                End If
+                lReport.AppendLine("   " & lTimeSpan)
+                If Len(aSeasonsLabel) > 0 Then
+                    lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                End If
                 SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "BOD-Labile Case"
@@ -1519,7 +1535,14 @@ Public Module atcConstituentTables
                 lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                 lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                 lReport.AppendLine("   Run Made " & aRunMade)
-                lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                If Len(aSeasonsLabel) > 0 Then
+                    lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                End If
+                lReport.AppendLine("   " & lTimeSpan)
+                If Len(aSeasonsLabel) > 0 Then
+                    lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                End If
                 SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
 #End Region
 #Region "TotalN Case"
@@ -1671,7 +1694,14 @@ Public Module atcConstituentTables
                         lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                         lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                         lReport.AppendLine("   Run Made " & aRunMade)
-                        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                        Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                        If Len(aSeasonsLabel) > 0 Then
+                            lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                        End If
+                        lReport.AppendLine("   " & lTimeSpan)
+                        If Len(aSeasonsLabel) > 0 Then
+                            lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                        End If
                         SaveFileString(aOutFolderName & lConstituent.ConstNameForEXPPlus & "_Reach_Budget.txt", lReport.ToString)
                         'For Reaches another report _Per_RCH_Ann_Avg_Budget.txt is produced with better information, so this report is redundant.
                     End If
@@ -1809,7 +1839,14 @@ Public Module atcConstituentTables
                         lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                         lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                         lReport.AppendLine("   Run Made " & aRunMade)
-                        lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                        Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                        If Len(aSeasonsLabel) > 0 Then
+                            lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                        End If
+                        lReport.AppendLine("   " & lTimeSpan)
+                        If Len(aSeasonsLabel) > 0 Then
+                            lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                        End If
                         SaveFileString(aOutFolderName & lConstituent.ConstNameForEXPPlus & "_Reach_Budget.txt", lReport.ToString)
                     End If
                 Next lConstituent
@@ -1940,7 +1977,14 @@ Public Module atcConstituentTables
                     lReport.AppendLine("Tabular Report of Average Annual Reach Budget for all the Reach Operations.")
                     lReport.AppendLine("   " & aUCI.GlobalBlock.RunInf.Value)
                     lReport.AppendLine("   Run Made " & aRunMade)
-                    lReport.AppendLine("   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: "))
+                    Dim lTimeSpan As String = TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+                    If Len(aSeasonsLabel) > 0 Then
+                        lTimeSpan = lTimeSpan.Substring(0, lTimeSpan.Length - 2)   'remove crlf if adding seasons
+                    End If
+                    lReport.AppendLine("   " & lTimeSpan)
+                    If Len(aSeasonsLabel) > 0 Then
+                        lReport.AppendLine("                    " & aSeasonsLabel & vbCrLf)
+                    End If
                     SaveFileString(aOutFolderName & aBalanceType & "_Reach_Budget.txt", lReport.ToString)
                 Next lConstituent
 #End Region

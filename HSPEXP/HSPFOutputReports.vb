@@ -656,9 +656,62 @@ Module HSPFOutputReports
                 Logger.Status(Now & " Generating Reports for " & lConstituent)
                 Logger.Dbg(Now & " Generating Reports for " & lConstituent)
 
+                'pbd season handling here -- first draft
+                'Dim lSeasonStartMonth As Integer = pSeasonStartMonth
+                'Dim lSeasonEndMonth As Integer = pSeasonEndMonth
+                'Dim lReportMonthsLabel As String = ""
+                'Dim lReportMonthsScenarioResults As New atcDataSource
+                'Dim lSeasons As New atcSeasonsYearSubset(lSeasonStartMonth, 1, lSeasonEndMonth, 1)
+                'Dim lSeasonsMonth As New atcSeasonsMonth()
+                'Dim lSeasonFrac As Double = 0.0   'the annual reporting scripts code annualizes the values, we don't want that so adjust
+                'For lMon As Integer = lSeasonStartMonth To lSeasonEndMonth
+                '    lSeasonFrac += lSeasonsMonth.SeasonYearFraction(lMon)
+                'Next
+                'lSeasons.SeasonSelected(0) = False  'outside
+                'lSeasons.SeasonSelected(1) = True   'inside
+                'If lSeasonStartMonth <> 1 Or lSeasonEndMonth <> 12 Then
+                '    lReportMonthsLabel = "for months " & MonthName(lSeasonStartMonth) & " thru " & MonthName(lSeasonEndMonth)
+                '    For Each lTimeseries As atcTimeseries In lScenarioResults.DataSets
+                '        Dim lSplitTS As atcTimeseriesGroup = lSeasons.Split(lTimeseries, Nothing)
+                '        lSplitTS(1) = lSplitTS(1) * lSeasonFrac
+                '        For iValue As Integer = 2 To lSplitTS(1).numValues
+                '            If Double.IsNaN(lSplitTS(1).Values(iValue)) Then
+                '                'use the previous value
+                '                lSplitTS(1).Values(iValue) = lSplitTS(1).Values(iValue - 1)
+                '            End If
+                '        Next
+                '        lReportMonthsScenarioResults.AddDataSet(lSplitTS(1))
+                '    Next
+                'Else
+                '    lReportMonthsScenarioResults = lScenarioResults
+                'End If
+
+                'pbd reporting months handling here
+                Dim lReportStartMonth As Integer = pSeasonStartMonth
+                Dim lReportEndMonth As Integer = pSeasonEndMonth
+                Dim lReportMonthsLabel As String = ""
+                Dim lReportMonthsScenarioResults As New atcDataSource
+                If lReportStartMonth <> 1 Or lReportEndMonth <> 12 Then
+                    lReportMonthsLabel = "for months " & MonthName(lReportStartMonth) & " thru " & MonthName(lReportEndMonth)
+                    For Each lTimeseries As atcTimeseries In lScenarioResults.DataSets
+                        Dim lTempTim As New atcTimeseries
+                        Dim lDate(5) As Integer
+                        lTempTim = lTimeseries.Clone
+                        For iValue As Integer = 1 To lTempTim.numValues
+                            J2Date(lTempTim.Dates.Value(iValue), lDate)
+                            If lDate(1) < lReportStartMonth + 1 Or lDate(1) > lReportEndMonth + 1 Then
+                                lTempTim.Value(iValue) = 0.0
+                            End If
+                        Next
+                        lReportMonthsScenarioResults.AddDataSet(lTempTim)
+                    Next
+                Else
+                    lReportMonthsScenarioResults = lScenarioResults
+                End If
+
                 'LandLoadingReports generates a text file report as well as the info needed for the QA report
                 '    "_Land_Loadings.txt" and "_Monthly_Land_Loadings.txt"
-                Dim lLandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                Dim lLandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lReportMonthsScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
                     aQAQCReportFile.AppendLine("<h2>" & lConstituent & " Loading Rate Analysis</h2>")
@@ -668,7 +721,7 @@ Module HSPFOutputReports
                 'ReachBudgetReports generates a text file report only
                 If Not pModelQAQC Then
                     '    "_Reach_Budget.txt"
-                    ReachBudgetReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                    ReachBudgetReports(pOutFolderName, lReportMonthsScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lReportMonthsLabel, lGQALID)
                 End If
 
                 If pModelQAQC Then
@@ -686,33 +739,9 @@ Module HSPFOutputReports
                     Dim lReport7LoadingRates As New atcReport.ReportText
                     Dim lDataForBarGraphs As New atcCollection
 
-                    'pbd season handling here
-                    Dim lSeasonStartMonth As Integer = pSeasonStartMonth
-                    Dim lSeasonEndMonth As Integer = pSeasonEndMonth
-                    Dim lSeasonsLabel As String = ""
-                    Dim lSeasonScenarioResults As New atcDataSource
-                    Dim lSeasons As New atcSeasonsYearSubset(lSeasonStartMonth, 1, lSeasonEndMonth, 31)
-                    Dim lSeasonsMonth As New atcSeasonsMonth()
-                    Dim lSeasonFrac As Double = 0.0
-                    For lMon As Integer = lSeasonStartMonth To lSeasonEndMonth
-                        lSeasonFrac += lSeasonsMonth.SeasonYearFraction(lMon)
-                    Next
-                    lSeasons.SeasonSelected(0) = False  'outside
-                    lSeasons.SeasonSelected(1) = True   'inside
-                    If lSeasonStartMonth <> 1 Or lSeasonEndMonth <> 12 Then
-                        lSeasonsLabel = "for months " & MonthName(lSeasonStartMonth) & " thru " & MonthName(lSeasonEndMonth)
-                        For Each lTimeseries As atcTimeseries In lScenarioResults.DataSets
-                            Dim lSplitTS As atcTimeseriesGroup = lSeasons.Split(lTimeseries, Nothing)
-                            lSplitTS(1) = lSplitTS(1) * lSeasonFrac
-                            lSeasonScenarioResults.AddDataSet(lSplitTS(1))
-                        Next
-                    Else
-                        lSeasonScenarioResults = lScenarioResults
-                    End If
-
                     HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                                                         lSeasonScenarioResults, pOutputLocations, aRunMade,
-                                                         pSDateJ, pEDateJ, lConstProperties, lSeasonsLabel,
+                                                         lReportMonthsScenarioResults, pOutputLocations, aRunMade,
+                                                         pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel,
                                                          lReport1ReachBudget,
                                                          lReport2NPSLoads,
                                                          lReport3LoadAllocationAll,
@@ -748,7 +777,7 @@ Module HSPFOutputReports
                     'Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
                     Dim lReportCons As New atcReport.ReportText
                     lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                    lScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties)
+                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
 
                     SaveFileString(lOutFileName, lReportCons.ToString)
@@ -757,7 +786,7 @@ Module HSPFOutputReports
                     'constituent balance
 
                     lReportCons = HspfSupport.WatershedConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                    lScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties)
+                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
 
                     SaveFileString(lOutFileName, lReportCons.ToString)
@@ -766,8 +795,8 @@ Module HSPFOutputReports
                         '    "_OvAll_Avg_By_Mult_Locs.txt", "_Grp_By_OPN_LU_Ann_Avg.txt", "_LU_AnnAvgs.txt", "_Oall_Avgd.txt"
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                            lScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ,
-                            lConstProperties, pOutFolderName, True)
+                            lReportMonthsScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ,
+                            lConstProperties, lReportMonthsLabel, pOutFolderName, True)
                         'now pivoted version
                         'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                         '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _

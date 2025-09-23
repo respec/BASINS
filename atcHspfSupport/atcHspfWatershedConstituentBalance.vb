@@ -39,6 +39,7 @@ Public Module WatershedConstituentBalance
                               ByVal aSDateJ As String,
                               ByVal aEDateJ As String,
                               ByVal aConstProperties As List(Of ConstituentProperties),
+                              ByVal aSeasonsLabel As String,
                      Optional ByVal aOutFilePrefix As String = "",
                      Optional ByVal aOutletDetails As Boolean = False,
                      Optional ByVal aSegmentRows As Boolean = False,
@@ -54,7 +55,8 @@ Public Module WatershedConstituentBalance
                                                aOperationTypes,
                                                aScenario, aScenarioResults,
                                                aRunMade, aSDateJ, aEDateJ, aConstProperties,
-                                                         lOutletLocation,
+                                               aSeasonsLabel,
+                                               lOutletLocation,
                                                aOutFilePrefix, True,
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
 
@@ -159,7 +161,7 @@ Public Module WatershedConstituentBalance
 
                 Dim lReport As New atcReport.ReportText
                 lReport.AppendLine(aBalanceType & " Balance Report For " & aScenario)
-                lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
+                lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ, aSeasonsLabel))
                 lReport.Append("Location".PadLeft(12))
                 For Each lLocation As String In aOutletLocations
                     lReport.Append(vbTab & lLocation.PadLeft(12) & vbTab & Space(12))
@@ -252,6 +254,7 @@ Public Module WatershedConstituentBalance
                            ByVal aSDateJ As Double,
                            ByVal aEDateJ As Double,
                            ByVal aConstProperties As List(Of ConstituentProperties),
+                           ByVal aSeasonsLabel As String,
                   Optional ByVal aOutletLocation As String = "",
                   Optional ByVal aOutFilePrefix As String = "",
                   Optional ByVal aOutletDetails As Boolean = False,
@@ -277,7 +280,7 @@ Public Module WatershedConstituentBalance
 
         Dim lReport As New atcReport.ReportText
         lReport.AppendLine(aScenario & " Annual Average Watershed Balance Report of " & aBalanceType & " For Each PERLND, IMPLND, and RCHRES.")
-        lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
+        lReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ, aSeasonsLabel))
         If aBalanceType = "Water" Then
             If aUci.GlobalBlock.EmFg = 1 Then
                 lReport.AppendLine("   (Units:Inches)")
@@ -737,7 +740,7 @@ Public Module WatershedConstituentBalance
                 Dim lDetailsReport As New atcReport.ReportText
                 Try
                     lDetailsReport.AppendLine(aBalanceType & " Balance by Land Use Category for " & aScenario & " at " & aOutletLocation)
-                    lDetailsReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
+                    lDetailsReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ, aSeasonsLabel))
                     lDetailsReport.AppendLine()
                     For Each lOperationType As String In aOperationTypes
                         Dim lOutputTable As New atcTableDelimited
@@ -896,7 +899,7 @@ Public Module WatershedConstituentBalance
             ' simple report - PERLND, IMPLND, RCHRES summary
             Dim lSummaryReport As New atcReport.ReportText
             lSummaryReport.AppendLine(Left(aBalanceType, 3) & " Balance for Subbasin " & aOutletLocation)
-            lSummaryReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ))
+            lSummaryReport.AppendLine(Header(aBalanceType, aScenario, aRunMade, aUci, aSDateJ, aEDateJ, aSeasonsLabel))
             lSummaryReport.AppendLine()
             lSummaryReport.AppendLine("Area Summary (acres)")
             Dim lTotalArea As Double = 0.0
@@ -1148,10 +1151,13 @@ Public Module WatershedConstituentBalance
     End Sub
 
     Private Function Header(ByVal aBalanceType As String, ByVal aScenario As String, ByVal aRunMade As Date, ByVal auci As atcUCI.HspfUci,
-                            ByVal aSDateJ As Double, ByVal aEDateJ As Double) As String
+                            ByVal aSDateJ As Double, ByVal aEDateJ As Double, ByVal aSeasonsLabel As String) As String
         Dim lString As String = "   Run Made " & aRunMade & vbCrLf
         lString &= "   " & auci.GlobalBlock.RunInf.Value & vbCrLf
         lString &= "   " & TimeSpanAsString(aSDateJ, aEDateJ, "Analysis Period: ")
+        If Len(aSeasonsLabel) > 0 Then
+            lString &= "                    " & aSeasonsLabel & vbCrLf
+        End If
         Return lString
     End Function
 
