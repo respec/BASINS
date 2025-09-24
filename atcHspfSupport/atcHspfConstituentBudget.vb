@@ -22,6 +22,7 @@ Public Module ConstituentBudget
                       ByVal aEDateJ As Double,
                       ByVal aConstProperties As List(Of ConstituentProperties),
                       ByVal aSeasonsLabel As String,
+                      ByVal aReportStartMonth As Integer, ByVal aReportEndMonth As Integer,
                       ByRef aReport1ReachBudget As atcReport.ReportText,
                       ByRef aReport2NPSLoads As atcReport.ReportText,
                       ByRef aReport3LoadAllocationAll As atcReport.ReportText,
@@ -291,8 +292,21 @@ Public Module ConstituentBudget
                                         End If
                                         Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                         lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                        If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                            'if reporting for some months only
+                                            Dim lDate(5) As Integer
+                                            For iValue As Integer = 1 To lTimeseries.numValues
+                                                J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                                If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                    lTimeseries.Value(iValue) = 0.0
+                                                End If
+                                            Next
+                                        End If
+
                                         lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUHour, 1, lTimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                         lPointVol += lTimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
+
                                     End If
                                 Next
                                 lTotalPointVol += lPointVol
@@ -307,7 +321,8 @@ Public Module ConstituentBudget
                             If lSource.Source.VolName = "GENER" Then
                                 Dim lGENEROperationisOutputtoWDM As Boolean = False
                                 GetGENERSum(aUci, lSource, aSDateJ, aEDateJ,
-                                    lGENERTSSum, lGENEROperationisOutputtoWDM)
+                                            aReportStartMonth, aReportEndMonth,
+                                            lGENERTSSum, lGENEROperationisOutputtoWDM)
                                 If lSource.MassLink > 0 Then
                                     lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                     For Each lMassLink As HspfMassLink In aUci.MassLinks
@@ -474,6 +489,18 @@ Public Module ConstituentBudget
                                             End If
                                             Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                            If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                                'if reporting for some months only
+                                                Dim lDate(5) As Integer
+                                                For iValue As Integer = 1 To lTimeseries.numValues
+                                                    J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                        lTimeseries.Value(iValue) = 0.0
+                                                    End If
+                                                Next
+                                            End If
+
                                             lTimeseries = Aggregate(lTimeseries, atcTimeUnit.TUHour, 1, lTimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointTons += lTimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                         End If
@@ -490,7 +517,8 @@ Public Module ConstituentBudget
                                 If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
                                     GetGENERSum(aUci, lSource, aSDateJ, aEDateJ,
-                                        lGENERTSSum, lGENEROperationisOutputtoWDM)
+                                                aReportStartMonth, aReportEndMonth,
+                                                lGENERTSSum, lGENEROperationisOutputtoWDM)
                                     If lSource.MassLink > 0 Then
                                         lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                         For Each lMassLink As HspfMassLink In aUci.MassLinks
@@ -692,6 +720,18 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                            If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                                'if reporting for some months only
+                                                Dim lDate(5) As Integer
+                                                For iValue As Integer = 1 To ltimeseries.numValues
+                                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
+                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                        ltimeseries.Value(iValue) = 0.0
+                                                    End If
+                                                Next
+                                            End If
+
                                             ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                         End If
@@ -708,7 +748,8 @@ Public Module ConstituentBudget
                                 If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
                                     GetGENERSum(aUci, lSource, aSDateJ, aEDateJ,
-                                        lGENERTSSum, lGENEROperationisOutputtoWDM)
+                                                aReportStartMonth, aReportEndMonth,
+                                                lGENERTSSum, lGENEROperationisOutputtoWDM)
                                     If lSource.MassLink > 0 Then
                                         lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
                                         For Each lMassLink As HspfMassLink In aUci.MassLinks
@@ -952,6 +993,18 @@ Public Module ConstituentBudget
                                             End If
                                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                            If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                                'if reporting for some months only
+                                                Dim lDate(5) As Integer
+                                                For iValue As Integer = 1 To ltimeseries.numValues
+                                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
+                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                        ltimeseries.Value(iValue) = 0.0
+                                                    End If
+                                                Next
+                                            End If
+
                                             ltimeseries = Aggregate(ltimeseries, atcTimeUnit.TUHour, 1, TimeSeriesTransformaton) 'assumes run is at 1 hour timestep
                                             lPointlbs += ltimeseries.Attributes.GetDefinedValue("Sum").Value * lMfact / YearsOfSimulation
                                         End If
@@ -968,6 +1021,7 @@ Public Module ConstituentBudget
                                 If lSource.Source.VolName = "GENER" Then
                                     Dim lGENEROperationisOutputtoWDM As Boolean = False
                                     GetGENERSum(aUci, lSource, aSDateJ, aEDateJ,
+                                        aReportStartMonth, aReportEndMonth,
                                         lGENERTSSum, lGENEROperationisOutputtoWDM)
                                     If lSource.MassLink > 0 Then
                                         lGENERTSSum *= lSource.MFact 'Multiplying with MFact in Schematic Block
@@ -1594,6 +1648,7 @@ Public Module ConstituentBudget
     End Function
 
     Private Sub GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                            ByVal aReportStartMonth As Integer, ByVal aReportEndMonth As Integer,
                             ByRef aGenerSum As Double, ByRef aGENEROperationisOutputtoWDM As Boolean)
         aGenerSum = 0
         Dim lGENERID As Integer = aSource.Source.VolId
@@ -1616,6 +1671,17 @@ Public Module ConstituentBudget
                             End If
                             Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                             ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+
+                            If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                'if reporting for some months only
+                                Dim lDate(5) As Integer
+                                For iValue As Integer = 1 To ltimeseries.numValues
+                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
+                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                        ltimeseries.Value(iValue) = 0.0
+                                    End If
+                                Next
+                            End If
                             aGenerSum = ltimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
                         End If
                     Next

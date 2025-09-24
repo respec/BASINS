@@ -1043,6 +1043,7 @@ Public Module atcConstituentTables
                                      ByVal aConstProperties As List(Of ConstituentProperties),
                                      ByVal aSDateJ As Double, ByVal aEDateJ As Double,
                                      ByVal aSeasonsLabel As String,
+                                     ByVal aReportStartMonth As Integer, ByVal aReportEndMonth As Integer,
                                      Optional aGQALID As Integer = 0)
         Dim lReport As New atcReport.ReportText
         Dim lUpstreamInflows As New atcCollection
@@ -1169,7 +1170,7 @@ Public Module atcConstituentTables
                         lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
-                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
+                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aReportStartMonth, aReportEndMonth)
                     Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "DOXOUTTOT", aSDateJ, aEDateJ)
                     Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "DOXIN", aSDateJ, aEDateJ)
                     Dim lPrecIn As Double = 0
@@ -1183,7 +1184,7 @@ Public Module atcConstituentTables
                     End Try
                     Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID,
                                                                   lOutflow, aBalanceType)
-                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lPrecIn
                     For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
                         Dim lColumnName As String = lColumnValue.ColumnName
@@ -1331,11 +1332,11 @@ Public Module atcConstituentTables
                         lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
-                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
+                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aReportStartMonth, aReportEndMonth)
                     Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "ROHEAT", aSDateJ, aEDateJ)
                     Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "IHEAT", aSDateJ, aEDateJ)
                     Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType)
-                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
                     For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
                         Dim lColumnName As String = lColumnValue.ColumnName
@@ -1481,11 +1482,11 @@ Public Module atcConstituentTables
                         lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                     End If
                     Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType)
-                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType)
+                    Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aReportStartMonth, aReportEndMonth)
                     Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, "BODOUTTOT", aSDateJ, aEDateJ)
                     Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, "BODIN", aSDateJ, aEDateJ)
                     Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType)
-                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ)
+                    Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth)
                     Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
 
                     For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
@@ -1612,7 +1613,7 @@ Public Module atcConstituentTables
                                 lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                             End If
                             Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, lReachConstituent)
-                            Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent)
+                            Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent, aReportStartMonth, aReportEndMonth)
                             Dim lOutflow As Double = SafeSumAnnual(aBinaryData, lLocationName, lReachConstituent & "-OUTTOT", aSDateJ, aEDateJ)
                             Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, lLocationName, lReachConstituent & "-INTOT", aSDateJ, aEDateJ)
                             Dim lTotalAtmDep As Double = 0.0
@@ -1633,7 +1634,7 @@ Public Module atcConstituentTables
                             End If
 
                             Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, lReachConstituent)
-                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
+                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
                                 Try
@@ -1775,7 +1776,7 @@ Public Module atcConstituentTables
                                 lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                             End If
                             Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, lReachConstituent)
-                            Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent)
+                            Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, lReachConstituent, aReportStartMonth, aReportEndMonth)
                             Dim lOutflow As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-OUTTOT", aSDateJ, aEDateJ)
                             Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, LocationName, lReachConstituent & "-INTOT", aSDateJ, aEDateJ)
                             Dim lTotalAtmDep As Double = 0.0
@@ -1785,7 +1786,7 @@ Public Module atcConstituentTables
 
                             Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, lReachConstituent)
 
-                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ)
+                            Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, lReachConstituent, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth)
                             Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad - lTotalAtmDep
                             For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
                                 Try
@@ -1921,11 +1922,13 @@ Public Module atcConstituentTables
                             lUpstreamIn = lUpstreamInflows.ItemByKey(lReach.Id)
                         End If
                         Dim lNPSLoad As Double = CalculateNPSLoad(aUCI, lReach, aBalanceType, aGQALID)
-                        Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType, aGQALID)
+                        Dim lPSLoad As Double = CalculatePSLoad(aUCI, lReach, aSDateJ, aEDateJ, aBalanceType,
+                                                                aReportStartMonth, aReportEndMonth,
+                                                                aGQALID)
                         Dim lOutflow As Double = SafeSumAnnual(aBinaryData, lLocationName, aBalanceType & "-TROQAL", aSDateJ, aEDateJ)
                         Dim lTotalIn As Double = SafeSumAnnual(aBinaryData, lLocationName, aBalanceType & "-TIQAL", aSDateJ, aEDateJ)
                         Dim lDiversion As Double = CalculateDiversion(aUCI, aBinaryData, lReach, lUpstreamInflows, lDownstreamReachID, lOutflow, aBalanceType, aGQALID)
-                        Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aGQALID)
+                        Dim lGENERLoad As Double = CalculateGENERLoad(aUCI, lReach, aBalanceType, aSDateJ, aEDateJ, aReportStartMonth, aReportEndMonth, aGQALID)
                         Dim lMassBalance As Double = lTotalIn - lNPSLoad - lUpstreamIn - lPSLoad - lGENERLoad
                         For Each lColumnValue As DataColumn In pReach_Budget_Table.Columns
                             Dim ColumnName As String = lColumnValue.ColumnName
@@ -2036,6 +2039,7 @@ Public Module atcConstituentTables
     Private Function CalculatePSLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation,
                                      ByVal aSDateJ As Double,
                                      ByVal aEDateJ As Double, ByVal aConstituentName As String,
+                                     ByVal aReportStartMonth As Integer, ByVal aReportEndMonth As Integer,
                                      Optional ByVal aGQALID As Integer = 0) As Double
         Dim lPSLoad As Double = 0.0
         Select Case aConstituentName
@@ -2059,6 +2063,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2088,6 +2104,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2119,6 +2147,18 @@ Public Module atcConstituentTables
                                 Dim ltimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not ltimeseries Is Nothing Then
                                     ltimeseries = SubsetByDate(ltimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To ltimeseries.numValues
+                                            J2Date(ltimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                ltimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(ltimeseries.Attributes.GetDefinedValue("Time Step").Value, ltimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2150,6 +2190,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2184,6 +2236,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2217,6 +2281,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2247,6 +2323,18 @@ Public Module atcConstituentTables
                                 Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                                 If Not lTimeseries Is Nothing Then
                                     lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                                    If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                        'if reporting for some months only
+                                        Dim lDate(5) As Integer
+                                        For iValue As Integer = 1 To lTimeseries.numValues
+                                            J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                            If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                lTimeseries.Value(iValue) = 0.0
+                                            End If
+                                        Next
+                                    End If
+
                                     lTransformationMultFact = MultiFactorForPointSource(lTimeseries.Attributes.GetDefinedValue("Time Step").Value, lTimeseries.Attributes.GetDefinedValue("Time Unit").Value.ToString,
                                                                                             lTimeSeriesTransformaton, aUCI.OpnSeqBlock.Delt)
                                 End If
@@ -2398,7 +2486,9 @@ Public Module atcConstituentTables
     End Function
 
     Private Function CalculateGENERLoad(ByVal aUCI As HspfUci, ByVal aReach As HspfOperation, ByVal aConstituentName As String,
-                                        ByVal aSDateJ As Double, ByVal aEDateJ As Double, Optional ByVal aGQALID As Integer = 0) As Double
+                                        ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                                        ByVal aReportStartMonth As Integer, aReportEndMonth As Integer,
+                                        Optional ByVal aGQALID As Integer = 0) As Double
         Dim lGENERLoad As Double = 0.0
 
         Select Case aConstituentName
@@ -2411,6 +2501,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2440,6 +2531,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2469,6 +2561,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2503,6 +2596,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2532,6 +2626,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2561,6 +2656,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2591,6 +2687,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2621,6 +2718,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2650,6 +2748,7 @@ Public Module atcConstituentTables
                     If lSource.Source.VolName = "GENER" Then
                         Dim lGENEROperationisOutputtoWDM As Boolean = False
                         GetGENERSum(aUCI, lSource, aSDateJ, aEDateJ,
+                                    aReportStartMonth, aReportEndMonth,
                                     lGENERSum, lGENEROperationisOutputtoWDM)
                         If lSource.MassLink > 0 Then
                             lGENERSum *= lSource.MFact
@@ -2836,6 +2935,7 @@ Public Module atcConstituentTables
     End Function
 
     Private Sub GetGENERSum(ByVal aUCI As HspfUci, ByVal aSource As HspfConnection, ByVal aSDateJ As Double, ByVal aEDateJ As Double,
+                            ByVal aReportStartMonth As Integer, ByVal aReportEndMonth As Integer,
                             ByRef aGenerSum As Double, ByRef aGENEROperationisOutputtoWDM As Boolean)
         aGenerSum = 0
         Dim lGENERID As Integer = aSource.Source.VolId
@@ -2858,6 +2958,18 @@ Public Module atcConstituentTables
                             End If
                             Dim lTimeseries As atcTimeseries = lDataSource.DataSets.FindData("ID", lDSN)(0)
                             lTimeseries = SubsetByDate(lTimeseries, aSDateJ, aEDateJ, Nothing)
+
+                            If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
+                                'if reporting for some months only
+                                Dim lDate(5) As Integer
+                                For iValue As Integer = 1 To lTimeseries.numValues
+                                    J2Date(lTimeseries.Dates.Value(iValue), lDate)
+                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                        lTimeseries.Value(iValue) = 0.0
+                                    End If
+                                Next
+                            End If
+
                             aGenerSum = lTimeseries.Attributes.GetDefinedValue("Sum").Value / YearCount(aSDateJ, aEDateJ)
                         End If
                     Next

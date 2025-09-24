@@ -20,7 +20,7 @@ End Class
 
 Public Module modBarGraph
 
-    Public Sub CreateGraph_BarGraph(items As BarGraphItem, aOutputFileName As String)
+    Public Sub CreateGraph_BarGraph(items As BarGraphItem, aOutputFileName As String, aReportMonthsLabel As String)
 
         Dim lZgc As New ZedGraph.ZedGraphControl()
         lZgc.Width = 1024
@@ -54,6 +54,9 @@ Public Module modBarGraph
                 items.Scenario & " model. " & vbCrLf & items.TimeSpan
         End Select
 
+        If Len(aReportMonthsLabel) > 0 Then
+            lGrapher.Title = lGrapher.Title & aReportMonthsLabel
+        End If
         lGrapher.OutputFile = aOutputFileName
 
         'Set the color of the data series

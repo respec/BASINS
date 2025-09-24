@@ -27,7 +27,7 @@ Module HSPFOutputReports
     Private pRunUci As Boolean = False 'Anurag added this option if the user wants this program to run the uci as well
     Private pModelQAQC As Boolean = False
     Private pSDateJ, pEDateJ As Double
-    Private pSeasonStartMonth, pSeasonEndMonth As Integer   'for load allocation reports
+    Private pReportStartMonth, pReportEndMonth As Integer   'for load allocation reports
     Private pOutFolderName As String
     Private pMultiSimulation As Boolean = False
     Private pAdditionalGraphs As Boolean = False
@@ -159,8 +159,8 @@ Module HSPFOutputReports
             Using lProgress As New ProgressLevel
                 pSDateJ = StartUp.DateTimePicker1.Value.ToOADate()
                 pEDateJ = StartUp.DateTimePicker2.Value.ToOADate() + 1
-                pSeasonStartMonth = StartUp.cboStartMonth.SelectedIndex + 1   'for load allocation reports
-                pSeasonEndMonth = StartUp.cboEndMonth.SelectedIndex + 1
+                pReportStartMonth = StartUp.cboStartMonth.SelectedIndex + 1   'for load allocation reports
+                pReportEndMonth = StartUp.cboEndMonth.SelectedIndex + 1
 
                 'get echo file name from files block
                 Dim lHspfEchoFileName As String = pTestPath & "hspfecho.out" 'Get the default name of echo file
@@ -659,8 +659,8 @@ Module HSPFOutputReports
                 'pbd season handling here -- first draft
                 'Dim lSeasonStartMonth As Integer = pSeasonStartMonth
                 'Dim lSeasonEndMonth As Integer = pSeasonEndMonth
-                'Dim lReportMonthsLabel As String = ""
-                'Dim lReportMonthsScenarioResults As New atcDataSource
+                'Dim lReportMonthsLabel1 As String = ""
+                'Dim lReportMonthsScenarioResults1 As New atcDataSource
                 'Dim lSeasons As New atcSeasonsYearSubset(lSeasonStartMonth, 1, lSeasonEndMonth, 1)
                 'Dim lSeasonsMonth As New atcSeasonsMonth()
                 'Dim lSeasonFrac As Double = 0.0   'the annual reporting scripts code annualizes the values, we don't want that so adjust
@@ -670,25 +670,25 @@ Module HSPFOutputReports
                 'lSeasons.SeasonSelected(0) = False  'outside
                 'lSeasons.SeasonSelected(1) = True   'inside
                 'If lSeasonStartMonth <> 1 Or lSeasonEndMonth <> 12 Then
-                '    lReportMonthsLabel = "for months " & MonthName(lSeasonStartMonth) & " thru " & MonthName(lSeasonEndMonth)
+                '    lReportMonthsLabel1 = "for months " & MonthName(lSeasonStartMonth) & " thru " & MonthName(lSeasonEndMonth)
                 '    For Each lTimeseries As atcTimeseries In lScenarioResults.DataSets
                 '        Dim lSplitTS As atcTimeseriesGroup = lSeasons.Split(lTimeseries, Nothing)
                 '        lSplitTS(1) = lSplitTS(1) * lSeasonFrac
                 '        For iValue As Integer = 2 To lSplitTS(1).numValues
                 '            If Double.IsNaN(lSplitTS(1).Values(iValue)) Then
-                '                'use the previous value
+                '                use the previous value
                 '                lSplitTS(1).Values(iValue) = lSplitTS(1).Values(iValue - 1)
                 '            End If
                 '        Next
-                '        lReportMonthsScenarioResults.AddDataSet(lSplitTS(1))
+                '        lReportMonthsScenarioResults1.AddDataSet(lSplitTS(1))
                 '    Next
                 'Else
-                '    lReportMonthsScenarioResults = lScenarioResults
+                '    lReportMonthsScenarioResults1 = lScenarioResults
                 'End If
 
                 'pbd reporting months handling here
-                Dim lReportStartMonth As Integer = pSeasonStartMonth
-                Dim lReportEndMonth As Integer = pSeasonEndMonth
+                Dim lReportStartMonth As Integer = pReportStartMonth
+                Dim lReportEndMonth As Integer = pReportEndMonth
                 Dim lReportMonthsLabel As String = ""
                 Dim lReportMonthsScenarioResults As New atcDataSource
                 If lReportStartMonth <> 1 Or lReportEndMonth <> 12 Then
@@ -699,7 +699,7 @@ Module HSPFOutputReports
                         lTempTim = lTimeseries.Clone
                         For iValue As Integer = 1 To lTempTim.numValues
                             J2Date(lTempTim.Dates.Value(iValue), lDate)
-                            If lDate(1) < lReportStartMonth + 1 Or lDate(1) > lReportEndMonth + 1 Then
+                            If lDate(1) < lReportStartMonth + 1 Or lDate(1) > lReportEndMonth + 1 Then   'pbd works for monthly output?
                                 lTempTim.Value(iValue) = 0.0
                             End If
                         Next
@@ -711,7 +711,8 @@ Module HSPFOutputReports
 
                 'LandLoadingReports generates a text file report as well as the info needed for the QA report
                 '    "_Land_Loadings.txt" and "_Monthly_Land_Loadings.txt"
-                Dim lLandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lReportMonthsScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
+                '    even when subseting by month, these reports should include the whole span because they already have monthly breakdown 
+                Dim lLandLoadingReportForConstituents As DataTable = LandLoadingReports(pOutFolderName, lScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lGQALID)
 
                 If pModelQAQC Then
                     aQAQCReportFile.AppendLine("<h2>" & lConstituent & " Loading Rate Analysis</h2>")
@@ -721,7 +722,7 @@ Module HSPFOutputReports
                 'ReachBudgetReports generates a text file report only
                 If Not pModelQAQC Then
                     '    "_Reach_Budget.txt"
-                    ReachBudgetReports(pOutFolderName, lReportMonthsScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lReportMonthsLabel, lGQALID)
+                    ReachBudgetReports(pOutFolderName, lReportMonthsScenarioResults, aHspfUci, pBaseName, aRunMade, lConstituentName, lConstProperties, pSDateJ, pEDateJ, lReportMonthsLabel, lReportStartMonth, lReportEndMonth, lGQALID)
                 End If
 
                 If pModelQAQC Then
@@ -741,7 +742,8 @@ Module HSPFOutputReports
 
                     HspfSupport.ConstituentBudget.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
                                                          lReportMonthsScenarioResults, pOutputLocations, aRunMade,
-                                                         pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel,
+                                                         pSDateJ, pEDateJ, lConstProperties,
+                                                         lReportMonthsLabel, lReportStartMonth, lReportEndMonth,
                                                          lReport1ReachBudget,
                                                          lReport2NPSLoads,
                                                          lReport3LoadAllocationAll,
@@ -770,7 +772,7 @@ Module HSPFOutputReports
 
                     If lDataForBarGraphs IsNot Nothing AndAlso lDataForBarGraphs.Keys.Count > 0 Then
                         For Each location As String In lDataForBarGraphs.Keys
-                            CreateGraph_BarGraph(lDataForBarGraphs.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png")
+                            CreateGraph_BarGraph(lDataForBarGraphs.ItemByKey(location), pOutFolderName & lConstituentName & "_" & pBaseName & "_" & location & "_LoadingAllocation.png", lReportMonthsLabel)
                         Next location
                     End If
 
