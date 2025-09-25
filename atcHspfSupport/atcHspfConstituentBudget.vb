@@ -296,9 +296,9 @@ Public Module ConstituentBudget
                                         If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
                                             'if reporting for some months only
                                             Dim lDate(5) As Integer
-                                            For iValue As Integer = 1 To lTimeseries.numValues
-                                                J2Date(lTimeseries.Dates.Value(iValue), lDate)
-                                                If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                            For iValue As Integer = 0 To lTimeseries.numValues
+                                                J2Date(lTimeseries.Dates.Value(iValue) - 0.001, lDate)
+                                                If lDate(1) < aReportStartMonth Or lDate(1) > aReportEndMonth Then
                                                     lTimeseries.Value(iValue) = 0.0
                                                 End If
                                             Next
@@ -493,9 +493,9 @@ Public Module ConstituentBudget
                                             If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
                                                 'if reporting for some months only
                                                 Dim lDate(5) As Integer
-                                                For iValue As Integer = 1 To lTimeseries.numValues
-                                                    J2Date(lTimeseries.Dates.Value(iValue), lDate)
-                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                For iValue As Integer = 0 To lTimeseries.numValues
+                                                    J2Date(lTimeseries.Dates.Value(iValue) - 0.001, lDate)
+                                                    If lDate(1) < aReportStartMonth Or lDate(1) > aReportEndMonth Then
                                                         lTimeseries.Value(iValue) = 0.0
                                                     End If
                                                 Next
@@ -724,9 +724,9 @@ Public Module ConstituentBudget
                                             If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
                                                 'if reporting for some months only
                                                 Dim lDate(5) As Integer
-                                                For iValue As Integer = 1 To ltimeseries.numValues
-                                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
-                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                For iValue As Integer = 0 To ltimeseries.numValues
+                                                    J2Date(ltimeseries.Dates.Value(iValue) - 0.001, lDate)
+                                                    If lDate(1) < aReportStartMonth Or lDate(1) > aReportEndMonth Then
                                                         ltimeseries.Value(iValue) = 0.0
                                                     End If
                                                 Next
@@ -997,9 +997,9 @@ Public Module ConstituentBudget
                                             If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
                                                 'if reporting for some months only
                                                 Dim lDate(5) As Integer
-                                                For iValue As Integer = 1 To ltimeseries.numValues
-                                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
-                                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                                For iValue As Integer = 0 To ltimeseries.numValues
+                                                    J2Date(ltimeseries.Dates.Value(iValue) - 0.001, lDate)
+                                                    If lDate(1) < aReportStartMonth Or lDate(1) > aReportEndMonth Then
                                                         ltimeseries.Value(iValue) = 0.0
                                                     End If
                                                 Next
@@ -1675,9 +1675,9 @@ Public Module ConstituentBudget
                             If aReportStartMonth <> 1 Or aReportEndMonth <> 12 Then
                                 'if reporting for some months only
                                 Dim lDate(5) As Integer
-                                For iValue As Integer = 1 To ltimeseries.numValues
-                                    J2Date(ltimeseries.Dates.Value(iValue), lDate)
-                                    If lDate(1) < aReportStartMonth + 1 Or lDate(1) > aReportEndMonth + 1 Then
+                                For iValue As Integer = 0 To ltimeseries.numValues
+                                    J2Date(ltimeseries.Dates.Value(iValue) - 0.001, lDate)
+                                    If lDate(1) < aReportStartMonth Or lDate(1) > aReportEndMonth Then
                                         ltimeseries.Value(iValue) = 0.0
                                     End If
                                 Next

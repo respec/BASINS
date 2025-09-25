@@ -697,9 +697,9 @@ Module HSPFOutputReports
                         Dim lTempTim As New atcTimeseries
                         Dim lDate(5) As Integer
                         lTempTim = lTimeseries.Clone
-                        For iValue As Integer = 1 To lTempTim.numValues
-                            J2Date(lTempTim.Dates.Value(iValue), lDate)
-                            If lDate(1) < lReportStartMonth + 1 Or lDate(1) > lReportEndMonth + 1 Then   'pbd works for monthly output?
+                        For iValue As Integer = 0 To lTempTim.numValues
+                            J2Date(lTempTim.Dates.Value(iValue) - 0.001, lDate)
+                            If lDate(1) < lReportStartMonth Or lDate(1) > lReportEndMonth Then   'pbd works
                                 lTempTim.Value(iValue) = 0.0
                             End If
                         Next
