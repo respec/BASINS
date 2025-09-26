@@ -1,3 +1,13 @@
+Date: 9/26/2025
+
+HSPEXP+3.2.1
+
+New Features:
+1. Generate reports over several years but just using outputs for certain months (i.e. June through September for the River Eutrophication Standard or April through September for the Sediment Standard).
+2. Reach Annual Average Budget (RCH_Ann_Avg_Budget) reports now have more descriptive info in the documentation (ConstituentBalanceReportsDocumentation.pdf)
+3. Also clarified info in the Load Allocation Tables in the documentation.
+
+
 Date: 2/4/2021
 
 HSPEXP+3.2

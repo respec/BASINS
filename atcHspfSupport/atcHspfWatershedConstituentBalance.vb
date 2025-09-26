@@ -40,6 +40,7 @@ Public Module WatershedConstituentBalance
                               ByVal aEDateJ As String,
                               ByVal aConstProperties As List(Of ConstituentProperties),
                               ByVal aSeasonsLabel As String,
+                              ByVal aReportEndMonth As Integer,
                      Optional ByVal aOutFilePrefix As String = "",
                      Optional ByVal aOutletDetails As Boolean = False,
                      Optional ByVal aSegmentRows As Boolean = False,
@@ -56,6 +57,7 @@ Public Module WatershedConstituentBalance
                                                aScenario, aScenarioResults,
                                                aRunMade, aSDateJ, aEDateJ, aConstProperties,
                                                aSeasonsLabel,
+                                               aReportEndMonth,
                                                lOutletLocation,
                                                aOutFilePrefix, True,
                                                aSegmentRows, aDecimalPlaces, aSignificantDigits, aFieldWidth, aSkipZeroOrNoValue)
@@ -255,6 +257,7 @@ Public Module WatershedConstituentBalance
                            ByVal aEDateJ As Double,
                            ByVal aConstProperties As List(Of ConstituentProperties),
                            ByVal aSeasonsLabel As String,
+                           ByVal aReportEndMonth As Integer,
                   Optional ByVal aOutletLocation As String = "",
                   Optional ByVal aOutFilePrefix As String = "",
                   Optional ByVal aOutletDetails As Boolean = False,
@@ -523,6 +526,29 @@ Public Module WatershedConstituentBalance
                                                     lAttribute = lSeasonalAttributes(0)
                                                     'Mark added this option to calculate the average of end of the year values for state variables.
                                                     'Earlier we were getting end of the simulation period value.
+
+                                                    'pbd this is where we might want to compute a different state variable when using months to report
+                                                    '    like April to Sept should report average Sept's end value 
+                                                    If aReportEndMonth < 12 Then
+                                                        Dim lTmpTs As atcTimeseries = lTempDataSet
+                                                        Dim lEndVal As Double = -999.0
+                                                        J2Date(lTmpTs.Dates.Value(0), lDate)
+                                                        Dim lCurYear As Integer = lDate(0)
+                                                        Dim lSum As Double = 0.0
+                                                        For iValue As Integer = 0 To lTmpTs.numValues
+                                                            J2Date(lTmpTs.Dates.Value(iValue) - 0.001, lDate)
+                                                            If lCurYear < lDate(0) Or iValue = lTmpTs.numValues Then
+                                                                lSum += lEndVal
+                                                                lCurYear = lDate(0)
+                                                            End If
+                                                            If lDate(1) <= aReportEndMonth Then
+                                                                lEndVal = lTmpTs.Value(iValue)
+                                                            End If
+                                                        Next
+                                                        lSeasonalAttributes(0).Value = lSum / lYearlyAttributes.Count
+                                                        lAttribute = lSeasonalAttributes(0)
+                                                    End If
+
                                                 Else
                                                     lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
                                                 End If

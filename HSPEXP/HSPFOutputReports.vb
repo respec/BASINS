@@ -779,7 +779,7 @@ Module HSPFOutputReports
                     'Logger.Dbg(Now & " Calculating Annual Constituent Balance for " & lConstituent)
                     Dim lReportCons As New atcReport.ReportText
                     lReportCons = HspfSupport.ConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel)
+                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel, lReportEndMonth)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Per_OPN_Per_Year.txt"
 
                     SaveFileString(lOutFileName, lReportCons.ToString)
@@ -788,7 +788,7 @@ Module HSPFOutputReports
                     'constituent balance
 
                     lReportCons = HspfSupport.WatershedConstituentBalance.Report(aHspfUci, lConstituent, aOperationTypes, pBaseName,
-                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel)
+                        lReportMonthsScenarioResults, aRunMade, pSDateJ, pEDateJ, lConstProperties, lReportMonthsLabel, lReportEndMonth)
                     lOutFileName = pOutFolderName & lConstituentName & "_" & pBaseName & "_Grp_By_OPN_LU_Ann_Avg.txt"
 
                     SaveFileString(lOutFileName, lReportCons.ToString)
@@ -798,7 +798,7 @@ Module HSPFOutputReports
                         HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                            (aHspfUci, lConstituent, aOperationTypes, pBaseName,
                             lReportMonthsScenarioResults, pOutputLocations, aRunMade, pSDateJ, pEDateJ,
-                            lConstProperties, lReportMonthsLabel, pOutFolderName, True)
+                            lConstProperties, lReportMonthsLabel, lReportEndMonth, pOutFolderName, True)
                         'now pivoted version
                         'HspfSupport.WatershedConstituentBalance.ReportsToFiles _
                         '   (lHspfUci, lConstituent, lOperationTypes, pBaseName, _

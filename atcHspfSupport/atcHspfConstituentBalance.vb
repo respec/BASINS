@@ -40,6 +40,7 @@ Public Module ConstituentBalance
                            ByVal aEDateJ As Double,
                            ByVal aConstProperties As List(Of ConstituentProperties),
                            ByVal aSeasonsLabel As String,
+                           ByVal aReportEndMonth As Integer,
                   Optional ByVal aDateRows As Boolean = False,
                   Optional ByVal aDecimalPlaces As Integer = 3,
                   Optional ByVal aSignificantDigits As Integer = 5,
@@ -124,9 +125,32 @@ Public Module ConstituentBalance
                                         Else
                                             lSeasons = New atcSeasonsCalendarYear
                                         End If
+                                        Dim lEndVals As New atcCollection  'if using monthly reporting save ending value for each year
                                         Dim lSeasonalAttributes As New atcDataAttributes
                                         If ConstituentsThatUseLast.Contains(lConstituentDataName) Then
                                             lSeasonalAttributes.SetValue("Last", 0)
+
+                                            'pbd this is where we might want to compute a different state variable when using months to report
+                                            '    like April to Sept should report Sept's end value 
+                                            If aReportEndMonth < 12 Then
+                                                Dim lTmpTs As atcTimeseries = lTempDataSet
+                                                Dim lEndVal As Double = -999.0
+                                                J2Date(lTmpTs.Dates.Value(0), lDate)
+                                                Dim lCurYear As Integer = lDate(0)
+                                                For iValue As Integer = 0 To lTmpTs.numValues
+                                                    J2Date(lTmpTs.Dates.Value(iValue) - 0.001, lDate)
+                                                    If lCurYear < lDate(0) Or iValue = lTmpTs.numValues Then
+                                                        'lSeasonalAttributes.SetValue("Last CalendarYear " & lDate(0) - 1, lEndVal)
+                                                        'lSeasonalAttributes.SetValue("Last", lEndVal)
+                                                        lEndVals.Add(lEndVal)
+                                                        lCurYear = lDate(0)
+                                                    End If
+                                                    If lDate(1) <= aReportEndMonth Then
+                                                        lEndVal = lTmpTs.Value(iValue)
+                                                    End If
+                                                Next
+                                            End If
+
                                         Else
                                             lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
                                         End If
@@ -279,7 +303,11 @@ Public Module ConstituentBalance
                                             End If
                                             Dim lFieldIndex As Integer = 3
                                             For Each lAttribute In lYearlyAttributes
-                                                .Value(lFieldIndex) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                If ConstituentsThatUseLast.Contains(lConstituentDataName) And aReportEndMonth < 12 Then  'pbd for monthly report option
+                                                    .Value(lFieldIndex) = DecimalAlign(lMult * lEndVals(lFieldIndex - 3), aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                Else
+                                                    .Value(lFieldIndex) = DecimalAlign(lMult * lAttribute.Value, aFieldWidth, aDecimalPlaces, aSignificantDigits)
+                                                End If
                                                 lFieldIndex += 1
                                             Next
                                         Else
