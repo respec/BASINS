@@ -301,10 +301,10 @@ Public Class frmDownload
                         For Each lHuc8 As String In HUC8s()
                             'If Not CheckAddress("https://s3.amazonaws.com/nhdplus/NHDPlusV2/NHDPlusExtensions/SubBasins/NHDPlus" & lHuc8.Substring(0, 2) & "/" & "NHDPlus" & lHuc8 & ".zip") Then
                             'If Not CheckAddress("ftp://newftp.epa.gov/exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                            'If Not CheckAddress("https://usgs.osn.mghpcc.org/mdmf/epa_basins/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then  'USGS version
+                            'If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
                             'MapWinUtility.Logger.Dbg("CheckAddress failed for newftp")
-                            If Not CheckAddress("https://gaftp.epa.gov/Exposure/BasinsData/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
-                                MapWinUtility.Logger.Dbg("CheckAddress failed for gaftp")
+                            If Not CheckAddress("https://usgs.osn.mghpcc.org/mdmf/epa_basins/NHDPlus21/NHDPlus" & lHuc8 & ".zip") Then
+                                MapWinUtility.Logger.Dbg("CheckAddress failed for usgs.osn.mghpcc.org")
                                 lProblem = True
                             End If
                             'End If
@@ -905,28 +905,36 @@ Public Class frmDownload
                                         lWDMxml = lWDMfrm.AskUser(Me.Icon, "NLDAS", IO.Path.Combine(lSaveFolderOnly, "nldas"), "NLDAS Processing Options")
                                         lWDMxml &= "<TimeZoneShift>" & txtTimeZone.Text & "</TimeZoneShift>" & vbCrLf
                                         If lstParameters.SelectedItems.Count <> 7 And lstParameters.SelectedItems.Count <> 0 Then
-                                            'user doens't want all the parameters
+                                            'user doens't want all the parameters  "Rainf", "PotEvap", "Tair", "Wind_E", "Wind_N", "SWdown", "Qair"
                                             If lstParameters.SelectedItems.Contains("Precip") Then
-                                                lWDMxml &= "<datatype>APCPsfc</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>APCPsfc</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>Rainf</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("PET") Then
-                                                lWDMxml &= "<datatype>PEVAPsfc</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>PEVAPsfc</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>PotEvap</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("Air Temp") Then
-                                                lWDMxml &= "<datatype>TMP2m</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>TMP2m</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>Tair</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("Wind") Then
-                                                lWDMxml &= "<datatype>UGRD10m</datatype>" & vbCrLf
-                                                lWDMxml &= "<datatype>VGRD10m</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>UGRD10m</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>VGRD10m</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>Wind_E</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>Wind_N</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("Sol Rad") Then
-                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>SWdown</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("Cloud") Then
-                                                lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>DSWRFsfc</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>SWdown</datatype>" & vbCrLf
                                             End If
                                             If lstParameters.SelectedItems.Contains("Dewp") Then
-                                                lWDMxml &= "<datatype>SPFH2m</datatype>" & vbCrLf
+                                                'lWDMxml &= "<datatype>SPFH2m</datatype>" & vbCrLf
+                                                lWDMxml &= "<datatype>Qair</datatype>" & vbCrLf
                                             End If
                                         End If
                                         If numStart.Value > 1979 Or numEnd.Value < DateTime.Now.Year Then
