@@ -222,7 +222,8 @@ Public Class frmAbout
         Me.lblProgramURL.Size = New System.Drawing.Size(432, 13)
         Me.lblProgramURL.TabIndex = 2
         Me.lblProgramURL.TabStop = True
-        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidance"
+        Me.lblProgramURL.Text = "http://www2.epa.gov/exposure-assessment-models/basins-user-information-and-guidan" &
+    "ce"
         Me.lblProgramURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpATC
@@ -236,7 +237,7 @@ Public Class frmAbout
         Me.grpATC.Size = New System.Drawing.Size(473, 160)
         Me.grpATC.TabIndex = 3
         Me.grpATC.TabStop = False
-        Me.grpATC.Text = "Developed by AQUA TERRA Division of RESPEC."
+        Me.grpATC.Text = "Developed by RESPEC"
         '
         'picATC
         '
@@ -259,7 +260,7 @@ Public Class frmAbout
         Me.lblAquaTerraURL.Size = New System.Drawing.Size(287, 18)
         Me.lblAquaTerraURL.TabIndex = 4
         Me.lblAquaTerraURL.TabStop = True
-        Me.lblAquaTerraURL.Text = "http://www.respec.com/service-area/water-environment/"
+        Me.lblAquaTerraURL.Text = "http://www.respec.com/market/water-environment/"
         Me.lblAquaTerraURL.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpZedGraph
@@ -381,6 +382,7 @@ Public Class frmAbout
             Try
 #If GISProvider = "DotSpatial" Then
                 lblProjFile.Text = g_Project.CurrentProjectFile
+                lblMapwinVersion.Text = "2.0.0.0"
 #Else
                 lblProjFile.Text = g_Project.FileName
                 lblConfigFile.Text = g_Project.ConfigFileName
