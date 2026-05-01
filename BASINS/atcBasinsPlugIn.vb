@@ -628,21 +628,25 @@ FoundDir:
 #If GISProvider = "DotSpatial" Then
     Public Shared Sub ShapesSelected(ByVal sender As Object, ByVal aSelectChangedArgs As EventArgs)
         If sender.Layers.SelectedLayer IsNot Nothing Then
-            Try
-                If CType(sender.Layers.SelectedLayer, IMapFeatureLayer).Selection.Count = 0 Then
-                    Exit Sub
-                Else
-                    For Each imap As IMapFeatureLayer In atcMwGisUtility.GisUtilDS.GetFeatureLayers(Nothing)
-                        If imap.Checked Then
-                            If imap.DataSet.Name <> sender.Layers.SelectedLayer.DataSet.Name Then
-                                imap.Selection.Clear()
+            If Not g_UpdatingInProgress Then
+                Try
+                    If CType(sender.Layers.SelectedLayer, IMapFeatureLayer).Selection.Count = 0 Then
+                        Exit Sub
+                    Else
+                        For Each imap As IMapFeatureLayer In atcMwGisUtility.GisUtilDS.GetFeatureLayers(Nothing)
+                            If imap.Checked Then
+                                If imap.DataSet.Name <> sender.Layers.SelectedLayer.DataSet.Name Then
+                                    g_UpdatingInProgress = True
+                                    imap.Selection.Clear()
+                                    g_UpdatingInProgress = False
+                                End If
                             End If
-                        End If
-                    Next
-                End If
-            Catch ex As Exception
-                Exit Sub
-            End Try
+                        Next
+                    End If
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+            End If
         Else
             Exit Sub
         End If

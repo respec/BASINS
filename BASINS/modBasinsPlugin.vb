@@ -27,6 +27,7 @@ Public Module modBasinsPlugin
     Friend g_Plugins As Object
     Friend g_Project As SerializationManager
     Friend g_MapWinWindowHandle As Integer
+    Friend g_UpdatingInProgress As Boolean = False
 #Else
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Friend g_Menus As MapWindow.Interfaces.Menus
