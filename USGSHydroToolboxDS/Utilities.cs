@@ -278,6 +278,12 @@ namespace USGSHydroToolbox
                 atcDataManager.DataPlugins.Add(script);
                 var lRDB = new atcTimeseriesRDB.atcTimeseriesRDB();
                 atcDataManager.DataPlugins.Add(lRDB);
+                var lWDM = new atcWDM.atcDataSourceWDM();
+                atcDataManager.DataPlugins.Add(lWDM);
+                //var lJSON = new atcTimeseriesJSON.atcTimeseriesJSON();
+                //atcDataManager.DataPlugins.Add(lJSON);
+                var lCSV = new atcTimeseriesCSV_USGS.atcTimeseriesCSV_USGS();
+                atcDataManager.DataPlugins.Add(lCSV);
                 var listPlugin = new atcList.atcListPlugin();
                 atcDataManager.DataPlugins.Add(listPlugin);
                 var graphPlugin = new atcGraph.atcGraphPlugin();

@@ -200,6 +200,9 @@ Public Class atcTimeseriesCSV_USGS
         Dim lConstituentDescriptions As New atcCollection
         Dim lArr() As String
 
+        lQualificationCodes.Add("P", "Provisional")
+        lQualificationCodes.Add("A", "Approved")
+
         lParmCode = aAttributes.GetValue("Parameter")
         lStatisticCode = aAttributes.GetValue("statistic")
         lLocation = aAttributes.GetValue("Location")
@@ -269,10 +272,10 @@ Public Class atcTimeseriesCSV_USGS
                             'If next field is code for this field, then make sure its code is in the allowed codes, QualificationCodes
                             'This test was for skipping provisional values: 'If .FieldName(lField + 1) <> .FieldName(lField) & "_cd" OrElse QualificationCodes.Contains(.Value(lField + 1).Trim().Substring(0, 1)) Then
 
-                            'lQualificationCode = ""
-                            'If .FieldName(lField + 1) = .FieldName(lField) & "_cd" Then
-                            '    lQualificationCode = .Value(lField + 1).Trim.Replace(":", "")
-                            'End If
+                            lQualificationCode = ""
+                            If .FieldName(lField + 1) = "Approval status" Then
+                                lQualificationCode = .Value(lField + 1).Trim.Replace(":", "")
+                            End If
 
                             'lConstituentDescription = lValueConstituentDescriptions.ItemByKey(lField)
 
@@ -361,13 +364,12 @@ Public Class atcTimeseriesCSV_USGS
                             Else
                                 lData.Value(lTSIndex) = lCurValue
                                 lData.Dates.Value(lTSIndex) = lDate
-                                'For Each lCodeChar As String In lQualificationCode
-                                '    lData.ValueAttributes(lTSIndex).Add(lCodeChar, True)
-                                '    Dim lAttributeName As String = "ValueAttributeDescription_" & lCodeChar
-                                '    If Not lData.Attributes.ContainsAttribute(lAttributeName) AndAlso lQualificationCodes.Keys.Contains(lCodeChar) Then
-                                '        lData.Attributes.SetValue(lAttributeName, lQualificationCodes.ItemByKey(lCodeChar))
-                                '    End If
-                                'Next
+                                Dim lCodeChar As String = lQualificationCode(0)
+                                lData.ValueAttributes(lTSIndex).Add(lCodeChar, True)
+                                Dim lAttributeName As String = "ValueAttributeDescription_" & lCodeChar
+                                If Not lData.Attributes.ContainsAttribute(lAttributeName) AndAlso lQualificationCodes.Keys.Contains(lCodeChar) Then
+                                    lData.Attributes.SetValue(lAttributeName, lQualificationCodes.ItemByKey(lCodeChar))
+                                End If
                                 lData.Attributes.SetValue("Count", lTSIndex)
                             End If
                         End If
@@ -412,6 +414,7 @@ Public Class atcTimeseriesCSV_USGS
             Dim lDateField As Integer = -1
             Dim lLocationField As Integer = -1
             Dim lParmField As Integer = -1
+            Dim lParmCode As String = ""
             Dim lUnitField As Integer = -1
             Dim lValueFields As New ArrayList
             'Dim lValueConstituentDescriptions As New atcCollection
@@ -419,6 +422,7 @@ Public Class atcTimeseriesCSV_USGS
             .Delimiter = ","
             .OpenStream(aInputReader.BaseStream)
 
+            'header for each data value:
             'time,value,vertical_datum,approval_status,qualifier,measuring_agency,parameter_code,field_measurements_series_id,field_visit_id,observing_procedure_code,observing_procedure,unit_of_measure,last_modified,control_condition,measurement_rated,field_measurement_id
             For lField = 1 To .NumFields
                 Select Case .FieldName(lField)
@@ -429,10 +433,6 @@ Public Class atcTimeseriesCSV_USGS
                 End Select
             Next
 
-            'Dim lValueFieldNames() As String = {"lev_va", "sl_lev_va"}
-            'Dim lConstituentNames() As String = {"GW LEVEL", "GW LEVEL"}
-            'Dim lDescriptions() As String = {"Water level value in feet below land surface", "Water level value in feet above specific vertical datum"}
-            'Dim lUnits() As String = {"ft", "ft"}
             Dim lLastValueField As Integer = lValueFields.Count
             'Dim lValueFieldNumber(lLastValueField) As Integer
             Dim lBuilders(lLastValueField) As atcTimeseriesBuilder
@@ -444,9 +444,6 @@ Public Class atcTimeseriesCSV_USGS
                     .ChangeTo(aAttributes)
                     .SetValue("Point", True)
                     .SetValue("Scenario", "OBSERVED")
-                    '.SetValue("Location", .GetValue("site_no"))
-                    '.SetValue("Description", lDescriptions(lValueFieldIndex))
-                    '.SetValue("parm_cd", lValueFieldNames(lValueFieldIndex))
                     .SetValue("ID", lValueFieldIndex + 1)
                 End With
             Next
@@ -467,27 +464,32 @@ Public Class atcTimeseriesCSV_USGS
                 '        lDateString &= " " & lTimeString.Substring(0, 2) & ":" & lTimeString.Substring(2, 2)
                 '    End If
                 'End If
+
+                Dim lUnits As String = Nothing
+                Dim lConstituent As String = ""
+                lParmCode = .Value(lParmField)
+                Select Case lParmCode
+                    Case "61055" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Water level, depth below measuring point, feet 
+                    Case "62611" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level above NAVD 1988, feet 
+                    Case "72019" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Depth to water level, feet below land surface 
+                    Case "72020" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Elevation above NGVD 1929, feet 
+                    Case "72150" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level relative to Mean Sea Level (MSL), feet.
+                End Select
+
                 If Date.TryParse(lDateString, lParsedDate) Then
-                    lDate = lParsedDate.ToOADate() + pJulianInterval 'add one interval to put date at end of interval
+                    lDate = lParsedDate.ToOADate() '+ pJulianInterval 'add one interval to put date at end of interval
                     For lValueFieldIndex = 0 To lLastValueField - 1
                         If lValueFields(lValueFieldIndex) > 0 Then
                             lValueString = .Value(lValueFields(lValueFieldIndex))
                             If Double.TryParse(lValueString, lValue) Then
                                 lBuilders(lValueFieldIndex).AddValue(lDate, lValue)
                                 'add other attributes here 
-
-                                'For lField As Integer = 1 To .NumFields
-                                '    If Array.IndexOf(lValueFieldNumber, lField) < 0 Then 'Not a value field, add it as value attribute
-                                '        Select Case .FieldName(lField)
-                                '            Case "agency_cd", "site_no", "lev_dt", "lev_tm", "lev_agency_cd" 'don't need these as value attributes
-                                '            Case Else
-                                '                Dim lAttributeValue As String = .Value(lField).Trim
-                                '                If lAttributeValue.Length > 0 Then
-                                '                    lBuilders(lValueFieldIndex).AddValueAttribute(.FieldName(lField), lAttributeValue)
-                                '                End If
-                                '        End Select
-                                '    End If
-                                'Next
+                                With lBuilders(lValueFieldIndex).Attributes
+                                    .SetValue("Constituent", lConstituent)
+                                    .SetValue("Units", lUnits)
+                                    .SetValue("Location", .GetValue("site_no"))
+                                    .SetValue("parm_cd", lParmCode)
+                                End With
                             End If
                         End If
                     Next
