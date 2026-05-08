@@ -1,4 +1,6 @@
 ﻿Imports MapWinUtility
+Imports MapWinUtility.Strings
+
 Public NotInheritable Class SplashScreen1
 
     'TODO: This form can easily be set as the splash screen for the application by going to the "Application" tab
@@ -26,6 +28,15 @@ Public NotInheritable Class SplashScreen1
         '  String.Format() in Help for more information.
         '
         '    Version.Text = System.String.Format(Version.Text, My.Application.Info.Version.Major, My.Application.Info.Version.Minor, My.Application.Info.Version.Build, My.Application.Info.Version.Revision)
+
+        Dim lTempCL As String = Environment.CommandLine
+        Dim lExeName As String = StrSplit(lTempCL, " ", """")
+        If Len(lTempCL) > 0 Then
+            'close splash screen if we have something on the command line 
+            Me.Height = 0
+            Me.Width = 0
+            Me.Close()
+        End If
 
         With My.Application.Info.Version
             Version.Text = "Version " & .Major & "." & .Minor ' & " beta"

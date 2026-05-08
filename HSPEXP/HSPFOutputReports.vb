@@ -820,7 +820,7 @@ Module HSPFOutputReports
         Next lConstituent
     End Sub
 
-    Private Function CheckEchoFile(ByVal aHspfEchoFileName As String)
+    Friend Function CheckEchoFile(ByVal aHspfEchoFileName As String)
         Dim lRunMade As String = ""
 
         If IO.File.Exists(aHspfEchoFileName) Then
@@ -861,7 +861,7 @@ Module HSPFOutputReports
     ''' This function returns the style portion of the QA/QC report.
     ''' </summary>
     ''' <returns></returns>
-    Private Function QAReportStyle() As String
+    Friend Function QAReportStyle() As String
         Dim lReportStyleText As New Text.StringBuilder
         lReportStyleText.AppendLine("<head>")
         lReportStyleText.AppendLine(
@@ -896,7 +896,7 @@ Module HSPFOutputReports
     ''' <param name="aUCI"></param>
     ''' <param name="aRunMade"></param>
     ''' <returns></returns>
-    Private Function QACheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
+    Friend Function QACheckHSPFParmValues(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String ' , ByVal ParameterValues As DataTable)
         Logger.Status("Creating the QAQC Model Parameter Report")
         Dim lHSPFParmTable As XmlDocument = New XmlDocument()
         Dim lTableName As String = ""
@@ -1175,7 +1175,7 @@ Module HSPFOutputReports
     ''' </summary>
     ''' <param name="aUCI"></param>
     ''' <returns></returns>
-    Private Function QAGeneralModelInfo(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String
+    Friend Function QAGeneralModelInfo(ByVal aUCI As HspfUci, ByVal aRunMade As String) As String
         Dim lGeneralModelInfoText As New Text.StringBuilder
         lGeneralModelInfoText.AppendLine("<h1>HSPF Model QA QC Report</h1>")
         lGeneralModelInfoText.AppendLine("<h2>Disclaimer</h2>")
@@ -1253,7 +1253,7 @@ Module HSPFOutputReports
     ''' <param name="aUCI"></param>
     ''' <param name="aOperationTypes"></param>
     ''' <returns></returns>
-    Private Function QAModelAreaReport(ByVal aUCI As HspfUci, ByVal aOperationTypes As atcCollection) As String
+    Friend Function QAModelAreaReport(ByVal aUCI As HspfUci, ByVal aOperationTypes As atcCollection) As String
         Dim lModelAreaReportTable As String = ""
         Dim lOutletLocations As New atcCollection
         Dim lCalibrationLocations As New atcCollection
@@ -1340,7 +1340,7 @@ Module HSPFOutputReports
         Return lModelAreaReportTable
     End Function
 
-    Private Function QALoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
+    Friend Function QALoadingRateComparison(ByVal aConstituentName As String, ByVal aLandLoadingConstReport As DataTable,
                                            ByVal aDateString As String) As String
         Logger.Status("Creating the QAQC Loading Rate Comparison Report")
         Dim lOverAllComments As New Text.StringBuilder
@@ -1779,7 +1779,7 @@ Module HSPFOutputReports
     '    Return MonthlyFlagisOn
     'End Function
 
-    Private Function QAVerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
+    Friend Function QAVerifyStorageTrend(ByVal aUCI As HspfUci, ByVal aBinaryData As atcDataSource, ByVal aConstituent As String) As String
         Logger.Status("Creating the QAQC Storage Trend Report")
         Dim lStorageTrend As New Text.StringBuilder
         Dim lOverAllStorageTrend As New Text.StringBuilder
@@ -1977,7 +1977,7 @@ Module HSPFOutputReports
     ''' <param name="aUCI"></param>
     ''' <param name="aConstituent"></param>
     ''' <returns></returns>
-    Private Function QACheckDiurnalPattern(ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
+    Friend Function QACheckDiurnalPattern(ByVal aUCI As HspfUci, ByVal aConstituent As String) As String
         Logger.Status("Creating the QAQC Diurnal Pattern Report")
         Dim lDiurnalPattern As New Text.StringBuilder
         Dim lDiurnalDetails As New Text.StringBuilder

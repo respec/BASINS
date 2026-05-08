@@ -144,11 +144,13 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="HSPFOutputReports.vb" />
+    <Compile Include="modHSPEXP.vb" />
     <Compile Include="modListUCIParameters.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -178,6 +180,7 @@
   <ItemGroup>
     <EmbeddedResource Include="frmWASPSegments.resx">
       <DependentUpon>frmWASPSegments.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -244,7 +247,7 @@
       <Name>atcHspfBinOut-D4EM10</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcHspfSupport\atcHspfSupport-D4EM10.vbproj">
-      <Project>{3B2EB97A-A305-4394-9843-72E138815152}</Project>
+      <Project>{3b2eb97a-a305-4394-9843-72e138815152}</Project>
       <Name>atcHspfSupport-D4EM10</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcList\atcList-D4EM10.vbproj">
