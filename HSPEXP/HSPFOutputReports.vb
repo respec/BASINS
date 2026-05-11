@@ -10,8 +10,8 @@ Imports System.Xml
 Imports System.Data
 
 Module HSPFOutputReports
-    Private pTestPath As String
-    Private pBaseName As String 'this is the base part of the file name (i.e., without .uci, .wdm, .exs) - it MUST be used to name everything
+    Friend pTestPath As String
+    Friend pBaseName As String 'this is the base part of the file name (i.e., without .uci, .wdm, .exs) - it MUST be used to name everything
     Private pOutputLocations As New atcCollection
 
     Private pGraphSaveFormat As String
@@ -28,7 +28,7 @@ Module HSPFOutputReports
     Private pModelQAQC As Boolean = False
     Private pSDateJ, pEDateJ As Double
     Private pReportStartMonth, pReportEndMonth As Integer   'for load allocation reports
-    Private pOutFolderName As String
+    Friend pOutFolderName As String
     Private pMultiSimulation As Boolean = False
     Private pAdditionalGraphs As Boolean = False
     Private pReganGraphs As Boolean = False

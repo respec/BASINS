@@ -69,6 +69,9 @@ Module modHSPEXP
                             .Add(New atcGraph.atcGraphPlugin)
                         End With
 
+                        'set up the timeseries attributes for statistics
+                        atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+
                         Dim lOpenHspfBinDataSource As New atcDataSource
                         Logger.Dbg(Now & " Opening the binary output files.")
                         For i As Integer = 0 To lUci.FilesBlock.Count
@@ -98,15 +101,27 @@ Module modHSPEXP
                             End If
                         Next
 
+                        'check echo file to be sure the model ran last time
+                        Dim lRunMade As String = CheckEchoFile(lHspfEchoFileName)
+                        'craete a folder name that has the basename and the time when the run was made.
+                        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") &
+                                    Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
+                        pTestPath = lUciName
+                        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(lUciName)
+                        pBaseName = lTestName
+                        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
+                        pOutFolderName = pTestPath & "Reports_" & lDateString & "\"
+                        Directory.CreateDirectory(pOutFolderName)
+                        File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
+
                         Dim lQAQCReportFile As New Text.StringBuilder
                         Logger.Status("Beginning the QAQC Report")
                         lQAQCReportFile.AppendLine("<html>")
                         lQAQCReportFile.AppendLine(QAReportStyle())
                         lQAQCReportFile.AppendLine("<body>")
-                        Dim lRunMade As String = CheckEchoFile(lHspfEchoFileName)
                         lQAQCReportFile.AppendLine(QAGeneralModelInfo(lUci, lRunMade))
                         lQAQCReportFile.AppendLine(QAModelAreaReport(lUci, lOperationTypes))
-                        'lQAQCReportFile.AppendLine(QACheckHSPFParmValues(lUci, lRunMade))
+                        lQAQCReportFile.AppendLine(QACheckHSPFParmValues(lUci, lRunMade))
                         lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "DO"))
                         lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "Water Temperature"))
                         'If pConstituents.Count > 0 Then  'consider adding constituents to command line
