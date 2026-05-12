@@ -303,9 +303,15 @@ Public Class atcTimeseriesCSV_USGS
                                         End If
                                     Case "00060"
                                         If lUSGSToolboxProgram Then
-                                            lConstituent = "Streamflow" : lUnits = "cubic feet per second"
+                                            If Len(lConstituent) = 0 Then
+                                                lConstituent = "Streamflow"
+                                            End If
+                                            lUnits = "cubic feet per second"
                                         Else
-                                            lConstituent = "FLOW" : lUnits = "cfs"
+                                            If Len(lConstituent) = 0 Then
+                                                lConstituent = "FLOW"
+                                            End If
+                                            lUnits = "cfs"
                                         End If
                                     Case "61055" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Water level, depth below measuring point, feet 
                                     Case "62611" : lConstituent = "GW LEVEL" : lUnits = "feet" 'Groundwater level above NAVD 1988, feet 
