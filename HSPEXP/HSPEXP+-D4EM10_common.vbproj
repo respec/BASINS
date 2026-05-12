@@ -254,6 +254,14 @@
       <Project>{A1A87CB8-8B9E-4C90-9549-C065357E499F}</Project>
       <Name>atcList-D4EM10</Name>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesCSV_USGS\atcTimeseriesCSV_USGS-D4EM10.vbproj">
+      <Project>{8c5f08ad-ba31-4b4f-a5b6-42d6138eee1f}</Project>
+      <Name>atcTimeseriesCSV_USGS-D4EM10</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesRDB\atcTimeseriesRDB-D4EM10.vbproj">
+      <Project>{82530a5b-ff39-4b9f-8a04-881468dfc662}</Project>
+      <Name>atcTimeseriesRDB-D4EM10</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesStatistics\atcTimeseriesStatistics-D4EM10.vbproj">
       <Project>{7E40E3E6-BF8E-45B5-99AF-4E11DAF039FD}</Project>
       <Name>atcTimeseriesStatistics-D4EM10</Name>

@@ -6,6 +6,7 @@ Imports atcData
 Imports atcGraph
 Imports HspfSupport
 Imports atcHspfBinOut
+Imports atcTimeseriesRDB
 Imports atcUCI
 Imports MapWinUtility 'for Logger
 Imports MapWinUtility.Strings
@@ -23,6 +24,8 @@ Module modHSPEXP
         Dim lExeName As String = StrSplit(lTempCL, " ", """")
 
         'lTempCL = "/QAQC C:\temp\ian\RedLake_222\RedLake_222.uci"  'for testing
+        'lTempCL = "/import 'C:\USGSDocs\TO2\json\NWIS_discharge_02225500.rdb' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
+        'lTempCL = "/import 'C:\USGSDocs\TO2\json\discharge_02225500.csv' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
 
         If Len(lTempCL) > 0 Then
             'If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
@@ -133,6 +136,32 @@ Module modHSPEXP
                         File.WriteAllText(lOutFolder & "\ModelQAQC.htm", lQAQCReportFile.ToString())
                         OpenFile(lOutFolder & "\ModelQAQC.htm")
                     End If
+
+                ElseIf StringFindAndRemove(lTempCL, "/import") Then
+                    'import specified timeseries file to WDM
+                    Dim lInputFile As String = StrRetRem(lTempCL)
+                    Dim lOutputFile As String = StrRetRem(lTempCL)
+                    Dim lDsn As Integer = Int(lTempCL)
+                    If UCase(FileExt(lInputFile)) = "RDB" Then
+                        Dim lRDBReader As New atcTimeseriesRDB.atcTimeseriesRDB()
+                        Dim lWDMfile As New atcWDM.atcDataSourceWDM
+                        If lRDBReader.Open(lInputFile) Then
+                            Dim lTS As atcTimeseries = lRDBReader.DataSets(0)
+                            lTS.Attributes.SetValue("ID", lDsn)
+                            lWDMfile.Open(lOutputFile)
+                            lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                        End If
+                    ElseIf UCase(FileExt(lInputFile)) = "CSV" Then
+                        Dim lCSVReader As New atcTimeseriesCSV_USGS.atcTimeseriesCSV_USGS
+                        Dim lWDMfile As New atcWDM.atcDataSourceWDM
+                        If lCSVReader.Open(lInputFile) Then
+                            Dim lTS As atcTimeseries = lCSVReader.DataSets(0)
+                            lTS.Attributes.SetValue("ID", lDsn)
+                            lWDMfile.Open(lOutputFile)
+                            lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                        End If
+                    End If
+
                 End If
 
                 'close monitor if unhandled command line instruction
