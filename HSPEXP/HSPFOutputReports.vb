@@ -14,9 +14,9 @@ Module HSPFOutputReports
     Friend pBaseName As String 'this is the base part of the file name (i.e., without .uci, .wdm, .exs) - it MUST be used to name everything
     Private pOutputLocations As New atcCollection
 
-    Private pGraphSaveFormat As String
-    Private pGraphSaveWidth As Integer
-    Private pGraphSaveHeight As Integer
+    Friend pGraphSaveFormat As String
+    Friend pGraphSaveWidth As Integer
+    Friend pGraphSaveHeight As Integer
     Private pGraphAnnual As Boolean = True
     Private pCurveStepType As String = "NonStep"
     Private pConstituents As New atcCollection
@@ -391,7 +391,7 @@ Module HSPFOutputReports
         StartUp.Show()
     End Sub
 
-    Private Sub DoExpertSystemStats(aHspfUci As HspfUci, aRunMade As String)
+    Friend Sub DoExpertSystemStats(aHspfUci As HspfUci, aRunMade As String, Optional ByRef aStatsOnly As Boolean = False)
         Dim lStr As String = ""
         Dim lExpertSystemFileNames As New NameValueCollection
         AddFilesInDir(lExpertSystemFileNames, IO.Directory.GetCurrentDirectory, False, "*.exs")
@@ -414,139 +414,140 @@ Module HSPFOutputReports
 
                 SaveFileString(pOutFolderName & "ExpertSysStats-" & IO.Path.GetFileNameWithoutExtension(lExpertSystemFileName) & ".txt", lStr)
 
-                'Becky added these to output advice
-                Logger.Dbg(Now & " Creating advice to save in " & pBaseName & ".*.txt")
-                For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
-                    Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
-                    lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
-                    Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
-                    SaveFileString(pOutFolderName & pBaseName & "." & lSiteNam & "advice.txt", lAdviceStr)
-                Next
+                If Not aStatsOnly Then
+                    'Becky added these to output advice
+                    Logger.Dbg(Now & " Creating advice to save in " & pBaseName & ".*.txt")
+                    For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                        Dim lAdviceStr As String = "Advice for Calibration Run " & pBaseName & vbCrLf & Now & vbCrLf & vbCrLf
+                        lExpertSystem.CalcAdvice(lAdviceStr, lSiteIndex)
+                        Dim lSiteNam As String = lExpertSystem.Sites(lSiteIndex - 1).Name
+                        SaveFileString(pOutFolderName & pBaseName & "." & lSiteNam & "advice.txt", lAdviceStr)
+                    Next
 
-                Dim lCons As String = "Flow"
-                For Each lSite As HexSite In lExpertSystem.Sites
-                    Dim lSiteName As String = lSite.Name
-                    Dim lArea As Double = lSite.Area
-                    Dim lSimTSerInchesOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                    Dim lSimTSerInches As atcTimeseries = Aggregate(lSimTSerInchesOriginal, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
-                    lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-                    Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
-                    lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
-                    lSimTSer.Attributes.SetValue("YAxis", "Left")
-                    lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
-                    Dim lObsTSerOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                    Dim lObsTSer As atcTimeseries = Aggregate(lObsTSerOriginal, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
-                    lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
-                    lObsTSer.Attributes.SetValue("YAxis", "Left")
-                    lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
-                    Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
-                    lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
-                    'Anurag changed the code so that the original time series for observed flow in cfs 
-                    'and simulated flow volume in 'inches could be at a smaller time step. Later on 
-                    'Anurag did the same for simulated precipitation.  This way shorter time period time series
-                    'could be used for storm graphs if the user is interested.
+                    Dim lCons As String = "Flow"
+                    For Each lSite As HexSite In lExpertSystem.Sites
+                        Dim lSiteName As String = lSite.Name
+                        Dim lArea As Double = lSite.Area
+                        Dim lSimTSerInchesOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(0)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Dim lSimTSerInches As atcTimeseries = Aggregate(lSimTSerInchesOriginal, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        lSimTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                        Dim lSimTSer As atcTimeseries = InchesToCfs(lSimTSerInches, lArea)
+                        lSimTSer.Attributes.SetValue("Units", "Flow (cfs)")
+                        lSimTSer.Attributes.SetValue("YAxis", "Left")
+                        lSimTSer.Attributes.SetValue("StepType", pCurveStepType)
+                        Dim lObsTSerOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(1)), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        Dim lObsTSer As atcTimeseries = Aggregate(lObsTSerOriginal, atcTimeUnit.TUDay, 1, atcTran.TranAverSame)
+                        lObsTSer.Attributes.SetValue("Units", "Flow (cfs)")
+                        lObsTSer.Attributes.SetValue("YAxis", "Left")
+                        lObsTSer.Attributes.SetValue("StepType", pCurveStepType)
+                        Dim lObsTSerInches As atcTimeseries = CfsToInches(lObsTSer, lArea)
+                        lObsTSerInches.Attributes.SetValue("Units", "Flow (inches)")
+                        'Anurag changed the code so that the original time series for observed flow in cfs 
+                        'and simulated flow volume in 'inches could be at a smaller time step. Later on 
+                        'Anurag did the same for simulated precipitation.  This way shorter time period time series
+                        'could be used for storm graphs if the user is interested.
 
-                    Dim lPrecDsn As Integer = lSite.DSN(5)
-                    Dim lPrecTserOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
-                    lPrecTserOriginal.Attributes.SetValue("Units", "inches")
-                    Dim lPrecTser As atcTimeseries = Aggregate(lPrecTserOriginal, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
+                        Dim lPrecDsn As Integer = lSite.DSN(5)
+                        Dim lPrecTserOriginal As atcTimeseries = SubsetByDate(lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lPrecDsn), lExpertSystem.SDateJ, lExpertSystem.EDateJ, Nothing)
+                        lPrecTserOriginal.Attributes.SetValue("Units", "inches")
+                        Dim lPrecTser As atcTimeseries = Aggregate(lPrecTserOriginal, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
 
-                    Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
-                    'pProgressBar.pbProgress.Increment(5)
-                    Dim lTSerBroken As atcTimeseries = lSimTSer.Clone
+                        Logger.Dbg(Now & " Calculating monthly summary for " & lSiteName)
+                        'pProgressBar.pbProgress.Increment(5)
+                        Dim lTSerBroken As atcTimeseries = lSimTSer.Clone
 
-                    Dim PercentMissingObservedData As Double = 0.0
+                        Dim PercentMissingObservedData As Double = 0.0
 
-                    If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
-                        PercentMissingObservedData = lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value * 100 / lObsTSerInches.Values.Count
-                        For i As Integer = 1 To lObsTSerInches.numValues
-                            If Double.IsNaN(lObsTSerInches.Value(i)) Then
-                                lSimTSerInches.Value(i) = Double.NaN
-                                lTSerBroken.Value(i) = Double.NaN
+                        If lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value > 0 Then
+                            PercentMissingObservedData = lObsTSerInches.Attributes.GetDefinedValue("Count Missing").Value * 100 / lObsTSerInches.Values.Count
+                            For i As Integer = 1 To lObsTSerInches.numValues
+                                If Double.IsNaN(lObsTSerInches.Value(i)) Then
+                                    lSimTSerInches.Value(i) = Double.NaN
+                                    lTSerBroken.Value(i) = Double.NaN
 
-                            End If
-                        Next
-                    End If
+                                End If
+                            Next
+                        End If
 
-                    lStr = HspfSupport.MonthlyAverageCompareStats.Report(aHspfUci,
-                                                                         lCons, lSiteName,
-                                                                         "inches",
-                                                                         lSimTSerInches, lObsTSerInches,
-                                                                         aRunMade,
-                                                                         lExpertSystem.SDateJ,
-                                                                         lExpertSystem.EDateJ,
-                                                                         PercentMissingObservedData)
-                    Dim lOutFileName As String = pOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
-                    SaveFileString(lOutFileName, lStr)
+                        lStr = HspfSupport.MonthlyAverageCompareStats.Report(aHspfUci,
+                                                                             lCons, lSiteName,
+                                                                             "inches",
+                                                                             lSimTSerInches, lObsTSerInches,
+                                                                             aRunMade,
+                                                                             lExpertSystem.SDateJ,
+                                                                             lExpertSystem.EDateJ,
+                                                                             PercentMissingObservedData)
+                        Dim lOutFileName As String = pOutFolderName & "MonthlyAverage" & lCons & "Stats-" & lSiteName & ".txt"
+                        SaveFileString(lOutFileName, lStr)
 
-                    Logger.Dbg(Now & " Calculating annual summary for " & lSiteName)
-                    lStr = HspfSupport.AnnualCompareStats.Report(aHspfUci,
-                                                                 lCons, lSiteName,
-                                                                 "inches",
-                                                                 lPrecTser, lSimTSerInches, lObsTSerInches,
-                                                                 aRunMade,
-                                                                 lExpertSystem.SDateJ,
-                                                                 lExpertSystem.EDateJ,
-                                                                 PercentMissingObservedData)
-                    lOutFileName = pOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
-                    SaveFileString(lOutFileName, lStr)
+                        Logger.Dbg(Now & " Calculating annual summary for " & lSiteName)
+                        lStr = HspfSupport.AnnualCompareStats.Report(aHspfUci,
+                                                                     lCons, lSiteName,
+                                                                     "inches",
+                                                                     lPrecTser, lSimTSerInches, lObsTSerInches,
+                                                                     aRunMade,
+                                                                     lExpertSystem.SDateJ,
+                                                                     lExpertSystem.EDateJ,
+                                                                     PercentMissingObservedData)
+                        lOutFileName = pOutFolderName & "Annual" & lCons & "Stats-" & lSiteName & ".txt"
+                        SaveFileString(lOutFileName, lStr)
 
-                    Logger.Dbg(Now & " Calculating daily summary for " & lSiteName)
-                    'pProgressBar.pbProgress.Increment(6)
-                    lStr = HspfSupport.DailyMonthlyCompareStats.Report(aHspfUci,
-                                                                       lCons, lSiteName,
-                                                                       lTSerBroken, lObsTSer,
-                                                                       aRunMade,
-                                                                       lExpertSystem.SDateJ,
-                                                                       lExpertSystem.EDateJ,
-                                                                       PercentMissingObservedData)
-                    lOutFileName = pOutFolderName & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
-                    SaveFileString(lOutFileName, lStr)
+                        Logger.Dbg(Now & " Calculating daily summary for " & lSiteName)
+                        'pProgressBar.pbProgress.Increment(6)
+                        lStr = HspfSupport.DailyMonthlyCompareStats.Report(aHspfUci,
+                                                                           lCons, lSiteName,
+                                                                           lTSerBroken, lObsTSer,
+                                                                           aRunMade,
+                                                                           lExpertSystem.SDateJ,
+                                                                           lExpertSystem.EDateJ,
+                                                                           PercentMissingObservedData)
+                        lOutFileName = pOutFolderName & "DailyMonthly" & lCons & "Stats-" & lSiteName & ".txt"
+                        SaveFileString(lOutFileName, lStr)
 
-                    Logger.Status(Now & " Preparing Graphs", True)
-                    Dim lTimeSeries As New atcTimeseriesGroup
-                    Logger.Dbg(Now & " Creating nonstorm graphs")
-                    lTimeSeries.Add("Observed", lObsTSer)
-                    lTimeSeries.Add("Simulated", lSimTSer)
-                    If PercentMissingObservedData > 0 Then
-                        lTimeSeries.Add("SimulatedBroken", lTSerBroken)
-                    End If
-                    lTimeSeries.Add("Precipitation", lPrecTser)
-                    lTimeSeries.Add("LZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(9)))
-                    lTimeSeries.Add("UZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(8)))
-                    lTimeSeries.Add("PotET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(6)))
-                    lTimeSeries.Add("ActET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(7)))
-                    lTimeSeries.Add("Baseflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(4)))
-                    lTimeSeries.Add("Interflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(3)))
-                    lTimeSeries.Add("Surface", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(2)))
-                    GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ,
-                                 lCons, lSiteName,
-                                 lTimeSeries,
-                                 pGraphSaveFormat,
-                                 pGraphSaveWidth,
-                                 pGraphSaveHeight,
-                                 pGraphAnnual, pOutFolderName,
-                                True, True,
-                                 True, PercentMissingObservedData)
-                    lTimeSeries.Clear()
+                        Logger.Status(Now & " Preparing Graphs", True)
+                        Dim lTimeSeries As New atcTimeseriesGroup
+                        Logger.Dbg(Now & " Creating nonstorm graphs")
+                        lTimeSeries.Add("Observed", lObsTSer)
+                        lTimeSeries.Add("Simulated", lSimTSer)
+                        If PercentMissingObservedData > 0 Then
+                            lTimeSeries.Add("SimulatedBroken", lTSerBroken)
+                        End If
+                        lTimeSeries.Add("Precipitation", lPrecTser)
+                        lTimeSeries.Add("LZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(9)))
+                        lTimeSeries.Add("UZS", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(8)))
+                        lTimeSeries.Add("PotET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(6)))
+                        lTimeSeries.Add("ActET", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(7)))
+                        lTimeSeries.Add("Baseflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(4)))
+                        lTimeSeries.Add("Interflow", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(3)))
+                        lTimeSeries.Add("Surface", lExpertSystem.ExpertWDMDataSource.DataSets.ItemByKey(lSite.DSN(2)))
+                        GraphAll(lExpertSystem.SDateJ, lExpertSystem.EDateJ,
+                                     lCons, lSiteName,
+                                     lTimeSeries,
+                                     pGraphSaveFormat,
+                                     pGraphSaveWidth,
+                                     pGraphSaveHeight,
+                                     pGraphAnnual, pOutFolderName,
+                                    True, True,
+                                     True, PercentMissingObservedData)
+                        lTimeSeries.Clear()
 
-                    Logger.Dbg(Now & " Creating storm graphs")
-                    lSimTSer = InchesToCfs(lSimTSerInchesOriginal, lArea)
+                        Logger.Dbg(Now & " Creating storm graphs")
+                        lSimTSer = InchesToCfs(lSimTSerInchesOriginal, lArea)
 
-                    lTimeSeries.Add("Observed", lObsTSerOriginal)
-                    lTimeSeries.Add("Simulated", lSimTSer)
-                    lTimeSeries.Add("Prec", lPrecTserOriginal)
+                        lTimeSeries.Add("Observed", lObsTSerOriginal)
+                        lTimeSeries.Add("Simulated", lSimTSer)
+                        lTimeSeries.Add("Prec", lPrecTserOriginal)
 
-                    lTimeSeries(0).Attributes.SetValue("Units", "cfs")
-                    lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
-                    lTimeSeries(1).Attributes.SetValue("Units", "cfs")
-                    lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
-                    lTimeSeries(2).Attributes.SetValue("YAxis", "Aux")
-                    IO.Directory.CreateDirectory(pOutFolderName & "\Storms\")
-                    GraphStorms(lTimeSeries, 2, pOutFolderName & "Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, True)
-                    lTimeSeries.Dispose()
-                Next
-
+                        lTimeSeries(0).Attributes.SetValue("Units", "cfs")
+                        lTimeSeries(0).Attributes.SetValue("StepType", pCurveStepType)
+                        lTimeSeries(1).Attributes.SetValue("Units", "cfs")
+                        lTimeSeries(1).Attributes.SetValue("StepType", pCurveStepType)
+                        lTimeSeries(2).Attributes.SetValue("YAxis", "Aux")
+                        IO.Directory.CreateDirectory(pOutFolderName & "\Storms\")
+                        GraphStorms(lTimeSeries, 2, pOutFolderName & "Storms\" & lSiteName, pGraphSaveFormat, pGraphSaveWidth, pGraphSaveHeight, lExpertSystem, True)
+                        lTimeSeries.Dispose()
+                    Next
+                End If
                 lExpertSystem = Nothing
 
             Catch lEx As ApplicationException

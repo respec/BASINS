@@ -11,6 +11,17 @@ Imports atcUCI
 Imports MapWinUtility 'for Logger
 Imports MapWinUtility.Strings
 Imports System.IO
+Imports System.Runtime.InteropServices
+
+Public Class clsCLI
+    <DllImport("kernel32.dll", SetLastError:=True)>
+    Friend Shared Function AttachConsole(dwProcessId As Integer) As Boolean
+    End Function
+
+    <DllImport("kernel32.dll", SetLastError:=True)>
+    Friend Shared Function FreeConsole() As Boolean
+    End Function
+End Class
 
 Module modHSPEXP
 
@@ -18,14 +29,18 @@ Module modHSPEXP
     ''' Entry point for HSPEXP+ command line arguments
     ''' </summary>
     ''' <remarks></remarks>
+
     Public Function CommandLine() As Integer
 
         Dim lTempCL As String = Environment.CommandLine
         Dim lExeName As String = StrSplit(lTempCL, " ", """")
 
+        'lTempCL = "-h"
         'lTempCL = "/QAQC C:\temp\ian\RedLake_222\RedLake_222.uci"  'for testing
-        'lTempCL = "/import 'C:\USGSDocs\TO2\json\NWIS_discharge_02225500.rdb' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
-        'lTempCL = "/import 'C:\USGSDocs\TO2\json\discharge_02225500.csv' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
+        'lTempCL = "/IMPORT 'C:\USGSDocs\TO2\json\NWIS_discharge_02225500.rdb' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
+        'lTempCL = "/IMPORT 'C:\USGSDocs\TO2\json\discharge_02225500.csv' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
+        'lTempCL = "/HYDRO 'C:\LAN-Cibolo\CiboloU125\CiboloU125.uci'"
+        'lTempCL = "/STATS 'C:\LAN-Cibolo\CiboloU125\CiboloU125.uci'"
 
         If Len(lTempCL) > 0 Then
             'If Logger.ProgressStatus Is Nothing OrElse Not (TypeOf (Logger.ProgressStatus) Is MonitorProgressStatus) Then
@@ -47,121 +62,157 @@ Module modHSPEXP
 
             Try
 
-                If StringFindAndRemove(lTempCL, "/QAQC") Then
-                    'do QAQC report from command line
+                If lTempCL = "-h" Or lTempCL = "--help" Then
+                    clsCLI.AttachConsole(-1)
+                    Console.WriteLine(" ")
+                    Console.WriteLine("usage: HSPEXP+.exe /QAQC uciName")
+                    Console.WriteLine("usage: HSPEXP+.exe /IMPORT rdbName wdmName newDSN")
+                    Console.WriteLine("usage: HSPEXP+.exe /HYDRO uciName")
+                    Console.WriteLine("usage: HSPEXP+.exe /STATS uciName")
+                    Console.WriteLine(" ")
+                    Console.WriteLine("switch /QAQC creates QAQC report for the specified UCI")
+                    Console.WriteLine("switch /IMPORT imports USGS rdb/csv file to wdm file with preferred DSN")
+                    Console.WriteLine("switch /HYDRO creates hydrology calibration reports and graphs for the specified UCI")
+                    Console.WriteLine("switch /STATS computes hydrology calibration statistics for the specified UCI")
+                    SendKeys.SendWait("{ENTER}")
+                    clsCLI.FreeConsole()
 
-                    Dim lOutFolder As String = PathNameOnly(lTempCL)
-                    ChDriveDir(lOutFolder)
-                    Dim lUciName As String = lTempCL
+                Else
+                    'general scripting setup
+                    atcData.atcDataManager.Clear()
+                    With atcData.atcDataManager.DataPlugins
+                        .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
+                        .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
+                        .Add(New atcWDM.atcDataSourceWDM)
+                        .Add(New atcTimeseriesWaterQualUS.atcTimeseriesWaterQualUS)
+                        .Add(New atcGraph.atcGraphPlugin)
+                    End With
+                    'set up the timeseries attributes for statistics
+                    atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+                    'init graph specs
+                    pGraphSaveFormat = ".png"
+                    pGraphSaveWidth = 1300
+                    pGraphSaveHeight = 768
 
-                    If IO.File.Exists(lUciName) Then
-                        Dim lUci As New HspfUci
-                        Dim lHspfMsg = New HspfMsg
+                    If StringFindAndRemove(lTempCL, "/HYDRO") Then
+                        'do hydro calibration report from command line
+                        Dim lUciName As String = StrRetRem(lTempCL)
+                        Dim lOutFolder As String = PathNameOnly(lUciName)
+                        ChDriveDir(lOutFolder)
 
-                        Dim lWinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
-                        atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(lWinHspfLtDir, "hspfmsg.wdm")
-                        lHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename)
-                        lUci.FastReadUciForStarter(lHspfMsg, lUciName)
+                        If IO.File.Exists(lUciName) Then
+                            Dim lUci As New HspfUci
+                            Dim lHspfMsg = New HspfMsg
+                            Dim lWinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+                            atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(lWinHspfLtDir, "hspfmsg.wdm")
+                            lHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename)
+                            lUci.FastReadUciForStarter(lHspfMsg, lUciName)
+                            Dim lRunMade As String = DateTimeFolder(lUciName, lUci)
+                            DoExpertSystemStats(lUci, lRunMade)
+                        End If
 
-                        atcData.atcDataManager.Clear()
-                        With atcData.atcDataManager.DataPlugins
-                            .Add(New atcHspfBinOut.atcTimeseriesFileHspfBinOut)
-                            .Add(New atcBasinsObsWQ.atcDataSourceBasinsObsWQ)
-                            .Add(New atcWDM.atcDataSourceWDM)
-                            .Add(New atcTimeseriesWaterQualUS.atcTimeseriesWaterQualUS)
-                            .Add(New atcGraph.atcGraphPlugin)
-                        End With
+                    ElseIf StringFindAndRemove(lTempCL, "/STATS") Then
+                        'do expert system stats from command line
+                        Dim lUciName As String = StrRetRem(lTempCL)
+                        Dim lOutFolder As String = PathNameOnly(lUciName)
+                        ChDriveDir(lOutFolder)
 
-                        'set up the timeseries attributes for statistics
-                        atcTimeseriesStatistics.atcTimeseriesStatistics.InitializeShared()
+                        If IO.File.Exists(lUciName) Then
+                            Dim lUci As New HspfUci
+                            Dim lHspfMsg = New HspfMsg
+                            Dim lWinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+                            atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(lWinHspfLtDir, "hspfmsg.wdm")
+                            lHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename)
+                            lUci.FastReadUciForStarter(lHspfMsg, lUciName)
+                            Dim lRunMade As String = DateTimeFolder(lUciName, lUci)
+                            DoExpertSystemStats(lUci, lRunMade, True)
+                        End If
 
-                        Dim lOpenHspfBinDataSource As New atcDataSource
-                        Logger.Dbg(Now & " Opening the binary output files.")
-                        For i As Integer = 0 To lUci.FilesBlock.Count
-                            If lUci.FilesBlock.Value(i).Typ = "BINO" Then
-                                Dim lHspfBinFileName As String = AbsolutePath(lUci.FilesBlock.Value(i).Name.Trim, CurDir())
-                                lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
-                                If lOpenHspfBinDataSource Is Nothing Then
-                                    If atcDataManager.OpenDataSource(lHspfBinFileName) Then
-                                        lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                    ElseIf StringFindAndRemove(lTempCL, "/QAQC") Then
+                        'do QAQC report from command line
+
+                        Dim lUciName As String = StrRetRem(lTempCL)
+                        Dim lOutFolder As String = PathNameOnly(lUciName)
+                        ChDriveDir(lOutFolder)
+
+                        If IO.File.Exists(lUciName) Then
+                            Dim lUci As New HspfUci
+                            Dim lHspfMsg = New HspfMsg
+
+                            Dim lWinHspfLtDir As String = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location) & g_PathChar & "WinHSPFLt"
+                            atcWDM.atcDataSourceWDM.HSPFMsgFilename = IO.Path.Combine(lWinHspfLtDir, "hspfmsg.wdm")
+                            lHspfMsg.Open(atcWDM.atcDataSourceWDM.HSPFMsgFilename)
+                            lUci.FastReadUciForStarter(lHspfMsg, lUciName)
+
+                            Dim lOpenHspfBinDataSource As New atcDataSource
+                            Logger.Dbg(Now & " Opening the binary output files.")
+                            For i As Integer = 0 To lUci.FilesBlock.Count
+                                If lUci.FilesBlock.Value(i).Typ = "BINO" Then
+                                    Dim lHspfBinFileName As String = AbsolutePath(lUci.FilesBlock.Value(i).Name.Trim, CurDir())
+                                    lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                    If lOpenHspfBinDataSource Is Nothing Then
+                                        If atcDataManager.OpenDataSource(lHspfBinFileName) Then
+                                            lOpenHspfBinDataSource = atcDataManager.DataSourceBySpecification(lHspfBinFileName)
+                                        End If
                                     End If
                                 End If
-                            End If
-                        Next i
+                            Next i
 
-                        'build collection of operation types to report
-                        Dim lOperationTypes As New atcCollection
-                        lOperationTypes.Add("P:", "PERLND")
-                        lOperationTypes.Add("I:", "IMPLND")
-                        lOperationTypes.Add("R:", "RCHRES")
-                        lOperationTypes.Add("B:", "BMPRAC")
-                        'get echo file name from files block
-                        Dim lHspfEchoFileName As String = ""
-                        For i As Integer = 0 To lUci.FilesBlock.Count
-                            If lUci.FilesBlock.Value(i).Typ = "MESSU" Then
-                                lHspfEchoFileName = AbsolutePath(lUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Update echo file name if it is referenced in the Files block
-                                Exit For
-                            End If
-                        Next
+                            'build collection of operation types to report
+                            Dim lOperationTypes As New atcCollection
+                            lOperationTypes.Add("P:", "PERLND")
+                            lOperationTypes.Add("I:", "IMPLND")
+                            lOperationTypes.Add("R:", "RCHRES")
+                            lOperationTypes.Add("B:", "BMPRAC")
 
-                        'check echo file to be sure the model ran last time
-                        Dim lRunMade As String = CheckEchoFile(lHspfEchoFileName)
-                        'craete a folder name that has the basename and the time when the run was made.
-                        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") &
-                                    Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
-                        pTestPath = lUciName
-                        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(lUciName)
-                        pBaseName = lTestName
-                        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
-                        pOutFolderName = pTestPath & "Reports_" & lDateString & "\"
-                        Directory.CreateDirectory(pOutFolderName)
-                        File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
+                            Dim lRunMade As String = DateTimeFolder(lUciName, lUci)
 
-                        Dim lQAQCReportFile As New Text.StringBuilder
-                        Logger.Status("Beginning the QAQC Report")
-                        lQAQCReportFile.AppendLine("<html>")
-                        lQAQCReportFile.AppendLine(QAReportStyle())
-                        lQAQCReportFile.AppendLine("<body>")
-                        lQAQCReportFile.AppendLine(QAGeneralModelInfo(lUci, lRunMade))
-                        lQAQCReportFile.AppendLine(QAModelAreaReport(lUci, lOperationTypes))
-                        lQAQCReportFile.AppendLine(QACheckHSPFParmValues(lUci, lRunMade))
-                        lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "DO"))
-                        lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "Water Temperature"))
-                        'If pConstituents.Count > 0 Then  'consider adding constituents to command line
-                        '    DoWaterQualityReports(lUci, lRunMade, lDateString, lOperationTypes, lQAQCReportFile)
-                        'End If
-                        Logger.Status("Closing the QAQC Report")
-                        lQAQCReportFile.AppendLine("</body>")
-                        lQAQCReportFile.AppendLine("</html>")
-                        File.WriteAllText(lOutFolder & "\ModelQAQC.htm", lQAQCReportFile.ToString())
-                        OpenFile(lOutFolder & "\ModelQAQC.htm")
-                    End If
-
-                ElseIf StringFindAndRemove(lTempCL, "/import") Then
-                    'import specified timeseries file to WDM
-                    Dim lInputFile As String = StrRetRem(lTempCL)
-                    Dim lOutputFile As String = StrRetRem(lTempCL)
-                    Dim lDsn As Integer = Int(lTempCL)
-                    If UCase(FileExt(lInputFile)) = "RDB" Then
-                        Dim lRDBReader As New atcTimeseriesRDB.atcTimeseriesRDB()
-                        Dim lWDMfile As New atcWDM.atcDataSourceWDM
-                        If lRDBReader.Open(lInputFile) Then
-                            Dim lTS As atcTimeseries = lRDBReader.DataSets(0)
-                            lTS.Attributes.SetValue("ID", lDsn)
-                            lWDMfile.Open(lOutputFile)
-                            lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                            Dim lQAQCReportFile As New Text.StringBuilder
+                            Logger.Status("Beginning the QAQC Report")
+                            lQAQCReportFile.AppendLine("<html>")
+                            lQAQCReportFile.AppendLine(QAReportStyle())
+                            lQAQCReportFile.AppendLine("<body>")
+                            lQAQCReportFile.AppendLine(QAGeneralModelInfo(lUci, lRunMade))
+                            lQAQCReportFile.AppendLine(QAModelAreaReport(lUci, lOperationTypes))
+                            lQAQCReportFile.AppendLine(QACheckHSPFParmValues(lUci, lRunMade))
+                            lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "DO"))
+                            lQAQCReportFile.AppendLine(QACheckDiurnalPattern(lUci, "Water Temperature"))
+                            'If pConstituents.Count > 0 Then  'consider adding constituents to command line
+                            '    DoWaterQualityReports(lUci, lRunMade, lDateString, lOperationTypes, lQAQCReportFile)
+                            'End If
+                            Logger.Status("Closing the QAQC Report")
+                            lQAQCReportFile.AppendLine("</body>")
+                            lQAQCReportFile.AppendLine("</html>")
+                            File.WriteAllText(lOutFolder & "\ModelQAQC.htm", lQAQCReportFile.ToString())
+                            OpenFile(lOutFolder & "\ModelQAQC.htm")
                         End If
-                    ElseIf UCase(FileExt(lInputFile)) = "CSV" Then
-                        Dim lCSVReader As New atcTimeseriesCSV_USGS.atcTimeseriesCSV_USGS
-                        Dim lWDMfile As New atcWDM.atcDataSourceWDM
-                        If lCSVReader.Open(lInputFile) Then
-                            Dim lTS As atcTimeseries = lCSVReader.DataSets(0)
-                            lTS.Attributes.SetValue("ID", lDsn)
-                            lWDMfile.Open(lOutputFile)
-                            lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
-                        End If
-                    End If
 
+                    ElseIf StringFindAndRemove(lTempCL, "/IMPORT") Then
+                        'import specified timeseries file to WDM
+                        Dim lInputFile As String = StrRetRem(lTempCL)
+                        Dim lOutputFile As String = StrRetRem(lTempCL)
+                        Dim lDsn As Integer = Int(lTempCL)
+                        If UCase(FileExt(lInputFile)) = "RDB" Then
+                            Dim lRDBReader As New atcTimeseriesRDB.atcTimeseriesRDB()
+                            Dim lWDMfile As New atcWDM.atcDataSourceWDM
+                            If lRDBReader.Open(lInputFile) Then
+                                Dim lTS As atcTimeseries = lRDBReader.DataSets(0)
+                                lTS.Attributes.SetValue("ID", lDsn)
+                                lWDMfile.Open(lOutputFile)
+                                lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                            End If
+                        ElseIf UCase(FileExt(lInputFile)) = "CSV" Then
+                            Dim lCSVReader As New atcTimeseriesCSV_USGS.atcTimeseriesCSV_USGS
+                            Dim lWDMfile As New atcWDM.atcDataSourceWDM
+                            If lCSVReader.Open(lInputFile) Then
+                                Dim lTS As atcTimeseries = lCSVReader.DataSets(0)
+                                lTS.Attributes.SetValue("ID", lDsn)
+                                lWDMfile.Open(lOutputFile)
+                                lWDMfile.AddDataset(lTS, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                            End If
+                        End If
+
+                    End If
                 End If
 
                 'close monitor if unhandled command line instruction
@@ -185,90 +236,31 @@ Module modHSPEXP
             Return False
         End If
     End Function
+
+    Private Function DateTimeFolder(ByRef aUciName As String, ByRef aUci As HspfUci) As String
+        'get echo file name from files block
+        Dim lHspfEchoFileName As String = ""
+        For i As Integer = 0 To aUci.FilesBlock.Count
+            If aUci.FilesBlock.Value(i).Typ = "MESSU" Then
+                lHspfEchoFileName = AbsolutePath(aUci.FilesBlock.Value(i).Name.Trim, CurDir()) 'Update echo file name if it is referenced in the Files block
+                Exit For
+            End If
+        Next
+
+        'check echo file to be sure the model ran last time
+        Dim lRunMade As String = CheckEchoFile(lHspfEchoFileName)
+        'craete a folder name that has the basename and the time when the run was made.
+        Dim lDateString As String = Format(Year(lRunMade), "00") & Format(Month(lRunMade), "00") &
+                    Format(Microsoft.VisualBasic.DateAndTime.Day(lRunMade), "00") & Format(Hour(lRunMade), "00") & Format(Minute(lRunMade), "00")
+        pTestPath = aUciName
+        Dim lTestName As String = IO.Path.GetFileNameWithoutExtension(aUciName)
+        pBaseName = lTestName
+        pTestPath = Mid(pTestPath, 1, Len(pTestPath) - Len(pBaseName) - 4)
+        pOutFolderName = pTestPath & "Reports_" & lDateString & "\"
+        Directory.CreateDirectory(pOutFolderName)
+        File.Copy(pTestPath & pBaseName & ".uci", pOutFolderName & pBaseName & ".uci", overwrite:=True)
+
+        Return lRunMade
+    End Function
+
 End Module
-
-''' <summary>
-''' Sends messages to VB6 Status Monitor. 
-''' Passes messages received from Status Monitor to file handle pPipeReadFromStatus
-''' </summary>
-''' <remarks></remarks>
-'Friend Class StatusMonitor
-'    Implements MapWinUtility.IProgressStatus
-
-'    Dim pInit As Boolean = False
-'    Dim pMonitorProcess As Process
-
-'    Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
-'        WriteStatus("PROGRESS " & aCurrentPosition & " of " & aLastPosition)
-'    End Sub
-
-'    Public Sub Status(ByVal aStatusMessage As String) Implements MapWinUtility.IProgressStatus.Status
-'        If Not pInit Then
-'            Try
-'                Dim lProcessId As Integer = Process.GetCurrentProcess.Id
-'                pMonitorProcess = New Process
-'                With pMonitorProcess.StartInfo
-'                    .FileName = FindFile("Status Monitor", "statusMonitor.exe")
-'                    .Arguments = lProcessId
-'                    .CreateNoWindow = True
-'                    .UseShellExecute = False
-'                    .RedirectStandardInput = True
-'                    .RedirectStandardOutput = True
-'                    'AddHandler pMonitorProcess.OutputDataReceived, AddressOf MonitorMessageHandler
-'                    .RedirectStandardError = True
-'                    'AddHandler pMonitorProcess.ErrorDataReceived, AddressOf MonitorMessageHandler
-'                End With
-'                pMonitorProcess.Start()
-'                '
-'                'NOTE: to debug pMonitorProcess, in VS2005 (not Express) - choose Tools:AttachToProcess - StatusMonitor
-'                '
-'                'pMonitorProcess.StandardInput.WriteLine("Show")
-'                'pMonitorProcess.BeginErrorReadLine()
-'                'pMonitorProcess.BeginOutputReadLine()
-'                Logger.Dbg("MonitorLaunched")
-'                Dim lStreamMonitorInputFromMyOutput As IO.FileStream = pMonitorProcess.StandardInput.BaseStream
-'                pPipeWriteToStatus = lStreamMonitorInputFromMyOutput.SafeFileHandle.DangerousGetHandle
-'                Dim lStreamMonitorOutputToMyInput As IO.FileStream = pMonitorProcess.StandardOutput.BaseStream
-'                pPipeReadFromStatus = lStreamMonitorOutputToMyInput.SafeFileHandle.DangerousGetHandle
-'            Catch ex As Exception
-'                Logger.Msg("StatusProcessStartError:" & ex.Message)
-'            End Try
-'            pInit = True
-'        End If
-
-'        WriteStatus(aStatusMessage)
-
-'        If aStatusMessage.ToLower = "exit" Then
-'            If Not pMonitorProcess.HasExited Then
-'                pMonitorProcess.StandardInput.WriteLine("Exit")
-'            End If
-'        End If
-'    End Sub
-
-'Private Function WriteStatus(ByVal aMsg As String) As Boolean
-'        If Not IsNothing(pMonitorProcess) Then
-'            If pMonitorProcess.HasExited Then
-'                If pMonitorProcess.ExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
-'                    Return False  'Process at other end of pipe is dead, stop talking to it
-'                End If
-'            End If
-'        End If
-
-'        If aMsg.StartsWith("(") AndAlso aMsg.EndsWith(")") Then
-'            aMsg = aMsg.Substring(1, aMsg.Length - 2)
-'        End If
-
-'        If aMsg.Length > 0 Then
-'            Dim OpenParenEscape As String = Chr(6)
-'            aMsg = aMsg.Replace("(", OpenParenEscape)
-'            Dim CloseParenEscape As String = Chr(7)
-'            aMsg = aMsg.Replace(")", CloseParenEscape)
-'            If Asc(Right(aMsg, 1)) > 31 Then
-'                aMsg = "(" & aMsg & ")"
-'            End If
-'            Logger.Dbg(aMsg)
-'            pMonitorProcess.StandardInput.WriteLine(aMsg)
-'        End If
-'        Return True
-'    End Function
-'End Class
