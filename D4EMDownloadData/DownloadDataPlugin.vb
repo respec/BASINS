@@ -10,16 +10,17 @@ Public Class DownloadDataPlugin
     Private g_Menus As DotSpatial.Controls.LayoutMenuStrip
     Friend Shared g_MapWin As AppManager
     Public Shared DSProject As DotSpatial.Controls.SerializationManager = Nothing
+    Private Const UsingWaterDataAPI As Boolean = True
 #Else
     Implements MapWindow.Interfaces.IPlugin
     Private g_Menus As MapWindow.Interfaces.Menus
     Friend Shared g_MapWin As MapWindow.Interfaces.IMapWin
+    Private Const UsingWaterDataAPI As Boolean = False
 #End If
     Private g_MainForm As Integer
 
     Private Const pMenuLabel As String = "Download Data"
     Private Const pMenuName As String = "mnuDownloadDataD4EM"
-    Private Const UsingWaterDataAPI As Boolean = True
     Private pPathChar As String = IO.Path.DirectorySeparatorChar
 
 #If GISProvider = "DotSpatial" Then
@@ -74,13 +75,13 @@ Public Class DownloadDataPlugin
                         Dim lResult As String = Nothing
                         If lQuery.Length > 0 Then
                             If UsingWaterDataAPI And lQuery.Contains("GetNWIS") Then
-                                Dim lWaterToolboxDemoExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & pPathChar & "waterdata_toolbox_demo.exe"
-                                If Not FileExists(lWaterToolboxDemoExe) Then
-                                    'lWaterToolboxDemoExe = FindFile("Please Locate waterdata_toolbox_demo.exe", "waterdata_toolbox_demo.exe")  'hard code for debug
-                                    lWaterToolboxDemoExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox_demo.exe"
+                                Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & pPathChar & "waterdata_toolbox.exe"
+                                If Not FileExists(lWaterToolboxExe) Then
+                                    lWaterToolboxExe = FindFile("Please Locate waterdata_toolbox.exe", "waterdata_toolbox.exe")  'hard code for debug
+                                    'lWaterToolboxExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox.exe"
                                 End If
-                                If IO.File.Exists(lWaterToolboxDemoExe) Then
-                                    If lWaterToolboxDemoExe.ToLowerInvariant().EndsWith("waterdata_toolbox_demo.exe") Then
+                                If IO.File.Exists(lWaterToolboxExe) Then
+                                    If lWaterToolboxExe.ToLowerInvariant().EndsWith("waterdata_toolbox.exe") Then
                                         'need code here to turn the XML query into the args needed for waterdata_toolbox
                                         lQuery = " xml-compat --xml " & lQuery
                                         Dim lArgs As String = lQuery
@@ -90,8 +91,8 @@ Public Class DownloadDataPlugin
                                         lArgs = ReplaceString(lArgs, "</function>", "</function>""")
                                         Dim lProcess As New System.Diagnostics.Process
                                         With lProcess.StartInfo
-                                            .FileName = lWaterToolboxDemoExe
-                                            .WorkingDirectory = IO.Path.GetDirectoryName(lWaterToolboxDemoExe)
+                                            .FileName = lWaterToolboxExe
+                                            .WorkingDirectory = IO.Path.GetDirectoryName(lWaterToolboxExe)
                                             .CreateNoWindow = True
                                             .UseShellExecute = False
                                             If Not String.IsNullOrEmpty(lArgs) Then .Arguments = lArgs
