@@ -651,14 +651,14 @@ Public Class frmDownload
                     'chkNCDC_MetData.ForeColor = System.Drawing.SystemColors.ControlText
                 ElseIf pApplicationName.StartsWith("USGS GW Toolbox") OrElse pApplicationName.Contains("Hydro Toolbox") Then
                     Select Case lFilename
-                        Case "nwis_stations_discharge"
+                        Case "nwis_stations_discharge", "discharge"
                             chkNWIS_GetNWISDailyDischarge_GW.Enabled = True
                             chkNWIS_GetNWISDailyDischarge_GW.Checked = True
                             chkNWIS_GetNWISIdaDischarge_GW.Enabled = True
-                        Case "nwis_stations_gw_daily"
+                        Case "nwis_stations_gw_daily", "daily"
                             chkNWIS_GetNWISDailyGW_GW.Enabled = True
                             chkNWIS_GetNWISDailyGW_GW.Checked = True
-                        Case "nwis_stations_gw_periodic"
+                        Case "nwis_stations_gw_periodic", "periodic"
                             chkNWIS_GetNWISPeriodicGW_GW.Enabled = True
                             chkNWIS_GetNWISPeriodicGW_GW.Checked = True
                         Case "nwis_stations_precipitation"

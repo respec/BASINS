@@ -77,6 +77,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Debug\DotSpatial.NTSExtension.dll</HintPath>
     </Reference>
+    <Reference Include="DotSpatial.Plugins.TableEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Debug\DotSpatial.Plugins.TableEditor.dll</HintPath>
+    </Reference>
     <Reference Include="DotSpatial.Positioning">
       <HintPath>..\bin\Debug\DotSpatial.Positioning.dll</HintPath>
     </Reference>

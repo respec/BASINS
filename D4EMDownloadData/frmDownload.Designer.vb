@@ -293,7 +293,7 @@ Partial Class frmDownload
         Me.grpNWIS.Size = New System.Drawing.Size(649, 80)
         Me.grpNWIS.TabIndex = 26
         Me.grpNWIS.TabStop = False
-        Me.grpNWIS.Text = "Data Values from US Geological Survey National Water Information System"
+        Me.grpNWIS.Text = "Data Values from US Geological Survey"
         Me.grpNWIS.Visible = False
         '
         'chkNWIS_GetNWISWQ
@@ -958,7 +958,7 @@ Partial Class frmDownload
         Me.grpNWISStations.Size = New System.Drawing.Size(649, 52)
         Me.grpNWISStations.TabIndex = 21
         Me.grpNWISStations.TabStop = False
-        Me.grpNWISStations.Text = "Station Locations from US Geological Survey National Water Information System"
+        Me.grpNWISStations.Text = "Station Locations from US Geological Survey"
         Me.grpNWISStations.Visible = False
         '
         'chkCacheOnly
@@ -1105,7 +1105,7 @@ Partial Class frmDownload
         Me.grpNWISStations_GW.Size = New System.Drawing.Size(649, 85)
         Me.grpNWISStations_GW.TabIndex = 48
         Me.grpNWISStations_GW.TabStop = False
-        Me.grpNWISStations_GW.Text = "Station Locations from US Geological Survey National Water Information System"
+        Me.grpNWISStations_GW.Text = "Station Locations from US Geological Survey"
         Me.grpNWISStations_GW.Visible = False
         '
         'lblMinCount
@@ -1135,7 +1135,7 @@ Partial Class frmDownload
         Me.grpNWIS_GW.Size = New System.Drawing.Size(649, 80)
         Me.grpNWIS_GW.TabIndex = 32
         Me.grpNWIS_GW.TabStop = False
-        Me.grpNWIS_GW.Text = "Data Values from US Geological Survey National Water Information System"
+        Me.grpNWIS_GW.Text = "Data Values from US Geological Survey"
         Me.grpNWIS_GW.Visible = False
         '
         'chkNWIS_GetNWISPrecipitation_GW

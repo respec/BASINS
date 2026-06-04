@@ -19,6 +19,7 @@ Imports System.Collections.Generic
 Public Module modDownload
 
     Private Const XMLappName As String = "BASINS System Application"
+    Private Const UsingWaterDataAPI As Boolean = True
 #If GISProvider = "DotSpatial" Then
     Public Sub ProcessDownloadResults(ByVal aInstructions As String)
         Dim lXmlInstructions As New Xml.XmlDocument
@@ -136,6 +137,11 @@ Public Module modDownload
                                 Case "pcs3", "pcs", "bac_stat", "nawqa", "rf1", "urban", "urban_nm", "epa_reg", "ecoreg", "lulcndx", "mad", "catpt", "cntypt"
                                     TryDeleteShapefile(lOutputFileName)
                                     Continue For  'Skip trying to add this shapefile to the map
+                                Case "daily", "periodic", "discharge"
+                                    If UsingWaterDataAPI Then
+                                        'need to copy projection file as well
+                                        TryCopy(IO.Path.Combine(PathNameOnly(lOutputFileName), "cat.prj"), FilenameNoExt(lOutputFileName) + ".prj")
+                                    End If
                             End Select
                         End If
 
@@ -1141,9 +1147,49 @@ StartOver:
                            & aRegion _
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
+                        If UsingWaterDataAPI Then
+                            lQuery = " xml-compat --xml " & lQuery
+                        End If
                 End Select
                 If lQuery.Length > 0 Then
-                    lResult = atcD4EMLauncher.Execute(lQuery)
+                    If UsingWaterDataAPI Then
+                        lResult = ""
+                        Dim lWaterToolboxDemoExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & g_PathChar & "waterdata_toolbox_demo.exe"
+                        If Not FileExists(lWaterToolboxDemoExe) Then
+                            'lWaterToolboxDemoExe = FindFile("Please Locate waterdata_toolbox_demo.exe", "waterdata_toolbox_demo.exe")  'hard code for debug
+                            lWaterToolboxDemoExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox_demo.exe"
+                        End If
+                        If IO.File.Exists(lWaterToolboxDemoExe) Then
+                            If lWaterToolboxDemoExe.ToLowerInvariant().EndsWith("waterdata_toolbox_demo.exe") Then
+                                Dim lArgs As String = lQuery
+                                'lArgs = " xml-compat --xml <Function name='GetNWISStations'><arguments><DataType>gw_daily</DataType><DataType>gw_periodic</DataType><DataType>discharge</DataType><MinCount>10</MinCount><SaveIn>C:\dev\BASINS\Bin\data\03130010-3\</SaveIn><CacheFolder>C:\dev\BASINS\bin\cache\</CacheFolder><DesiredProjection>+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m</DesiredProjection><region>" & vbCrLf & "  <northbc>3687396.64040437</northbc>" & vbCrLf & "  <southbc>3579364.57999628</southbc>" & vbCrLf & "  <eastbc>-9416785.999603</eastbc>" & vbCrLf & "  <westbc>-9462449.26845449</westbc>" & vbCrLf & "  <projection> +x_0=0 +y_0=0 +lon_0=0 +lat_1=0 +proj=merc +ellps=WGS84 +no_defs</projection>" & vbCrLf & "  <HUC8 status=""set by BASINS System Application"">03130010</HUC8>" & vbCrLf & "</region>" & vbCrLf & "<clip>False</clip> <merge>False</merge></arguments></function>"
+                                'do some string manipulations for compatibility
+                                lArgs = ReplaceString(lArgs, "<Fun", "<fun")
+                                lArgs = ReplaceString(lArgs, "<fun", """<fun")
+                                lArgs = ReplaceString(lArgs, """set by BASINS System Application""", "'set by BASINS System Application'")
+                                lArgs = ReplaceString(lArgs, "</function>", "</function>""")
+                                'lArgs = " xml-compat --xml ""<function name='GetNWISStations'><arguments><DataType>gw_daily</DataType><DataType>gw_periodic</DataType><DataType>discharge</DataType><MinCount>10</MinCount><SaveIn>C:\dev\BASINS\Bin\data\03130010-3\</SaveIn><CacheFolder>C:\dev\BASINS\bin\cache\</CacheFolder><DesiredProjection>+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m</DesiredProjection><region>" & vbCrLf & "  <northbc>3687396.64040437</northbc>" & vbCrLf & "  <southbc>3579364.57999628</southbc>" & vbCrLf & "  <eastbc>-9416785.999603</eastbc>" & vbCrLf & "  <westbc>-9462449.26845449</westbc>" & vbCrLf & "  <projection> +x_0=0 +y_0=0 +lon_0=0 +lat_1=0 +proj=merc +ellps=WGS84 +no_defs</projection>" & vbCrLf & "  <HUC8 status='set by BASINS System Application'>03130010</HUC8>" & vbCrLf & "</region>" & vbCrLf & "<clip>False</clip> <merge>False</merge></arguments></function>"""
+                                Dim lProcess As New System.Diagnostics.Process
+                                With lProcess.StartInfo
+                                    .FileName = lWaterToolboxDemoExe
+                                    .WorkingDirectory = IO.Path.GetDirectoryName(aNewDataDir)
+                                    .CreateNoWindow = True
+                                    .UseShellExecute = False
+                                    If Not String.IsNullOrEmpty(lArgs) Then .Arguments = lArgs
+                                    .RedirectStandardOutput = True
+                                    .RedirectStandardError = True
+                                    Dim q As New System.Text.StringBuilder
+                                    lProcess.Start()
+                                    While Not lProcess.HasExited
+                                        q.Append(lProcess.StandardOutput.ReadToEnd())
+                                    End While
+                                    lResult = q.ToString()
+                                End With
+                            End If
+                        End If
+                    Else
+                        lResult = atcD4EMLauncher.Execute(lQuery)
+                    End If
                     If Not lResult Is Nothing AndAlso lResult.Length > 0 AndAlso lResult.StartsWith("<success>") Then
                         Logger.DisplayMessageBoxes = False
                         ProcessDownloadResults(lResult)

@@ -1,4 +1,5 @@
 Imports MapWinUtility
+Imports atcUtility
 #If GISProvider = "DotSpatial" Then
 Imports DotSpatial.Controls
 Imports DotSpatial.Extensions
@@ -18,6 +19,8 @@ Public Class DownloadDataPlugin
 
     Private Const pMenuLabel As String = "Download Data"
     Private Const pMenuName As String = "mnuDownloadDataD4EM"
+    Private Const UsingWaterDataAPI As Boolean = True
+    Private pPathChar As String = IO.Path.DirectorySeparatorChar
 
 #If GISProvider = "DotSpatial" Then
     Public Sub Initialize(ByVal MapWin As AppManager, ByVal ParentHandle As Integer)
@@ -67,28 +70,86 @@ Public Class DownloadDataPlugin
                         'Next
                         'Dim lDownloadManager As New D4EMDataManager.DataManager(lPlugins)
                         Logger.Status("LABEL TITLE BASINS Data Download")
-                        Dim lResult As String = atcD4EMLauncher.Execute(lQuery)
-                        If lResult Is Nothing Then
-                            Logger.Dbg("QueryResult:Nothing")
-                        Else
-                            'Logger.Msg(lResult, "Result of Query from DataManager")
-                            Logger.Dbg("QueryResult:" & lResult)
-                            Dim lSilentSuccess As Boolean = lResult.ToLower.Contains("<success />")
-                            If lSilentSuccess Then
-                                lResult = lResult.Replace("<success />", "").Trim
-                                Logger.Dbg("QueryResultTrimmed:" & lResult)
-                            End If
-                            If lResult.Length = 0 Then
-                                If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
-                            ElseIf lResult.Contains("<success>") Then
-                                BASINS.ProcessDownloadResults(lResult)
+
+                        Dim lResult As String = Nothing
+                        If lQuery.Length > 0 Then
+                            If UsingWaterDataAPI And lQuery.Contains("GetNWIS") Then
+                                Dim lWaterToolboxDemoExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & pPathChar & "waterdata_toolbox_demo.exe"
+                                If Not FileExists(lWaterToolboxDemoExe) Then
+                                    'lWaterToolboxDemoExe = FindFile("Please Locate waterdata_toolbox_demo.exe", "waterdata_toolbox_demo.exe")  'hard code for debug
+                                    lWaterToolboxDemoExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox_demo.exe"
+                                End If
+                                If IO.File.Exists(lWaterToolboxDemoExe) Then
+                                    If lWaterToolboxDemoExe.ToLowerInvariant().EndsWith("waterdata_toolbox_demo.exe") Then
+                                        'need code here to turn the XML query into the args needed for waterdata_toolbox
+                                        lQuery = " xml-compat --xml " & lQuery
+                                        Dim lArgs As String = lQuery
+                                        '"<function name='GetNWISDailyDischarge'>" & vbCrLf & "<arguments>" & vbCrLf & "<SaveIn>C:\dev\BASINS\Bin\data\03130010-15</SaveIn>" & vbCrLf & "<CacheFolder>C:\dev\BASINS\bin\cache\</CacheFolder>" & vbCrLf & "<DesiredProjection> +x_0=0 +y_0=0 +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +proj=aea +datum=NAD83 +no_defs</DesiredProjection>" & vbCrLf & "<region>" & vbCrLf & "<northbc>1007492.70467868</northbc>" & vbCrLf & "<southbc>915218.817750492</southbc>" & vbCrLf & "<eastbc>1079014.40020556</eastbc>" & vbCrLf & "<westbc>1040517.5152288</westbc>" & vbCrLf & "<HUC8>03130010</HUC8>" & vbCrLf & "<preferredformat>huc8</preferredformat>" & vbCrLf & "<projection> +x_0=0 +y_0=0 +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +proj=aea +datum=NAD83 +no_defs</projection>" & vbCrLf & "</region>" & vbCrLf & "<stationid>02356638</stationid>" & vbCrLf & "<stationid>02356640</stationid>" & vbCrLf & "<stationid>02356810</stationid>" & vbCrLf & "<stationid>02356980</stationid>" & vbCrLf & "<GetEvenIfCached>True</GetEvenIfCached>" & vbCrLf & "<MinCount>10</MinCount>" & vbCrLf & "<clip>False</clip>" & vbCrLf & "<merge>False</merge>" & vbCrLf & "<joinattributes>true</joinattributes>" & vbCrLf & "</arguments>" & vbCrLf & "</function>" & vbCrLf & vbCrLf
+                                        'do some string manipulations for compatibility
+                                        lArgs = ReplaceString(lArgs, "<fun", """<fun")
+                                        lArgs = ReplaceString(lArgs, "</function>", "</function>""")
+                                        Dim lProcess As New System.Diagnostics.Process
+                                        With lProcess.StartInfo
+                                            .FileName = lWaterToolboxDemoExe
+                                            .WorkingDirectory = IO.Path.GetDirectoryName(lWaterToolboxDemoExe)
+                                            .CreateNoWindow = True
+                                            .UseShellExecute = False
+                                            If Not String.IsNullOrEmpty(lArgs) Then .Arguments = lArgs
+                                            .RedirectStandardOutput = True
+                                            .RedirectStandardError = True
+                                            Dim q As New System.Text.StringBuilder
+                                            lProcess.Start()
+                                            While Not lProcess.HasExited
+                                                q.Append(lProcess.StandardOutput.ReadToEnd())
+                                            End While
+                                            lResult = q.ToString()
+                                            If lResult Is Nothing Then
+                                                Logger.Dbg("QueryResult:Nothing")
+                                            Else
+                                                Logger.Dbg("QueryResult:" & lResult)
+                                                Dim lSilentSuccess As Boolean = lResult.ToLower.Contains("<success />")
+                                                If lSilentSuccess Then
+                                                    lResult = lResult.Replace("<success />", "").Trim
+                                                    Logger.Dbg("QueryResultTrimmed:" & lResult)
+                                                End If
+                                                If lResult.Length = 0 Then
+                                                    If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
+                                                ElseIf lResult.Contains("<success>") Then
+                                                    If lResult.Contains("type=""CSV""") Then
+                                                        lResult = lResult.Replace("type=""CSV""", "type=""USGS CSV""")
+                                                    End If
+                                                    BASINS.ProcessDownloadResults(lResult)
+                                                End If
+                                            End If
+                                        End With
+                                    End If
+                                End If
                             Else
-                                If lResult.Contains("<error>Error downloading from https://www.mrlc.gov") Then
-                                    'pbd better error message here when server down?
-                                    ''"<error>Error downloading from https://www.mrlc.gov/geoserver/mrlc_download/wms?SERVICE=WMS&request=GetMap&layers=NLCD_2019_Land_Cover_L48&bbox=-84.3885248345288, 33.4322709170764, -75.0747797710852, 38.044461713196&width=25995&height=13002&srs=EPSG:4326&format=image/geotiff&version=1.1.1, file not created: C:\USGSHydroToolboxDS\HydrologicToolbox1.1\data\03020201\NLCD\NLCD_landcover_2019.tif</error>"
-                                    Logger.Msg("NLCD WMS Server not responding, appears to be down", "Data Download")
+                                lResult = atcD4EMLauncher.Execute(lQuery)
+
+                                If lResult Is Nothing Then
+                                    Logger.Dbg("QueryResult:Nothing")
                                 Else
-                                    Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                                    'Logger.Msg(lResult, "Result of Query from DataManager")
+                                    Logger.Dbg("QueryResult:" & lResult)
+                                    Dim lSilentSuccess As Boolean = lResult.ToLower.Contains("<success />")
+                                    If lSilentSuccess Then
+                                        lResult = lResult.Replace("<success />", "").Trim
+                                        Logger.Dbg("QueryResultTrimmed:" & lResult)
+                                    End If
+                                    If lResult.Length = 0 Then
+                                        If lSilentSuccess Then Logger.Msg("Download Complete", "Data Download")
+                                    ElseIf lResult.Contains("<success>") Then
+                                        BASINS.ProcessDownloadResults(lResult)
+                                    Else
+                                        If lResult.Contains("<error>Error downloading from https://www.mrlc.gov") Then
+                                            'pbd better error message here when server down?
+                                            ''"<error>Error downloading from https://www.mrlc.gov/geoserver/mrlc_download/wms?SERVICE=WMS&request=GetMap&layers=NLCD_2019_Land_Cover_L48&bbox=-84.3885248345288, 33.4322709170764, -75.0747797710852, 38.044461713196&width=25995&height=13002&srs=EPSG:4326&format=image/geotiff&version=1.1.1, file not created: C:\USGSHydroToolboxDS\HydrologicToolbox1.1\data\03020201\NLCD\NLCD_landcover_2019.tif</error>"
+                                            Logger.Msg("NLCD WMS Server not responding, appears to be down", "Data Download")
+                                        Else
+                                            Logger.Msg(atcUtility.ReadableFromXML(lResult), "Data Download")
+                                        End If
+                                    End If
                                 End If
                             End If
                         End If

@@ -228,6 +228,10 @@
       <Name>atcTimeseriesBaseflow-DSC</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesCSV_USGS\atcTimeseriesCSV_USGS-DSC.vbproj">
+      <Project>{8c5f08ad-ba31-4b4f-a5b6-42d6138eee1f}</Project>
+      <Name>atcTimeseriesCSV_USGS-DSC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath-DSC.vbproj">
       <Project>{bd299eb7-7a62-4ef9-8806-86e9288c498f}</Project>
       <Name>atcTimeseriesMath-DSC</Name>
@@ -277,6 +281,10 @@
       <Project>{67027820-9036-481e-80f6-077e5085f59d}</Project>
       <Name>atcUtility-DSC</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcWDM\atcWDM-DSC.vbproj">
+      <Project>{f0f41e48-35ed-43f4-ab00-30252b0e5690}</Project>
+      <Name>atcWDM-DSC</Name>
     </ProjectReference>
     <ProjectReference Include="..\BASINS\ToolboxMWPlugin-DSC.vbproj">
       <Project>{9b3bb48b-2caf-4e49-a900-5e08217da078}</Project>
