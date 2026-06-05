@@ -75,6 +75,9 @@ Public Class DownloadDataPlugin
                         Dim lResult As String = Nothing
                         If lQuery.Length > 0 Then
                             If UsingWaterDataAPI And lQuery.Contains("GetNWIS") Then
+                                Logger.Status("LABEL TITLE BASINS Data Download")
+                                Logger.Status("SHOW")
+                                Logger.Status("Downloading with waterdata_toolbox.exe")
                                 Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & pPathChar & "waterdata_toolbox.exe"
                                 If Not FileExists(lWaterToolboxExe) Then
                                     lWaterToolboxExe = FindFile("Please Locate waterdata_toolbox.exe", "waterdata_toolbox.exe")  'hard code for debug

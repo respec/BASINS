@@ -39,6 +39,9 @@ Public Module modDownload
                 atcDataManager.UserManage()
             End If
         End If
+        If lMessage.Length = 2 AndAlso Logger.DisplayMessageBoxes Then
+            Logger.Msg("No data found at selected locations.", "Data Download")
+        End If
     End Sub
 
     Private Function ProcessDownloadResult(ByVal aInstructions As String) As String

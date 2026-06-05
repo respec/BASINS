@@ -372,7 +372,7 @@ Public Class frmAbout
 
             Try
                 'lblPluginVersion.Text = " Build Date:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
-                lblPluginVersion.Text = " Release Date: February 20, 2026"
+                lblPluginVersion.Text = " Release Date: June 2026"
             Catch
             End Try
             Try
