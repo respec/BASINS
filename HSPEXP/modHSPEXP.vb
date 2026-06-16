@@ -37,6 +37,7 @@ Module modHSPEXP
 
         'lTempCL = "-h"
         'lTempCL = "/QAQC C:\temp\ian\RedLake_222\RedLake_222.uci"  'for testing
+        'lTempCL = "/QAQC C:\Talon\HSPF_Model\v10RSAftables\TalonRSA.uci"  'for testing
         'lTempCL = "/IMPORT 'C:\USGSDocs\TO2\json\NWIS_discharge_02225500.rdb' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
         'lTempCL = "/IMPORT 'C:\USGSDocs\TO2\json\discharge_02225500.csv' 'C:\USGSDocs\TO2\json\temp.wdm' 500"
         'lTempCL = "/HYDRO 'C:\LAN-Cibolo\CiboloU125\CiboloU125.uci'"
@@ -183,7 +184,9 @@ Module modHSPEXP
                             Logger.Status("Closing the QAQC Report")
                             lQAQCReportFile.AppendLine("</body>")
                             lQAQCReportFile.AppendLine("</html>")
+                            'Logger.Msg("about to write qaqc")
                             File.WriteAllText(lOutFolder & "\ModelQAQC.htm", lQAQCReportFile.ToString())
+                            'Logger.Msg("finished writing qaqc")
                             OpenFile(lOutFolder & "\ModelQAQC.htm")
                         End If
 
@@ -221,6 +224,7 @@ Module modHSPEXP
                 End 'force exit if command line handled instructions
 
             Catch ex As Exception
+                Logger.Msg(ex.ToString)
                 pStatusMonitor.StopMonitor()
             End Try
         End If
