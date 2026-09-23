@@ -1151,19 +1151,20 @@ StartOver:
                            & "<clip>False</clip> <merge>False</merge>" _
                            & "</arguments></function>"
                         If UsingWaterDataAPI Then
-                            lQuery = " xml-compat --xml " & lQuery
+                            'lQuery = " xml-compat --debug-log C:\temp\hydrologic_toolbox_data_retrieval_cli_debug.log --xml " & lQuery
+                            lQuery = " xml-compat --debug-log hydrologic_toolbox_data_retrieval_cli_debug.log --xml " & lQuery
                         End If
                 End Select
                 If lQuery.Length > 0 Then
                     If UsingWaterDataAPI Then
                         lResult = ""
-                        Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & g_PathChar & "waterdata_toolbox.exe"
+                        Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "hydrologic_toolbox_data_retrieval_cli") & g_PathChar & "hydrologic_toolbox_data_retrieval_cli.exe"
                         If Not FileExists(lWaterToolboxExe) Then
-                            lWaterToolboxExe = FindFile("Please Locate waterdata_toolbox.exe", "waterdata_toolbox.exe")  'hard code for debug
-                            'lWaterToolboxExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox_demo.exe"
+                            lWaterToolboxExe = FindFile("Please Locate hydrologic_toolbox_data_retrieval_cli.exe", "hydrologic_toolbox_data_retrieval_cli.exe")  'hard code for debug
+                            'lWaterToolboxExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\hydrologic_toolbox_data_retrieval_cli\hydrologic_toolbox_data_retrieval_cli.exe"
                         End If
                         If IO.File.Exists(lWaterToolboxExe) Then
-                            If lWaterToolboxExe.ToLowerInvariant().EndsWith("waterdata_toolbox.exe") Then
+                            If lWaterToolboxExe.ToLowerInvariant().EndsWith("hydrologic_toolbox_data_retrieval_cli.exe") Then
                                 Dim lArgs As String = lQuery
                                 'lArgs = " xml-compat --xml <Function name='GetNWISStations'><arguments><DataType>gw_daily</DataType><DataType>gw_periodic</DataType><DataType>discharge</DataType><MinCount>10</MinCount><SaveIn>C:\dev\BASINS\Bin\data\03130010-3\</SaveIn><CacheFolder>C:\dev\BASINS\bin\cache\</CacheFolder><DesiredProjection>+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m</DesiredProjection><region>" & vbCrLf & "  <northbc>3687396.64040437</northbc>" & vbCrLf & "  <southbc>3579364.57999628</southbc>" & vbCrLf & "  <eastbc>-9416785.999603</eastbc>" & vbCrLf & "  <westbc>-9462449.26845449</westbc>" & vbCrLf & "  <projection> +x_0=0 +y_0=0 +lon_0=0 +lat_1=0 +proj=merc +ellps=WGS84 +no_defs</projection>" & vbCrLf & "  <HUC8 status=""set by BASINS System Application"">03130010</HUC8>" & vbCrLf & "</region>" & vbCrLf & "<clip>False</clip> <merge>False</merge></arguments></function>"
                                 'do some string manipulations for compatibility
@@ -1183,10 +1184,13 @@ StartOver:
                                     .RedirectStandardError = True
                                     Dim q As New System.Text.StringBuilder
                                     lProcess.Start()
+                                    Logger.Dbg(lArgs, "Debug")
+                                    q.Append(lProcess.StandardOutput.ReadToEnd())
                                     While Not lProcess.HasExited
                                         q.Append(lProcess.StandardOutput.ReadToEnd())
                                     End While
                                     lResult = q.ToString()
+                                    Logger.Dbg(lResult, "Debug")
                                 End With
                             End If
                         End If

@@ -77,16 +77,18 @@ Public Class DownloadDataPlugin
                             If UsingWaterDataAPI And lQuery.Contains("GetNWIS") Then
                                 Logger.Status("LABEL TITLE BASINS Data Download")
                                 Logger.Status("SHOW")
-                                Logger.Status("Downloading with waterdata_toolbox.exe")
-                                Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "waterdata_toolbox") & pPathChar & "waterdata_toolbox.exe"
+                                Logger.Status("Downloading with hydrologic_toolbox_data_retrieval_cli.exe")
+                                Dim lWaterToolboxExe As String = IO.Path.Combine(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location), "hydrologic_toolbox_data_retrieval_cli") & pPathChar & "hydrologic_toolbox_data_retrieval_cli.exe"
                                 If Not FileExists(lWaterToolboxExe) Then
-                                    lWaterToolboxExe = FindFile("Please Locate waterdata_toolbox.exe", "waterdata_toolbox.exe")  'hard code for debug
-                                    'lWaterToolboxExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\waterdata_toolbox\waterdata_toolbox.exe"
+                                    lWaterToolboxExe = FindFile("Please Locate hydrologic_toolbox_data_retrieval_cli.exe", "hydrologic_toolbox_data_retrieval_cli.exe")  'hard code for debug
+                                    'lWaterToolboxExe = "C:\USGSHydroToolboxDS\hydrologic-toolbox-v1.1.1\bin\hydrologic_toolbox_data_retrieval_cli\hydrologic_toolbox_data_retrieval_cli.exe"
                                 End If
                                 If IO.File.Exists(lWaterToolboxExe) Then
-                                    If lWaterToolboxExe.ToLowerInvariant().EndsWith("waterdata_toolbox.exe") Then
-                                        'need code here to turn the XML query into the args needed for waterdata_toolbox
-                                        lQuery = " xml-compat --xml " & lQuery
+                                    If lWaterToolboxExe.ToLowerInvariant().EndsWith("hydrologic_toolbox_data_retrieval_cli.exe") Then
+                                        'need code here to turn the XML query into the args needed for hydrologic_toolbox_data_retrieval_cli
+                                        'lQuery = " xml-compat --xml " & lQuery
+                                        'lQuery = " xml-compat --debug-log C:\temp\hydrologic_toolbox_data_retrieval_cli_debug.log --xml " & lQuery
+                                        lQuery = " xml-compat --debug-log hydrologic_toolbox_data_retrieval_cli_debug.log --xml " & lQuery
                                         Dim lArgs As String = lQuery
                                         '"<function name='GetNWISDailyDischarge'>" & vbCrLf & "<arguments>" & vbCrLf & "<SaveIn>C:\dev\BASINS\Bin\data\03130010-15</SaveIn>" & vbCrLf & "<CacheFolder>C:\dev\BASINS\bin\cache\</CacheFolder>" & vbCrLf & "<DesiredProjection> +x_0=0 +y_0=0 +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +proj=aea +datum=NAD83 +no_defs</DesiredProjection>" & vbCrLf & "<region>" & vbCrLf & "<northbc>1007492.70467868</northbc>" & vbCrLf & "<southbc>915218.817750492</southbc>" & vbCrLf & "<eastbc>1079014.40020556</eastbc>" & vbCrLf & "<westbc>1040517.5152288</westbc>" & vbCrLf & "<HUC8>03130010</HUC8>" & vbCrLf & "<preferredformat>huc8</preferredformat>" & vbCrLf & "<projection> +x_0=0 +y_0=0 +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +proj=aea +datum=NAD83 +no_defs</projection>" & vbCrLf & "</region>" & vbCrLf & "<stationid>02356638</stationid>" & vbCrLf & "<stationid>02356640</stationid>" & vbCrLf & "<stationid>02356810</stationid>" & vbCrLf & "<stationid>02356980</stationid>" & vbCrLf & "<GetEvenIfCached>True</GetEvenIfCached>" & vbCrLf & "<MinCount>10</MinCount>" & vbCrLf & "<clip>False</clip>" & vbCrLf & "<merge>False</merge>" & vbCrLf & "<joinattributes>true</joinattributes>" & vbCrLf & "</arguments>" & vbCrLf & "</function>" & vbCrLf & vbCrLf
                                         'do some string manipulations for compatibility
@@ -103,10 +105,13 @@ Public Class DownloadDataPlugin
                                             .RedirectStandardError = True
                                             Dim q As New System.Text.StringBuilder
                                             lProcess.Start()
+                                            Logger.Dbg(lArgs, "Debug")
+                                            q.Append(lProcess.StandardOutput.ReadToEnd())
                                             While Not lProcess.HasExited
                                                 q.Append(lProcess.StandardOutput.ReadToEnd())
                                             End While
                                             lResult = q.ToString()
+                                            Logger.Dbg(lResult, "Debug")
                                             If lResult Is Nothing Then
                                                 Logger.Dbg("QueryResult:Nothing")
                                             Else
